@@ -7,7 +7,28 @@ datasource db {
     url = env("POSTGRES_URL")
 }
 
+enum Gender {
+    Male
+    Female
+}
+
+enum SchoolYear {
+    Freshman
+    Sophomore
+    Junior
+    Senior
+    Graduate
+    Alumni
+}
+
 model User {
-    id      Int     @id
-    name    String 
+    id      String     @id
+    email   String
+    name    String
+    age     Int
+    gender  Gender
+    genderInterest Gender
+    interests String[]
+    images  String[]
+    description String
 }
