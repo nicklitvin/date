@@ -1,0 +1,2 @@
+setup postgres
+start adding api endpoints

@@ -1,0 +1,121 @@
+FUNCTIONALITIES
+create/edit/delete account
+view others swipe
+message matches
+
+CLASSES
+User {
+    id: string
+    email: string
+    firstName: string
+    age: number
+    gender: male/female/other
+    genderInterest: male/female/everyone
+    year: fresh/soph/junior/senior/grad, post-grad
+    interests: string[]
+    images: string[]
+    description: string
+    settings: Settings
+}
+
+Settings {
+    notifications: boolean
+}
+
+Interest {
+    id: string
+    type: Physical Activity, Entertainment, Creative...
+    title: string
+}
+
+Swipe {
+    id: string
+    timestamp: Date
+    userID: string
+    swipedUserID: string
+    action: Like/Dislike
+}
+
+Message {
+    id: string
+    timestamp: Date
+    userID: string
+    recipientID: string
+    message: string
+    readStatus: boolean
+}
+
+Report {
+    id: string
+    timestamp: Date
+    reportedEmail: string
+}
+
+MatchOverview {
+    userID: string
+    name: string,
+    lastMessage: Message,
+    image: string,
+}
+
+DB
+Users
+Interests
+Swipe
+Report (10 reports = ban)
+API Keys
+
+UserInterests {
+    id -> User
+    interest
+}
+
+API
+Home
+/login {
+    get user based on auth() id
+    if user not exist:
+        create user
+}
+
+Swipe Tab
+/getPeople = return profiles of X people not matched with
+/makeSwipe = like/dislike
+/reportUser
+
+Message Tab
+/getMatches (start, end) {
+    get users that both swiped each other
+    get user info + last message if any
+    sort desc with no message priority 
+} : MatchOverview[]
+/getMessages (start, end) {
+    find messages (as sender and receiver) sorted by timestamp
+    return messages in specified range
+} : Message[]
+/messageUser (userID, message) {
+    check if actually friend
+    add to db
+    notify userID of message
+} : ok
+/reportUser (userID) {
+    add report to db
+} : ok
+
+Profile Tab
+/getProfile (userID) {
+    return user
+} : Profile
+/editProfile (setting, value)[] {
+    create transaction
+    change user.thing to value
+    commit transaction
+} : ok
+
+Settings Tabs
+/changeSetting (setting, value) {
+    change user.settings.setting to value
+} : ok
+/deleteAccount {
+    delete everything associated with user (excl. reports)
+} : ok
