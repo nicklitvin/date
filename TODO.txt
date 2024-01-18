@@ -1,2 +1,8 @@
-setup postgres
 start adding api endpoints
+
+NOTES
+to make prisma client autofill:
+npx prisma generate --schema=./server/schema.prisma
+
+double quotes for table names
+select * from "<table>"
