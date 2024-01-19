@@ -1,4 +1,5 @@
 import { PrismaClient, User } from "@prisma/client";
+import { PublicProfile, SwipeFeed } from "./types";
 
 export class PrismaManager {
     protected prisma : PrismaClient;
@@ -41,6 +42,55 @@ export class PrismaManager {
             },
             data: change
         })
+    }
+
+    public async getSwipeFeed(userID : string) : Promise<SwipeFeed> {
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: userID
+            }
+        });
+        const userUniversity = user?.university;
+
+        const alreadySwipedIDs = await this.prisma.swipe.findMany({
+            where: {
+                userID: userID
+            }
+        }).then( users => users.map( (user) => user.id));
+
+        const likedMeIDs = await this.prisma.swipe.findMany({
+            where: {
+                swipedUserID: userID,
+                action: "Like"
+            }
+        }).then( users => users.map( (user) => user.id));
+
+        const results : PublicProfile[] = await this.prisma.user.findMany({
+            select: {
+                id: true,
+                name: true,
+                age: true,
+                gender: true,
+                attributes: true,
+                interest: true,
+                description: true,
+                university: true,
+                images: true
+            },
+            where: {
+                university: userUniversity,
+                id: {
+                    notIn: [userID, ...alreadySwipedIDs]
+                }
+            },
+        });
+        
+        const rate = (id : string) => likedMeIDs.includes(id) ? -1 : 0;
+        results.sort( (a,b) => rate(a.id) - rate(b.id));
+        return {
+            feed: results,
+            likedMeIDs: likedMeIDs
+        };
     }
 }
 

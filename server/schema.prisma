@@ -21,16 +21,30 @@ enum SchoolYear {
     Alumni
 }
 
+enum Opinion {
+    Like
+    Dislike
+    Report
+}
+
 model User {
-    id      String     @id
-    email   String
-    name    String
-    age     Int
-    gender  Gender
-    interest Gender
-    attributes String[]
-    images  String[]
-    description String
-    notifications Boolean
-    university String
+    id              String     @id
+    email           String
+    name            String
+    age             Int
+    gender          Gender
+    interest        Gender
+    attributes      String[]
+    images          String[]
+    description     String
+    notifications   Boolean
+    university      String
+}
+
+model Swipe {
+    id              String      @id
+    timestamp       DateTime
+    userID          String
+    swipedUserID    String
+    action          Opinion
 }

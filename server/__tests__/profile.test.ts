@@ -43,4 +43,13 @@ describe("profile", () => {
         const changedUser = await handler.getProfile(userID);
         expect(changedUser?.age == initial.age).toEqual(false);
     })
+
+    it("should not get public profile of nonuser", async () => {
+        expect(await handler.getPublicProfile(userID) == null).toEqual(true);       
+    })
+
+    it("should get public profile of user", async () => {
+        expect(await handler.createUser(createSampleUser(userID))).toEqual(true);
+        expect(await handler.getPublicProfile(userID) == null).toEqual(false);       
+    })
 })

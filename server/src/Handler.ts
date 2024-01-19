@@ -1,5 +1,6 @@
 import { User } from "@prisma/client";
 import { PrismaManager } from "./PrismaManager";
+import { PublicProfile, SwipeFeed } from "./types";
 
 export class Handler {
     private prisma : PrismaManager;
@@ -46,6 +47,34 @@ export class Handler {
             return false;
         }
     }
+
+    public async getPublicProfile(userID : string) : Promise<PublicProfile|null> {
+        const profile = await this.getProfile(userID);
+        return profile ?
+        {
+            id: profile.id,
+            age: profile.age,
+            attributes: profile.attributes,
+            description: profile.description,
+            gender: profile.gender,
+            images: profile.images,
+            name: profile.name,
+            university: profile.university
+        } : null
+    }
+
+    public async getSwipeFeed(userID : string) : Promise<SwipeFeed> {
+        if (await this.doesUserExist(userID)) {
+            return this.prisma.getSwipeFeed(userID);
+        } else {
+            return {
+                feed: [],
+                likedMeIDs: []
+            }
+        }
+    }
+
+    // PRIVATE
 
     private doesUniversityMatchEmail(user : User) {
         const isEdu = user.email.endsWith(".edu");
