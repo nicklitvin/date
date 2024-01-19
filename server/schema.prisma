@@ -43,7 +43,7 @@ model User {
 
 model Swipe {
     id              String      @id
-    timestamp       DateTime
+    timestamp       DateTime    
     userID          String
     swipedUserID    String
     action          Opinion

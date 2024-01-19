@@ -20,6 +20,5 @@ export class TestPrismaManager extends PrismaManager {
         } else {
             return await this.prisma.user.count();
         }
-        
     }
 }

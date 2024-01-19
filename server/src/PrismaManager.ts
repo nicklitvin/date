@@ -1,5 +1,6 @@
-import { PrismaClient, User } from "@prisma/client";
+import { Opinion, PrismaClient, Swipe, User } from "@prisma/client";
 import { PublicProfile, SwipeFeed } from "./types";
+import { randomUUID } from "crypto";
 
 export class PrismaManager {
     protected prisma : PrismaClient;
@@ -91,6 +92,38 @@ export class PrismaManager {
             feed: results,
             likedMeIDs: likedMeIDs
         };
+    }
+
+    public async createSwipe(userID : string, swipedUserID : string, action : Opinion) : Promise<void> {
+        await this.prisma.swipe.create({
+            data: {
+                action: action,
+                swipedUserID: swipedUserID,
+                userID: userID,
+                id: randomUUID(),
+                timestamp: new Date()
+            }
+        })
+    }
+
+    public async updateSwipe(swipeID : string, action : Opinion) : Promise<void> {
+        await this.prisma.swipe.update({
+            data: {
+                action: action
+            },
+            where: {
+                id: swipeID
+            }
+        })
+    }
+
+    public async getSwipe(userID : string, swipedUserID : string) : Promise<Swipe|null> {
+        return await this.prisma.swipe.findFirst({
+            where: {
+                userID: userID,
+                swipedUserID: swipedUserID
+            }
+        })
     }
 }
 

@@ -1,4 +1,4 @@
-import { User } from "@prisma/client";
+import { Opinion, User } from "@prisma/client";
 import { PrismaManager } from "./PrismaManager";
 import { PublicProfile, SwipeFeed } from "./types";
 
@@ -71,6 +71,20 @@ export class Handler {
                 feed: [],
                 likedMeIDs: []
             }
+        }
+    }
+
+    public async makeSwipe(userID : string, swipedUserID : string, action : Opinion) : Promise<boolean> {
+        if (await this.doesUserExist(userID) && await this.doesUserExist(swipedUserID)) {
+            const swipe = await this.prisma.getSwipe(userID, swipedUserID);
+            if (swipe) {
+                await this.prisma.updateSwipe(swipe.id, action);
+            } else {
+                await this.prisma.createSwipe(userID, swipedUserID, action);
+            }
+            return true;
+        } else {
+            return false;
         }
     }
 
