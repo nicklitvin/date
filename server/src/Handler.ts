@@ -1,6 +1,5 @@
 import { User } from "@prisma/client";
 import { PrismaManager } from "./PrismaManager";
-import { AllowedEdits } from "./types";
 
 export class Handler {
     private prisma : PrismaManager;
@@ -17,9 +16,11 @@ export class Handler {
     public async createUser(user : User) : Promise<boolean> {
         if (await this.prisma.getUser(user.id)) {
             return false;
-        } else {
+        } else if (this.doesUniversityMatchEmail(user)) {
             await this.prisma.createUser(user);
             return true;
+        } else {
+            return false;
         }
     }
     
@@ -44,6 +45,13 @@ export class Handler {
         } catch (err) {
             return false;
         }
+    }
+
+    private doesUniversityMatchEmail(user : User) {
+        const isEdu = user.email.endsWith(".edu");
+        const emailUniversity = user.email.split("@")[1].split(".edu")[0];
+        
+        return isEdu && emailUniversity === user.university;
     }
 }
 

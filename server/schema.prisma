@@ -27,8 +27,10 @@ model User {
     name    String
     age     Int
     gender  Gender
-    genderInterest Gender
-    interests String[]
+    interest Gender
+    attributes String[]
     images  String[]
     description String
+    notifications Boolean
+    university String
 }

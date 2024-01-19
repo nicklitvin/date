@@ -1,10 +1,9 @@
 TODO
-report user
-change setting
+
 
 NOTES
 to make prisma client autofill:
-npx prisma generate --schema=./server/schema.prisma
+npx prisma generate --schema=./schema.prisma
 
 to make prisma table updated:
 npx prisma db push

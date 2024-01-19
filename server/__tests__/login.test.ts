@@ -1,12 +1,38 @@
-import { afterEach, describe, expect, it } from "@jest/globals";
+import { describe, expect, it } from "@jest/globals";
 import { prismaManager, handler, createSampleUser } from "../jest.setup";
 
 describe("login", () => {
     const userID = "1";
     const userID_2 = "2";
+    const badEmail = "a@gmail.com";
+    const badEmail_2 = "a.edu@gmail.com";
+    const mismatchEmail = "a@berkeley.edu";
+    const mismatchUni = "stanford";
 
     it("should not see user", async () => {
         expect(await handler.doesUserExist(userID)).toEqual(false);
+    })
+
+    it("should not create bad email", async () => {
+        const user = createSampleUser(userID);
+        user.email = badEmail;
+
+        expect(await handler.createUser(user)).toEqual(false);
+    })
+
+    it("should not create bad email 1", async () => {
+        const user = createSampleUser(userID);
+        user.email = badEmail_2;
+
+        expect(await handler.createUser(user)).toEqual(false);
+    })
+
+    it("should not create not matching university", async () => {
+        const user = createSampleUser(userID);
+        user.email = mismatchEmail;
+        user.university = mismatchUni;
+
+        expect(await handler.createUser(user)).toEqual(false);
     })
 
     it("should create user", async () => {

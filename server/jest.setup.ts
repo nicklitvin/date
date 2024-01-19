@@ -14,20 +14,18 @@ afterEach( async () => {
     await prismaManager.deleteEverything();
 })
 
-afterAll( async () => {
-    await prismaManager.deleteEverything();
-})
-
 export function createSampleUser(userID : string) : User {
     return {
         age: 20,
         description: "hi",
         email: "a@berkeley.edu",
         gender: "Male",
-        genderInterest: "Male",
+        attributes: [],
+        interest: "Male",
         id: userID,
         images: [],
-        interests: [],
-        name: "name" 
+        name: "name",
+        notifications: true,
+        university: "berkeley"
     }
 }
