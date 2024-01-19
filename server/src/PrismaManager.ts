@@ -27,5 +27,20 @@ export class PrismaManager {
         });
         return user;
     }
+
+    /**
+     * 
+     * @param userID 
+     * @param change setting must be a column in table User with its associated value type, 
+     * will error if invalid and needs to be caught
+     */
+    public async editUser(userID : string, change: { [setting : string] : any} ) : Promise<void> {
+        await this.prisma.user.update({
+            where: {
+                id: userID
+            },
+            data: change
+        })
+    }
 }
 

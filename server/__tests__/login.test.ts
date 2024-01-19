@@ -1,31 +1,9 @@
 import { afterEach, describe, expect, it } from "@jest/globals";
-import { TestPrismaManager } from "../testModules/TestPrismaManager";
-import { Handler } from "../src/Handler";
-import { User } from "@prisma/client";
-
-function createSampleUser(userID : string) : User {
-    return {
-        age: 20,
-        description: "hi",
-        email: "a@berkeley.edu",
-        gender: "Male",
-        genderInterest: "Male",
-        id: userID,
-        images: [],
-        interests: [],
-        name: "name" 
-    }
-}
+import { prismaManager, handler, createSampleUser } from "../jest.setup";
 
 describe("login", () => {
-    const prismaManager = new TestPrismaManager()
-    const handler = new Handler(prismaManager);
     const userID = "1";
     const userID_2 = "2";
-
-    afterEach( async () => {
-        await prismaManager.deleteEverything();
-    })
 
     it("should not see user", async () => {
         expect(await handler.doesUserExist(userID)).toEqual(false);

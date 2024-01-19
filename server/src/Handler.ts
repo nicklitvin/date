@@ -1,5 +1,6 @@
 import { User } from "@prisma/client";
 import { PrismaManager } from "./PrismaManager";
+import { AllowedEdits } from "./types";
 
 export class Handler {
     private prisma : PrismaManager;
@@ -27,6 +28,22 @@ export class Handler {
             await this.prisma.deleteUser(userID);
         }
         return (await this.prisma.getUser(userID) == null)
+    }
+
+    public async getProfile(userID : string) : Promise<User|null> {
+        return await this.prisma.getUser(userID);
+    }
+
+    public async editUser(userID : string, attribute: (keyof User), value : any) : Promise<boolean>{
+        try {
+            const approvedChange = {
+                [attribute] : value
+            }
+            await this.prisma.editUser(userID, approvedChange);
+            return true;
+        } catch (err) {
+            return false;
+        }
     }
 }
 

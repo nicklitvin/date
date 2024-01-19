@@ -1,8 +1,13 @@
-start adding api endpoints
+TODO
+report user
+change setting
 
 NOTES
 to make prisma client autofill:
 npx prisma generate --schema=./server/schema.prisma
+
+to make prisma table updated:
+npx prisma db push
 
 double quotes for table names
 select * from "<table>"

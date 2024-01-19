@@ -72,10 +72,11 @@ UserInterests {
 
 API
 Home
-/login {
-    get user based on auth() id
-    if user not exist:
-        create user
+/checkUser{
+    return if user exists
+}
+/createUser {
+    sends data about user form
 }
 
 Swipe Tab
