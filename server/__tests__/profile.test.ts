@@ -27,12 +27,12 @@ describe("profile", () => {
     })
 
     it("should not edit user with bad value", async () => {
-        const initialUser = createSampleUser(userID);
-        expect(await handler.createUser(initialUser)).toEqual(true);
+        const initial = createSampleUser(userID);
+        expect(await handler.createUser(initial)).toEqual(true);
         expect(await handler.editUser(userID, attribute, badValue)).toEqual(false);
         
         const changedUser = await handler.getProfile(userID);
-        expect(changedUser?.age).toEqual(initialUser.age);
+        expect(changedUser?.age).toEqual(initial.age);
     })
 
     it("should edit user with good input", async () => {
@@ -45,11 +45,11 @@ describe("profile", () => {
     })
 
     it("should not get public profile of nonuser", async () => {
-        expect(await handler.getPublicProfile(userID) == null).toEqual(true);       
+        expect(await handler.getPublicProfile(userID)).toEqual(null);       
     })
 
     it("should get public profile of user", async () => {
         expect(await handler.createUser(createSampleUser(userID))).toEqual(true);
-        expect(await handler.getPublicProfile(userID) == null).toEqual(false);       
+        expect(await handler.getPublicProfile(userID)).toEqual(null);       
     })
 })

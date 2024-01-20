@@ -1,6 +1,7 @@
 import { Opinion, User } from "@prisma/client";
 import { PrismaManager } from "./PrismaManager";
 import { PublicProfile, SwipeFeed } from "./types";
+import { doesUniversityMatchEmail } from "./utils";
 
 export class Handler {
     private prisma : PrismaManager;
@@ -10,26 +11,23 @@ export class Handler {
     }
 
     public async doesUserExist(userID : string) : Promise<boolean> {
-        const user = await this.prisma.getUser(userID);
-        return user != null;
+        return Boolean(await this.prisma.getUser(userID));
     }
     
     public async createUser(user : User) : Promise<boolean> {
         if (await this.prisma.getUser(user.id)) {
             return false;
-        } else if (this.doesUniversityMatchEmail(user)) {
-            await this.prisma.createUser(user);
-            return true;
+        } else if (doesUniversityMatchEmail(user)) {
+            return Boolean(await this.prisma.createUser(user));
         } else {
             return false;
         }
     }
     
     public async deleteUser(userID : string) : Promise<boolean> {
-        if (await this.prisma.getUser(userID)) {
-            await this.prisma.deleteUser(userID);
-        }
-        return (await this.prisma.getUser(userID) == null)
+        return await this.prisma.getUser(userID) ? 
+            Boolean(await this.prisma.deleteUser(userID)) :
+            true;
     }
 
     public async getProfile(userID : string) : Promise<User|null> {
@@ -38,11 +36,7 @@ export class Handler {
 
     public async editUser(userID : string, attribute: (keyof User), value : any) : Promise<boolean>{
         try {
-            const approvedChange = {
-                [attribute] : value
-            }
-            await this.prisma.editUser(userID, approvedChange);
-            return true;
+            return Boolean(await this.prisma.editUser(userID, attribute, value));
         } catch (err) {
             return false;
         }
@@ -78,23 +72,13 @@ export class Handler {
         if (await this.doesUserExist(userID) && await this.doesUserExist(swipedUserID)) {
             const swipe = await this.prisma.getSwipe(userID, swipedUserID);
             if (swipe) {
-                await this.prisma.updateSwipe(swipe.id, action);
+                return Boolean(await this.prisma.updateSwipe(swipe.id, action));
             } else {
-                await this.prisma.createSwipe(userID, swipedUserID, action);
+                return Boolean(await this.prisma.createSwipe(userID, swipedUserID, action));
             }
-            return true;
         } else {
             return false;
         }
-    }
-
-    // PRIVATE
-
-    private doesUniversityMatchEmail(user : User) {
-        const isEdu = user.email.endsWith(".edu");
-        const emailUniversity = user.email.split("@")[1].split(".edu")[0];
-        
-        return isEdu && emailUniversity === user.university;
     }
 }
 

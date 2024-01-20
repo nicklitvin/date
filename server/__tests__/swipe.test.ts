@@ -12,14 +12,14 @@ describe("swipe", () => {
     const stanfordName = "stanford";
     
     it("should not get feed for nonuser", async () => {
-        const swipeFeed = await handler.getSwipeFeed(userID)
-        expect(swipeFeed.feed).toEqual([]);
-        expect(swipeFeed.likedMeIDs).toEqual([]);
+        const swipeFeed = await handler.getSwipeFeed(userID);
+        expect(swipeFeed.feed.length).toEqual(0);
+        expect(swipeFeed.likedMeIDs.length).toEqual(0);
     })
 
     it("should not show self in feed", async () => {
         expect(await handler.createUser(createSampleUser(userID))).toEqual(true);
-        const swipeFeed = await handler.getSwipeFeed(userID)
+        const swipeFeed = await handler.getSwipeFeed(userID);
         expect(swipeFeed.feed.length).toEqual(0);
         expect(swipeFeed.likedMeIDs.length).toEqual(0);
     })

@@ -9,12 +9,12 @@ export class PrismaManager {
         this.prisma = new PrismaClient();
     }
 
-    public async createUser(user : User) : Promise<void> {
-        await this.prisma.user.create({ data: user })
+    public async createUser(user : User) : Promise<User> {
+        return await this.prisma.user.create({ data: user })
     }
     
-    public async deleteUser(userID : string) : Promise<void> {
-        await this.prisma.user.delete({
+    public async deleteUser(userID : string) : Promise<User> {
+        return await this.prisma.user.delete({
             where: {
                 id: userID
             }
@@ -22,26 +22,21 @@ export class PrismaManager {
     }
 
     public async getUser(userID : string) : Promise<User|null> {
-        const user = await this.prisma.user.findFirst({
+        return await this.prisma.user.findFirst({
             where: {
                 id: userID
             }
         });
-        return user;
     }
 
-    /**
-     * 
-     * @param userID 
-     * @param change setting must be a column in table User with its associated value type, 
-     * will error if invalid and needs to be caught
-     */
-    public async editUser(userID : string, change: { [setting : string] : any} ) : Promise<void> {
-        await this.prisma.user.update({
+    public async editUser(userID : string, attribute : (keyof User), value : any) : Promise<User> {
+        return await this.prisma.user.update({
             where: {
                 id: userID
             },
-            data: change
+            data: {
+                [attribute]: value
+            }
         })
     }
 
@@ -94,8 +89,8 @@ export class PrismaManager {
         };
     }
 
-    public async createSwipe(userID : string, swipedUserID : string, action : Opinion) : Promise<void> {
-        await this.prisma.swipe.create({
+    public async createSwipe(userID : string, swipedUserID : string, action : Opinion) : Promise<Swipe> {
+        return await this.prisma.swipe.create({
             data: {
                 action: action,
                 swipedUserID: swipedUserID,
@@ -106,8 +101,8 @@ export class PrismaManager {
         })
     }
 
-    public async updateSwipe(swipeID : string, action : Opinion) : Promise<void> {
-        await this.prisma.swipe.update({
+    public async updateSwipe(swipeID : string, action : Opinion) : Promise<Swipe> {
+        return await this.prisma.swipe.update({
             data: {
                 action: action
             },

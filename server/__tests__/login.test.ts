@@ -9,25 +9,25 @@ describe("login", () => {
     const mismatchEmail = "a@berkeley.edu";
     const mismatchUni = "stanford";
 
-    it("should not see user", async () => {
+    it("should not see nonuser", async () => {
         expect(await handler.doesUserExist(userID)).toEqual(false);
     })
 
-    it("should not create bad email", async () => {
+    it("should not create bad email user", async () => {
         const user = createSampleUser(userID);
         user.email = badEmail;
 
         expect(await handler.createUser(user)).toEqual(false);
     })
 
-    it("should not create bad email 1", async () => {
+    it("should not create bad email user 2", async () => {
         const user = createSampleUser(userID);
         user.email = badEmail_2;
 
         expect(await handler.createUser(user)).toEqual(false);
     })
 
-    it("should not create not matching university", async () => {
+    it("should not create not matching university user", async () => {
         const user = createSampleUser(userID);
         user.email = mismatchEmail;
         user.university = mismatchUni;
@@ -52,8 +52,9 @@ describe("login", () => {
         expect(await prismaManager.getUserCount(userID)).toEqual(1);
     })
 
-    it("should delete notexisting user", async () => {
+    it("should delete nonuser", async () => {
         expect(await handler.deleteUser(userID)).toEqual(true);
+        expect(await handler.doesUserExist(userID)).toEqual(false);
     })
 
     it("should delete user", async () => {
@@ -67,6 +68,6 @@ describe("login", () => {
         expect(await handler.createUser(createSampleUser(userID_2))).toEqual(true);
         expect(await handler.deleteUser(userID)).toEqual(true);
         expect(await prismaManager.getUserCount()).toEqual(1);
-        expect(await handler.doesUserExist(userID_2)).toEqual(true);
+        expect(await handler.doesUserExist(userID)).toEqual(false);
     })
 })
