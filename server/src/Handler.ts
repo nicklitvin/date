@@ -1,4 +1,4 @@
-import { Opinion, User } from "@prisma/client";
+import { Message, Opinion, User } from "@prisma/client";
 import { PrismaManager } from "./PrismaManager";
 import { PublicProfile, SwipeFeed } from "./types";
 import { doesUniversityMatchEmail } from "./utils";
@@ -98,6 +98,18 @@ export class Handler {
             return (await this.prisma.updateUserReadStatus(userID, fromID)).count;
         } else {
             return 0;
+        }
+    }
+
+    public async getMessages(userID : string, withID : string, count : number, fromTime: Date) : Promise<Message[]> {
+        if (
+            await this.doesUserExist(userID) &&
+            await this.doesUserExist(withID) &&
+            await this.prisma.doUsersLikeEachOther(userID, withID)
+        ) {     
+            return await this.prisma.getMessages(userID, withID, count, fromTime);
+        } else {
+            return []
         }
     }
 }

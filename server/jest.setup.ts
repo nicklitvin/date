@@ -1,7 +1,7 @@
 import { afterAll, afterEach, beforeAll, expect } from "@jest/globals";
 import { TestPrismaManager } from "./testModules/TestPrismaManager";
 import { Handler } from "./src/Handler";
-import { User } from "@prisma/client";
+import { Message, User } from "@prisma/client";
 
 export const prismaManager = new TestPrismaManager();
 export const handler = new Handler(prismaManager);
@@ -66,4 +66,14 @@ export async function createTwoUsersInSameUni() {
 export async function matchUsers(userID : string, otherID : string) {
     expect(await handler.makeSwipe(userID,otherID,"Like")).toEqual(true);
     expect(await handler.makeSwipe(otherID,userID,"Like")).toEqual(true);
+}
+
+export async function createSampleChatLog(userID : string, otherID : string, index : number, count : number) {
+    const messages : Message[] = [];
+    for (let i = 0; i < count; i++) {
+        const message = await prismaManager.createChatAtTime(userID, otherID, new Date((i + 1) * 10), String(index + i) );
+        messages.push(message);
+    }
+    expect(messages.length).toEqual(count);    
+    return messages;
 }

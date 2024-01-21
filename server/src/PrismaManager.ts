@@ -178,5 +178,35 @@ export class PrismaManager {
             }
         })
     }
+
+    public async getMessages(userID : string, withID : string, count: number, fromTime: Date) {
+        return await this.prisma.message.findMany({
+            where: {
+                AND: [
+                    {
+                        OR: [
+                            {
+                                userID: userID,
+                                recepientID: withID
+                            },
+                            {
+                                userID: withID,
+                                recepientID: userID
+                            }
+                        ]
+                    },
+                    {
+                        timestamp: {
+                            lt: fromTime
+                        }
+                    }
+                ] 
+            },
+            orderBy: {
+                timestamp: "desc"
+            },
+            take: count
+        })
+    }
 }
 

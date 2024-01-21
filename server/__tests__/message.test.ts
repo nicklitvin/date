@@ -1,5 +1,5 @@
 import { describe, expect, it } from "@jest/globals";
-import { createSampleUser, createTwoUsersInSameUni, defaults, handler, matchUsers, prismaManager } from "../jest.setup";
+import { createSampleChatLog, createSampleUser, createTwoUsersInSameUni, defaults, handler, matchUsers, prismaManager } from "../jest.setup";
 
 describe("message", () => {
     it("should not send message if not like each other 1", async () => {
@@ -104,5 +104,25 @@ describe("message", () => {
 
         const after = await prismaManager.getChatLog(defaults.userID, defaults.userID_2);
         expect(after.filter( (message) => message.readStatus == true).length).toEqual(2);
+    })
+
+    it("should return chat log", async () => {
+        await createTwoUsersInSameUni();
+        await matchUsers(defaults.userID, defaults.userID_2);
+        const messages = await createSampleChatLog(defaults.userID, defaults.userID_2, 1, 5);
+        expect(messages.length).toEqual(5);
+
+        const msg_1 = await handler.getMessages(defaults.userID, defaults.userID_2, 1, new Date(25));
+        expect(msg_1.length).toEqual(1);
+        expect(msg_1[0].timestamp.getTime()).toEqual(new Date(20).getTime());
+
+        const msg_2 = await handler.getMessages(defaults.userID, defaults.userID_2, 1, new Date(5));
+        expect(msg_2.length).toEqual(0);
+
+        const msg_3 = await handler.getMessages(defaults.userID, defaults.userID_2, 10, new Date(35));
+        expect(msg_3.length).toEqual(3);
+        expect(msg_3[0].timestamp.getTime()).toEqual(new Date(30).getTime());
+        expect(msg_3[1].timestamp.getTime()).toEqual(new Date(20).getTime());
+        expect(msg_3[2].timestamp.getTime()).toEqual(new Date(10).getTime());
     })
 })

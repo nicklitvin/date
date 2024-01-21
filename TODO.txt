@@ -1,4 +1,6 @@
 TODO
+get match overview
+
 report system
     user report goes into report table
     when looking for swipes, should check report table to not give in feed
@@ -20,3 +22,4 @@ npx prisma db push
 
 double quotes for table names
 select * from "<table>"
+

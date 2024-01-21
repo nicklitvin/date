@@ -46,8 +46,6 @@ UserInterests {
 
 API
 Swipe Tab
-/getPeople = return profiles of X people not matched with
-/makeSwipe = like/dislike
 /reportUser
 
 Message Tab
@@ -56,10 +54,6 @@ Message Tab
     get user info + last message if any
     sort desc with no message priority 
 } : MatchOverview[]
-/getMessages (start, end) {
-    find messages (as sender and receiver) sorted by timestamp
-    return messages in specified range
-} : Message[]
 /messageUser (userID, message) {
     check if actually friend
     add to db

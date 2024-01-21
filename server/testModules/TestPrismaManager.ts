@@ -1,3 +1,4 @@
+import { randomUUID } from "crypto";
 import { PrismaManager } from "../src/PrismaManager";
 
 export class TestPrismaManager extends PrismaManager {
@@ -63,6 +64,19 @@ export class TestPrismaManager extends PrismaManager {
             },
             orderBy: {
                 timestamp: "desc"
+            }
+        })
+    }
+
+    public async createChatAtTime(userID : string, recepientID : string, time : Date, message : string) {
+        return await this.prisma.message.create({
+            data: {
+                id: randomUUID(),
+                message: message,
+                readStatus: false,
+                recepientID: recepientID,
+                timestamp: time,
+                userID: userID
             }
         })
     }
