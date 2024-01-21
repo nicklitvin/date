@@ -24,7 +24,6 @@ enum SchoolYear {
 enum Opinion {
     Like
     Dislike
-    Report
 }
 
 model User {
@@ -47,4 +46,13 @@ model Swipe {
     userID          String
     swipedUserID    String
     action          Opinion
+}
+
+model Message {
+    id              String      @id
+    timestamp       DateTime
+    userID          String
+    recepientID     String
+    message         String
+    readStatus      Boolean
 }

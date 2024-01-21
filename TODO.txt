@@ -1,5 +1,9 @@
 TODO
-do swipes
+
+report system
+    user report goes into report table
+    when looking for swipes, should check report table to not give in feed
+    after X reports, user does not show up in any feed
 
 
 NOTES

@@ -1,4 +1,4 @@
-import { Opinion, Prisma, PrismaClient, Swipe, User } from "@prisma/client";
+import { Message, Opinion, Prisma, PrismaClient, Swipe, User } from "@prisma/client";
 import { PublicProfile, SwipeFeed } from "./types";
 import { randomUUID } from "crypto";
 
@@ -131,6 +131,37 @@ export class PrismaManager {
             where: {
                 userID: userID,
                 swipedUserID: swipedUserID
+            }
+        })
+    }
+
+    public async doUsersLikeEachOther(userID : string, otherUserID : string) : Promise<boolean> {
+        const userLikesOther = await this.prisma.swipe.count({
+            where: {
+                userID: userID,
+                swipedUserID: otherUserID,
+                action: "Like"
+            }
+        })
+        const otherLikesUser = await this.prisma.swipe.count({
+            where: {
+                userID: otherUserID,
+                swipedUserID: userID,
+                action: "Like"
+            }
+        })
+        return userLikesOther == 1 && otherLikesUser == 1;
+    }
+
+    public async makeMessage(userID : string, recepientID : string, message : string) : Promise<Message> {
+        return await this.prisma.message.create({
+            data: {
+                id: randomUUID(),
+                message: message,
+                readStatus: false,
+                userID: userID,
+                recepientID: recepientID,
+                timestamp: new Date()
             }
         })
     }

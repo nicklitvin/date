@@ -4,36 +4,10 @@ view others swipe
 message matches
 
 CLASSES
-User {
-    id: string
-    email: string
-    firstName: string
-    age: number
-    gender: male/female/other
-    genderInterest: male/female/everyone
-    year: fresh/soph/junior/senior/grad, post-grad
-    interests: string[]
-    images: string[]
-    description: string
-    settings: Settings
-}
-
-Settings {
-    notifications: boolean
-}
-
 Interest {
     id: string
     type: Physical Activity, Entertainment, Creative...
     title: string
-}
-
-Swipe {
-    id: string
-    timestamp: Date
-    userID: string
-    swipedUserID: string
-    action: Like/Dislike
 }
 
 Message {
@@ -71,14 +45,6 @@ UserInterests {
 }
 
 API
-Home
-/checkUser{
-    return if user exists
-}
-/createUser {
-    sends data about user form
-}
-
 Swipe Tab
 /getPeople = return profiles of X people not matched with
 /makeSwipe = like/dislike
@@ -101,22 +67,4 @@ Message Tab
 } : ok
 /reportUser (userID) {
     add report to db
-} : ok
-
-Profile Tab
-/getProfile (userID) {
-    return user
-} : Profile
-/editProfile (setting, value)[] {
-    create transaction
-    change user.thing to value
-    commit transaction
-} : ok
-
-Settings Tabs
-/changeSetting (setting, value) {
-    change user.settings.setting to value
-} : ok
-/deleteAccount {
-    delete everything associated with user (excl. reports)
 } : ok

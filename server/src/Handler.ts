@@ -80,5 +80,17 @@ export class Handler {
             return false;
         }
     }
+
+    public async sendMessage(userID: string, recepientID : string, message : string) : Promise<boolean> {
+        if (
+            await this.doesUserExist(userID) &&
+            await this.doesUserExist(recepientID) &&
+            await this.prisma.doUsersLikeEachOther(userID, recepientID)  
+        ) {
+            return Boolean(await this.prisma.makeMessage(userID, recepientID, message));
+        } else {
+            return false;
+        }
+    }
 }
 
