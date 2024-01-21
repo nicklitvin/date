@@ -165,5 +165,18 @@ export class PrismaManager {
             }
         })
     }
+
+    public async updateUserReadStatus(userID : string, fromID : string) : Promise<Prisma.BatchPayload> {
+        return await this.prisma.message.updateMany({
+            where: {
+                recepientID: userID,
+                userID: fromID,
+                readStatus: false
+            },
+            data: {
+                readStatus: true
+            }
+        })
+    }
 }
 

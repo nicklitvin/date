@@ -46,4 +46,24 @@ export class TestPrismaManager extends PrismaManager {
             return await this.prisma.message.count();
         }
     }
+
+    public async getChatLog(userID : string, otherID : string) {
+        return await this.prisma.message.findMany({
+            where: {
+                OR: [
+                    {
+                        userID: userID, 
+                        recepientID: otherID
+                    },
+                    {
+                        userID: otherID,
+                        recepientID: userID
+                    }
+                ]
+            },
+            orderBy: {
+                timestamp: "desc"
+            }
+        })
+    }
 }

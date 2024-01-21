@@ -92,5 +92,13 @@ export class Handler {
             return false;
         }
     }
+
+    public async updateUserReadStatus(userID : string, fromID : string) : Promise<number> {
+        if (await this.doesUserExist(userID)) {
+            return (await this.prisma.updateUserReadStatus(userID, fromID)).count;
+        } else {
+            return 0;
+        }
+    }
 }
 

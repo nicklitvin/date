@@ -1,4 +1,5 @@
 TODO
+cant swipe self
 
 report system
     user report goes into report table

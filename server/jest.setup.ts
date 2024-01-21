@@ -41,7 +41,8 @@ export const defaults = {
     calName : "berkeley",
     stanfordEmail : "a@stanford.edu",
     stanfordName : "stanford",
-    message: "message"
+    message: "message",
+    message_2: "message2"
 }
 
 export async function createTwoUsersInSameUni() {
@@ -60,4 +61,9 @@ export async function createTwoUsersInSameUni() {
         user1: user1,
         user2: user2
     }
+}
+
+export async function matchUsers(userID : string, otherID : string) {
+    expect(await handler.makeSwipe(userID,otherID,"Like")).toEqual(true);
+    expect(await handler.makeSwipe(otherID,userID,"Like")).toEqual(true);
 }
