@@ -50,6 +50,6 @@ describe("profile", () => {
 
     it("should get public profile of user", async () => {
         expect(await handler.createUser(createSampleUser(userID))).toEqual(true);
-        expect(await handler.getPublicProfile(userID)).toEqual(null);       
+        expect(Boolean(await handler.getPublicProfile(userID))).toEqual(true);       
     })
 })

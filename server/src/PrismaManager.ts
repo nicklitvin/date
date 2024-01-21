@@ -1,4 +1,4 @@
-import { Opinion, PrismaClient, Swipe, User } from "@prisma/client";
+import { Opinion, Prisma, PrismaClient, Swipe, User } from "@prisma/client";
 import { PublicProfile, SwipeFeed } from "./types";
 import { randomUUID } from "crypto";
 
@@ -13,12 +13,26 @@ export class PrismaManager {
         return await this.prisma.user.create({ data: user })
     }
     
-    public async deleteUser(userID : string) : Promise<User> {
-        return await this.prisma.user.delete({
-            where: {
-                id: userID
-            }
-        })
+    public async deleteUser(userID : string) : Promise<[User, Prisma.BatchPayload]> {
+        return await this.prisma.$transaction([
+            this.prisma.user.delete({
+                where: {
+                    id: userID
+                }
+            }),
+            this.prisma.swipe.deleteMany({
+                where: {
+                    OR: [
+                        {
+                            userID: userID 
+                        },
+                        {
+                            swipedUserID: userID
+                        }
+                    ]
+                }
+            })
+        ])
     }
 
     public async getUser(userID : string) : Promise<User|null> {
@@ -52,14 +66,14 @@ export class PrismaManager {
             where: {
                 userID: userID
             }
-        }).then( users => users.map( (user) => user.id));
+        }).then( swipes => swipes.map( (swipe) => swipe.swipedUserID));
 
         const likedMeIDs = await this.prisma.swipe.findMany({
             where: {
                 swipedUserID: userID,
                 action: "Like"
             }
-        }).then( users => users.map( (user) => user.id));
+        }).then( swipes => swipes.map( (swipe) => swipe.userID));
 
         const results : PublicProfile[] = await this.prisma.user.findMany({
             select: {

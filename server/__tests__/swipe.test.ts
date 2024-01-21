@@ -5,11 +5,31 @@ describe("swipe", () => {
     const badID = "bad";
     const userID = "1";
     const userID_2 = "2";
+    const userID_3 = "3";
     const calEmail = "a@berkeley.edu";
     const calEmail_2 = "b@berkeley.edu";
+    const calEmail_3 = "c@berkeley.edu";
     const calName = "berkeley";
     const stanfordEmail = "a@stanford.edu";
     const stanfordName = "stanford";
+
+    const createTwoUsersInSameUni = async () => {
+        const user1 = createSampleUser(userID);
+        user1.email = calEmail;
+        user1.university = calName;
+
+        const user2 = createSampleUser(userID_2);
+        user2.email = calEmail_2;
+        user2.university = calName;
+
+        expect(await handler.createUser(user1)).toEqual(true);
+        expect(await handler.createUser(user2)).toEqual(true);
+
+        return {
+            user1: user1,
+            user2: user2
+        }
+    }
     
     it("should not get feed for nonuser", async () => {
         const swipeFeed = await handler.getSwipeFeed(userID);
@@ -45,15 +65,7 @@ describe("swipe", () => {
     })
 
     it("show same uni in feed", async () => {
-        const user1 = createSampleUser(userID);
-        const user2 = createSampleUser(userID_2);
-        user1.email = calEmail;
-        user1.university = calName;
-        user2.email = calEmail_2;
-        user2.university = calName;
-
-        expect(await handler.createUser(user1)).toEqual(true);
-        expect(await handler.createUser(user2)).toEqual(true);
+        const { user2 } = await createTwoUsersInSameUni();
 
         const swipeFeed = await handler.getSwipeFeed(userID);
         expect(swipeFeed.feed.length).toEqual(1);
@@ -80,16 +92,7 @@ describe("swipe", () => {
     })
 
     it("should create swipe", async () => {
-        const user1 = createSampleUser(userID);
-        user1.email = calEmail;
-        user1.university = calName;
-
-        const user2 = createSampleUser(userID_2);
-        user2.email = calEmail;
-        user2.university = calName;
-
-        expect(await handler.createUser(user1)).toEqual(true);
-        expect(await handler.createUser(user2)).toEqual(true);
+        await createTwoUsersInSameUni();
 
         expect(await handler.makeSwipe(userID, userID_2,"Like")).toEqual(true);
         const swipe = await prismaManager.getSwipe(userID,userID_2);
@@ -97,20 +100,74 @@ describe("swipe", () => {
     })
 
     it("should update swipe", async () => {
-        const user1 = createSampleUser(userID);
-        user1.email = calEmail;
-        user1.university = calName;
-
-        const user2 = createSampleUser(userID_2);
-        user2.email = calEmail;
-        user2.university = calName;
-
-        expect(await handler.createUser(user1)).toEqual(true);
-        expect(await handler.createUser(user2)).toEqual(true);
+        await createTwoUsersInSameUni();
 
         expect(await handler.makeSwipe(userID, userID_2,"Like")).toEqual(true);
         expect(await handler.makeSwipe(userID, userID_2,"Dislike")).toEqual(true);
         const swipe = await prismaManager.getSwipe(userID,userID_2);
         expect(swipe?.action === "Dislike").toEqual(true);
+    })
+
+    it("should not show user after swiping", async () => {
+        await createTwoUsersInSameUni();
+
+        expect(await handler.makeSwipe(userID, userID_2,"Like")).toEqual(true);
+        const swipeFeed = await handler.getSwipeFeed(userID);
+        expect(swipeFeed.feed.length).toEqual(0);
+        
+        const swipeFeed_2 = await handler.getSwipeFeed(userID_2);
+        expect(swipeFeed_2.likedMeIDs.length).toEqual(1);
+        expect(swipeFeed_2.likedMeIDs[0]).toEqual(userID);
+    })
+
+    it("should not show user after dislike", async () => {
+        await createTwoUsersInSameUni();
+
+        expect(await handler.makeSwipe(userID, userID_2,"Dislike")).toEqual(true);
+        const swipeFeed = await handler.getSwipeFeed(userID);
+        expect(swipeFeed.feed.length).toEqual(0);
+        
+        const swipeFeed_2 = await handler.getSwipeFeed(userID_2);
+        expect(swipeFeed_2.likedMeIDs.length).toEqual(0);
+    })
+
+    it("should show users that liked me first", async () => {
+        await createTwoUsersInSameUni();
+
+        const user3 = createSampleUser(userID_3);
+        user3.email = calEmail_3;
+        user3.university = calName;
+
+        expect(await handler.createUser(user3)).toEqual(true);
+        expect(await handler.makeSwipe(userID_3, userID_2,"Like")).toEqual(true);
+        const swipeFeed = await handler.getSwipeFeed(userID_2);
+
+        expect(swipeFeed.feed.length).toEqual(2);
+        expect(swipeFeed.feed[0].id).toEqual(userID_3);
+        expect(swipeFeed.feed[1].id).toEqual(userID);
+    })
+
+    it("should delete swipes if user deletes account", async () => {
+        await createTwoUsersInSameUni();
+
+        expect(await handler.makeSwipe(userID, userID_2,"Like")).toEqual(true);
+        expect(await prismaManager.getSwipeCount(userID)).toEqual(1);
+
+        expect(await handler.deleteUser(userID)).toEqual(true);
+        expect(await prismaManager.getSwipeCount(userID)).toEqual(0);
+    })
+
+    it("should not delete swipes is other user deletes account", async () => {
+        await createTwoUsersInSameUni();
+
+        const user3 = createSampleUser(userID_3);
+        user3.email = calEmail_3;
+        user3.university = calName;
+
+        expect(await handler.createUser(user3)).toEqual(true);
+
+        expect(await handler.makeSwipe(userID_2, userID_3, "Like")).toEqual(true);
+        expect(await handler.deleteUser(userID)).toEqual(true);
+        expect(await prismaManager.getSwipeCount()).toEqual(1);
     })
 })

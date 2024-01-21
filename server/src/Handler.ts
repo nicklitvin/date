@@ -26,7 +26,7 @@ export class Handler {
     
     public async deleteUser(userID : string) : Promise<boolean> {
         return await this.prisma.getUser(userID) ? 
-            Boolean(await this.prisma.deleteUser(userID)) :
+            Boolean( (await this.prisma.deleteUser(userID))[0] ) :
             true;
     }
 

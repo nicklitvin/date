@@ -21,4 +21,16 @@ export class TestPrismaManager extends PrismaManager {
             return await this.prisma.user.count();
         }
     }
+
+    public async getSwipeCount(userID? : string) {
+        if (userID) {
+            return await this.prisma.swipe.count({
+                where: {
+                    userID: userID
+                }
+            })
+        } else {
+            return await this.prisma.swipe.count();
+        }
+    }
 }
