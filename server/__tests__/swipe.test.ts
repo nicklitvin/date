@@ -134,11 +134,15 @@ describe("swipe", () => {
         const user3 = createSampleUser(defaults.userID_3);
         user3.email = defaults.calEmail_3;
         user3.university = defaults.calName;
-
         expect(await handler.createUser(user3)).toEqual(true);
 
         expect(await handler.makeSwipe(defaults.userID_2, defaults.userID_3, "Like")).toEqual(true);
         expect(await handler.deleteUser(defaults.userID)).toEqual(true);
         expect(await prismaManager.getSwipeCount()).toEqual(1);
+    })
+
+    it("should not swipe self", async () => {
+        await createTwoUsersInSameUni();
+        expect(await handler.makeSwipe(defaults.userID, defaults.userID, "Like")).toEqual(false);
     })
 })

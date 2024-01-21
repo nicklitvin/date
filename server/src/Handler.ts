@@ -69,7 +69,7 @@ export class Handler {
     }
 
     public async makeSwipe(userID : string, swipedUserID : string, action : Opinion) : Promise<boolean> {
-        if (await this.doesUserExist(userID) && await this.doesUserExist(swipedUserID)) {
+        if (await this.doesUserExist(userID) && await this.doesUserExist(swipedUserID) && userID != swipedUserID) {
             const swipe = await this.prisma.getSwipe(userID, swipedUserID);
             if (swipe) {
                 return Boolean(await this.prisma.updateSwipe(swipe.id, action));
