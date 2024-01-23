@@ -68,10 +68,10 @@ export async function matchUsers(userID : string, otherID : string) {
     expect(await handler.makeSwipe(otherID,userID,"Like")).toEqual(true);
 }
 
-export async function createSampleChatLog(userID : string, otherID : string, index : number, count : number) {
+export async function createSampleChatLog(userID : string, otherID : string, start: number, count : number) {
     const messages : Message[] = [];
     for (let i = 0; i < count; i++) {
-        const message = await prismaManager.createChatAtTime(userID, otherID, new Date((i + 1) * 10), String(index + i) );
+        const message = await prismaManager.createChatAtTime(userID, otherID, new Date(start + 10*i), String(i) );
         messages.push(message);
     }
     expect(messages.length).toEqual(count);    

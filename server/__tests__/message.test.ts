@@ -109,7 +109,7 @@ describe("message", () => {
     it("should return chat log", async () => {
         await createTwoUsersInSameUni();
         await matchUsers(defaults.userID, defaults.userID_2);
-        const messages = await createSampleChatLog(defaults.userID, defaults.userID_2, 1, 5);
+        const messages = await createSampleChatLog(defaults.userID, defaults.userID_2, 10, 5);
         expect(messages.length).toEqual(5);
 
         const msg_1 = await handler.getMessages(defaults.userID, defaults.userID_2, 1, new Date(25));
@@ -124,5 +124,99 @@ describe("message", () => {
         expect(msg_3[0].timestamp.getTime()).toEqual(new Date(30).getTime());
         expect(msg_3[1].timestamp.getTime()).toEqual(new Date(20).getTime());
         expect(msg_3[2].timestamp.getTime()).toEqual(new Date(10).getTime());
+
+        const msg_4 = await handler.getMessages(defaults.userID, defaults.userID_2, 10, new Date(10));
+        expect(msg_4.length).toEqual(1);
+        expect(msg_4[0].timestamp.getTime()).toEqual(new Date(10).getTime());
+        
+    })
+
+    it("should get chat preview", async () => {
+        await createTwoUsersInSameUni();
+        await matchUsers(defaults.userID, defaults.userID_2);
+        await createSampleChatLog(defaults.userID, defaults.userID_2, 10, 5);
+
+        const preview = await handler.getChatPreviews(defaults.userID, new Date(), 1);
+        expect(preview.length).toEqual(1);
+        expect(preview[0].lastMessages[0].timestamp > preview[0].lastMessages[1].timestamp).toEqual(true);
+        expect(preview[0].profile.id).toEqual(defaults.userID_2);
+    })
+
+    it("should combine chats between users in preview", async () => {
+        await createTwoUsersInSameUni();
+        await matchUsers(defaults.userID, defaults.userID_2);
+        await createSampleChatLog(defaults.userID, defaults.userID_2, 10, 5);
+        await createSampleChatLog(defaults.userID, defaults.userID_2, 60, 5);
+        expect(await prismaManager.getMessageCount()).toEqual(10);
+
+        const preview = await handler.getChatPreviews(defaults.userID, new Date(), 1);
+        expect(preview.length).toEqual(1);
+        expect(preview[0].lastMessages.length).toEqual(10);
+        expect(preview[0].lastMessages[0].timestamp.getTime()).toEqual(new Date(100).getTime());
+    })
+
+    it("should sort diff chats based on recency", async () => {
+        await createTwoUsersInSameUni();
+
+        const user3 = createSampleUser(defaults.userID_3);
+        user3.email = defaults.calEmail_3;
+        user3.university = defaults.calName;
+        expect(await handler.createUser(user3)).toEqual(true);
+
+        await matchUsers(defaults.userID, defaults.userID_2);
+        await matchUsers(defaults.userID, defaults.userID_3);
+
+        await createSampleChatLog(defaults.userID, defaults.userID_3, 10, 2);
+        await createSampleChatLog(defaults.userID, defaults.userID_2, 50, 2);
+        expect(await prismaManager.getMessageCount(defaults.userID)).toEqual(4);
+
+        const preview = await handler.getChatPreviews(defaults.userID, new Date(), 2);
+        expect(preview.length).toEqual(2);
+        expect(preview[0].profile.id).toEqual(defaults.userID_2);
+        expect(preview[1].profile.id).toEqual(defaults.userID_3);
+
+        await createSampleChatLog(defaults.userID, defaults.userID_3, 100, 2);
+
+        const preview_2 = await handler.getChatPreviews(defaults.userID, new Date(), 2);
+        expect(preview_2[0].profile.id).toEqual(defaults.userID_3);
+        expect(preview_2[1].profile.id).toEqual(defaults.userID_2);
+    })
+
+    it("should give old chats", async () => {
+        await createTwoUsersInSameUni();
+
+        const user3 = createSampleUser(defaults.userID_3);
+        user3.email = defaults.calEmail_3;
+        user3.university = defaults.calName;
+        expect(await handler.createUser(user3)).toEqual(true);
+
+        await matchUsers(defaults.userID, defaults.userID_2);
+        await matchUsers(defaults.userID, defaults.userID_3);
+
+        await createSampleChatLog(defaults.userID, defaults.userID_3, 10, 2);
+        await createSampleChatLog(defaults.userID, defaults.userID_2, 50, 2);
+
+        const preview = await handler.getChatPreviews(defaults.userID, new Date(40), 2);
+        expect(preview.length).toEqual(1);
+        expect(preview[0].profile.id).toEqual(defaults.userID_3);
+    })
+
+    it("should limit chat preview count", async () => {
+        await createTwoUsersInSameUni();
+
+        const user3 = createSampleUser(defaults.userID_3);
+        user3.email = defaults.calEmail_3;
+        user3.university = defaults.calName;
+        expect(await handler.createUser(user3)).toEqual(true);
+
+        await matchUsers(defaults.userID, defaults.userID_2);
+        await matchUsers(defaults.userID, defaults.userID_3);
+
+        await createSampleChatLog(defaults.userID, defaults.userID_3, 10, 2);
+        await createSampleChatLog(defaults.userID_2, defaults.userID, 50, 2);
+
+        const preview = await handler.getChatPreviews(defaults.userID, new Date(), 1);
+        expect(preview.length).toEqual(1);
+        expect(preview[0].profile.id).toEqual(defaults.userID_2);
     })
 })

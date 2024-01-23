@@ -1,17 +1,22 @@
 TODO
 get match overview
+global variables (messages returned)
+create/retrieve attributes 
 
 report system
     user report goes into report table
     when looking for swipes, should check report table to not give in feed
     after X reports, user does not show up in any feed
 
-premium
+premium (first 100 people get free)
     read status of other person
     better filters
     more impressions
     more likes/day
     stats
+    reason for swiping no include
+
+if ever try catch error, send post to server with message
 
 NOTES
 to make prisma client autofill:

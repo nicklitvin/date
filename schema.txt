@@ -49,11 +49,6 @@ Swipe Tab
 /reportUser
 
 Message Tab
-/getMatches (start, end) {
-    get users that both swiped each other
-    get user info + last message if any
-    sort desc with no message priority 
-} : MatchOverview[]
 /messageUser (userID, message) {
     check if actually friend
     add to db

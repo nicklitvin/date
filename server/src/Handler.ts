@@ -1,6 +1,6 @@
 import { Message, Opinion, User } from "@prisma/client";
 import { PrismaManager } from "./PrismaManager";
-import { PublicProfile, SwipeFeed } from "./types";
+import { MatchPreview, PublicProfile, SwipeFeed } from "./types";
 import { doesUniversityMatchEmail } from "./utils";
 
 export class Handler {
@@ -43,18 +43,7 @@ export class Handler {
     }
 
     public async getPublicProfile(userID : string) : Promise<PublicProfile|null> {
-        const profile = await this.getProfile(userID);
-        return profile ?
-        {
-            id: profile.id,
-            age: profile.age,
-            attributes: profile.attributes,
-            description: profile.description,
-            gender: profile.gender,
-            images: profile.images,
-            name: profile.name,
-            university: profile.university
-        } : null
+        return await this.prisma.getPublicProfile(userID);
     }
 
     public async getSwipeFeed(userID : string) : Promise<SwipeFeed> {
@@ -108,6 +97,14 @@ export class Handler {
             await this.prisma.doUsersLikeEachOther(userID, withID)
         ) {     
             return await this.prisma.getMessages(userID, withID, count, fromTime);
+        } else {
+            return []
+        }
+    }
+
+    public async getChatPreviews(userID : string, timestamp : Date, count : number) : Promise<MatchPreview[]> {
+        if (await this.doesUserExist(userID)) {
+            return await this.prisma.getChatPreviews(userID, timestamp, count);
         } else {
             return []
         }

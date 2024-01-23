@@ -40,7 +40,10 @@ export class TestPrismaManager extends PrismaManager {
         if (userID) {
             return await this.prisma.message.count({
                 where: {
-                    userID: userID
+                    OR: [
+                        {userID: userID},
+                        {recepientID: userID}
+                    ]
                 }
             })
         } else {

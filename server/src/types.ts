@@ -1,4 +1,4 @@
-import { Gender, User } from "@prisma/client"
+import { Gender, Message, User } from "@prisma/client"
 
 export const AllowedEdits : (keyof User)[] = ["age"]
 
@@ -16,4 +16,9 @@ export type PublicProfile = {
 export type SwipeFeed = {
     feed: PublicProfile[]
     likedMeIDs: string[]
+}
+
+export type MatchPreview = {
+    profile: PublicProfile
+    lastMessages: Message[]
 }

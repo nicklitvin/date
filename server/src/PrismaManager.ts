@@ -1,5 +1,5 @@
 import { Message, Opinion, Prisma, PrismaClient, Swipe, User } from "@prisma/client";
-import { PublicProfile, SwipeFeed } from "./types";
+import { MatchPreview, PublicProfile, SwipeFeed } from "./types";
 import { randomUUID } from "crypto";
 
 export class PrismaManager {
@@ -197,7 +197,7 @@ export class PrismaManager {
                     },
                     {
                         timestamp: {
-                            lt: fromTime
+                            lte: fromTime
                         }
                     }
                 ] 
@@ -207,6 +207,80 @@ export class PrismaManager {
             },
             take: count
         })
+    }
+    public async getPublicProfile(userID : string) : Promise<PublicProfile|null> {
+        return await this.prisma.user.findFirst({
+            where: {
+                id: userID
+            },
+            select: {
+                id: true,
+                age: true,
+                attributes: true,
+                description: true,
+                gender: true,
+                images: true,
+                name: true,
+                university: true
+            }
+        })
+    }
+
+    public async getChatPreviews(userID : string, fromTime : Date, count : number) : Promise<MatchPreview[]> {
+        const messageFromUserID = await this.prisma.message.findMany({
+            where: {
+                userID: userID,
+                timestamp: {
+                    lte: fromTime
+                }
+            },
+            orderBy: {
+                timestamp: "desc"
+            },
+            distinct: ["recepientID"],
+            take: count
+        })
+
+        const messageToUserID = await this.prisma.message.findMany({
+            where: {
+                recepientID: userID,
+                timestamp: {
+                    lte: fromTime
+                }
+            },
+            orderBy: {
+                timestamp: "desc"
+            },
+            distinct: ["userID"],
+            take: count
+        })
+
+        const combined = messageFromUserID.concat(messageToUserID).sort( 
+            (a,b) => b.timestamp.getTime() - a.timestamp.getTime()
+        );
+
+        const usedUserIDs = new Set<string>();
+        const result : MatchPreview[] = [];
+
+        for (let message of combined) {
+            if (result.length == count) break;
+
+            if (message.userID == userID && !usedUserIDs.has(message.recepientID)) {
+                usedUserIDs.add(message.recepientID);
+                result.push({
+                    profile: (await this.getPublicProfile(message.recepientID))!,
+                    lastMessages: await this.getMessages(userID, message.recepientID, 10, new Date())
+                })
+
+            } else if (message.recepientID == userID && !usedUserIDs.has(message.userID)) {
+                usedUserIDs.add(message.userID);
+                result.push({
+                    profile: (await this.getPublicProfile(message.userID))!,
+                    lastMessages: await this.getMessages(userID, message.recepientID, 10, new Date())
+                })
+            }
+        }
+        return result;
     }
 }
 
