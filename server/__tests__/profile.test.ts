@@ -1,55 +1,54 @@
 import { describe, expect, it } from "@jest/globals";
-import { createSampleUser, handler } from "../jest.setup";
+import { createSampleUser, defaults, handler } from "../jest.setup";
 import { User } from "@prisma/client";
 
 describe("profile", () => {
-    const userID = "1";
-    const attribute : (keyof User) = "age";
-    const badValue = "12";
-    const goodValue = 12;
+    const validAttribute : (keyof User) = "age";
+    const validAttributeValue = 12;
+    const invalidAttributeValue = "12";
 
     it("should not get nonuser", async () => {
-        expect(await handler.getProfile(userID)).toEqual(null);
+        expect(await handler.getProfile(defaults.userID)).toEqual(null);
     })    
 
     it("should get user", async () => {
-        expect(await handler.createUser(createSampleUser(userID))).toEqual(true);
-        expect(await handler.getProfile(userID)).toEqual(createSampleUser(userID));
+        expect(await handler.createUser(createSampleUser(defaults.userID))).toEqual(true);
+        expect(await handler.getProfile(defaults.userID)).toEqual(createSampleUser(defaults.userID));
     })
 
     it("should not edit nonuser", async () => {
-        expect(await handler.editUser(userID, attribute, goodValue)).toEqual(false);
+        expect(await handler.editUser(defaults.userID, validAttribute, validAttributeValue)).toEqual(false);
     })
 
     it("should not edit user with bad setting", async () => {
-        expect(await handler.createUser(createSampleUser(userID))).toEqual(true);
-        expect(await handler.editUser(userID, attribute, badValue)).toEqual(false);
+        expect(await handler.createUser(createSampleUser(defaults.userID))).toEqual(true);
+        expect(await handler.editUser(defaults.userID, validAttribute, validAttribute)).toEqual(false);
     })
 
     it("should not edit user with bad value", async () => {
-        const initial = createSampleUser(userID);
+        const initial = createSampleUser(defaults.userID);
         expect(await handler.createUser(initial)).toEqual(true);
-        expect(await handler.editUser(userID, attribute, badValue)).toEqual(false);
+        expect(await handler.editUser(defaults.userID, validAttribute, invalidAttributeValue)).toEqual(false);
         
-        const changedUser = await handler.getProfile(userID);
+        const changedUser = await handler.getProfile(defaults.userID);
         expect(changedUser?.age).toEqual(initial.age);
     })
 
     it("should edit user with good input", async () => {
-        const initial = createSampleUser(userID);
+        const initial = createSampleUser(defaults.userID);
         expect(await handler.createUser(initial)).toEqual(true);
-        expect(await handler.editUser(userID, attribute, goodValue)).toEqual(true);
+        expect(await handler.editUser(defaults.userID, validAttribute, validAttributeValue)).toEqual(true);
         
-        const changedUser = await handler.getProfile(userID);
+        const changedUser = await handler.getProfile(defaults.userID);
         expect(changedUser?.age == initial.age).toEqual(false);
     })
 
     it("should not get public profile of nonuser", async () => {
-        expect(await handler.getPublicProfile(userID)).toEqual(null);       
+        expect(await handler.getPublicProfile(defaults.userID)).toEqual(null);       
     })
 
     it("should get public profile of user", async () => {
-        expect(await handler.createUser(createSampleUser(userID))).toEqual(true);
-        expect(Boolean(await handler.getPublicProfile(userID))).toEqual(true);       
+        expect(await handler.createUser(createSampleUser(defaults.userID))).toEqual(true);
+        expect(Boolean(await handler.getPublicProfile(defaults.userID))).toEqual(true);       
     })
 })

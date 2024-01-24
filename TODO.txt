@@ -1,5 +1,4 @@
 TODO
-profile use defaults variable
 create/retrieve attributes 
 firebase image storage
 

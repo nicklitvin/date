@@ -42,7 +42,7 @@ export const defaults = {
     stanfordEmail : "a@stanford.edu",
     stanfordName : "stanford",
     message: "message",
-    message_2: "message2"
+    message_2: "message2",
 }
 
 export async function createTwoUsersInSameUni() {
