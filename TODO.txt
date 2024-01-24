@@ -1,12 +1,13 @@
 TODO
-get match overview
-global variables (messages returned)
+profile use defaults variable
 create/retrieve attributes 
+firebase image storage
 
 report system
     user report goes into report table
     when looking for swipes, should check report table to not give in feed
     after X reports, user does not show up in any feed
+    a user cannot report others more than X times or sus
 
 premium (first 100 people get free)
     read status of other person
@@ -27,4 +28,5 @@ npx prisma db push
 
 double quotes for table names
 select * from "<table>"
+
 

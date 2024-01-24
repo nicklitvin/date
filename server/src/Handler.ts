@@ -2,6 +2,7 @@ import { Message, Opinion, User } from "@prisma/client";
 import { PrismaManager } from "./PrismaManager";
 import { MatchPreview, PublicProfile, SwipeFeed } from "./types";
 import { doesUniversityMatchEmail } from "./utils";
+import { reportsForBan } from "./globals";
 
 export class Handler {
     private prisma : PrismaManager;
@@ -25,9 +26,11 @@ export class Handler {
     }
     
     public async deleteUser(userID : string) : Promise<boolean> {
-        return await this.prisma.getUser(userID) ? 
-            Boolean( (await this.prisma.deleteUser(userID))[0] ) :
-            true;
+        if (await this.prisma.getUser(userID)) {
+            return Boolean( (await this.prisma.deleteUser(userID))[0] )
+        } else {
+            return true;
+        }
     }
 
     public async getProfile(userID : string) : Promise<User|null> {
@@ -107,6 +110,22 @@ export class Handler {
             return await this.prisma.getChatPreviews(userID, timestamp, count);
         } else {
             return []
+        }
+    }
+
+    public async reportUser(userID : string, reportedID : string, customReportCountForBan : number = reportsForBan) : Promise<boolean> {
+        if (
+            await this.doesUserExist(userID) && 
+            await this.doesUserExist(reportedID) &&
+            !(await this.prisma.doesReportExist(userID, reportedID))
+        ) {
+            const report = await this.prisma.reportUser(userID, reportedID);
+            if (report && await this.prisma.getReportCount(report.reportedEmail) >= customReportCountForBan) {
+                await this.deleteUser(reportedID);
+            } 
+            return Boolean(report);
+        } else {
+            return false;
         }
     }
 }

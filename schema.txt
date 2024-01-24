@@ -57,3 +57,86 @@ Message Tab
 /reportUser (userID) {
     add report to db
 } : ok
+
+
+
+
+
+
+
+
+
+
+FITNESS
+Soccer
+Basketball
+Football
+Tennis
+Cricket
+Basketball
+Golf
+Swim
+Volleyball
+Ice Hockey
+Table Tennis
+Badminton
+Martial Arts
+Track & Field
+Weightlifting
+Running
+Ski/Snowboard
+Surf
+
+MUSIC
+Pop
+Rock
+Hip-Hop
+R&B
+Country
+Jazz
+Electronic
+Classical
+Lo-fi
+K-pop
+J-pop
+EDM
+Indie
+Latin Pop
+Folk
+
+FOOD
+Vegeterian/Vegan
+Home Chef
+Sweet Tooth
+Coffee
+Tea
+Late-Night Snacker
+Home Baker
+Streetfood
+
+
+
+
+ENTERTAINMENT
+Online Gaming
+Concerts
+NightLife
+Road Trip
+Photography
+
+
+Road Trip
+Reading Books
+Movie Nights
+Outdoor Adventures
+Concert-Goer
+Board Games
+Hiking
+Cooking
+Traveling Abroad
+Karaoke
+Art Exhibitions
+Wine Tasting
+Photography
+Beach Days
+

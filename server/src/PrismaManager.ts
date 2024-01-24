@@ -1,6 +1,7 @@
 import { Message, Opinion, Prisma, PrismaClient, Swipe, User } from "@prisma/client";
 import { MatchPreview, PublicProfile, SwipeFeed } from "./types";
 import { randomUUID } from "crypto";
+import { matchPreviewMessageCount } from "./globals";
 
 export class PrismaManager {
     protected prisma : PrismaClient;
@@ -13,7 +14,7 @@ export class PrismaManager {
         return await this.prisma.user.create({ data: user })
     }
     
-    public async deleteUser(userID : string) : Promise<[User, Prisma.BatchPayload]> {
+    public async deleteUser(userID : string) : Promise<[User, Prisma.BatchPayload, Prisma.BatchPayload]> {
         return await this.prisma.$transaction([
             this.prisma.user.delete({
                 where: {
@@ -31,12 +32,17 @@ export class PrismaManager {
                         }
                     ]
                 }
+            }),
+            this.prisma.message.deleteMany({
+                where: {
+                    userID: userID
+                }
             })
         ])
     }
 
     public async getUser(userID : string) : Promise<User|null> {
-        return await this.prisma.user.findFirst({
+        return await this.prisma.user.findUnique({
             where: {
                 id: userID
             }
@@ -68,6 +74,12 @@ export class PrismaManager {
             }
         }).then( swipes => swipes.map( (swipe) => swipe.swipedUserID));
 
+        const reportedEmails = await this.prisma.report.findMany({
+            where: {
+                userID: userID
+            }
+        }).then( (report) => report.map( (user) => user.reportedEmail))
+
         const likedMeIDs = await this.prisma.swipe.findMany({
             where: {
                 swipedUserID: userID,
@@ -91,6 +103,9 @@ export class PrismaManager {
                 university: userUniversity,
                 id: {
                     notIn: [userID, ...alreadySwipedIDs]
+                },
+                email: {
+                    notIn: reportedEmails
                 }
             },
         });
@@ -269,18 +284,69 @@ export class PrismaManager {
                 usedUserIDs.add(message.recepientID);
                 result.push({
                     profile: (await this.getPublicProfile(message.recepientID))!,
-                    lastMessages: await this.getMessages(userID, message.recepientID, 10, new Date())
+                    lastMessages: await this.getMessages(userID, message.recepientID, matchPreviewMessageCount, new Date())
                 })
 
             } else if (message.recepientID == userID && !usedUserIDs.has(message.userID)) {
                 usedUserIDs.add(message.userID);
                 result.push({
                     profile: (await this.getPublicProfile(message.userID))!,
-                    lastMessages: await this.getMessages(userID, message.recepientID, 10, new Date())
+                    lastMessages: await this.getMessages(userID, message.recepientID, matchPreviewMessageCount, new Date())
                 })
             }
         }
         return result;
+    }
+
+    public async deleteChat(userID : string, withID : string) {
+        return await this.prisma.message.deleteMany({
+            where: {
+                OR: [
+                    {
+                        userID: userID,
+                        recepientID: withID
+                    },
+                    {
+                        userID: withID,
+                        recepientID: userID
+                    }
+                ]
+            }
+        })
+    }
+
+    public async reportUser(userID : string, reportedID : string) {
+        const reportedUserEmail = (await this.getUser(reportedID))!.email;
+
+        await this.deleteChat(userID, reportedID);
+
+        return await this.prisma.report.create({
+            data: {
+                userID: userID,
+                reportedEmail: reportedUserEmail,
+                id: randomUUID(),
+                timestamp: new Date()
+            }
+        })
+    }
+
+    public async doesReportExist(userID : string, reportedID : string) {
+        const reportedUserEmail = (await this.getUser(reportedID))!.email;
+        
+        return Boolean(await this.prisma.report.findFirst({
+            where: {
+                userID: userID,
+                reportedEmail: reportedUserEmail
+            }
+        }))
+    }
+
+    public async getReportCount(userEmail : string) {
+        return await this.prisma.report.count({
+            where: {
+                reportedEmail: userEmail
+            }
+        })
     }
 }
 

@@ -219,4 +219,12 @@ describe("message", () => {
         expect(preview.length).toEqual(1);
         expect(preview[0].profile.id).toEqual(defaults.userID_2);
     })
+
+    it("should delete messages with user", async () => {
+        await createTwoUsersInSameUni();
+        await matchUsers(defaults.userID, defaults.userID_2);
+        await createSampleChatLog(defaults.userID, defaults.userID_3, 10, 2);
+        expect(await handler.deleteUser(defaults.userID)).toEqual(true);
+        expect(await prismaManager.getMessageCount(defaults.userID)).toEqual(0);
+    })
 })

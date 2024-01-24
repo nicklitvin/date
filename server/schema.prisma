@@ -26,6 +26,10 @@ enum Opinion {
     Dislike
 }
 
+enum AttributeType {
+    Fitness
+}
+
 model User {
     id              String     @id
     email           String
@@ -55,4 +59,17 @@ model Message {
     recepientID     String
     message         String
     readStatus      Boolean
+}
+
+model Attribute {
+    id              String          @id
+    type            AttributeType   
+    title           String
+}
+
+model Report {
+    id              String              @id
+    userID          String
+    timestamp       DateTime
+    reportedEmail   String              
 }
