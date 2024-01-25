@@ -1,4 +1,4 @@
-import { Gender, Message, User } from "@prisma/client"
+import { AttributeType, Gender, Message, User } from "@prisma/client"
 
 export const AllowedEdits : (keyof User)[] = ["age"]
 

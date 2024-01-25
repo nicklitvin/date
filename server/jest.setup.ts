@@ -1,7 +1,8 @@
-import { afterAll, afterEach, beforeAll, expect } from "@jest/globals";
+import { beforeEach, afterEach, beforeAll, expect } from "@jest/globals";
 import { TestPrismaManager } from "./testModules/TestPrismaManager";
 import { Handler } from "./src/Handler";
-import { Message, User } from "@prisma/client";
+import { AttributeType, Message, User } from "@prisma/client";
+import { userAttributes } from "./src/globals";
 
 export const prismaManager = new TestPrismaManager();
 export const handler = new Handler(prismaManager);
@@ -10,9 +11,21 @@ beforeAll( async () => {
     await prismaManager.deleteEverything();
 })
 
+beforeEach( async () => {
+    await setupAttributes();
+})
+    
 afterEach( async () => {
     await prismaManager.deleteEverything();
 })
+
+async function setupAttributes() {
+    for (let type of Object.keys(userAttributes) as AttributeType[]) {
+        for (let value of userAttributes[type]) {
+            await prismaManager.createAttribute(type, value);
+        }
+    }
+}
 
 export function createSampleUser(userID : string) : User {
     return {

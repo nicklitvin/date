@@ -1,4 +1,4 @@
-import { Message, Opinion, User } from "@prisma/client";
+import { AttributeType, Message, Opinion, User } from "@prisma/client";
 import { PrismaManager } from "./PrismaManager";
 import { MatchPreview, PublicProfile, SwipeFeed } from "./types";
 import { doesUniversityMatchEmail } from "./utils";
@@ -37,9 +37,9 @@ export class Handler {
         return await this.prisma.getUser(userID);
     }
 
-    public async editUser(userID : string, attribute: (keyof User), value : any) : Promise<boolean>{
+    public async editUser(userID : string, setting: (keyof User), value : any) : Promise<boolean>{
         try {
-            return Boolean(await this.prisma.editUser(userID, attribute, value));
+            return Boolean(await this.prisma.editUser(userID, setting, value));
         } catch (err) {
             return false;
         }
@@ -127,6 +127,18 @@ export class Handler {
         } else {
             return false;
         }
+    }
+
+    public async getAttributes() : Promise<{ type: AttributeType; values: string[] }[]>{
+        return await this.prisma.getAttributes()
+    }
+
+    public async createAttribute(type : AttributeType, title : string) : Promise<boolean> {
+        return Boolean(await this.prisma.createAttribute(type,title));
+    }
+
+    public async deleteAttribute(type : AttributeType, title : string) : Promise<boolean> {
+        return Boolean(await this.prisma.deleteAttribute(type, title));
     }
 }
 

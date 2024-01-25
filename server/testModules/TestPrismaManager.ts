@@ -11,6 +11,7 @@ export class TestPrismaManager extends PrismaManager {
         await this.prisma.swipe.deleteMany();
         await this.prisma.message.deleteMany();
         await this.prisma.report.deleteMany();
+        await this.prisma.attribute.deleteMany();
     }
 
     public async getUserCount(userID? : string) {
@@ -84,16 +85,4 @@ export class TestPrismaManager extends PrismaManager {
             }
         })
     }
-
-    // public async getReportCount(reportedEmail? : string) {
-    //     if (reportedEmail) {
-    //         return await this.prisma.report.count({
-    //             where: {
-    //                 reportedEmail: reportedEmail
-    //             }
-    //         })
-    //     } else {
-    //         return await this.prisma.report.count()
-    //     }
-    // }
 }

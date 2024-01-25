@@ -28,6 +28,7 @@ enum Opinion {
 
 enum AttributeType {
     Fitness
+    Music
 }
 
 model User {
@@ -62,13 +63,12 @@ model Message {
 }
 
 model Attribute {
-    id              String          @id
-    type            AttributeType   
-    title           String
+    type            AttributeType   @id
+    values          String[]
 }
 
 model Report {
-    id              String              @id
+    id              String          @id
     userID          String
     timestamp       DateTime
     reportedEmail   String              

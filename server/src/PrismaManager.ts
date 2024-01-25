@@ -1,4 +1,4 @@
-import { Message, Opinion, Prisma, PrismaClient, Swipe, User } from "@prisma/client";
+import { AttributeType, Message, Opinion, Prisma, PrismaClient, Swipe, User } from "@prisma/client";
 import { MatchPreview, PublicProfile, SwipeFeed } from "./types";
 import { randomUUID } from "crypto";
 import { matchPreviewMessageCount } from "./globals";
@@ -49,13 +49,13 @@ export class PrismaManager {
         });
     }
 
-    public async editUser(userID : string, attribute : (keyof User), value : any) : Promise<User> {
+    public async editUser(userID : string, setting : (keyof User), value : any) : Promise<User> {
         return await this.prisma.user.update({
             where: {
                 id: userID
             },
             data: {
-                [attribute]: value
+                [setting]: value
             }
         })
     }
@@ -347,6 +347,69 @@ export class PrismaManager {
                 reportedEmail: userEmail
             }
         })
+    }
+
+    public async getAttributes() {
+        return await this.prisma.attribute.findMany()
+    }
+
+    public async deleteAttribute(type : AttributeType, title: string) {
+        const currentAttributes = await this.prisma.attribute.findUnique({
+            where: {
+                type: type
+            }
+        });
+
+        if (currentAttributes) {
+            const revisedAttributes = currentAttributes.values.filter( 
+                (attribute) => attribute != title
+            );
+            if (revisedAttributes.length == 0) {
+                return await this.prisma.attribute.delete({
+                    where: {
+                        type: type
+                    }
+                })
+            } else {
+                return await this.prisma.attribute.update({
+                    where: {
+                        type: type
+                    },
+                    data: {
+                        values: revisedAttributes
+                    }
+                })
+            }
+        }
+    }
+
+    public async createAttribute(type : AttributeType, title : string) {
+        const currentAttributes = await this.prisma.attribute.findUnique({
+            where: {
+                type: type
+            }
+        });
+
+        if (currentAttributes) {
+            const newList = [...currentAttributes.values, title];
+            newList.sort()
+
+            return await this.prisma.attribute.update({
+                data: {
+                    values: newList
+                },
+                where: {
+                    type: type
+                }
+            })
+        } else {
+            return await this.prisma.attribute.create({
+                data: {
+                    type: type,
+                    values: [title]
+                }
+            })
+        }
     }
 }
 
