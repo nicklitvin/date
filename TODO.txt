@@ -1,5 +1,8 @@
 TODO
-firebase image storage (upload to firestore and return download url, delete)
+create User (user data, +images to upload)
+=> create file (loading...)
+
+before creating prisma, create s3 images with randomUUID() and add to user
 
 NOTES
 to make prisma client autofill:
