@@ -1,4 +1,4 @@
-import { AttributeType, ErrorLog, Message, Opinion, User } from "@prisma/client";
+import { Announcement, AttributeType, ErrorLog, Message, Opinion, User } from "@prisma/client";
 import { PrismaManager } from "./PrismaManager";
 import { FileUpload, MatchPreview, PublicProfile, SwipeFeed } from "./types";
 import { doesUniversityMatchEmail } from "./utils";
@@ -205,6 +205,30 @@ export class Handler {
 
     public async clearErrorLogs() : Promise<boolean> {
         return Boolean(await this.prisma.clearErrorLogs());
+    }
+
+    public async makeAnnouncement(announcement : Announcement) : Promise<boolean> {
+        return Boolean(await this.prisma.makeAnnouncement(announcement));
+    }
+
+    public async getAnnouncements() : Promise<Announcement[]> {
+        return await this.prisma.getAnnouncements();
+    }
+
+    public async getAllAnnouncements() : Promise<Announcement[]> {
+        return await this.prisma.getAllAnouncements();
+    }
+
+    public async deleteAnnouncement(id : string) : Promise<boolean> {
+        const announcement = await this.prisma.getAnnouncementByID(id);
+        if (announcement) {
+            return Boolean(await this.prisma.deleteAnnouncement(id));
+        }
+        return true;
+    }
+
+    public async deleteAllAnouncement() : Promise<boolean> {
+        return Boolean(await this.prisma.deleteAllAnouncements());
     }
 }
 

@@ -1,7 +1,9 @@
 TODO
-change all for loops with awaits to promise.all
-announcement table
 stripe subscription
+get analytics
+premium features
+smart swiping
+server catch errors write to client errors
 
 NOTES
 to make prisma client autofill:
@@ -22,10 +24,6 @@ premium (first 100 people get free)
     reason for swiping no include
 
 if ever try catch error, send post to server with message
-
-Globals
-    allowed Attribute Changes string[] (can change)
-    valid Attribute Types
 
 Make different user authentication rules list of functions that must pass
 

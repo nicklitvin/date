@@ -103,6 +103,7 @@ export async function createSampleChatLog(userID : string, otherID : string, sta
         const message = await prismaManager.createChatAtTime(userID, otherID, new Date(start + 10*i), String(i) );
         messages.push(message);
     }
+
     expect(messages.length).toEqual(count);    
     return messages;
 }

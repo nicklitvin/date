@@ -13,7 +13,8 @@ export class TestPrismaManager extends PrismaManager {
             this.prisma.message.deleteMany(),
             this.prisma.report.deleteMany(),
             this.prisma.attribute.deleteMany(),
-            this.prisma.errorLog.deleteMany()
+            this.prisma.errorLog.deleteMany(),
+            this.prisma.announcement.deleteMany()
         ])
     }
 

@@ -1,4 +1,4 @@
-import { AttributeType, ErrorLog, Message, Opinion, Prisma, PrismaClient, Swipe, User } from "@prisma/client";
+import { Announcement, AttributeType, ErrorLog, Message, Opinion, Prisma, PrismaClient, Swipe, User } from "@prisma/client";
 import { MatchPreview, PublicProfile, SwipeFeed } from "./types";
 import { randomUUID } from "crypto";
 import { matchPreviewMessageCount } from "./globals";
@@ -482,6 +482,55 @@ export class PrismaManager {
 
     public async clearErrorLogs() {
         return this.prisma.errorLog.deleteMany();
+    }
+
+    public async makeAnnouncement(announcement : Announcement) {
+        return await this.prisma.announcement.create({
+            data: {
+                endTime: announcement.endTime,
+                message: announcement.message,
+                id: randomUUID(),
+                startTime: announcement.startTime,
+                title: announcement.title
+            }
+        })
+    } 
+
+    public async getAnnouncements() {
+        return await this.prisma.announcement.findMany({
+            where: {
+                startTime: {
+                    lte: new Date()
+                },
+                endTime: {
+                    gte: new Date()
+                }
+            }
+        })
+    }
+
+    public async getAllAnouncements() {
+        return await this.prisma.announcement.findMany();
+    }
+
+    public async deleteAnnouncement(id : string) {
+        return await this.prisma.announcement.delete({
+            where: {
+                id: id
+            }
+        })
+    }
+
+    public async deleteAllAnouncements() {
+        return await this.prisma.announcement.deleteMany();
+    }
+
+    public async getAnnouncementByID(id : string) {
+        return await this.prisma.announcement.findUnique({
+            where: {
+                id: id
+            }
+        })
     }
 }       
 

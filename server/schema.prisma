@@ -80,3 +80,11 @@ model ErrorLog {
     device          String
     message         String
 }
+
+model Announcement {
+    id              String          @id
+    startTime       DateTime
+    endTime         DateTime
+    title           String
+    message         String
+}
