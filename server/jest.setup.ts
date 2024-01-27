@@ -1,14 +1,20 @@
-import { beforeEach, afterEach, beforeAll, expect } from "@jest/globals";
+import { beforeEach, afterEach, beforeAll, expect, jest } from "@jest/globals";
 import { TestPrismaManager } from "./testModules/TestPrismaManager";
 import { Handler } from "./src/Handler";
 import { AttributeType, Message, User } from "@prisma/client";
 import { userAttributes } from "./src/globals";
+import { deleteImage, getImageList } from "./src/images";
 
 export const prismaManager = new TestPrismaManager();
 export const handler = new Handler(prismaManager);
 
-beforeAll( async () => {
-    await prismaManager.deleteEverything();
+jest.setTimeout(1000 * 10);
+
+beforeAll( async () => {    
+    await Promise.all([
+        prismaManager.deleteEverything(),
+        emptyImageStorage()
+    ])
 })
 
 beforeEach( async () => {
@@ -16,8 +22,18 @@ beforeEach( async () => {
 })
     
 afterEach( async () => {
-    await prismaManager.deleteEverything();
+    await Promise.all([
+        prismaManager.deleteEverything(),
+        emptyImageStorage()
+    ])
 })
+
+async function emptyImageStorage() {
+    const list = await getImageList() || [];
+    await Promise.all( list.map( (image) => {
+        return deleteImage(image.Key as string)
+    }))
+}
 
 async function setupAttributes() {
     for (let type of Object.keys(userAttributes) as AttributeType[]) {

@@ -1,4 +1,4 @@
-import { DeleteObjectCommand, GetObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { DeleteObjectCommand, GetObjectCommand, ListObjectsV2Command, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { randomUUID } from "crypto";
 import dotenv from "dotenv";
@@ -65,7 +65,7 @@ export async function getImageURL(id : string) : Promise<string|null> {
 export async function deleteImage(id : string) : Promise<boolean> {
     const command = new DeleteObjectCommand({
         Bucket: bucket,
-        Key: id
+        Key: id,
     })
     try {
         await s3.send(command);
@@ -74,4 +74,12 @@ export async function deleteImage(id : string) : Promise<boolean> {
         console.log(err);
         return false;
     }
+}
+
+export async function getImageList() {
+    const command = new ListObjectsV2Command({
+        Bucket: bucket
+    });
+
+    return (await s3.send(command)).Contents;
 }

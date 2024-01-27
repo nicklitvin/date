@@ -1,8 +1,9 @@
 import { AttributeType, Message, Opinion, User } from "@prisma/client";
 import { PrismaManager } from "./PrismaManager";
-import { MatchPreview, PublicProfile, SwipeFeed } from "./types";
+import { FileUpload, MatchPreview, PublicProfile, SwipeFeed } from "./types";
 import { doesUniversityMatchEmail } from "./utils";
-import { reportsForBan } from "./globals";
+import { maxProfileImageCount, reportsForBan } from "./globals";
+import { deleteImage, uploadImage } from "./images";
 
 export class Handler {
     private prisma : PrismaManager;
@@ -15,10 +16,21 @@ export class Handler {
         return Boolean(await this.prisma.getUser(userID));
     }
     
-    public async createUser(user : User) : Promise<boolean> {
+    public async createUser(user : User, images: FileUpload[] = [], maxImageCount : number = maxProfileImageCount) : Promise<boolean> {
         if (await this.prisma.getUser(user.id)) {
             return false;
         } else if (doesUniversityMatchEmail(user)) {
+            await Promise.all(images.map( async (image, index) => {
+                if (index < maxImageCount) {
+                    try {
+                        const imageID = await uploadImage(image.buffer, image.mimetype);
+                        if (imageID) {
+                            user.images.push(imageID);
+                        }
+                    } catch (err) {}
+                } 
+            }))
+
             return Boolean(await this.prisma.createUser(user));
         } else {
             return false;
@@ -26,7 +38,11 @@ export class Handler {
     }
     
     public async deleteUser(userID : string) : Promise<boolean> {
-        if (await this.prisma.getUser(userID)) {
+        const user = await this.prisma.getUser(userID);
+        if (user) {
+            const promises = user.images.map( async (imageID) => await deleteImage(imageID));
+            await Promise.all(promises)
+
             return Boolean( (await this.prisma.deleteUser(userID))[0] )
         } else {
             return true;
@@ -139,6 +155,44 @@ export class Handler {
 
     public async deleteAttribute(type : AttributeType, title : string) : Promise<boolean> {
         return Boolean(await this.prisma.deleteAttribute(type, title));
+    }
+
+    public async uploadImage(userID : string, image : FileUpload, maxImageCount : number = maxProfileImageCount) : Promise<boolean> {
+        const user = await this.getProfile(userID);
+        if (user && user.images.length < maxImageCount) {
+            const imageID = await uploadImage(image.buffer, image.mimetype);
+            if (imageID) {
+                return Boolean(await this.prisma.addImage(userID, imageID));
+            }
+            return false;
+        }
+        return false;
+    }
+
+    public async deleteImage(userID : string, imageID : string) : Promise<boolean> {
+        const user = await this.prisma.getUser(userID);
+        if (user) {
+            if ( user.images.includes(imageID) ) {
+                return Boolean(
+                    await this.prisma.deleteImage(userID, imageID) &&
+                    await deleteImage(imageID)
+                );
+            } else {
+                return true;
+            }
+        }
+        return false;   
+    }
+
+    public async changeImageOrder(userID : string, imageIDs : string[]) : Promise<boolean> {
+        const user = await this.prisma.getUser(userID);
+        if (
+            user && 
+            user.images.length == imageIDs.length && 
+            imageIDs.every( (val) => user.images.includes(val))) {
+                return Boolean(await this.prisma.changeImageOrder(userID, imageIDs));
+        }   
+        return false;
     }
 }
 

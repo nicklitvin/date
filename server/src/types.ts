@@ -22,3 +22,8 @@ export type MatchPreview = {
     profile: PublicProfile
     lastMessages: Message[]
 }
+
+export type FileUpload = {
+    buffer: Buffer
+    mimetype: string
+}

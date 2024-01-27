@@ -411,5 +411,48 @@ export class PrismaManager {
             })
         }
     }
-}
+
+    public async addImage(userID : string, imageID : string) {
+        return await this.prisma.user.update({
+            where: {
+                id: userID
+            },
+            data: {
+                images: {
+                    push: imageID
+                }
+            }
+        })
+    }
+
+    public async deleteImage(userID : string, imageID : string) {
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: userID
+            }
+        });
+
+        const newImageList = user?.images.filter( (val) => val != imageID);
+
+        return await this.prisma.user.update({
+            where: {
+                id: userID
+            },
+            data: {
+                images: newImageList
+            }
+        })
+    }
+
+    public async changeImageOrder(userID : string, imageIDs : string[]) {
+        return await this.prisma.user.update({
+            where: {
+                id: userID
+            },
+            data: {
+                images: imageIDs
+            }
+        })
+    }
+}       
 
