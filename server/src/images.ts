@@ -2,6 +2,9 @@ import { DeleteObjectCommand, GetObjectCommand, PutObjectCommand, S3Client } fro
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { randomUUID } from "crypto";
 import dotenv from "dotenv";
+import { acceptableMimetypes, imageHeight, imageWidth } from "./globals";
+import sharp from "sharp";
+import axios from "axios";
 
 dotenv.config();
 
@@ -19,12 +22,19 @@ const s3 = new S3Client({
 })
 
 export async function uploadImage(buffer : Buffer, mimetype : string) : Promise<string|null> {
+    if (!acceptableMimetypes.includes(mimetype.toLowerCase())) return null;
+
+    const resizedBuffer = await sharp(buffer).resize({
+        width: imageWidth,
+        height: imageHeight
+    }).toBuffer();
+
     const imageID = randomUUID();
 
     const command = new PutObjectCommand({
         Bucket: bucket,
         Key: imageID,
-        Body: buffer,
+        Body: resizedBuffer,
         ContentType: mimetype
     })
 
@@ -37,12 +47,19 @@ export async function uploadImage(buffer : Buffer, mimetype : string) : Promise<
     }
 }
 
-export async function getImage(id : string) : Promise<string|null> {
+export async function getImageURL(id : string) : Promise<string|null> {
     const command = new GetObjectCommand({
         Bucket: bucket,
         Key: id,
     });
-    return await getSignedUrl(s3, command);
+
+    const url = await getSignedUrl(s3, command);
+    try {
+        await axios.get(url);
+        return url;
+    } catch (err) {
+        return null;
+    }
 }
 
 export async function deleteImage(id : string) : Promise<boolean> {
