@@ -1,4 +1,4 @@
-import { AttributeType, Message, Opinion, Prisma, PrismaClient, Swipe, User } from "@prisma/client";
+import { AttributeType, ErrorLog, Message, Opinion, Prisma, PrismaClient, Swipe, User } from "@prisma/client";
 import { MatchPreview, PublicProfile, SwipeFeed } from "./types";
 import { randomUUID } from "crypto";
 import { matchPreviewMessageCount } from "./globals";
@@ -453,6 +453,35 @@ export class PrismaManager {
                 images: imageIDs
             }
         })
+    }
+
+    public async logError(device : string, message : string, date : Date) {
+        return await this.prisma.errorLog.create({
+            data: {
+                id: randomUUID(),
+                timestamp: date,
+                device: device,
+                message: message
+            }
+        })
+    }
+
+    public async getErrorLogs(count : number, fromTime : Date) {
+        return await this.prisma.errorLog.findMany({
+            where: {
+                timestamp: {
+                    lte: fromTime
+                }
+            },
+            orderBy: {
+                timestamp: "desc"
+            },
+            take: count
+        })
+    }
+
+    public async clearErrorLogs() {
+        return this.prisma.errorLog.deleteMany();
     }
 }       
 

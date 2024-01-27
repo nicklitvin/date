@@ -1,4 +1,4 @@
-import { AttributeType, Message, Opinion, User } from "@prisma/client";
+import { AttributeType, ErrorLog, Message, Opinion, User } from "@prisma/client";
 import { PrismaManager } from "./PrismaManager";
 import { FileUpload, MatchPreview, PublicProfile, SwipeFeed } from "./types";
 import { doesUniversityMatchEmail } from "./utils";
@@ -193,6 +193,18 @@ export class Handler {
                 return Boolean(await this.prisma.changeImageOrder(userID, imageIDs));
         }   
         return false;
+    }
+
+    public async logError(device : string, message : string, date : Date = new Date()) : Promise<boolean> {
+        return Boolean(await this.prisma.logError(device, message, date));
+    }
+
+    public async getErrorLogs(count : number, fromTime : Date) : Promise<ErrorLog[]> {
+        return await this.prisma.getErrorLogs(count,fromTime);
+    } 
+
+    public async clearErrorLogs() : Promise<boolean> {
+        return Boolean(await this.prisma.clearErrorLogs());
     }
 }
 

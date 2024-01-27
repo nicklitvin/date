@@ -7,11 +7,14 @@ export class TestPrismaManager extends PrismaManager {
     }
 
     public async deleteEverything() {
-        await this.prisma.user.deleteMany();
-        await this.prisma.swipe.deleteMany();
-        await this.prisma.message.deleteMany();
-        await this.prisma.report.deleteMany();
-        await this.prisma.attribute.deleteMany();
+        await Promise.all([
+            this.prisma.user.deleteMany(),
+            this.prisma.swipe.deleteMany(),
+            this.prisma.message.deleteMany(),
+            this.prisma.report.deleteMany(),
+            this.prisma.attribute.deleteMany(),
+            this.prisma.errorLog.deleteMany()
+        ])
     }
 
     public async getUserCount(userID? : string) {

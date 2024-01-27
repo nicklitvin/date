@@ -73,3 +73,10 @@ model Report {
     timestamp       DateTime
     reportedEmail   String              
 }
+
+model ErrorLog {
+    id              String          @id
+    timestamp       DateTime
+    device          String
+    message         String
+}

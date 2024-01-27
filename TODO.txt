@@ -1,4 +1,7 @@
 TODO
+change all for loops with awaits to promise.all
+announcement table
+stripe subscription
 
 NOTES
 to make prisma client autofill:

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "@jest/globals";
-import { deleteImage, getImageList, getImageURL, uploadImage } from "../src/images";
+import { deleteImage, getImageURL, uploadImage } from "../src/images";
 import fs from "fs/promises";
 import mime  from "mime-types";
 import axios from "axios";
