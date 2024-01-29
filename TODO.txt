@@ -1,8 +1,7 @@
 TODO
-stripe subscription
-get analytics
+change returns for prismaManager (delete returns count)
 premium features
-smart swiping
+swiping elo
 server catch errors write to client errors
 
 NOTES

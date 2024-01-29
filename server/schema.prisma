@@ -43,6 +43,9 @@ model User {
     description     String
     notifications   Boolean
     university      String
+    subscribeEnd    DateTime
+    isSubscribed    Boolean
+    subscriptionID  String?
 }
 
 model Swipe {

@@ -532,5 +532,40 @@ export class PrismaManager {
             }
         })
     }
+
+    public async setUserSubscriptionInfo(userID : string, endDate : Date, subscriptionId : string, isSubscribed : boolean) {
+        return await this.prisma.user.update({
+            where: {
+                id: userID
+            },
+            data: {
+                subscribeEnd: endDate,
+                isSubscribed: isSubscribed,
+                subscriptionID: subscriptionId
+            }
+        })
+    }
+
+    // public async setSubscribeEndDate(userID : string, date : Date) {
+    //     return await this.prisma.user.update({
+    //         where: {
+    //             id: userID
+    //         },
+    //         data: {
+    //             subscribeEnd: date
+    //         }
+    //     })
+    // }
+
+    // public async setUserSubscriptionID(userID : string, subscriptionID : string | null) {
+    //     return await this.prisma.user.update({
+    //         where: {
+    //             id: userID
+    //         },
+    //         data: {
+    //             subscriptionID: subscriptionID
+    //         }
+    //     })
+    // }
 }       
 

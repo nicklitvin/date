@@ -12,8 +12,9 @@ describe("profile", () => {
     })    
 
     it("should get user", async () => {
-        expect(await handler.createUser(createSampleUser(defaults.userID))).toEqual(true);
-        expect(await handler.getProfile(defaults.userID)).toEqual(createSampleUser(defaults.userID));
+        const initial = createSampleUser(defaults.userID);
+        expect(await handler.createUser(initial)).toEqual(true);
+        expect(await handler.getProfile(defaults.userID)).toEqual(initial);
     })
 
     it("should not edit nonuser", async () => {

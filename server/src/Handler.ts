@@ -4,12 +4,17 @@ import { FileUpload, MatchPreview, PublicProfile, SwipeFeed } from "./types";
 import { doesUniversityMatchEmail } from "./utils";
 import { maxProfileImageCount, reportsForBan } from "./globals";
 import { deleteImage, uploadImage } from "./images";
+import Stripe from "stripe";
 
 export class Handler {
     private prisma : PrismaManager;
+    private stripe : Stripe;
 
     constructor(prismaManager : PrismaManager) {
         this.prisma = prismaManager;
+        this.stripe = new Stripe(process.env.STRIPE_API_KEY!, {
+            typescript: true
+        })
     }
 
     public async doesUserExist(userID : string) : Promise<boolean> {
@@ -189,8 +194,9 @@ export class Handler {
         if (
             user && 
             user.images.length == imageIDs.length && 
-            imageIDs.every( (val) => user.images.includes(val))) {
-                return Boolean(await this.prisma.changeImageOrder(userID, imageIDs));
+            imageIDs.every( (val) => user.images.includes(val))) 
+        {
+            return Boolean(await this.prisma.changeImageOrder(userID, imageIDs));
         }   
         return false;
     }
@@ -229,6 +235,54 @@ export class Handler {
 
     public async deleteAllAnouncement() : Promise<boolean> {
         return Boolean(await this.prisma.deleteAllAnouncements());
+    }
+
+    async createSubscriptioncSessionURL(userID : string) {
+        const sessions = await this.stripe.checkout.sessions.create({
+            mode: "subscription",
+            line_items: [
+                {
+                    price: process.env.PREMIUM_PRICE_ID!,
+                    quantity: 1
+                }
+            ],
+            success_url: process.env.SUCCESS_RETURN_URL!,
+            cancel_url: process.env.CANCEL_RETURN_URL!,
+            allow_promotion_codes: true,
+            metadata: {
+                userID: userID
+            }
+        });
+    
+        return sessions;
+    }
+
+    async processSubscriptionPayment(userID: string, subscriptionID : string) : Promise<boolean> {
+        const user = await this.prisma.getUser(userID);
+        if (user) {
+            const newDate = new Date();
+            newDate.setMonth(newDate.getMonth() + 1);
+            return Boolean(
+                await this.prisma.setUserSubscriptionInfo(userID,newDate,subscriptionID,true)
+            );
+        }
+        return false;
+    }
+
+    async cancelSubscription(userID : string, ignoreStripe = false) : Promise<boolean> {
+        const user = await this.prisma.getUser(userID);
+        if (user && user.subscriptionID) {
+            return Boolean(
+                (
+                    ignoreStripe ?? 
+                    await this.stripe.subscriptions.cancel(user.subscriptionID)
+                ) && 
+                await this.prisma.setUserSubscriptionInfo(
+                    userID, user.subscribeEnd, user.subscriptionID, false
+                )
+            )
+        }
+        return false;
     }
 }
 

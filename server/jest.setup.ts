@@ -55,7 +55,10 @@ export function createSampleUser(userID : string) : User {
         images: [],
         name: "name",
         notifications: true,
-        university: "berkeley"
+        university: "berkeley",
+        subscribeEnd: new Date(),
+        isSubscribed: false,
+        subscriptionID: null
     }
 }
 
@@ -72,6 +75,7 @@ export const defaults = {
     stanfordName : "stanford",
     message: "message",
     message_2: "message2",
+    subscriptionID: "sub_id"
 }
 
 export async function createTwoUsersInSameUni() {
