@@ -1,5 +1,5 @@
 import { Announcement, AttributeType, ErrorLog, Message, Opinion, Prisma, PrismaClient, Swipe, User } from "@prisma/client";
-import { MatchPreview, PublicProfile, SwipeFeed } from "./types";
+import { LikeDislike, MatchPreview, PublicProfile, SwipeFeed, UserStats } from "./types";
 import { randomUUID } from "crypto";
 import { matchPreviewMessageCount } from "./globals";
 
@@ -118,14 +118,14 @@ export class PrismaManager {
         };
     }
 
-    public async createSwipe(userID : string, swipedUserID : string, action : Opinion) : Promise<Swipe> {
+    public async createSwipe(userID : string, swipedUserID : string, action : Opinion, date = new Date()) : Promise<Swipe> {
         return await this.prisma.swipe.create({
             data: {
                 action: action,
                 swipedUserID: swipedUserID,
                 userID: userID,
                 id: randomUUID(),
-                timestamp: new Date()
+                timestamp: date
             }
         })
     }
@@ -546,26 +546,52 @@ export class PrismaManager {
         })
     }
 
-    // public async setSubscribeEndDate(userID : string, date : Date) {
-    //     return await this.prisma.user.update({
-    //         where: {
-    //             id: userID
-    //         },
-    //         data: {
-    //             subscribeEnd: date
-    //         }
-    //     })
-    // }
+    public async getUserStats(userID : string, fromTime : Date, toTime : Date, weeksAgo : number | undefined) : Promise<LikeDislike> {
+        const myLikes = await this.prisma.swipe.count({
+            where: {
+                userID: userID,
+                action: "Like",
+                timestamp: {
+                    lte: toTime,
+                    gte: fromTime
+                }
+            },
+        })
 
-    // public async setUserSubscriptionID(userID : string, subscriptionID : string | null) {
-    //     return await this.prisma.user.update({
-    //         where: {
-    //             id: userID
-    //         },
-    //         data: {
-    //             subscriptionID: subscriptionID
-    //         }
-    //     })
-    // }
+        const myDislikes = await this.prisma.swipe.count({
+            where: {
+                userID: userID,
+                action: "Dislike",
+                timestamp: {
+                    lte: toTime,
+                    gte: fromTime
+                }
+            },
+        })
+        
+        const likedMe = await this.prisma.swipe.count({
+            where: {
+                swipedUserID: userID,
+                action: "Like",
+                timestamp: {
+                    lte: toTime,
+                    gte: fromTime
+                }
+            }
+        }) 
+
+        const dislikedMe = await this.prisma.swipe.count({
+            where: {
+                swipedUserID: userID,
+                action: "Dislike",
+                timestamp: {
+                    lte: toTime,
+                    gte: fromTime
+                }
+            }
+        });
+        
+        return { myLikes, myDislikes, likedMe, dislikedMe, weeksAgo }
+    } 
 }       
 

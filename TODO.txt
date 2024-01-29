@@ -1,4 +1,5 @@
 TODO
+add predefined to prismaManager functions parameters
 change returns for prismaManager (delete returns count)
 premium features
 swiping elo
@@ -22,9 +23,16 @@ premium (first 100 people get free)
     stats
     reason for swiping no include
 
+age preference/distance
+
 if ever try catch error, send post to server with message
 
 Make different user authentication rules list of functions that must pass
+
+PUBLIC
+BASIC
+PREMIUM
+ADMIN
 
 USER ATTRIBUTES
 

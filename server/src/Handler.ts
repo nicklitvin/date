@@ -1,10 +1,11 @@
 import { Announcement, AttributeType, ErrorLog, Message, Opinion, User } from "@prisma/client";
 import { PrismaManager } from "./PrismaManager";
-import { FileUpload, MatchPreview, PublicProfile, SwipeFeed } from "./types";
+import { FileUpload, LikeDislike, MatchPreview, PublicProfile, SwipeFeed, UserStats } from "./types";
 import { doesUniversityMatchEmail } from "./utils";
 import { maxProfileImageCount, reportsForBan } from "./globals";
 import { deleteImage, uploadImage } from "./images";
 import Stripe from "stripe";
+import { startOfWeek, subWeeks } from "date-fns";
 
 export class Handler {
     private prisma : PrismaManager;
@@ -283,6 +284,30 @@ export class Handler {
             )
         }
         return false;
+    }
+
+    async getUserStats(userID : string) : Promise<UserStats|null>{
+        if (await this.doesUserExist(userID)) {
+            const weekStart = startOfWeek(new Date());
+
+            const allStats = await this.prisma.getUserStats(userID, new Date(0), new Date(), undefined);
+            const weekStatPromises = Array.from({length: 4}).map( (_, index) =>
+                this.prisma.getUserStats(
+                    userID, 
+                    subWeeks(weekStart, index), 
+                    index == 0 ? new Date() : subWeeks(weekStart,index - 1), 
+                    index
+                )
+            )
+            const weekStats = await Promise.all(weekStatPromises);
+            weekStats.sort( (a,b) => ( a.weeksAgo as number ) - ( b.weeksAgo as number) );
+            
+            return {
+                allTime: allStats,
+                weekly: weekStats
+            }
+        }
+        return null;
     }
 }
 

@@ -27,3 +27,16 @@ export type FileUpload = {
     buffer: Buffer
     mimetype: string
 }
+
+export type UserStats = {
+    allTime: LikeDislike
+    weekly: LikeDislike[]
+}
+
+export type LikeDislike = {
+    myLikes: number
+    myDislikes: number
+    likedMe: number
+    dislikedMe: number
+    weeksAgo: number | undefined
+}
