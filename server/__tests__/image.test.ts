@@ -1,212 +1,85 @@
-import { describe, expect, it } from "@jest/globals";
-import { deleteImage, getImageURL, uploadImage } from "../src/images";
+import { afterEach, describe, expect, it } from "@jest/globals";
+import { handler } from "../jest.setup";
+import { ImageInput } from "../src/types";
 import fs from "fs/promises";
-import mime  from "mime-types";
+import mime from "mime-types";
 import axios from "axios";
 import sizeOf from "image-size";
 import { imageHeight, imageWidth } from "../src/globals";
-import { createSampleUser, defaults, handler } from "../jest.setup";
-import { FileUpload } from "../src/types";
-import { User } from "@prisma/client";
+
+afterEach( async () => {
+    await handler.image.deleteAllImages();
+})
 
 describe("image", () => {
-    const imageFilePath = "./testModules/image.jpg";
-    const badImageFilePath = "./testModules/badImage.txt";
+    const funcs = handler.image;
+    const imageFilePath = "./__tests__/images/goodImage.jpg";
+    const badImageFilePath = "./__tests__/images/badImage.txt";
 
-    const getImageDetails = async (good : boolean = true) : Promise<FileUpload> => {
+    const getImageDetails = async (good : boolean) : Promise<ImageInput> => {
         return {
             buffer: await fs.readFile(good ? imageFilePath : badImageFilePath),
             mimetype: mime.lookup(good ? imageFilePath : badImageFilePath) as string
         }
     }
 
-    it("should upload/get/delete image", async () => {
-        const image = await getImageDetails()
-        
-        const imageID = await uploadImage(image.buffer,image.mimetype);
-        expect(typeof(imageID) == "string").toEqual(true);
-
-        const dowloadLink = await getImageURL(imageID as string);
-        expect(typeof(dowloadLink) == "string").toEqual(true);
-        
-        expect(await deleteImage(imageID as string)).toEqual(true);
+    it("should not upload nonimage", async () => {
+        expect(await funcs.uploadImage(await getImageDetails(false))).toEqual(null);
     })
 
-    it("should not upload bad file extension", async () => {
-        const image = await getImageDetails(false);
-        expect(await uploadImage(image.buffer,image.mimetype)).toEqual(null);
+    it("should upload image", async () => {
+        expect(await funcs.uploadImage(await getImageDetails(true))).not.toEqual(null);
     })
 
-    it("should upload and resize file", async () => {
-        const image = await getImageDetails()
+    it("should not get nonImageURL", async () => {
+        expect(await funcs.uploadImage(await getImageDetails(true))).not.toEqual(null);
+    })
 
-        const imageID = await uploadImage(image.buffer,image.mimetype) as string;
-        expect(typeof(imageID)=="string").toEqual(true);
-
-        const downloadLink = await getImageURL(imageID) as string;
-        const response = await axios.get(downloadLink, { responseType: "arraybuffer"} );
-
+    it("should get imageURL", async () => {
+        const imageID = await funcs.uploadImage(await getImageDetails(true)) as string;
+        expect(await funcs.getImageURL(imageID)).not.toEqual(null);
+    })
+    
+    it("should resize image upload", async () => {
+        const imageID = await funcs.uploadImage(await getImageDetails(true)) as string;
+        const URL = await funcs.getImageURL(imageID) as string;
+        const response = await axios.get(URL, { responseType: "arraybuffer"} );
         const dimensions = sizeOf(response.data);
+        
         expect(dimensions.height).toEqual(imageHeight);
         expect(dimensions.width).toEqual(imageWidth);
-
-        expect(await deleteImage(imageID)).toEqual(true);
     })
 
-    it("should not delete if nonimage", async () => {
-        const randomID = "random";
-        expect(await deleteImage(randomID)).toEqual(true);
+    it("should get all imageIDs", async () => {
+        const image = await getImageDetails(true);
+        await Promise.all([
+            funcs.uploadImage(image),
+            funcs.uploadImage(image),
+            funcs.uploadImage(image)
+        ]);
+
+        const images = await funcs.getAllImageIDs();
+        expect(images.length).toEqual(3);
     })
 
-    it("should not get download link for nonimage", async () => {
-        const randomID = "random";
-        expect(await getImageURL(randomID)).toEqual(null);
+    it("should not delete nonimage", async () => {
+        expect(await funcs.deleteImage("bad")).toEqual(null);
     })
 
-    it("should create/delete user with images", async () => {
-        const image = await getImageDetails();
-        expect(await handler.createUser(
-            createSampleUser(defaults.userID),[image, image]
-        )).toEqual(true);
-        
-        const user = await handler.getProfile(defaults.userID);
-        expect(user?.images.length).toEqual(2);
+    it("should delete image", async () => {
+        const imageID = await funcs.uploadImage(await getImageDetails(true)) as string;
+        expect(await funcs.deleteImage(imageID)).toEqual(imageID);
     })
 
-    it("should ignore image with bad format", async () => {
-        const image = await getImageDetails();
-        const badImage = await getImageDetails(false);
-        expect(await handler.createUser(
-            createSampleUser(defaults.userID),[image, badImage]
-        )).toEqual(true);
-        
-        const user = await handler.getProfile(defaults.userID);
-        expect(user?.images.length).toEqual(1);
+    it("should delete all images", async () => {
+        const image = await getImageDetails(true);
+        await Promise.all([
+            funcs.uploadImage(image),
+            funcs.uploadImage(image),
+            funcs.uploadImage(image)
+        ]);
+
+        const deleted = await funcs.deleteAllImages();
+        expect(deleted).toEqual(3);
     })
-
-    it("should not create user with too many images", async () => {
-        const image = await getImageDetails();
-        expect(await handler.createUser(
-            createSampleUser(defaults.userID),
-            [image, image, image],
-            1
-        )).toEqual(true);
-        
-        const user = await handler.getProfile(defaults.userID);
-        expect(user?.images.length).toEqual(1);
-    })
-
-    it("should not upload for nonuser", async () => {
-        const image = await getImageDetails();
-        expect(await handler.uploadImage(defaults.userID, image)).toEqual(false);
-    })
-
-    it("should not upload bad image", async () => {
-        expect(await handler.createUser(createSampleUser(defaults.userID))).toEqual(true);
-
-        const image = await getImageDetails(false);
-        expect(await handler.uploadImage(defaults.userID, image)).toEqual(false);
-    })
-
-    it("should not upload past max image count", async () => {
-        expect(await handler.createUser(createSampleUser(defaults.userID))).toEqual(true);
-
-        const image = await getImageDetails();
-        expect(await handler.uploadImage(defaults.userID, image, 0)).toEqual(false);
-    })
-
-    it("should upload image for user", async () => {
-        expect(await handler.createUser(createSampleUser(defaults.userID))).toEqual(true);
-
-        const image = await getImageDetails();
-        expect(await handler.uploadImage(defaults.userID, image)).toEqual(true);
-    })
-
-    it("should not delete image for nonuser", async () => {
-        expect(await handler.createUser(createSampleUser(defaults.userID))).toEqual(true);
-
-        const image = await getImageDetails();
-        expect(await handler.uploadImage(defaults.userID, image)).toEqual(true);
-
-        const user = await handler.getProfile(defaults.userID) as User;
-        expect(await handler.deleteImage(defaults.userID_2, user.images[0])).toEqual(false);
-    })
-
-    it("should delete nonimage for user", async () => {
-        expect(await handler.createUser(createSampleUser(defaults.userID))).toEqual(true);
-        
-        const image = await getImageDetails();
-        expect(await handler.uploadImage(defaults.userID, image)).toEqual(true);
-
-        expect(await handler.deleteImage(defaults.userID, "random")).toEqual(true);
-    })
-
-    it("should delete image for user", async () => {
-        expect(await handler.createUser(createSampleUser(defaults.userID))).toEqual(true);
-        
-        const image = await getImageDetails();
-        expect(await handler.uploadImage(defaults.userID, image)).toEqual(true);
-
-        const user = await handler.getProfile(defaults.userID) as User;
-        const imageID = user.images[0];
-
-        expect(await handler.deleteImage(defaults.userID, imageID)).toEqual(true);
-        expect(await getImageURL(imageID)).toEqual(null);
-
-        const userAfter = await handler.getProfile(defaults.userID) as User;
-        expect(userAfter.images.length).toEqual(0);
-    })
-
-    it("should not change image order for nonuser", async () => {
-        const image = await getImageDetails();
-        expect(await handler.createUser(
-            createSampleUser(defaults.userID),
-            [image, image]
-        )).toEqual(true);
-        
-        const user = await handler.getProfile(defaults.userID) as User;
-        const userImages = user.images;
-        userImages.reverse();
-
-        expect(await handler.changeImageOrder(defaults.userID_2, userImages)).toEqual(false);
-    })
-
-    it("should not make invalid order for user", async () => {
-        const image = await getImageDetails();
-        expect(await handler.createUser(
-            createSampleUser(defaults.userID),
-            [image, image]
-        )).toEqual(true);
-
-        expect(await handler.changeImageOrder(defaults.userID, ["1","2"])).toEqual(false);
-    })
-
-    it("should change image order for user", async () => {
-        const image = await getImageDetails();
-        expect(await handler.createUser(
-            createSampleUser(defaults.userID),
-            [image, image]
-        )).toEqual(true);
-
-        const user = await handler.getProfile(defaults.userID) as User;
-        const userImages = user.images;
-        userImages.reverse();
-
-        expect(await handler.changeImageOrder(defaults.userID, userImages)).toEqual(true);
-    })
-
-    it("should delete images with user", async () => {
-        const image = await getImageDetails();
-        expect(await handler.createUser(
-            createSampleUser(defaults.userID),
-            [image]
-        )).toEqual(true);
-
-        const user = await handler.getProfile(defaults.userID) as User;
-
-        expect(await handler.deleteUser(defaults.userID)).toEqual(true);
-        expect(await getImageURL(user.images[0])).toEqual(null);
-    })
-
-    it("ab", async () => {})
 })

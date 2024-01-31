@@ -1,55 +1,69 @@
-import { describe, expect, it } from "@jest/globals";
+import { afterEach, describe, expect, it } from "@jest/globals";
 import { handler } from "../jest.setup";
-import { userAttributes } from "../src/globals";
-import { AttributeType } from "@prisma/client";
+import { AttributeValueInput } from "../src/types";
+
+afterEach( async () => {
+    await handler.attribute.deleteAllAttributes();
+})
 
 describe("attribute", () => {
-    it("should set up attributes for testing", async () => {
-        let count = 0;
-        for (let type of Object.keys(userAttributes)) {
-            count += userAttributes[type as AttributeType].length;
-        }
+    const funcs = handler.attribute;
+    const attributeInput : AttributeValueInput = {
+        type: "Fitness",
+        value: "Gym"
+    }
+    const attributeInput_2 : AttributeValueInput = {
+        type: "Fitness",
+        value: "Basketball"
+    }
+    const attributeInput_3 : AttributeValueInput = {
+        type: "Music",
+        value: "Piano"
+    }
 
-        const retrievedAttributes = await handler.getAttributes();
-        let actualCount = 0;
+    it("should add attribute value", async () => {
+        expect(await funcs.addAttribute(attributeInput)).not.toEqual(null);
+    })
 
-        for (let attribute of retrievedAttributes) {
-            actualCount += attribute.values.length;            
-        }
-        expect(actualCount).toEqual(count);
-    })  
+    it("should get attributes", async () => {
+        await Promise.all([
+            funcs.addAttribute(attributeInput),
+            funcs.addAttribute(attributeInput_2),
+            funcs.addAttribute(attributeInput_3),
+        ])
 
-    it("should create attribute", async () => {
-        const createAttributeType = "Fitness";
-        const newAttributeValue = "newValue"; 
-        
-        const beforeAttributes = await handler.getAttributes();
-        const beforeList = beforeAttributes.find(obj => obj.type == createAttributeType);
-        expect(beforeList?.values.includes(newAttributeValue)).toEqual(false);
+        const attributes = await funcs.getAttributes();
+        expect(attributes.get("Fitness")!.length).toEqual(2);
+        expect(attributes.get("Fitness")![0].value).toEqual(attributeInput_2.value);
+        expect(attributes.get("Fitness")![1].value).toEqual(attributeInput.value);
+        expect(attributes.get("Music")!.length).toEqual(1);
+        expect(attributes.get("Music")![0].value).toEqual(attributeInput_3.value);
+    })
 
-        expect(await handler.createAttribute(createAttributeType, newAttributeValue)).toEqual(true);
-
-        const afterAttributes = await handler.getAttributes();
-        const afterList = afterAttributes.find(obj => obj.type == createAttributeType);
-        expect(afterList?.values.includes(newAttributeValue)).toEqual(true);
-
-        const copy = [...afterAttributes];
-        copy.sort()
-        expect(copy.every( (val,index) => val == afterAttributes[index])).toEqual(true);
+    it("should not delete nonattribute value", async () => {
+        expect(await funcs.deleteAttribute("badID")).toEqual(null);
     })
 
     it("should delete attribute", async () => {
-        const removeType : AttributeType = "Fitness";
-        const removeAttributeValue = "Basketball";
+        await Promise.all([
+            funcs.addAttribute(attributeInput),
+            funcs.addAttribute(attributeInput_2),
+        ])
 
-        const beforeAttributes = await handler.getAttributes();
-        const beforeList = beforeAttributes.find(obj => obj.type == removeType);
-        expect(beforeList?.values.includes(removeAttributeValue)).toEqual(true);
+        const attributes = await funcs.getAttributes();
+        const attribute_id = attributes.get("Fitness")![0].id;
+        expect(await funcs.deleteAttribute(attribute_id)).toEqual({
+            ...attributeInput_2,
+            id: attribute_id,
+        });
+    })
 
-        expect(await handler.deleteAttribute(removeType, removeAttributeValue)).toEqual(true);
-
-        const afterAttributes = await handler.getAttributes();
-        const afterList = afterAttributes.find(obj => obj.type == removeType);
-        expect(afterList?.values.includes(removeAttributeValue)).toEqual(false);
+    it("should delete all attributes", async () => {
+        await Promise.all([
+            funcs.addAttribute(attributeInput),
+            funcs.addAttribute(attributeInput),
+            funcs.addAttribute(attributeInput),
+        ])
+        expect(await funcs.deleteAllAttributes()).toEqual(3);
     })
 })

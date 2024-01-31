@@ -1,10 +1,36 @@
 import { AttributeType, Gender, Message, User } from "@prisma/client"
 
-export const AllowedEdits : (keyof User)[] = ["age"]
+export interface AnnouncementInput {
+    startTime: Date
+    endTime: Date
+    title: string
+    message: string
+}
+
+export interface AttributeValueInput {
+    type: AttributeType
+    value: string
+}
+
+export interface ErrorLogInput {
+    device: string
+    message: string
+}
+
+export interface UserInput {
+    email: string
+    name: string
+    age: number
+    gender: Gender
+    interestedIn: Gender[]
+    attributes: string[]
+    images: string[]
+    description: string
+}
 
 export type PublicProfile = {
-    id : string
-    name : string
+    id: string
+    name: string
     age: number
     gender: Gender
     attributes: string[]
@@ -12,6 +38,21 @@ export type PublicProfile = {
     description: string
     university: string
 }
+
+export interface EditUserInput {
+    id: string
+    setting: (keyof User)
+    value: any
+}
+
+export const AllowedUserEdits: (keyof User)[] = ["age"]
+
+export type ImageInput = {
+    buffer: Buffer
+    mimetype: string
+}
+
+// OLD
 
 export type SwipeFeed = {
     feed: PublicProfile[]
@@ -21,11 +62,6 @@ export type SwipeFeed = {
 export type MatchPreview = {
     profile: PublicProfile
     lastMessages: Message[]
-}
-
-export type FileUpload = {
-    buffer: Buffer
-    mimetype: string
 }
 
 export type UserStats = {
@@ -39,4 +75,10 @@ export type LikeDislike = {
     likedMe: number
     dislikedMe: number
     weeksAgo: number | undefined
+}
+
+export type UserDelete = {
+    user: number
+    swipes: number
+    messages: number
 }
