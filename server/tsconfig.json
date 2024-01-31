@@ -6,7 +6,7 @@
       "esModuleInterop": true,
       "types": ["node", "jest"]
     },
-    "include": ["src/**/*.ts", "testModules/TestPrismaManager.ts"],
+    "include": ["src/**/*.ts", "testModules/TestPrismaManager.ts", "../old/PrismaManager.ts"],
     "exclude": ["node_modules"]
 }
   

@@ -40,6 +40,25 @@ export interface SwipeInput {
     action: Opinion
 }
 
+export interface MessageInput {
+    userID: string
+    recepientID: string
+    message: string
+}
+
+export interface ReadStatusInput {
+    userID: string
+    fromID: string
+    timestamp: Date
+}
+
+export interface GetChatInput {
+    userID: string
+    withID: string
+    count: number
+    fromTime: Date
+}
+
 export const AllowedUserEdits: (keyof User)[] = ["age"]
 
 export type ImageInput = {

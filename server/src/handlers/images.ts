@@ -2,7 +2,6 @@ import { DeleteObjectCommand, GetObjectCommand, ListObjectsV2Command, PutObjectC
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { randomUUID } from "crypto";
 import dotenv from "dotenv";
-import { acceptableMimetypes, imageHeight, imageWidth } from "../globals";
 import sharp from "sharp";
 import axios from "axios";
 import { ImageInput } from "../types";
@@ -15,6 +14,9 @@ const secretAccessKey = process.env.SECRET_ACCESS_KEY!;
 
 export class S3ImageHandler {
     private client : S3Client;
+    private acceptableMimetypes = ["image/png","image/jpeg"];
+    private imageHeight = 400;
+    private imageWidth = 300;
 
     constructor() {
         this.client = new S3Client({
@@ -27,11 +29,11 @@ export class S3ImageHandler {
     }
 
     async uploadImage(input : ImageInput) : Promise<string|null> {
-        if (!acceptableMimetypes.includes(input.mimetype.toLowerCase())) return null;
+        if (!this.acceptableMimetypes.includes(input.mimetype.toLowerCase())) return null;
     
         const resizedBuffer = await sharp(input.buffer).resize({
-            width: imageWidth,
-            height: imageHeight
+            width: this.imageWidth,
+            height: this.imageHeight
         }).toBuffer();
     
         const imageID = randomUUID();
