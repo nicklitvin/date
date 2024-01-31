@@ -88,7 +88,7 @@ describe("user", () => {
 
     it("should not edit nonuser", async () => {
         expect(await funcs.editUser({
-            id: "bad",
+            userID: "bad",
             setting: "age",
             value: 21
         })).toEqual(null);
@@ -97,7 +97,7 @@ describe("user", () => {
     it("should not edit user with bad input", async () => {
         const user = await funcs.createUser(createUserInput()) as User;
         expect(await funcs.editUser({
-            id: user.id,
+            userID: user.id,
             setting: "age",
             value: "21"
         })).toEqual(null);
@@ -106,7 +106,7 @@ describe("user", () => {
     it("should edit user", async () => {
         const user = await funcs.createUser(createUserInput()) as User;
         expect(await funcs.editUser({
-            id: user.id,
+            userID: user.id,
             setting: "age",
             value: 21
         })).not.toEqual(null);

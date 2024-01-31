@@ -1,4 +1,4 @@
-import { AttributeType, Gender, Message, User } from "@prisma/client"
+import { AttributeType, Gender, Message, Opinion, User } from "@prisma/client"
 
 export interface AnnouncementInput {
     startTime: Date
@@ -28,6 +28,25 @@ export interface UserInput {
     description: string
 }
 
+export interface EditUserInput {
+    userID: string
+    setting: (keyof User)
+    value: any
+}
+
+export interface SwipeInput {
+    userID: string
+    swipedUserID: string
+    action: Opinion
+}
+
+export const AllowedUserEdits: (keyof User)[] = ["age"]
+
+export type ImageInput = {
+    buffer: Buffer
+    mimetype: string
+}
+
 export type PublicProfile = {
     id: string
     name: string
@@ -37,19 +56,6 @@ export type PublicProfile = {
     images: string[]
     description: string
     university: string
-}
-
-export interface EditUserInput {
-    id: string
-    setting: (keyof User)
-    value: any
-}
-
-export const AllowedUserEdits: (keyof User)[] = ["age"]
-
-export type ImageInput = {
-    buffer: Buffer
-    mimetype: string
 }
 
 // OLD

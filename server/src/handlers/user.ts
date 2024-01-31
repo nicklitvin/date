@@ -87,7 +87,7 @@ export class UserHandler {
     public async editUser(input : EditUserInput) : Promise<User|null> {
         const user = await this.prisma.user.findUnique({
             where: {
-                id: input.id
+                id: input.userID
             }
         });
 
@@ -98,7 +98,7 @@ export class UserHandler {
                         [input.setting]: input.value
                     },
                     where: {
-                        id: input.id
+                        id: input.userID
                     }
                 })
             } catch (err) {

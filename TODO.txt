@@ -1,7 +1,7 @@
 TODO
-add predefined to prismaManager functions parameters
-change returns for prismaManager (delete returns count)
-premium features
+USER
+fix tests to check only the important value for the test
+shortend prisma manager line length
 swiping elo
 server catch errors write to client errors
 
