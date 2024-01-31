@@ -6,6 +6,7 @@ import { UserHandler } from "./handlers/user";
 import { S3ImageHandler } from "./handlers/images";
 import { SwipeHandler } from "./handlers/swipe";
 import { MessageHandler } from "./handlers/message";
+import { ReportHandler } from "./handlers/report";
 
 export class Handler {
     public announcement : AnnouncementHandler;
@@ -15,6 +16,7 @@ export class Handler {
     public image : S3ImageHandler;
     public swipe : SwipeHandler;
     public message : MessageHandler;
+    public report : ReportHandler;
 
     constructor(prisma : PrismaClient) {
         this.announcement = new AnnouncementHandler(prisma);
@@ -24,6 +26,7 @@ export class Handler {
         this.image = new S3ImageHandler();
         this.swipe = new SwipeHandler(prisma);
         this.message = new MessageHandler(prisma);
+        this.report = new ReportHandler(prisma);
     }
 
     public async deleteEverything() {
@@ -34,7 +37,8 @@ export class Handler {
             this.user.deleteAllUsers(),
             this.image.deleteAllImages(),
             this.swipe.deleteAllSwipes(),
-            this.message.deleteAllMessages()
+            this.message.deleteAllMessages(),
+            this.report.deleteAllReports()
         ])
     }
 }

@@ -59,6 +59,11 @@ export interface GetChatInput {
     fromTime: Date
 }
 
+export interface UserReportInput {
+    userID: string
+    reportedEmail: string
+}
+
 export const AllowedUserEdits: (keyof User)[] = ["age"]
 
 export type ImageInput = {
