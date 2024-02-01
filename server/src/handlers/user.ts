@@ -1,6 +1,7 @@
 import { PrismaClient, User } from "@prisma/client";
 import { EditUserInput, EditUserSubscriptionInput, PublicProfile, UserInput } from "../types";
 import { randomUUID } from "crypto";
+import { addMonths } from "date-fns";
 
 export class UserHandler {
     private prisma : PrismaClient;
@@ -94,15 +95,28 @@ export class UserHandler {
         }
     }
 
-    public async updateSubscriptionStatus(input : EditUserSubscriptionInput) {
+    public async updateSubscriptionAfterPay(userID : string, subscriptionID? : string) : 
+        Promise<User> 
+        {
         return await this.prisma.user.update({
             data: {
-                subscribeEnd: input.subscribeEnd,
-                isSubscribed: input.isSubscribed,
-                subscriptionID: input.subscriptionID
+                subscribeEnd: addMonths(new Date(), 1),
+                subscriptionID: subscriptionID,
+                isSubscribed: true
             },
             where: {
-                id: input.userID
+                id: userID
+            }
+        })
+    }
+
+    public async cancelSubscription(userID : string) : Promise<User> {
+        return await this.prisma.user.update({
+            data: {
+                isSubscribed: false
+            },
+            where: {
+                id: userID
             }
         })
     }

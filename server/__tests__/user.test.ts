@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from "@jest/globals";
 import { handler } from "../jest.setup";
 import { UserInput } from "../src/types";
-import { User } from "@prisma/client";
+import { differenceInMonths } from "date-fns";
 
 afterEach( async () => {
     await handler.user.deleteAllUsers();
@@ -40,12 +40,12 @@ describe("user", () => {
     })
 
     it("should get user by ID", async () => {
-        const user = await funcs.createUser(createUserInput()) as User;
+        const user = await funcs.createUser(createUserInput()) ;
         expect(await funcs.getUserByID(user.id)).toEqual(user);
     })
 
     it("should get user by email", async () => {
-        const user = await funcs.createUser(createUserInput()) as User;
+        const user = await funcs.createUser(createUserInput()) ;
         expect(await funcs.getUserByEmail(user.email)).toEqual(user);
     })
 
@@ -54,7 +54,7 @@ describe("user", () => {
     })
 
     it("should get public profile of user", async () => {
-        const user = await funcs.createUser(createUserInput()) as User;
+        const user = await funcs.createUser(createUserInput()) ;
         expect(await funcs.getPublicProfile(user.id)).not.toEqual(null);
     })
 
@@ -63,7 +63,7 @@ describe("user", () => {
     })
 
     it("should delete user", async () => {
-        const user = await funcs.createUser(createUserInput()) as User;
+        const user = await funcs.createUser(createUserInput()) ;
         expect(await funcs.deleteUser(user.id)).toEqual(user);
     })
 
@@ -78,7 +78,7 @@ describe("user", () => {
     })
 
     it("should not edit user with bad input", async () => {
-        const user = await funcs.createUser(createUserInput()) as User;
+        const user = await funcs.createUser(createUserInput());
         expect(await funcs.editUser({
             userID: user.id,
             setting: "age",
@@ -87,7 +87,7 @@ describe("user", () => {
     })
 
     it("should edit user", async () => {
-        const user = await funcs.createUser(createUserInput()) as User;
+        const user = await funcs.createUser(createUserInput());
         expect(await funcs.editUser({
             userID: user.id,
             setting: "age",
@@ -95,13 +95,21 @@ describe("user", () => {
         })).not.toEqual(null);
     })
 
-    it("should update user subscription status", async () => {
-        const user = await funcs.createUser(createUserInput()) as User;
-        expect(await funcs.updateSubscriptionStatus({
-            userID: user.id,
-            isSubscribed: false,
-            subscribeEnd: new Date(),
-            subscriptionID: "id"
-        })).not.toEqual(null);
+    it("should update user subscription after pay", async () => {
+        const subscriptionID = "id";
+        const user = await funcs.createUser(createUserInput());
+        const after = await funcs.updateSubscriptionAfterPay(user.id,subscriptionID);
+        
+        expect(after.isSubscribed).toEqual(true);
+        expect(after.subscriptionID).toEqual(subscriptionID);
+        expect(differenceInMonths(after.subscribeEnd, user.subscribeEnd)).toEqual(1);
+    })
+
+    it("should cancel user subscription", async () => {
+        const user = await funcs.createUser(createUserInput());
+        await funcs.updateSubscriptionAfterPay(user.id);
+        const after = await funcs.cancelSubscription(user.id);
+
+        expect(after.isSubscribed).toEqual(false);
     })
 })
