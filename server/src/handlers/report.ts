@@ -9,10 +9,8 @@ export class ReportHandler {
         this.prisma = prisma;
     }
 
-    public async makeReport(input : UserReportInput) : Promise<UserReport|null> {
-        const report = await this.getReportByUsers(input.userID, input.reportedEmail);
-        return report ? null :
-            await this.prisma.userReport.create({
+    public async makeReport(input : UserReportInput) : Promise<UserReport> {
+        return await this.prisma.userReport.create({
                 data: {
                     ...input,
                     id: randomUUID(),

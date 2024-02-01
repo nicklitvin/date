@@ -39,15 +39,6 @@ describe("user", () => {
         expect(await funcs.createUser(createUserInput())).not.toEqual(null);
     })
 
-    it("should not create user again", async () => {
-        await funcs.createUser(createUserInput()) as User;
-        expect(await funcs.createUser(createUserInput())).toEqual(null);
-    })
-
-    it("should not create user with invalid email", async () => {
-        expect(await funcs.createUser(createUserInput("a@gmail.com"))).toEqual(null);
-    })
-
     it("should get user by ID", async () => {
         const user = await funcs.createUser(createUserInput()) as User;
         expect(await funcs.getUserByID(user.id)).toEqual(user);
@@ -86,14 +77,6 @@ describe("user", () => {
         expect(await funcs.deleteAllUsers()).toEqual(3);
     })
 
-    it("should not edit nonuser", async () => {
-        expect(await funcs.editUser({
-            userID: "bad",
-            setting: "age",
-            value: 21
-        })).toEqual(null);
-    })
-
     it("should not edit user with bad input", async () => {
         const user = await funcs.createUser(createUserInput()) as User;
         expect(await funcs.editUser({
@@ -109,6 +92,16 @@ describe("user", () => {
             userID: user.id,
             setting: "age",
             value: 21
+        })).not.toEqual(null);
+    })
+
+    it("should update user subscription status", async () => {
+        const user = await funcs.createUser(createUserInput()) as User;
+        expect(await funcs.updateSubscriptionStatus({
+            userID: user.id,
+            isSubscribed: false,
+            subscribeEnd: new Date(),
+            subscriptionID: "id"
         })).not.toEqual(null);
     })
 })

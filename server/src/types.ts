@@ -64,6 +64,13 @@ export interface UserReportInput {
     reportedEmail: string
 }
 
+export interface EditUserSubscriptionInput {
+    userID: string
+    subscribeEnd: Date
+    isSubscribed: boolean
+    subscriptionID: string | undefined
+}
+
 export const AllowedUserEdits: (keyof User)[] = ["age"]
 
 export type ImageInput = {

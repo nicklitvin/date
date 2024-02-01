@@ -21,11 +21,6 @@ describe("report", () => {
         expect(await funcs.makeReport(makeReport())).not.toEqual(null);
     })
 
-    it("should not report user twice by same person", async () => {
-        await funcs.makeReport(makeReport());
-        expect(await funcs.makeReport(makeReport())).toEqual(null);
-    })
-
     it("should get user reports", async () => {
         const report = makeReport();
 

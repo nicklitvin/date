@@ -36,9 +36,12 @@ describe("swipe", () => {
         expect(await funcs.createSwipe(createSwipeInput("Like"))).not.toEqual(null);
     })
 
-    it("should not create duplicate swipe", async () => {
-        await funcs.createSwipe(createSwipeInput("Like"));
-        expect(await funcs.createSwipe(createSwipeInput("Dislike"))).toEqual(null);
+    it("should get swipe", async () => {
+        const swipe = await funcs.createSwipe(createSwipeInput("Like"));
+        expect(await funcs.getSwipeByUsers(swipe.userID, swipe.swipedUserID)).toEqual(
+            swipe
+        );
+        expect(await funcs.getSwipeByID(swipe.id)).toEqual(swipe);
     })
 
     it("should update swipe", async () => {
@@ -50,11 +53,6 @@ describe("swipe", () => {
 
         expect(updated.action).toEqual("Dislike");
         expect(updated.timestamp.getTime()).not.toEqual(initial.timestamp.getTime())
-    })
-
-    it("should get swipe", async () => {
-        const swipe = await funcs.createSwipe(createSwipeInput("Like")) as Swipe;
-        expect(await funcs.getSwipe(swipe.id)).toEqual(swipe);
     })
 
     it("should not delete nonswipe", async () => {

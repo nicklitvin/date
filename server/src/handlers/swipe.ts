@@ -10,25 +10,14 @@ export class SwipeHandler {
         this.prisma = prisma;
     }
 
-    public async createSwipe(input : SwipeInput, customTime = new Date()) : 
-        Promise<Swipe|null> 
-    {
-        const count = await this.prisma.swipe.count({
-            where: {
-                userID: input.userID,
-                swipedUserID: input.swipedUserID
+    public async createSwipe(input : SwipeInput, customTime = new Date()) : Promise<Swipe> {
+        return await this.prisma.swipe.create({
+            data: {
+                ...input,
+                id: randomUUID(),
+                timestamp: customTime,
             }
-        });
-
-        return count == 0 ?
-            await this.prisma.swipe.create({
-                data: {
-                    ...input,
-                    id: randomUUID(),
-                    timestamp: customTime,
-                }
-            }) :
-            null;
+        })
     }
 
     public async updateSwipe(id : string, input : SwipeInput) : Promise<Swipe|null> {
@@ -43,7 +32,7 @@ export class SwipeHandler {
         })
     }
 
-    public async getSwipe(id : string) : Promise<Swipe|null> {
+    public async getSwipeByID(id : string) : Promise<Swipe|null> {
         return await this.prisma.swipe.findUnique({
             where: {
                 id: id
@@ -51,8 +40,19 @@ export class SwipeHandler {
         })
     }
 
+    public async getSwipeByUsers(userID : string, swipedUserID : string) : 
+        Promise<Swipe|null> 
+    {
+        return await this.prisma.swipe.findFirst({
+            where: {
+                userID: userID,
+                swipedUserID: swipedUserID
+            }
+        })
+    }
+
     public async deleteSwipe(id : string) : Promise<Swipe|null> {
-        return await this.getSwipe(id) ?
+        return await this.getSwipeByID(id) ?
             await this.prisma.swipe.delete({
                 where: {
                     id: id
