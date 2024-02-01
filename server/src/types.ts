@@ -82,6 +82,18 @@ export type PublicProfile = {
     university: string
 }
 
+export type UserSwipeStats = {
+    allTime: SwipeBreakdown
+    weekly: SwipeBreakdown[]
+}
+
+export type SwipeBreakdown = {
+    myLikes: number
+    myDislikes: number
+    likedMe: number
+    dislikedMe: number
+}
+
 // OLD
 
 export type SwipeFeed = {
@@ -92,23 +104,4 @@ export type SwipeFeed = {
 export type MatchPreview = {
     profile: PublicProfile
     lastMessages: Message[]
-}
-
-export type UserStats = {
-    allTime: LikeDislike
-    weekly: LikeDislike[]
-}
-
-export type LikeDislike = {
-    myLikes: number
-    myDislikes: number
-    likedMe: number
-    dislikedMe: number
-    weeksAgo: number | undefined
-}
-
-export type UserDelete = {
-    user: number
-    swipes: number
-    messages: number
 }

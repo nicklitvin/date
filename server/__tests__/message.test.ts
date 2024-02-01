@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "@jest/globals";
-import { handler } from "../jest.setup";
+import { handler, waitOneMoment } from "../jest.setup";
 import { MessageInput } from "../src/types";
 import { randomUUID } from "crypto";
 
@@ -93,8 +93,11 @@ describe("message", () => {
 
     it("should get chat", async () => {
         const m1 = await funcs.sendMessage(makeMessageInput());
+        await waitOneMoment();
         const m2 = await funcs.sendMessage(makeMessageInput(true));
+        await waitOneMoment();
         const m3 = await funcs.sendMessage(makeMessageInput());
+        await waitOneMoment();
         const m4 = await funcs.sendMessage(makeRandomMessageInput())
 
         const chat = await funcs.getChat({

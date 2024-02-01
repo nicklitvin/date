@@ -5,7 +5,6 @@ import fs from "fs/promises";
 import mime from "mime-types";
 import axios from "axios";
 import sizeOf from "image-size";
-import { imageHeight, imageWidth } from "../src/globals";
 
 afterEach( async () => {
     await handler.image.deleteAllImages();
@@ -46,8 +45,8 @@ describe("image", () => {
         const response = await axios.get(URL, { responseType: "arraybuffer"} );
         const dimensions = sizeOf(response.data);
         
-        expect(dimensions.height).toEqual(imageHeight);
-        expect(dimensions.width).toEqual(imageWidth);
+        expect(dimensions.height).toEqual(400);
+        expect(dimensions.width).toEqual(300);
     })
 
     it("should get all imageIDs", async () => {

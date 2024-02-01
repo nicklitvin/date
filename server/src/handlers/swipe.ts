@@ -1,6 +1,7 @@
 import { PrismaClient, Swipe } from "@prisma/client";
 import { randomUUID } from "crypto";
-import { SwipeInput } from "../types";
+import { SwipeBreakdown, SwipeInput, UserSwipeStats } from "../types";
+import { startOfWeek, subWeeks } from "date-fns";
 
 export class SwipeHandler {
     private prisma : PrismaClient;
@@ -9,7 +10,9 @@ export class SwipeHandler {
         this.prisma = prisma;
     }
 
-    public async createSwipe(input : SwipeInput) : Promise<Swipe|null> {
+    public async createSwipe(input : SwipeInput, customTime = new Date()) : 
+        Promise<Swipe|null> 
+    {
         const count = await this.prisma.swipe.count({
             where: {
                 userID: input.userID,
@@ -22,7 +25,7 @@ export class SwipeHandler {
                 data: {
                     ...input,
                     id: randomUUID(),
-                    timestamp: new Date(),
+                    timestamp: customTime,
                 }
             }) :
             null;
@@ -61,5 +64,64 @@ export class SwipeHandler {
     public async deleteAllSwipes() : Promise<number> {
         const deleted = await this.prisma.swipe.deleteMany();
         return deleted.count;
+    }
+
+    public async getSwipeBreakdown(userID: string, from: Date, to: Date) : 
+        Promise<SwipeBreakdown> 
+    {
+        const [myLikes, myDislikes, likedMe, dislikedMe] = await Promise.all([
+            this.prisma.swipe.count({
+                where: {
+                    userID: userID,
+                    action: "Like",
+                    timestamp: { gte: from, lte: to }
+                }
+            }),
+            this.prisma.swipe.count({
+                where: {
+                    userID: userID,
+                    action: "Dislike",
+                    timestamp: { gte: from, lte: to }
+                },
+            }),
+            this.prisma.swipe.count({
+                where: {
+                    swipedUserID: userID,
+                    action: "Like",
+                    timestamp: { gte: from, lte: to }
+                }
+            }),
+            this.prisma.swipe.count({
+                where: {
+                    swipedUserID: userID,
+                    action: "Dislike",
+                    timestamp: { gte: from, lte: to }
+                }
+            })
+        ]);
+        return { myLikes, myDislikes, likedMe, dislikedMe}
+    }
+
+    public async getUserSwipeStats(userID : string) : Promise<UserSwipeStats> {
+        const weekStart = startOfWeek(new Date());
+
+        const [allTime, week0, week1, week2, week3] = await Promise.all([
+            this.getSwipeBreakdown(userID, new Date(0), new Date()),
+            this.getSwipeBreakdown(userID, weekStart, new Date()),
+            this.getSwipeBreakdown(userID, subWeeks(weekStart, 1), 
+                weekStart
+            ),
+            this.getSwipeBreakdown(userID, subWeeks(weekStart, 2), 
+                subWeeks(weekStart, 1)
+            ),
+            this.getSwipeBreakdown(userID, subWeeks(weekStart, 3), 
+                subWeeks(weekStart, 2)
+            )
+        ])
+
+        return {
+            allTime: allTime,
+            weekly: [week0, week1, week2, week3]
+        }
     }
 }

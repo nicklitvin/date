@@ -11,6 +11,14 @@ beforeAll( async () => {
     ])
 })
 
+export async function waitOneMoment() {
+    return new Promise( (res) => {
+        setTimeout( () => {
+            res(null)
+        }, 1)
+    })
+}
+
 // import { beforeEach, afterEach, beforeAll, expect, jest } from "@jest/globals";
 // import { TestPrismaManager } from "./testModules/TestPrismaManager";
 // import { Handler } from "./src/HandlerOld";
