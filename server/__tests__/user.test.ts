@@ -1,7 +1,9 @@
 import { afterEach, describe, expect, it } from "@jest/globals";
 import { handler } from "../jest.setup";
-import { UserInput } from "../src/types";
+import { RequestUserInput, UserInput } from "../src/types";
 import { differenceInMonths } from "date-fns";
+import { globals } from "../src/globals";
+import fs from "fs/promises";
 
 afterEach( async () => {
     await handler.user.deleteAllUsers();
@@ -9,6 +11,23 @@ afterEach( async () => {
 
 describe("user", () => {
     const funcs = handler.user;
+    const imageFilePath = "./__tests__/images/goodImage.jpg";
+
+    const validRequestUserInput = async () : Promise<RequestUserInput> => { 
+        return {
+            age: globals.minAge,
+            attributes: Array.from({length: globals.maxAttributes}, (_,index) => `${index}`),
+            interestedIn: ["Male", "Female"],
+            email: "a@berkeley.edu",
+            gender: "Male",
+            files: [{
+                buffer: await fs.readFile(imageFilePath),
+                mimetype: "image/jpeg"
+            }],
+            name: "a".repeat(globals.maxNameLength),
+            description: "a".repeat(globals.maxDescriptionLength)
+        }
+    }
 
     const createUserInput = (email = "a@berkeley.edu") : UserInput => {
         return {
@@ -112,4 +131,35 @@ describe("user", () => {
 
         expect(after.isSubscribed).toEqual(false);
     })
+
+    it("should validate input", async () => {
+        expect(funcs.isInputValid(await validRequestUserInput())).toEqual(true);
+    })
+
+    it("should invalidate input", async () => {
+        let input = await validRequestUserInput();
+        input.age -= 1
+        expect(funcs.isInputValid(input)).toEqual(false);
+
+        input = await validRequestUserInput();
+        input.name += "a"
+        expect(funcs.isInputValid(input)).toEqual(false);
+
+        input = await validRequestUserInput();
+        input.interestedIn.push("Male");
+        expect(funcs.isInputValid(input)).toEqual(false);
+
+        input = await validRequestUserInput();
+        input.attributes.push("a");
+        expect(funcs.isInputValid(input)).toEqual(false);
+
+        input = await validRequestUserInput();
+        input.description += "a";
+        expect(funcs.isInputValid(input)).toEqual(false);
+
+        input = await validRequestUserInput();
+        input.files[0].mimetype = "bad"
+        expect(funcs.isInputValid(input)).toEqual(false);
+    })
 })
+

@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, User } from "@prisma/client";
 import { AnnouncementHandler } from "./handlers/announcement";
 import { AttributeHandler } from "./handlers/attribute";
 import { ErrorLogHandler } from "./handlers/errorlog";
@@ -8,6 +8,7 @@ import { SwipeHandler } from "./handlers/swipe";
 import { MessageHandler } from "./handlers/message";
 import { ReportHandler } from "./handlers/report";
 import { PaymentHandler } from "./handlers/pay";
+import { RequestUserInput, UserInput } from "./types";
 
 export class Handler {
     public announcement : AnnouncementHandler;
@@ -43,5 +44,35 @@ export class Handler {
             this.message.deleteAllMessages(),
             this.report.deleteAllReports()
         ])
+    }
+
+    /**
+     * 
+     * @param user (images: string[] will be ignored in UserInput)
+     * @param images 
+     */
+    public async createUser(input : RequestUserInput) : Promise<User|null> {
+        if ( await this.user.getUserByEmail(input.email) || 
+            !this.user.isInputValid(input) )
+        {
+            return null;
+        }
+
+        const imageIDs = await Promise.all(
+            input.files.map( val => this.image.uploadImage(val))
+        );
+
+        const userInput : UserInput = {
+            age: input.age,
+            attributes: input.attributes,
+            description: input.description,
+            email: input.email, 
+            gender: input.gender,
+            interestedIn: input.interestedIn,
+            name: input.name,
+            images: imageIDs as string[]
+        }
+
+        return await this.user.createUser(userInput);
     }
 }

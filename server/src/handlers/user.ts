@@ -1,7 +1,8 @@
 import { PrismaClient, User } from "@prisma/client";
-import { EditUserInput, EditUserSubscriptionInput, PublicProfile, UserInput } from "../types";
+import { EditUserInput, PublicProfile, RequestUserInput, UserInput } from "../types";
 import { randomUUID } from "crypto";
 import { addMonths } from "date-fns";
+import { globals } from "../globals";
 
 export class UserHandler {
     private prisma : PrismaClient;
@@ -119,5 +120,23 @@ export class UserHandler {
                 id: userID
             }
         })
+    }
+
+    public isInputValid(input : RequestUserInput) : boolean {
+        return (
+            input.age >= globals.minAge &&
+            input.age <= globals.maxAge &&
+            input.name.length <= globals.maxNameLength &&
+            input.interestedIn.length <= globals.maxInterestedIn &&
+            input.interestedIn.length == Array.from(new Set(input.interestedIn)).length &&
+            input.attributes.length <= globals.maxAttributes && 
+            input.attributes.length == Array.from(new Set(input.attributes)).length &&
+            input.description.length <= globals.maxDescriptionLength && 
+            input.files.length >= globals.minImagesCount &&
+            input.files.length <= globals.maxImagesCount &&
+            input.files.length == input.files.filter(val => 
+                globals.acceptaleImageFormats.includes(val.mimetype)
+            ).length
+        )
     }
 }

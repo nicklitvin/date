@@ -17,15 +17,22 @@ export interface ErrorLogInput {
     message: string
 }
 
-export interface UserInput {
+interface BasicUserInput {
     email: string
     name: string
     age: number
     gender: Gender
     interestedIn: Gender[]
     attributes: string[]
-    images: string[]
     description: string
+}
+
+export interface UserInput extends BasicUserInput {
+    images : string[]
+}
+
+export interface RequestUserInput extends BasicUserInput {
+    files: FileUpload[]
 }
 
 export interface EditUserInput {
@@ -99,6 +106,11 @@ export type SwipeBreakdown = {
     myDislikes: number
     likedMe: number
     dislikedMe: number
+}
+
+export type FileUpload = {
+    buffer: Buffer
+    mimetype: string
 }
 
 // OLD
