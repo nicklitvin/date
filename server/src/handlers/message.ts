@@ -106,4 +106,16 @@ export class MessageHandler {
         })
         return deleted.count;
     }
+
+    public async deleteAllChatsWithUser(userID: string) : Promise<number> {
+        const deleted = await this.prisma.message.deleteMany({
+            where: {
+                OR: [
+                    {userID: userID},
+                    {recepientID: userID}
+                ]
+            }
+        })
+        return deleted.count;
+    }
 }

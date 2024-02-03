@@ -9,38 +9,46 @@ afterEach( async () => {
     await handler.user.deleteAllUsers();
 })
 
+const imageFilePath = "./__tests__/images/goodImage.jpg";
+
+export const validRequestUserInput = async () : Promise<RequestUserInput> => { 
+    const buffer = await fs.readFile(imageFilePath);
+    return {
+        age: globals.minAge,
+        attributes: Array.from({length: globals.maxAttributes}, (_,index) => `${index}`),
+        interestedIn: ["Male", "Female"],
+        email: "a@berkeley.edu",
+        gender: "Male",
+        files: [
+            {
+                buffer: buffer,
+                mimetype: "image/jpeg"
+            },
+            {
+                buffer: buffer,
+                mimetype: "image/jpeg"
+            },
+        ],
+        name: "a".repeat(globals.maxNameLength),
+        description: "a".repeat(globals.maxDescriptionLength)
+    }
+}
+
+export const createUserInput = (email = "a@berkeley.edu") : UserInput => {
+    return {
+        email: email,
+        name: "a",
+        age: 21,
+        gender: "Male",
+        interestedIn: ["Male"],
+        attributes: ["Basketball"],
+        images: ["imageURL"],
+        description: "description"
+    }
+}
+
 describe("user", () => {
     const funcs = handler.user;
-    const imageFilePath = "./__tests__/images/goodImage.jpg";
-
-    const validRequestUserInput = async () : Promise<RequestUserInput> => { 
-        return {
-            age: globals.minAge,
-            attributes: Array.from({length: globals.maxAttributes}, (_,index) => `${index}`),
-            interestedIn: ["Male", "Female"],
-            email: "a@berkeley.edu",
-            gender: "Male",
-            files: [{
-                buffer: await fs.readFile(imageFilePath),
-                mimetype: "image/jpeg"
-            }],
-            name: "a".repeat(globals.maxNameLength),
-            description: "a".repeat(globals.maxDescriptionLength)
-        }
-    }
-
-    const createUserInput = (email = "a@berkeley.edu") : UserInput => {
-        return {
-            email: email,
-            name: "a",
-            age: 21,
-            gender: "Male",
-            interestedIn: ["Male"],
-            attributes: ["Basketball"],
-            images: ["imageURL"],
-            description: "description"
-        }
-    }
 
     it("should validate email", () => {
         expect(funcs.isEmailValid("a@gmail.com")).toEqual(false);
@@ -159,6 +167,10 @@ describe("user", () => {
 
         input = await validRequestUserInput();
         input.files[0].mimetype = "bad"
+        expect(funcs.isInputValid(input)).toEqual(false);
+
+        input = await validRequestUserInput();
+        input.files = [];
         expect(funcs.isInputValid(input)).toEqual(false);
     })
 })

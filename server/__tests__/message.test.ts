@@ -7,34 +7,46 @@ afterEach( async () => {
     await handler.message.deleteAllMessages()
 })
 
+export const makeMessageInput = (userID : string, userID_2 : string) : 
+    MessageInput => 
+{
+    return {
+        userID: userID,
+        recepientID: userID_2,
+        message: "message"
+    }
+}
+
+export const makeMessageInputWithRandoms = () : MessageInput => {
+    return {
+        userID: randomUUID(),
+        recepientID: randomUUID(),
+        message: "message"
+    }
+}
+
+export const makeMessageInputWithOneRandom = (userID : string, flipUsers = false) : 
+    MessageInput => 
+{
+    return {
+        userID: flipUsers ? randomUUID() : userID,
+        recepientID: flipUsers ? userID : randomUUID(),
+        message: "message",
+    }
+}
+
 describe("message", () => {
     const funcs = handler.message;
-
-    const makeMessageInput = (flipUsers = false) : MessageInput => {
-        const userID = "userID";
-        const userID_2 = "userID_2";
-
-        return {
-            userID: flipUsers ? userID_2 : userID,
-            recepientID: flipUsers ? userID : userID_2,
-            message: "message"
-        }
-    }
-
-    const makeRandomMessageInput = () : MessageInput => {
-        return {
-            userID: randomUUID(),
-            recepientID: randomUUID(),
-            message: "message"
-        }
-    }
+    const userID = "userID";
+    const userID_2 = "userID_2";
     
     it("should send message", async () => {
-        expect(await funcs.sendMessage(makeMessageInput())).not.toEqual(null);
+        expect(await funcs.sendMessage(makeMessageInput(userID,userID_2))).
+            not.toEqual(null);
     })
 
     it("should not update read status if not conversation", async () => {
-        const messageInput = makeMessageInput();
+        const messageInput = makeMessageInput(userID, userID_2);
         await funcs.sendMessage(messageInput);
         expect(await funcs.updateReadStatus({
             userID: "random",
@@ -44,7 +56,7 @@ describe("message", () => {
     })
 
     it("should not update read status for writer", async () => {
-        const messageInput = makeMessageInput();
+        const messageInput = makeMessageInput(userID, userID_2);
         await funcs.sendMessage(messageInput);
         expect(await funcs.updateReadStatus({
             userID: messageInput.userID,
@@ -54,7 +66,7 @@ describe("message", () => {
     })
 
     it("should update read status", async () => {
-        const messageInput = makeMessageInput();
+        const messageInput = makeMessageInput(userID, userID_2);
         await funcs.sendMessage(messageInput);
         expect(await funcs.updateReadStatus({
             userID: messageInput.recepientID,
@@ -68,7 +80,7 @@ describe("message", () => {
     })
 
     it("should get message", async () => {
-        const message = await funcs.sendMessage(makeMessageInput());
+        const message = await funcs.sendMessage(makeMessageInput(userID, userID_2));
         expect(await funcs.getMessage(message.id)).toEqual(message);
     })
 
@@ -77,32 +89,32 @@ describe("message", () => {
     })
 
     it("should delete message", async () => {
-        const message = await funcs.sendMessage(makeMessageInput());
+        const message = await funcs.sendMessage(makeMessageInput(userID, userID_2));
         expect(await funcs.deleteMessage(message.id)).toEqual(message);
     })
 
     it("should delete all messages", async () => {
         await Promise.all([
-            funcs.sendMessage(makeMessageInput()),
-            funcs.sendMessage(makeMessageInput()),
-            funcs.sendMessage(makeRandomMessageInput())
+            funcs.sendMessage(makeMessageInput(userID, userID_2)),
+            funcs.sendMessage(makeMessageInput(userID, userID_2)),
+            funcs.sendMessage(makeMessageInputWithRandoms())
         ])
 
         expect(await funcs.deleteAllMessages()).toEqual(3);
     })
 
     it("should get chat", async () => {
-        const m1 = await funcs.sendMessage(makeMessageInput());
+        await funcs.sendMessage(makeMessageInput(userID, userID_2));
         await waitOneMoment();
-        const m2 = await funcs.sendMessage(makeMessageInput(true));
+        const m2 = await funcs.sendMessage(makeMessageInput(userID_2, userID));
         await waitOneMoment();
-        const m3 = await funcs.sendMessage(makeMessageInput());
+        await funcs.sendMessage(makeMessageInput(userID, userID_2));
         await waitOneMoment();
-        const m4 = await funcs.sendMessage(makeRandomMessageInput())
+        await funcs.sendMessage(makeMessageInputWithRandoms())
 
         const chat = await funcs.getChat({
-            userID: m1.userID,
-            withID: m1.recepientID,
+            userID: userID,
+            withID: userID_2,
             count: 10,
             fromTime: new Date()
         })
@@ -111,8 +123,8 @@ describe("message", () => {
         expect(chat[1].timestamp.getTime()).toBeGreaterThan(chat[2].timestamp.getTime());
 
         const chat_2 = await funcs.getChat({
-            userID: m1.userID,
-            withID: m1.recepientID,
+            userID: userID,
+            withID: userID_2,
             count: 1,
             fromTime: m2.timestamp
         });
@@ -121,15 +133,24 @@ describe("message", () => {
     })
 
     it("should delete chat", async () => {
-        const message = makeMessageInput();
-
         await Promise.all([
-            funcs.sendMessage(makeMessageInput()),
-            funcs.sendMessage(makeMessageInput(true)),
-            funcs.sendMessage(makeMessageInput()),
-            funcs.sendMessage(makeRandomMessageInput())
+            funcs.sendMessage(makeMessageInput(userID, userID_2)),
+            funcs.sendMessage(makeMessageInput(userID_2, userID)),
+            funcs.sendMessage(makeMessageInput(userID, userID_2)), 
+            funcs.sendMessage(makeMessageInputWithRandoms())
         ])
 
-        expect(await funcs.deleteChat(message.userID, message.recepientID)).toEqual(3);
+        expect(await funcs.deleteChat(userID, userID_2)).toEqual(3);
+    })
+
+    it("should delete all chats with user", async () => {
+        await Promise.all([
+            funcs.sendMessage(makeMessageInputWithOneRandom(userID)),
+            funcs.sendMessage(makeMessageInputWithOneRandom(userID)),
+            funcs.sendMessage(makeMessageInputWithOneRandom(userID, true)),
+            funcs.sendMessage(makeMessageInputWithRandoms())
+        ])
+
+        expect(await funcs.deleteAllChatsWithUser(userID)).toEqual(3);
     })
 })

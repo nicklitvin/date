@@ -75,4 +75,23 @@ export class Handler {
 
         return await this.user.createUser(userInput);
     }
+
+    public async deleteUser(userID : string) {
+        const foundUser = await this.user.getUserByID(userID);
+        if (!foundUser) return null;
+
+        const deleteAllUserImages = async () : Promise<number> => {
+            const deleted = await Promise.all(
+                foundUser.images.map(imageID => this.image.deleteImage(imageID)),
+            )
+            return deleted.length;
+        }
+
+        const [images, messages, user]= await Promise.all([
+            deleteAllUserImages(),
+            this.message.deleteAllChatsWithUser(foundUser.id),
+            this.user.deleteUser(foundUser.id)
+        ])
+        return {images, messages, user};
+    }
 }

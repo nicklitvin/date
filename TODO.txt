@@ -1,8 +1,4 @@
 TODO
-aws error when no internet and stripe
-
-/deleteUser
-/createUser
 /getSwipeFeed
 /makeSwipe
 /sendMessage
@@ -12,8 +8,6 @@ aws error when no internet and stripe
 /uploadImage
 /deleteImage
 /cancelSubscription (stripe)
-
-
 /changeImageOrder
 
 
