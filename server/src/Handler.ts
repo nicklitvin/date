@@ -1,4 +1,4 @@
-import { PrismaClient, User } from "@prisma/client";
+import { Message, PrismaClient, User } from "@prisma/client";
 import { AnnouncementHandler } from "./handlers/announcement";
 import { AttributeHandler } from "./handlers/attribute";
 import { ErrorLogHandler } from "./handlers/errorlog";
@@ -8,7 +8,7 @@ import { SwipeHandler } from "./handlers/swipe";
 import { MessageHandler } from "./handlers/message";
 import { ReportHandler } from "./handlers/report";
 import { PaymentHandler } from "./handlers/pay";
-import { RequestUserInput, UserInput } from "./types";
+import { MessageInput, RequestUserInput, SwipeInput, UserInput } from "./types";
 
 export class Handler {
     public announcement : AnnouncementHandler;
@@ -93,5 +93,33 @@ export class Handler {
             this.user.deleteUser(foundUser.id)
         ])
         return {images, messages, user};
+    }
+
+    public async makeSwipe(input : SwipeInput) : Promise<SwipeInput|null> {
+        const [user, swipedUser, previousSwipe] = await Promise.all([
+            this.user.getUserByID(input.userID),
+            this.user.getUserByID(input.swipedUserID),
+            this.swipe.getSwipeByUsers(input.userID, input.swipedUserID)
+        ])
+
+        if (!user || !swipedUser || user.id == swipedUser.id || previousSwipe) return null;
+
+        return await this.swipe.createSwipe(input);
+    }
+
+    public async sendMessage(input : MessageInput) : Promise<Message|null> {
+        const [user, recepient, userOpinion, recepientOpinion] = await Promise.all([
+            this.user.getUserByID(input.userID),
+            this.user.getUserByID(input.recepientID),
+            this.swipe.getSwipeByUsers(input.userID, input.recepientID),
+            this.swipe.getSwipeByUsers(input.recepientID, input.userID)
+        ])
+
+        if (user && recepient && userOpinion?.action == "Like" && 
+            recepientOpinion?.action == "Like"
+        ) {
+            return await this.message.sendMessage(input);
+        }
+        return null;
     }
 }

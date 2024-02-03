@@ -1,15 +1,14 @@
 TODO
 /getSwipeFeed
+
 /makeSwipe
 /sendMessage
-/getMessages
 /getChatPreviews
 /reportUser (ban if too much)
 /uploadImage
 /deleteImage
 /cancelSubscription (stripe)
 /changeImageOrder
-
 
 swiping elo
 server catch errors write to client errors

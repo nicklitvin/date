@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from "@jest/globals";
 import { handler } from "../jest.setup";
-import { RequestUserInput, UserInput } from "../src/types";
+import { FileUpload, RequestUserInput, UserInput } from "../src/types";
 import { differenceInMonths } from "date-fns";
 import { globals } from "../src/globals";
 import fs from "fs/promises";
@@ -146,23 +146,27 @@ describe("user", () => {
 
     it("should invalidate input", async () => {
         let input = await validRequestUserInput();
-        input.age -= 1
+        input.age = globals.minAge - 1
         expect(funcs.isInputValid(input)).toEqual(false);
 
         input = await validRequestUserInput();
-        input.name += "a"
+        input.age = globals.maxAge + 1
         expect(funcs.isInputValid(input)).toEqual(false);
 
         input = await validRequestUserInput();
-        input.interestedIn.push("Male");
+        input.name = "a".repeat(globals.maxNameLength + 1);
         expect(funcs.isInputValid(input)).toEqual(false);
 
         input = await validRequestUserInput();
-        input.attributes.push("a");
+        input.interestedIn = ["Male", "Female", "Female"];
         expect(funcs.isInputValid(input)).toEqual(false);
 
         input = await validRequestUserInput();
-        input.description += "a";
+        input.attributes = Array(globals.maxAttributes + 1).fill("a");
+        expect(funcs.isInputValid(input)).toEqual(false);
+
+        input = await validRequestUserInput();
+        input.description = "a".repeat(globals.maxDescriptionLength + 1);
         expect(funcs.isInputValid(input)).toEqual(false);
 
         input = await validRequestUserInput();
@@ -170,7 +174,11 @@ describe("user", () => {
         expect(funcs.isInputValid(input)).toEqual(false);
 
         input = await validRequestUserInput();
-        input.files = [];
+        input.files = Array(globals.minImagesCount - 1).fill(input.files[0]) ;
+        expect(funcs.isInputValid(input)).toEqual(false);
+
+        input = await validRequestUserInput();
+        input.files = Array(globals.maxImagesCount + 1).fill(input.files[0]);
         expect(funcs.isInputValid(input)).toEqual(false);
     })
 })

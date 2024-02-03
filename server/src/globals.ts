@@ -1,4 +1,6 @@
 export const globals = {
+
+    // User Restrictions
     minAge : 18,
     maxAge : 150,
     maxInterestedIn : 2,
@@ -8,6 +10,8 @@ export const globals = {
     acceptaleImageFormats : ["image/jpeg","image/png"],
     maxNameLength : 16,
     maxDescriptionLength : 100,
+
+    
 }
 
 // import { AttributeType } from "@prisma/client",
