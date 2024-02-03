@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from "@jest/globals";
 import { handler, waitOneMoment } from "../jest.setup";
-import { SwipeInput } from "../src/types";
+import { SwipeInput } from "../src/interfaces";
 import { Opinion, Swipe } from "@prisma/client";
 import { randomUUID } from "crypto";
 import { startOfWeek, subWeeks } from "date-fns";

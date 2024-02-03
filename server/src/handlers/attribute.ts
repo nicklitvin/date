@@ -1,5 +1,5 @@
 import { Attribute, AttributeType, PrismaClient } from "@prisma/client";
-import { AttributeValueInput } from "../types";
+import { AttributeValueInput } from "../interfaces";
 import { randomUUID } from "crypto";
 
 export class AttributeHandler {

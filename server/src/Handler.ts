@@ -8,7 +8,7 @@ import { SwipeHandler } from "./handlers/swipe";
 import { MessageHandler } from "./handlers/message";
 import { ReportHandler } from "./handlers/report";
 import { PaymentHandler } from "./handlers/pay";
-import { MessageInput, RequestUserInput, SwipeInput, UserInput } from "./types";
+import { GetChatPreviewsInput, MessageInput, RequestUserInput, SwipeInput, UserInput } from "./interfaces";
 
 export class Handler {
     public announcement : AnnouncementHandler;
@@ -121,5 +121,9 @@ export class Handler {
             return await this.message.sendMessage(input);
         }
         return null;
+    }
+
+    public async getChatPreviews(input : GetChatPreviewsInput) {
+
     }
 }

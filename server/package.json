@@ -5,7 +5,7 @@
   "scripts": {
     "start": "npx ts-node ./src/index.ts",
     "testfull": "jest --runInBand",
-    "test": "jest --runInBand --testPathIgnorePatterns \"./__tests__/image.test.ts\""
+    "test": "jest --runInBand --testPathIgnorePatterns \"./__tests__/image.test.ts\" \"./__tests__/handler.test.ts\""
   },
   "keywords": [],
   "author": "",

@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "@jest/globals";
-import { AnnouncementInput } from "../src/types";
+import { AnnouncementInput } from "../src/interfaces";
 import { handler } from "../jest.setup";
 
 afterEach( async () => {

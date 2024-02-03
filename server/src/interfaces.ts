@@ -78,14 +78,18 @@ export interface EditUserSubscriptionInput {
     subscriptionID: string | undefined
 }
 
-export const AllowedUserEdits: (keyof User)[] = ["age"]
+export interface GetChatPreviewsInput {
+    userID: string
+    timestamp: Date
+    count: number
+}
 
-export type ImageInput = {
+export interface ImageInput {
     buffer: Buffer
     mimetype: string
 }
 
-export type PublicProfile = {
+export interface PublicProfile {
     id: string
     name: string
     age: number
@@ -96,31 +100,31 @@ export type PublicProfile = {
     university: string
 }
 
-export type UserSwipeStats = {
+export interface UserSwipeStats     {
     allTime: SwipeBreakdown
     weekly: SwipeBreakdown[]
 }
 
-export type SwipeBreakdown = {
+export interface SwipeBreakdown {
     myLikes: number
     myDislikes: number
     likedMe: number
     dislikedMe: number
 }
 
-export type FileUpload = {
+export interface FileUpload {
     buffer: Buffer
     mimetype: string
 }
 
 // OLD
 
-export type SwipeFeed = {
-    feed: PublicProfile[]
-    likedMeIDs: string[]
-}
+// export type SwipeFeed = {
+//     feed: PublicProfile[]
+//     likedMeIDs: string[]
+// }
 
-export type MatchPreview = {
-    profile: PublicProfile
-    lastMessages: Message[]
-}
+// export type MatchPreview = {
+//     profile: PublicProfile
+//     lastMessages: Message[]
+// }

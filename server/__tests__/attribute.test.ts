@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from "@jest/globals";
 import { handler } from "../jest.setup";
-import { AttributeValueInput } from "../src/types";
+import { AttributeValueInput } from "../src/interfaces";
 
 afterEach( async () => {
     await handler.attribute.deleteAllAttributes();

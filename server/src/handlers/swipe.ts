@@ -1,6 +1,6 @@
 import { PrismaClient, Swipe } from "@prisma/client";
 import { randomUUID } from "crypto";
-import { SwipeBreakdown, SwipeInput, UserSwipeStats } from "../types";
+import { SwipeBreakdown, SwipeInput, UserSwipeStats } from "../interfaces";
 import { startOfWeek, subWeeks } from "date-fns";
 
 export class SwipeHandler {

@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from "@jest/globals";
 import { handler } from "../jest.setup";
-import { FileUpload, RequestUserInput, UserInput } from "../src/types";
+import { FileUpload, RequestUserInput, UserInput } from "../src/interfaces";
 import { differenceInMonths } from "date-fns";
 import { globals } from "../src/globals";
 import fs from "fs/promises";

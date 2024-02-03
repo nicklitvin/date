@@ -1,5 +1,5 @@
 import { PrismaClient, User } from "@prisma/client";
-import { EditUserInput, PublicProfile, RequestUserInput, UserInput } from "../types";
+import { EditUserInput, PublicProfile, RequestUserInput, UserInput } from "../interfaces";
 import { randomUUID } from "crypto";
 import { addMonths } from "date-fns";
 import { globals } from "../globals";

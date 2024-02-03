@@ -1,8 +1,6 @@
 TODO
 /getSwipeFeed
 
-/makeSwipe
-/sendMessage
 /getChatPreviews
 /reportUser (ban if too much)
 /uploadImage

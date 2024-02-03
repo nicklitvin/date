@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from "@jest/globals";
 import { handler } from "../jest.setup";
-import { ImageInput } from "../src/types";
+import { ImageInput } from "../src/interfaces";
 import fs from "fs/promises";
 import mime from "mime-types";
 import axios from "axios";

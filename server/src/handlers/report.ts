@@ -1,5 +1,5 @@
 import { PrismaClient, UserReport } from "@prisma/client";
-import { UserReportInput } from "../types";
+import { UserReportInput } from "../interfaces";
 import { randomUUID } from "crypto";
 
 export class ReportHandler {

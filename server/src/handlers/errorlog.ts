@@ -1,5 +1,5 @@
 import { ErrorLog, PrismaClient } from "@prisma/client";
-import { ErrorLogInput } from "../types";
+import { ErrorLogInput } from "../interfaces";
 import { randomUUID } from "crypto";
 
 export class ErrorLogHandler {

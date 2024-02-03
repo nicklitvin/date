@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from "@jest/globals";
 import { handler } from "../jest.setup";
-import { ErrorLogInput } from "../src/types";
+import { ErrorLogInput } from "../src/interfaces";
 
 afterEach( async () => {
     await handler.errorLog.deleteAllErrorLogs();

@@ -1,5 +1,5 @@
 import { Announcement, PrismaClient } from "@prisma/client";
-import { AnnouncementInput } from "../types";
+import { AnnouncementInput } from "../interfaces";
 import { randomUUID } from "crypto";
 
 export class AnnouncementHandler {

@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from "@jest/globals";
 import { handler, waitOneMoment } from "../jest.setup";
-import { MessageInput } from "../src/types";
+import { MessageInput } from "../src/interfaces";
 import { randomUUID } from "crypto";
 
 afterEach( async () => {

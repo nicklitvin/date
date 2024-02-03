@@ -1,5 +1,5 @@
 import { Message, PrismaClient } from "@prisma/client";
-import { GetChatInput, MessageInput, ReadStatusInput } from "../types";
+import { GetChatInput, MessageInput, ReadStatusInput } from "../interfaces";
 import { randomUUID } from "crypto";
 
 export class MessageHandler {
