@@ -4,7 +4,7 @@ import { randomUUID } from "crypto";
 import dotenv from "dotenv";
 import sharp from "sharp";
 import axios from "axios";
-import { ImageInput } from "../interfaces";
+import { ImageHandler, ImageInput } from "../interfaces";
 
 dotenv.config();
 const bucket = process.env.BUCKET_NAME!;
@@ -12,9 +12,8 @@ const region = process.env.BUCKET_REGION!;
 const accessKey = process.env.ACCESS_KEY!;
 const secretAccessKey = process.env.SECRET_ACCESS_KEY!;
 
-export class S3ImageHandler {
+export class S3ImageHandler implements ImageHandler {
     private client : S3Client;
-    private acceptableMimetypes = ["image/png","image/jpeg"];
     private imageHeight = 400;
     private imageWidth = 300;
 
@@ -29,8 +28,6 @@ export class S3ImageHandler {
     }
 
     async uploadImage(input : ImageInput) : Promise<string|null> {
-        if (!this.acceptableMimetypes.includes(input.mimetype.toLowerCase())) return null;
-    
         const resizedBuffer = await sharp(input.buffer).resize({
             width: this.imageWidth,
             height: this.imageHeight

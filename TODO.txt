@@ -2,6 +2,7 @@ TODO
 /getSwipeFeed
 
 /getChatPreviews
+/getNewMatches
 /reportUser (ban if too much)
 /uploadImage
 /deleteImage

@@ -1,20 +1,15 @@
+import { beforeAll } from "@jest/globals";
 import { PrismaClient } from "@prisma/client";
+import { MockImageHandler } from "./__testExtras__/image";
 import { Handler } from "./src/handler";
-import { afterEach, beforeAll } from "@jest/globals";
 
-const prismaClient = new PrismaClient();
-export const handler = new Handler(prismaClient);
+export const handler = new Handler(
+    new PrismaClient(), 
+    process.argv.includes('--use-mocks=true') ? new MockImageHandler() : undefined
+);
 
 beforeAll( async () => {
     await Promise.all([
         handler.deleteEverything()
     ])
 })
-
-export async function waitOneMoment() {
-    return new Promise( (res) => {
-        setTimeout( () => {
-            res(null)
-        }, 1)
-    })
-}

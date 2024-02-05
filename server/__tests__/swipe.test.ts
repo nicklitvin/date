@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "@jest/globals";
-import { handler, waitOneMoment } from "../jest.setup";
+import { handler } from "../jest.setup";
 import { SwipeInput } from "../src/interfaces";
 import { Opinion, Swipe } from "@prisma/client";
 import { randomUUID } from "crypto";
@@ -45,8 +45,9 @@ describe("swipe", () => {
     })
 
     it("should update swipe", async () => {
-        const initial = await funcs.createSwipe(createSwipeInput("Like")) as Swipe;
-        await waitOneMoment();
+        const initial = await funcs.createSwipe(
+            createSwipeInput("Like"), new Date(0)
+        ) as Swipe;
         const updated = await funcs.updateSwipe(
             initial.id, createSwipeInput("Dislike")
         ) as Swipe;

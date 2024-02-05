@@ -8,25 +8,29 @@ import { SwipeHandler } from "./handlers/swipe";
 import { MessageHandler } from "./handlers/message";
 import { ReportHandler } from "./handlers/report";
 import { PaymentHandler } from "./handlers/pay";
-import { GetChatPreviewsInput, MessageInput, RequestUserInput, SwipeInput, UserInput } from "./interfaces";
+import { ChatPreview, GetChatPreviewsInput, ImageHandler, MessageInput, RequestUserInput, SwipeInput, UserInput } from "./interfaces";
+import { globals } from "./globals";
 
 export class Handler {
     public announcement : AnnouncementHandler;
     public attribute : AttributeHandler;
     public errorLog : ErrorLogHandler;
     public user : UserHandler;
-    public image : S3ImageHandler;
+    public image : ImageHandler;
     public swipe : SwipeHandler;
     public message : MessageHandler;
     public report : ReportHandler;
     public pay : PaymentHandler;
 
-    constructor(prisma : PrismaClient) {
+    constructor(prisma : PrismaClient, 
+        customImageHandler : ImageHandler = new S3ImageHandler) 
+    {
+        this.image = customImageHandler,
+
         this.announcement = new AnnouncementHandler(prisma);
         this.attribute = new AttributeHandler(prisma);
         this.errorLog = new ErrorLogHandler(prisma);
         this.user = new UserHandler(prisma);
-        this.image = new S3ImageHandler();
         this.swipe = new SwipeHandler(prisma);
         this.message = new MessageHandler(prisma);
         this.report = new ReportHandler(prisma);
@@ -123,7 +127,46 @@ export class Handler {
         return null;
     }
 
-    public async getChatPreviews(input : GetChatPreviewsInput) {
+    public async getChatPreviews(input : GetChatPreviewsInput) : 
+        Promise<ChatPreview[]|null> 
+    {
+        const user = await this.user.getUserByID(input.userID);
+        if (!user) return null;
 
+        const messages = await this.message.getLatestMessagesFromDistinctUsers(input);
+        const combined = messages.messagesFromUserID.concat(messages.messagesToUserID).
+            sort( (a,b) => b.timestamp.getTime() - a.timestamp.getTime())
+
+        const getChatPreview = async (message : Message) : Promise<ChatPreview|null> => {
+            const [profile, messages] = await Promise.all([
+                message.userID == input.userID ?
+                    this.user.getPublicProfile(message.recepientID) :
+                    this.user.getPublicProfile(message.userID),
+                this.message.getChat({
+                    userID: message.userID,
+                    withID: message.recepientID,
+                    fromTime: input.timestamp
+                })
+            ])
+            if (profile && messages) return {profile, messages}
+            return null;
+        }
+        
+        const allChatPreviews = await Promise.all(combined.map(message => 
+            getChatPreview(message)    
+        ))
+        const usedUserIDs = new Set<string>();
+        const result : ChatPreview[] = [];
+
+        for (const chatPreview of allChatPreviews) {
+            if (result.length == globals.usersLoadedInPreview) break;
+
+            if (chatPreview && !usedUserIDs.has(chatPreview.profile.id)) {
+                usedUserIDs.add(chatPreview.profile.id);
+                result.push(chatPreview);
+            }
+        }
+
+        return result;
     }
 }

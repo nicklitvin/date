@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "@jest/globals";
-import { handler, waitOneMoment } from "../jest.setup";
+import { handler } from "../jest.setup";
 import { MessageInput } from "../src/interfaces";
 import { randomUUID } from "crypto";
 
@@ -35,7 +35,7 @@ export const makeMessageInputWithOneRandom = (userID : string, flipUsers = false
     }
 }
 
-describe("message", () => {
+describe("message suite", () => {
     const funcs = handler.message;
     const userID = "userID";
     const userID_2 = "userID_2";
@@ -104,32 +104,19 @@ describe("message", () => {
     })
 
     it("should get chat", async () => {
-        await funcs.sendMessage(makeMessageInput(userID, userID_2));
-        await waitOneMoment();
-        const m2 = await funcs.sendMessage(makeMessageInput(userID_2, userID));
-        await waitOneMoment();
-        await funcs.sendMessage(makeMessageInput(userID, userID_2));
-        await waitOneMoment();
-        await funcs.sendMessage(makeMessageInputWithRandoms())
+        await funcs.sendMessage(makeMessageInput(userID, userID_2), new Date(1));
+        const m2 = await funcs.sendMessage(makeMessageInput(userID_2, userID), new Date(2));
+        await funcs.sendMessage(makeMessageInput(userID, userID_2), new Date(3));
+        await funcs.sendMessage(makeMessageInputWithRandoms(), new Date(4));
 
         const chat = await funcs.getChat({
             userID: userID,
             withID: userID_2,
-            count: 10,
             fromTime: new Date()
         })
         expect(chat.length).toEqual(3);
         expect(chat[0].timestamp.getTime()).toBeGreaterThan(chat[1].timestamp.getTime());
         expect(chat[1].timestamp.getTime()).toBeGreaterThan(chat[2].timestamp.getTime());
-
-        const chat_2 = await funcs.getChat({
-            userID: userID,
-            withID: userID_2,
-            count: 1,
-            fromTime: m2.timestamp
-        });
-        expect(chat_2.length).toEqual(1);
-        expect(chat_2[0].id).toEqual(m2.id);
     })
 
     it("should delete chat", async () => {
@@ -152,5 +139,32 @@ describe("message", () => {
         ])
 
         expect(await funcs.deleteAllChatsWithUser(userID)).toEqual(3);
+    })
+
+    it("should get messages from distinct users", async () => {
+        const [m1,m2,m3,m4] = await Promise.all([
+            funcs.sendMessage(makeMessageInputWithOneRandom(userID), new Date(10)),
+            funcs.sendMessage(makeMessageInputWithOneRandom(userID), new Date(11)),
+            funcs.sendMessage(makeMessageInputWithOneRandom(userID, true), new Date(12)),
+            funcs.sendMessage(makeMessageInputWithRandoms(), new Date(13))
+        ])
+
+        const data = await funcs.getLatestMessagesFromDistinctUsers({
+            userID: userID,
+            timestamp: new Date()
+        })
+        expect(data.messagesFromUserID.length).toEqual(2);
+        expect(data.messagesFromUserID[0].id).toEqual(m2.id);
+        expect(data.messagesFromUserID[1].id).toEqual(m1.id);
+
+        expect(data.messagesToUserID.length).toEqual(1);
+        expect(data.messagesToUserID[0].id).toEqual(m3.id);
+        
+        const data_2 = await funcs.getLatestMessagesFromDistinctUsers({
+            userID: userID,
+            timestamp: new Date(5)
+        })
+        expect(data_2.messagesFromUserID.length).toEqual(0);
+        expect(data_2.messagesToUserID.length).toEqual(0);
     })
 })

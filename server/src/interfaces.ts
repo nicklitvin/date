@@ -62,7 +62,6 @@ export interface ReadStatusInput {
 export interface GetChatInput {
     userID: string
     withID: string
-    count: number
     fromTime: Date
 }
 
@@ -76,12 +75,6 @@ export interface EditUserSubscriptionInput {
     subscribeEnd: Date
     isSubscribed: boolean
     subscriptionID: string | undefined
-}
-
-export interface GetChatPreviewsInput {
-    userID: string
-    timestamp: Date
-    count: number
 }
 
 export interface ImageInput {
@@ -100,7 +93,7 @@ export interface PublicProfile {
     university: string
 }
 
-export interface UserSwipeStats     {
+export interface UserSwipeStats {
     allTime: SwipeBreakdown
     weekly: SwipeBreakdown[]
 }
@@ -115,6 +108,25 @@ export interface SwipeBreakdown {
 export interface FileUpload {
     buffer: Buffer
     mimetype: string
+}
+
+export interface GetChatPreviewsInput {
+    userID: string
+    timestamp: Date
+}
+
+export interface ChatPreview {
+    profile: PublicProfile
+    messages: Message[]
+}
+
+
+export interface ImageHandler {
+    uploadImage(input : ImageInput) : Promise<string|null>
+    getImageURL(id : string) : Promise<string|null>
+    deleteImage(id : string) : Promise<string|null>
+    getAllImageIDs() : Promise<string[]>
+    deleteAllImages() : Promise<number>
 }
 
 // OLD

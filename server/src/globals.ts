@@ -10,6 +10,10 @@ export const globals = {
     acceptaleImageFormats : ["image/jpeg","image/png"],
     maxNameLength : 16,
     maxDescriptionLength : 100,
+
+    // Other
+    usersLoadedInPreview : 10,
+    messagesLoadedInChat: 10,
 }
 
 // import { AttributeType } from "@prisma/client",
