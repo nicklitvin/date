@@ -1,4 +1,5 @@
 import Stripe from "stripe";
+import { PaymentExtractOutput } from "../interfaces";
 
 export class PaymentHandler {
     private stripe : Stripe;
@@ -27,17 +28,35 @@ export class PaymentHandler {
         });
     }
 
-    public async extractUserIDFromPayment(request : Request) : Promise<string|null> {
-        const body = await request.text();
-        const signature = request.headers.get("Stripe-Signature") as string;
-        const event = this.stripe.webhooks.constructEvent(body,signature,
-            process.env.STRIPE_WEBHOOK!    
-        );
-
-        if (event.type == "checkout.session.completed") {
-            const session = event.data.object;
-            return session.metadata!["userID"];
+    public async extractDataFromPayment(request : Request) : 
+        Promise<PaymentExtractOutput|null> 
+    {
+        try {
+            const body = await request.text();
+            const signature = request.headers.get("Stripe-Signature") as string;
+            const event = this.stripe.webhooks.constructEvent(body,signature,
+                process.env.STRIPE_WEBHOOK!    
+            );
+    
+            if (event.type == "checkout.session.completed") {
+                const session = event.data.object;
+                return {
+                    userID: session.metadata!["userID"],
+                    subscriptionID: session.subscription!.toString()
+                }
+            }
+            return null;
+        } catch (err) {
+            return null;
         }
-        return null;
+    }
+
+    public async cancelSubscription(subscriptionID: string) : Promise<boolean> {
+        try {
+            await this.stripe.subscriptions.cancel(subscriptionID);
+            return true;
+        } catch (err) {
+            return false
+        }
     }
 }

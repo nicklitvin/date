@@ -114,7 +114,8 @@ export class UserHandler {
     public async cancelSubscription(userID : string) : Promise<User> {
         return await this.prisma.user.update({
             data: {
-                isSubscribed: false
+                isSubscribed: false,
+                subscriptionID: null
             },
             where: {
                 id: userID

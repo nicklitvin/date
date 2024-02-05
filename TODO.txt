@@ -1,13 +1,10 @@
 TODO
 /getSwipeFeed
 /getNewMatches
-/cancelSubscription (stripe)
 
 dont show reported users 
 database of users that have already activated free month
-
 insetad of returning null, return error message
-
 swiping elo
 server catch errors write to client errors
 

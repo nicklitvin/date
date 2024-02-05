@@ -144,6 +144,11 @@ export interface DeleteImageInput {
     imageID: string
 }
 
+export interface PaymentExtractOutput {
+    userID: string
+    subscriptionID: string
+}
+
 // OLD
 
 // export type SwipeFeed = {

@@ -254,4 +254,22 @@ export class Handler {
             return null;
         }
     }
+
+    public async processSubscriptionPay(request : Request) : Promise<void> {
+        const data = await this.pay.extractDataFromPayment(request);
+        if (data) {
+            await this.user.updateSubscriptionAfterPay(data.userID, data.subscriptionID);
+        }
+    }
+
+    public async cancelSubscription(userID: string) : Promise<User|null> {
+        const user = await this.user.getUserByID(userID);
+
+        if (!user || !user.subscriptionID) return null;
+
+        if (await this.pay.cancelSubscription(user.subscriptionID)) {
+            return await this.user.cancelSubscription(userID)
+        }
+        return null;
+    }
 }
