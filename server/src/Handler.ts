@@ -8,7 +8,7 @@ import { SwipeHandler } from "./handlers/swipe";
 import { MessageHandler } from "./handlers/message";
 import { ReportHandler } from "./handlers/report";
 import { PaymentHandler } from "./handlers/pay";
-import { ChatPreview, GetChatPreviewsInput, ImageHandler, MessageInput, RequestReportInput, RequestUserInput, SwipeInput, UserInput } from "./interfaces";
+import { ChatPreview, GetChatPreviewsInput, ImageHandler, MessageInput, RequestReportInput, RequestUserInput, SwipeInput, UploadImageInput, UserInput } from "./interfaces";
 import { globals } from "./globals";
 
 export class Handler {
@@ -193,5 +193,24 @@ export class Handler {
         if (reportCount == globals.maxReportCount) await this.deleteUser(reportedUser.id);
 
         return report
+    }
+
+    public async uploadImage(input : UploadImageInput) : Promise<User|null> {
+        const user = await this.user.getUserByID(input.userID);
+
+        if (
+            !user || 
+            user.images.length == globals.maxImagesCount ||
+            !globals.acceptaleImageFormats.includes(input.image.mimetype)
+        ) return null;
+
+        const imageID = await this.image.uploadImage(input.image);
+        if (!imageID) return null;
+        
+        return await this.user.editUser({
+            setting: "images",
+            userID: input.userID,
+            value: user.images.concat([imageID])
+        })
     }
 }

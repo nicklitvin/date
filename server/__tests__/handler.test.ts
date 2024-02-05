@@ -6,6 +6,7 @@ import { User } from "@prisma/client";
 import { makeMessageInputWithOneRandom, makeMessageInputWithRandoms } from "./message.test";
 import { ChatPreview } from "../src/interfaces";
 import { randomUUID } from "crypto";
+import { getImageDetails } from "./image.test";
 
 afterEach( async () => {
     await handler.deleteEverything()
@@ -270,5 +271,44 @@ describe("handler", () => {
             reportedID: user_2.id
         })
         expect(await handler.user.getUserByID(user_2.id)).toEqual(null);
+    })
+
+    it("should no upload image for nonuser", async () => {
+        expect(await handler.uploadImage({
+            userID: "random",
+            image: await getImageDetails(true)
+        })).toEqual(null);
+    })
+
+    it("should not upload bad image", async () => {
+        const user = await handler.user.createUser(createUserInput("a@berkeley.edu"));
+        expect(await handler.uploadImage({
+            userID: user.id,
+            image: await getImageDetails(false)
+        })).toEqual(null);
+    })
+
+    it("should not upload over max images", async () => {
+        const userInput = createUserInput("a@berkeley.edu");
+        const maxImages = Array.from({length: globals.maxImagesCount}).fill(
+            "imageID") as string[];
+        userInput.images = maxImages;
+
+        const user = await handler.user.createUser(userInput);
+        expect(await handler.uploadImage({
+            userID: user.id,
+            image: await getImageDetails(true)
+        })).toEqual(null);
+    })
+
+    it("should upload image", async () => {
+        const user = await handler.user.createUser(createUserInput("a@berkeley.edu"));
+        const after = await handler.uploadImage({
+            userID: user.id,
+            image: await getImageDetails(true)
+        });
+
+        expect(after).not.toEqual(null);
+        expect(after?.images.length).toEqual(user.images.length + 1);
     })
 })

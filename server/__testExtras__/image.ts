@@ -11,7 +11,6 @@ export class MockImageHandler implements ImageHandler {
     }
 
     getImageURL(id : string) : Promise<string|null> {
-        console.log("A");
         return Promise.resolve(`mock image url for ${id}`)
     }
 

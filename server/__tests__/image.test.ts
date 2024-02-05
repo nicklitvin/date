@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "@jest/globals";
-import { handler } from "../jest.setup";
+import { handler, isAWSMocked } from "../jest.setup";
 import { ImageInput } from "../src/interfaces";
 import fs from "fs/promises";
 import mime from "mime-types";
@@ -10,21 +10,24 @@ afterEach( async () => {
     await handler.image.deleteAllImages();
 })
 
+const imageFilePath = "./__tests__/images/goodImage.jpg";
+const badImageFilePath = "./__tests__/images/badImage.txt";
+export const getImageDetails = async (good : boolean) : Promise<ImageInput> => {
+    return {
+        buffer: await fs.readFile(good ? imageFilePath : badImageFilePath),
+        mimetype: mime.lookup(good ? imageFilePath : badImageFilePath) as string
+    }
+}
+
 describe("image", () => {
     const funcs = handler.image;
-    const imageFilePath = "./__tests__/images/goodImage.jpg";
-    const badImageFilePath = "./__tests__/images/badImage.txt";
-
+    
     const getImageDetails = async (good : boolean) : Promise<ImageInput> => {
         return {
             buffer: await fs.readFile(good ? imageFilePath : badImageFilePath),
             mimetype: mime.lookup(good ? imageFilePath : badImageFilePath) as string
         }
     }
-
-    it("should not upload nonimage", async () => {
-        expect(await funcs.uploadImage(await getImageDetails(false))).toEqual(null);
-    })
 
     it("should upload image", async () => {
         expect(await funcs.uploadImage(await getImageDetails(true))).not.toEqual(null);
@@ -40,13 +43,15 @@ describe("image", () => {
     })
     
     it("should resize image upload", async () => {
-        const imageID = await funcs.uploadImage(await getImageDetails(true)) as string;
-        const URL = await funcs.getImageURL(imageID) as string;
-        const response = await axios.get(URL, { responseType: "arraybuffer"} );
-        const dimensions = sizeOf(response.data);
-        
-        expect(dimensions.height).toEqual(400);
-        expect(dimensions.width).toEqual(300);
+        if (!isAWSMocked) {
+            const imageID = await funcs.uploadImage(await getImageDetails(true)) as string;
+            const URL = await funcs.getImageURL(imageID) as string;
+            const response = await axios.get(URL, { responseType: "arraybuffer"} );
+            const dimensions = sizeOf(response.data);
+            
+            expect(dimensions.height).toEqual(400);
+            expect(dimensions.width).toEqual(300);
+        }
     })
 
     it("should get all imageIDs", async () => {

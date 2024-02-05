@@ -134,6 +134,11 @@ export interface ImageHandler {
     deleteAllImages() : Promise<number>
 }
 
+export interface UploadImageInput {
+    userID: string
+    image: FileUpload
+}
+
 // OLD
 
 // export type SwipeFeed = {
