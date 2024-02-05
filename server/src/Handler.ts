@@ -8,7 +8,7 @@ import { SwipeHandler } from "./handlers/swipe";
 import { MessageHandler } from "./handlers/message";
 import { ReportHandler } from "./handlers/report";
 import { PaymentHandler } from "./handlers/pay";
-import { ChatPreview, GetChatPreviewsInput, ImageHandler, MessageInput, RequestReportInput, RequestUserInput, SwipeInput, UploadImageInput, UserInput } from "./interfaces";
+import { ChatPreview, DeleteImageInput, GetChatPreviewsInput, ImageHandler, MessageInput, RequestReportInput, RequestUserInput, SwipeInput, UploadImageInput, UserInput } from "./interfaces";
 import { globals } from "./globals";
 
 export class Handler {
@@ -206,11 +206,23 @@ export class Handler {
 
         const imageID = await this.image.uploadImage(input.image);
         if (!imageID) return null;
-        
+
         return await this.user.editUser({
             setting: "images",
             userID: input.userID,
             value: user.images.concat([imageID])
+        })
+    }
+
+    public async deleteImage(input : DeleteImageInput) : Promise<User|null> {
+        const user = await this.user.getUserByID(input.userID);
+
+        if (!user || !user.images.includes(input.imageID)) return null;
+
+        return await this.user.editUser({
+            setting: "images",
+            userID: input.userID,
+            value: user.images.filter( val => val != input.imageID)
         })
     }
 }

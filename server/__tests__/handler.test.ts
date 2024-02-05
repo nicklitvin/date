@@ -311,4 +311,27 @@ describe("handler", () => {
         expect(after).not.toEqual(null);
         expect(after?.images.length).toEqual(user.images.length + 1);
     })
+
+    it("should not delete image from nonuser", async () => {
+        expect(await handler.deleteImage({
+            userID: "random",
+            imageID: "imageID"
+        })).toEqual(null);
+    })
+
+    it("should not delete nonimage from user", async () => {
+        const user = await handler.user.createUser(createUserInput("a@berkeley.edu"));
+        expect(await handler.deleteImage({
+            userID: user.id,
+            imageID: "random"
+        })).toEqual(null);
+    })
+
+    it("should delete image from user", async () => {
+        const user = await handler.user.createUser(createUserInput("a@berkeley.edu"));
+        expect(await handler.deleteImage({
+            userID: user.id,
+            imageID: user.images[0]
+        })).not.toEqual(null);
+    })
 })

@@ -1,10 +1,8 @@
 TODO
 /getSwipeFeed
-
 /getNewMatches
-/reportUser (ban if too much)
-/uploadImage
-/deleteImage
+
+/editUser
 /cancelSubscription (stripe)
 /changeImageOrder
 

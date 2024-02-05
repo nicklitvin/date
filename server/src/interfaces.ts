@@ -139,6 +139,11 @@ export interface UploadImageInput {
     image: FileUpload
 }
 
+export interface DeleteImageInput {
+    userID: string
+    imageID: string
+}
+
 // OLD
 
 // export type SwipeFeed = {
