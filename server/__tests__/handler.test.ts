@@ -334,4 +334,30 @@ describe("handler", () => {
             imageID: user.images[0]
         })).not.toEqual(null);
     })
+
+    it("should not edit nonnuser", async () => {
+        expect(await handler.editUser({
+            userID: "random",
+            setting: "email",
+            value: "1"
+        })).toEqual(null);
+    })
+
+    it("should not edit not allowed attribute", async () => {
+        const user = await handler.user.createUser(createUserInput("a@berkeley.edu"));
+        expect(await handler.editUser({
+            userID: user.id,
+            setting: "age",
+            value: "12"
+        })).toEqual(null);
+    })
+
+    it("should edit user", async () => {
+        const user = await handler.user.createUser(createUserInput("a@berkeley.edu"));
+        expect(await handler.editUser({
+            userID: user.id,
+            setting: "age",
+            value: 12
+        })).not.toEqual(null);
+    })
 })

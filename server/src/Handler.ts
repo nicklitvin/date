@@ -8,7 +8,7 @@ import { SwipeHandler } from "./handlers/swipe";
 import { MessageHandler } from "./handlers/message";
 import { ReportHandler } from "./handlers/report";
 import { PaymentHandler } from "./handlers/pay";
-import { ChatPreview, DeleteImageInput, GetChatPreviewsInput, ImageHandler, MessageInput, RequestReportInput, RequestUserInput, SwipeInput, UploadImageInput, UserInput } from "./interfaces";
+import { ChatPreview, DeleteImageInput, EditUserInput, GetChatPreviewsInput, ImageHandler, MessageInput, RequestReportInput, RequestUserInput, SwipeInput, UploadImageInput, UserInput } from "./interfaces";
 import { globals } from "./globals";
 
 export class Handler {
@@ -224,5 +224,15 @@ export class Handler {
             userID: input.userID,
             value: user.images.filter( val => val != input.imageID)
         })
+    }
+
+    public async editUser(input : EditUserInput) : Promise<User|null> {
+        const user = await this.user.getUserByID(input.userID);
+
+        if (!user || !globals.allowedAttributeEdits.includes(input.setting)) {
+            return null;
+        }
+
+        return await this.user.editUser(input);
     }
 }
