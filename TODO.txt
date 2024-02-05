@@ -1,13 +1,15 @@
 TODO
 /getSwipeFeed
 
-/getChatPreviews
 /getNewMatches
 /reportUser (ban if too much)
 /uploadImage
 /deleteImage
 /cancelSubscription (stripe)
 /changeImageOrder
+
+dont show reported users 
+database of users that have already activated free month
 
 swiping elo
 server catch errors write to client errors

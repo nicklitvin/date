@@ -4,7 +4,7 @@
   "description": "",
   "scripts": {
     "start": "npx ts-node ./src/index.ts",
-    "test": "jest --runInBand --use-mocks=true --testPathIgnorePatterns \"./__tests__/image.test.ts\"",
+    "test": "jest --runInBand --use-mocks=true --testPathIgnorePatterns \"./__tests__/image.test.ts\" \"./__tests__/pay.test.ts\"",
     "test-real": "jest --runInBand"
   },
   "keywords": [],

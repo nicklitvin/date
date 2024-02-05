@@ -65,6 +65,11 @@ export interface GetChatInput {
     fromTime: Date
 }
 
+export interface RequestReportInput {
+    userID: string
+    reportedID: string
+}
+
 export interface UserReportInput {
     userID: string
     reportedEmail: string

@@ -1,4 +1,4 @@
-import { Message, PrismaClient, User } from "@prisma/client";
+import { Message, PrismaClient, User, UserReport } from "@prisma/client";
 import { AnnouncementHandler } from "./handlers/announcement";
 import { AttributeHandler } from "./handlers/attribute";
 import { ErrorLogHandler } from "./handlers/errorlog";
@@ -8,7 +8,7 @@ import { SwipeHandler } from "./handlers/swipe";
 import { MessageHandler } from "./handlers/message";
 import { ReportHandler } from "./handlers/report";
 import { PaymentHandler } from "./handlers/pay";
-import { ChatPreview, GetChatPreviewsInput, ImageHandler, MessageInput, RequestUserInput, SwipeInput, UserInput } from "./interfaces";
+import { ChatPreview, GetChatPreviewsInput, ImageHandler, MessageInput, RequestReportInput, RequestUserInput, SwipeInput, UserInput } from "./interfaces";
 import { globals } from "./globals";
 
 export class Handler {
@@ -168,5 +168,30 @@ export class Handler {
         }
 
         return result;
+    }
+
+    public async reportUser(input : RequestReportInput) : Promise<UserReport|null> {
+        const [user, reportedUser] = await Promise.all([
+            this.user.getUserByID(input.userID),
+            this.user.getUserByID(input.reportedID),
+        ])
+
+        if (!(user && reportedUser) || user.id == reportedUser.id) return null;
+
+        const [existingReport, reportCount] = await Promise.all([
+            this.report.getReportByUsers(user.id, reportedUser.email),
+            this.report.getReportCountForEmail(reportedUser.email)
+        ])
+
+        if (existingReport) return null;
+
+        const report = await this.report.makeReport({
+            userID: input.userID,
+            reportedEmail: reportedUser.email
+        });
+
+        if (reportCount == globals.maxReportCount) await this.deleteUser(reportedUser.id);
+
+        return report
     }
 }

@@ -5,6 +5,7 @@ import { createUserInput, validRequestUserInput } from "./user.test";
 import { User } from "@prisma/client";
 import { makeMessageInputWithOneRandom, makeMessageInputWithRandoms } from "./message.test";
 import { ChatPreview } from "../src/interfaces";
+import { randomUUID } from "crypto";
 
 afterEach( async () => {
     await handler.deleteEverything()
@@ -219,5 +220,55 @@ describe("handler", () => {
             timestamp: new Date()
         })
         expect(previews?.length).toEqual(0);
+    })
+
+    it("should not add report from nonuser", async () => {
+        const user = await handler.user.createUser(createUserInput("a@berkeley.edu"));
+        expect(await handler.reportUser({
+            userID: "random",
+            reportedID: user.id
+        })).toEqual(null);
+    })
+
+    it("should not report nonuser", async () => {
+        const user = await handler.user.createUser(createUserInput("a@berkeley.edu"));
+        expect(await handler.reportUser({
+            userID: user.id,
+            reportedID: "random"
+        })).toEqual(null);
+    })
+
+    it("should not report self", async () => {
+        const user = await handler.user.createUser(createUserInput("a@berkeley.edu"));
+        expect(await handler.reportUser({
+            userID: user.id,
+            reportedID: user.id
+        })).toEqual(null);
+    })
+
+    it("should report user", async () => {
+        const {user, user_2} = await makeTwoUsersAndMatch();
+        expect(await handler.reportUser({
+            userID: user.id,
+            reportedID: user_2.id
+        })).not.toEqual(null);        
+    })
+
+    it("should delete user after enough reports", async () => {
+        const {user, user_2} = await makeTwoUsersAndMatch();
+        await Promise.all(
+            Array.from({length: globals.maxReportCount}, () => randomUUID()).map(
+                (val) => handler.report.makeReport({
+                    userID: val,
+                    reportedEmail: user_2.email
+                })
+            )
+        )
+
+        await handler.reportUser({
+            userID: user.id,
+            reportedID: user_2.id
+        })
+        expect(await handler.user.getUserByID(user_2.id)).toEqual(null);
     })
 })
