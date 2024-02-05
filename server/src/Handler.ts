@@ -235,4 +235,23 @@ export class Handler {
 
         return await this.user.editUser(input);
     }
+
+    public async changeImageOrder(input : EditUserInput) : Promise<User|null> {
+        const user = await this.user.getUserByID(input.userID);
+
+        if (!user || input.setting != "images") return null;
+
+        try {
+            const newOrder = input.value as string[];
+            if (newOrder.length == user.images.length && 
+                user.images.every( val => newOrder.includes(val))) 
+            {
+                return await this.user.editUser(input);
+            } else {
+                return null;
+            }
+        } catch (err) {
+            return null;
+        }
+    }
 }

@@ -360,4 +360,58 @@ describe("handler", () => {
             value: 12
         })).not.toEqual(null);
     })
+
+    it("should not change image order of nonuser", async () => {
+        expect(await handler.changeImageOrder({
+            userID: "random",
+            setting: "images",
+            value: ["1","2"]
+        })).toEqual(null);
+    })
+
+    it("should not change image order with bad input", async () => {
+        const user = await handler.user.createUser(createUserInput("a@berkeley.edu"));
+        expect(await handler.changeImageOrder({
+            userID: user.id,
+            setting: "images",
+            value: "1"
+        })).toEqual(null);
+    })
+
+    it("should not change image order if images dont match", async () => {
+        const userInput = createUserInput("a@berkeley.edu");
+        userInput.images = ["1","2"];
+
+        const user = await handler.user.createUser(userInput);
+        expect(await handler.changeImageOrder({
+            userID: user.id,
+            setting: "images",
+            value: ["1"]
+        })).toEqual(null);
+        expect(await handler.changeImageOrder({
+            userID: user.id,
+            setting: "images",
+            value: ["1","2","3"]
+        })).toEqual(null);
+        expect(await handler.changeImageOrder({
+            userID: user.id,
+            setting: "images",
+            value: [1,2]
+        })).toEqual(null);
+    })
+
+    it("should change image order", async () => {
+        const userInput = createUserInput("a@berkeley.edu");
+        userInput.images = ["1","2"];
+
+        const user = await handler.user.createUser(userInput);
+        const after = await handler.changeImageOrder({
+            userID: user.id,
+            setting: "images",
+            value: ["2","1"]
+        })
+        expect(after?.images.length).toEqual(2);
+        expect(after?.images[0]).toEqual(userInput.images[1]);
+        expect(after?.images[1]).toEqual(userInput.images[0]);
+    })
 })

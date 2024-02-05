@@ -1,10 +1,7 @@
 TODO
 /getSwipeFeed
 /getNewMatches
-
-/editUser
 /cancelSubscription (stripe)
-/changeImageOrder
 
 dont show reported users 
 database of users that have already activated free month
