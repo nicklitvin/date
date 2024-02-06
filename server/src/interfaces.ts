@@ -1,4 +1,4 @@
-import { AttributeType, Gender, Message, Opinion, User } from "@prisma/client"
+import { AttributeType, Gender, Message, Opinion, Swipe, User } from "@prisma/client"
 
 export interface AnnouncementInput {
     startTime: Date
@@ -154,6 +154,16 @@ export interface PaymentHandler {
         Promise<string>
     extractDataFromPayment(request : Request) : Promise<PaymentExtractOutput|null> 
     cancelSubscription(subscriptionID: string) : Promise<boolean>
+}
+
+export interface UnlikeInput {
+    userID: string
+    withID: string
+}
+
+export interface UnlikeOutput {
+    newSwipe: Swipe,
+    deletedMessages: number
 }
 
 // OLD

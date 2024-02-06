@@ -49,7 +49,7 @@ describe("swipe", () => {
             createSwipeInput("Like"), new Date(0)
         ) as Swipe;
         const updated = await funcs.updateSwipe(
-            initial.id, createSwipeInput("Dislike")
+            initial.id, "Dislike"
         ) as Swipe;
 
         expect(updated.action).toEqual("Dislike");

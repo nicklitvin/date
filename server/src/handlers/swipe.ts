@@ -1,4 +1,4 @@
-import { PrismaClient, Swipe } from "@prisma/client";
+import { Opinion, PrismaClient, Swipe } from "@prisma/client";
 import { randomUUID } from "crypto";
 import { SwipeBreakdown, SwipeInput, UserSwipeStats } from "../interfaces";
 import { startOfWeek, subWeeks } from "date-fns";
@@ -20,13 +20,13 @@ export class SwipeHandler {
         })
     }
 
-    public async updateSwipe(id : string, input : SwipeInput) : Promise<Swipe|null> {
+    public async updateSwipe(id : string, action : Opinion) : Promise<Swipe|null> {
         return await this.prisma.swipe.update({
             where: {
                 id: id
             },
             data: {
-                action: input.action,
+                action: action,
                 timestamp: new Date()
             }
         })

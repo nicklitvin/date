@@ -1,4 +1,4 @@
-import { Message, PrismaClient, User, UserReport } from "@prisma/client";
+import { Message, PrismaClient, Swipe, User, UserReport } from "@prisma/client";
 import { AnnouncementHandler } from "./handlers/announcement";
 import { AttributeHandler } from "./handlers/attribute";
 import { ErrorLogHandler } from "./handlers/errorlog";
@@ -8,7 +8,7 @@ import { SwipeHandler } from "./handlers/swipe";
 import { MessageHandler } from "./handlers/message";
 import { ReportHandler } from "./handlers/report";
 import { StripePaymentHandler } from "./handlers/pay";
-import { ChatPreview, DeleteImageInput, EditUserInput, GetChatPreviewsInput, ImageHandler, MessageInput, PaymentHandler, RequestReportInput, RequestUserInput, SwipeInput, UploadImageInput, UserInput } from "./interfaces";
+import { ChatPreview, DeleteImageInput, EditUserInput, GetChatPreviewsInput, ImageHandler, MessageInput, PaymentHandler, RequestReportInput, RequestUserInput, SwipeInput, UnlikeInput, UnlikeOutput, UploadImageInput, UserInput } from "./interfaces";
 import { globals } from "./globals";
 import { FreeTrialHandler } from "./handlers/freetrial";
 
@@ -104,7 +104,7 @@ export class Handler {
         return {images, messages, user};
     }
 
-    public async makeSwipe(input : SwipeInput) : Promise<SwipeInput|null> {
+    public async makeSwipe(input : SwipeInput) : Promise<Swipe|null> {
         const [user, swipedUser, previousSwipe] = await Promise.all([
             this.user.getUserByID(input.userID),
             this.user.getUserByID(input.swipedUserID),
@@ -189,6 +189,17 @@ export class Handler {
         ])
 
         if (existingReport) return null;
+
+        const swipe = await this.swipe.getSwipeByUsers(user.id, reportedUser.id);
+
+        const [] = await Promise.all([
+            this.report.makeReport({
+                userID: input.userID,
+                reportedEmail: reportedUser.email
+            }),
+            swipe ? this.swipe.updateSwipe(swipe.id, "Dislike") : Promise.resolve(null),
+            this.message.deleteChat(user.id, reportedUser.id)
+        ])
 
         const report = await this.report.makeReport({
             userID: input.userID,
@@ -284,5 +295,28 @@ export class Handler {
             return await this.user.cancelSubscription(userID)
         }
         return null;
+    }
+
+    public async unlike(input : UnlikeInput) : Promise<UnlikeOutput|null> {
+        const [user, matchUser] = await Promise.all([
+            this.user.getUserByID(input.userID),
+            this.user.getUserByID(input.withID)
+        ]);
+
+        if (!user || !matchUser) return null;
+
+        const swipe = await this.swipe.getSwipeByUsers(user.id, matchUser.id);
+
+        if (!swipe || swipe.action == "Dislike") return null;
+
+        const [newSwipe, messagesDeleted] = await Promise.all([
+            this.swipe.updateSwipe(swipe.id, "Dislike"),
+            this.message.deleteChat(user.id, matchUser.id)
+        ])
+
+        return {
+            deletedMessages: messagesDeleted,
+            newSwipe: newSwipe as Swipe
+        };
     }
 }

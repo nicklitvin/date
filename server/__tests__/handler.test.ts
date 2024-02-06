@@ -3,7 +3,7 @@ import { handler } from "../jest.setup";
 import { globals } from "../src/globals";
 import { createUserInput, validRequestUserInput } from "./user.test";
 import { User } from "@prisma/client";
-import { makeMessageInputWithOneRandom, makeMessageInputWithRandoms } from "./message.test";
+import { makeMessageInput, makeMessageInputWithOneRandom, makeMessageInputWithRandoms } from "./message.test";
 import { ChatPreview } from "../src/interfaces";
 import { randomUUID } from "crypto";
 import { getImageDetails } from "./image.test";
@@ -247,12 +247,39 @@ describe("handler", () => {
         })).toEqual(null);
     })
 
-    it("should report user", async () => {
+    it("should report user, unmatch, and delete chat", async () => {
         const {user, user_2} = await makeTwoUsersAndMatch();
+        await Promise.all([
+            handler.message.sendMessage({
+                userID: user.id,
+                message: "",
+                recepientID: user_2.id
+            }),
+            handler.message.sendMessage({
+                userID: user_2.id,
+                message: "",
+                recepientID: user.id
+            })
+        ])
+
         expect(await handler.reportUser({
             userID: user.id,
             reportedID: user_2.id
         })).not.toEqual(null);        
+
+        const [userOpinion, user2Opinion, chat] = await Promise.all([
+            handler.swipe.getSwipeByUsers(user.id, user_2.id),
+            handler.swipe.getSwipeByUsers(user_2.id, user.id),
+            handler.message.getChat({
+                userID: user.id,
+                withID: user_2.id,
+                fromTime: new Date()
+            })
+        ]);
+
+        expect(userOpinion?.action).toEqual("Dislike");
+        expect(user2Opinion?.action).toEqual("Like");
+        expect(chat).toHaveLength(0);
     })
 
     it("should delete user after enough reports", async () => {
@@ -440,5 +467,56 @@ describe("handler", () => {
         const after = await handler.cancelSubscription(user.id) as User;
         expect(after.isSubscribed).toEqual(false);
         expect(after.subscriptionID).toEqual(null);
+    })
+
+    it("should not unlike if nonuser", async () => {
+        const user = await handler.user.createUser(createUserInput("a@berkeley.edu"));
+        expect(await handler.unlike({
+            userID: "random",
+            withID: user.id
+        })).toEqual(null);
+    })
+
+    it("should not unlike from nonuser", async () => {
+        const user = await handler.user.createUser(createUserInput("a@berkeley.edu"));
+        expect(await handler.unlike({
+            userID: user.id,
+            withID: "random"
+        })).toEqual(null);
+    })
+
+    it("should not unlike if not liked", async () => {
+        const [user, user_2] = await Promise.all([
+            handler.user.createUser(createUserInput("a@berkeley.edu")),
+            handler.user.createUser(createUserInput("b@berkeley.edu"))
+        ]);
+
+        expect(await handler.unlike({
+            userID: user.id,
+            withID: user_2.id
+        })).toEqual(null);
+    })
+
+    it("should unlike and delete chat", async () => {
+        const {user, user_2} = await makeTwoUsersAndMatch();
+        await Promise.all([
+            handler.message.sendMessage({
+                userID: user.id,
+                message: "",
+                recepientID: user_2.id
+            }),
+            handler.message.sendMessage({
+                userID: user_2.id,
+                message: "",
+                recepientID: user.id
+            })
+        ]);
+
+        const deleted = await handler.unlike({
+            userID: user.id,
+            withID: user_2.id
+        })
+        expect(deleted?.deletedMessages).toEqual(2);
+        expect(deleted?.newSwipe).not.toEqual(null);
     })
 })
