@@ -414,4 +414,31 @@ describe("handler", () => {
         expect(after?.images[0]).toEqual(userInput.images[1]);
         expect(after?.images[1]).toEqual(userInput.images[0]);
     })
+
+    it("should not create checkout page for nonuser", async () => {
+        expect(await handler.getSubscriptionCheckoutPage("random")).toEqual(null);
+    })
+
+    it("should create checkout page for user", async () => {
+        const user = await handler.user.createUser(createUserInput("a@berkeley.edu"));
+        expect(await handler.getSubscriptionCheckoutPage(user.id)).not.toEqual(null);
+    })
+
+    it("should not cancel subscription for nonuser", async () => {
+        expect(await handler.cancelSubscription("random")).toEqual(null);
+    })
+
+    it("should not cancel subscription if user has none", async () => {
+        const user = await handler.user.createUser(createUserInput("a@berkeley.edu"));
+        expect(await handler.cancelSubscription(user.id)).toEqual(null);
+    })
+
+    it("should cancel subscription for user", async () => {
+        const user = await handler.user.createUser(createUserInput("a@berkeley.edu"));
+        await handler.user.updateSubscriptionAfterPay(user.id, "subscriptionId");
+        
+        const after = await handler.cancelSubscription(user.id) as User;
+        expect(after.isSubscribed).toEqual(false);
+        expect(after.subscriptionID).toEqual(null);
+    })
 })

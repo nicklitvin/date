@@ -16,6 +16,7 @@ export const globals = {
     usersLoadedInPreview : 10,
     messagesLoadedInChat: 10,
     maxReportCount: 10,
+    freeTrialDays: 7,
 }
 
 // import { AttributeType } from "@prisma/client",

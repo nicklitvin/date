@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "@jest/globals";
-import { handler, isAWSMocked } from "../jest.setup";
+import { handler, usingMocks } from "../jest.setup";
 import { ImageInput } from "../src/interfaces";
 import fs from "fs/promises";
 import mime from "mime-types";
@@ -43,7 +43,7 @@ describe("image", () => {
     })
     
     it("should resize image upload", async () => {
-        if (!isAWSMocked) {
+        if (!usingMocks) {
             const imageID = await funcs.uploadImage(await getImageDetails(true)) as string;
             const URL = await funcs.getImageURL(imageID) as string;
             const response = await axios.get(URL, { responseType: "arraybuffer"} );

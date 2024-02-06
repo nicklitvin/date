@@ -92,3 +92,8 @@ model Announcement {
     title           String
     message         String
 }
+
+model FreeTrialUsedUser {
+    email           String          @id
+    timestamp       DateTime
+}

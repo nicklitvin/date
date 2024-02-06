@@ -18,7 +18,7 @@ npx prisma db push
 double quotes for table names
 select * from "<table>"
 
-premium (first 100 people get free)
+premium 
     read status of other person
     better filters
     more impressions

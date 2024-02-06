@@ -1,7 +1,8 @@
 import Stripe from "stripe";
-import { PaymentExtractOutput } from "../interfaces";
+import { PaymentExtractOutput, PaymentHandler } from "../interfaces";
+import { globals } from "../globals";
 
-export class PaymentHandler {
+export class StripePaymentHandler implements PaymentHandler {
     private stripe : Stripe;
 
     constructor() {
@@ -10,22 +11,29 @@ export class PaymentHandler {
         })
     }
 
-    public async createSubscriptioncSessionURL(userID : string) {
-        return await this.stripe.checkout.sessions.create({
+    public async createSubscriptionSessionURL(userID : string, freeTrial: boolean) :
+        Promise<string> 
+    {
+        const session = await this.stripe.checkout.sessions.create({
             mode: "subscription",
             line_items: [
                 {
                     price: process.env.PREMIUM_PRICE_ID!,
-                    quantity: 1
+                    quantity: 1,
                 }
             ],
+            
             success_url: process.env.SUCCESS_RETURN_URL!,
             cancel_url: process.env.CANCEL_RETURN_URL!,
             allow_promotion_codes: true,
             metadata: {
                 userID: userID
+            },
+            subscription_data: {
+                trial_period_days: freeTrial ? globals.freeTrialDays : 0
             }
         });
+        return session.url as string;
     }
 
     public async extractDataFromPayment(request : Request) : 

@@ -7,9 +7,10 @@ import { S3ImageHandler } from "./handlers/images";
 import { SwipeHandler } from "./handlers/swipe";
 import { MessageHandler } from "./handlers/message";
 import { ReportHandler } from "./handlers/report";
-import { PaymentHandler } from "./handlers/pay";
-import { ChatPreview, DeleteImageInput, EditUserInput, GetChatPreviewsInput, ImageHandler, MessageInput, RequestReportInput, RequestUserInput, SwipeInput, UploadImageInput, UserInput } from "./interfaces";
+import { StripePaymentHandler } from "./handlers/pay";
+import { ChatPreview, DeleteImageInput, EditUserInput, GetChatPreviewsInput, ImageHandler, MessageInput, PaymentHandler, RequestReportInput, RequestUserInput, SwipeInput, UploadImageInput, UserInput } from "./interfaces";
 import { globals } from "./globals";
+import { FreeTrialHandler } from "./handlers/freetrial";
 
 export class Handler {
     public announcement : AnnouncementHandler;
@@ -21,11 +22,14 @@ export class Handler {
     public message : MessageHandler;
     public report : ReportHandler;
     public pay : PaymentHandler;
+    public freeTrial : FreeTrialHandler;
 
     constructor(prisma : PrismaClient, 
-        customImageHandler : ImageHandler = new S3ImageHandler) 
-    {
+        customImageHandler : ImageHandler = new S3ImageHandler(),
+        customPaymentHandler : PaymentHandler = new StripePaymentHandler()
+    ) {
         this.image = customImageHandler,
+        this.pay = customPaymentHandler;
 
         this.announcement = new AnnouncementHandler(prisma);
         this.attribute = new AttributeHandler(prisma);
@@ -34,7 +38,7 @@ export class Handler {
         this.swipe = new SwipeHandler(prisma);
         this.message = new MessageHandler(prisma);
         this.report = new ReportHandler(prisma);
-        this.pay = new PaymentHandler();
+        this.freeTrial = new FreeTrialHandler(prisma);
     }
 
     public async deleteEverything() {
@@ -46,7 +50,8 @@ export class Handler {
             this.image.deleteAllImages(),
             this.swipe.deleteAllSwipes(),
             this.message.deleteAllMessages(),
-            this.report.deleteAllReports()
+            this.report.deleteAllReports(),
+            this.freeTrial.deleteAllFreeTrialUsedUsers()
         ])
     }
 
@@ -253,6 +258,14 @@ export class Handler {
         } catch (err) {
             return null;
         }
+    }
+
+    public async getSubscriptionCheckoutPage(userID: string) : Promise<string|null> {
+        const user = await this.user.getUserByID(userID);
+        if (!user) return null;
+
+        const usedFreeTrial = await this.freeTrial.hasEmailUsedFreeTrial(user.email);
+        return await this.pay.createSubscriptionSessionURL(userID, !usedFreeTrial);
     }
 
     public async processSubscriptionPay(request : Request) : Promise<void> {

@@ -149,6 +149,13 @@ export interface PaymentExtractOutput {
     subscriptionID: string
 }
 
+export interface PaymentHandler {
+    createSubscriptionSessionURL(userID : string, freeTrial: boolean) : 
+        Promise<string>
+    extractDataFromPayment(request : Request) : Promise<PaymentExtractOutput|null> 
+    cancelSubscription(subscriptionID: string) : Promise<boolean>
+}
+
 // OLD
 
 // export type SwipeFeed = {

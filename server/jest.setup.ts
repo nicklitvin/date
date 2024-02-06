@@ -2,11 +2,13 @@ import { beforeAll } from "@jest/globals";
 import { PrismaClient } from "@prisma/client";
 import { MockImageHandler } from "./__testExtras__/image";
 import { Handler } from "./src/handler";
+import { MockPaymentHandler } from "./__testExtras__/pay";
 
-export const isAWSMocked = process.argv.includes('--use-mocks=true');
+export const usingMocks = process.argv.includes('--use-mocks=true');
 export const handler = new Handler(
     new PrismaClient(), 
-    isAWSMocked ? new MockImageHandler() : undefined
+    usingMocks ? new MockImageHandler() : undefined,
+    usingMocks ? new MockPaymentHandler() : undefined,
 );
 
 beforeAll( async () => {
