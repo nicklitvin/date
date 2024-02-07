@@ -166,6 +166,11 @@ export interface UnlikeOutput {
     deletedMessages: number
 }
 
+export interface NewMatchInput {
+    userID: string
+    fromTime: Date
+}
+
 // OLD
 
 // export type SwipeFeed = {

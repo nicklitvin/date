@@ -14,21 +14,16 @@ describe("swipe", () => {
     const userID = "userID";
     const userID_2 = "userID_2";
 
-    const createSwipeInput = (opinion : Opinion, randomUserID = false, 
-        randomSwipedUserID = false) : SwipeInput => 
+    const createSwipeInput = (
+        action : Opinion,
+        userID: string = randomUUID(), 
+        swipedUserID: string = randomUUID()
+        ) : SwipeInput => 
     {
         return {
-            userID: randomUserID ? randomUUID() : userID,
-            swipedUserID: randomSwipedUserID ? randomUUID() : userID_2,
-            action: opinion
-        }
-    }
-
-    const createReverseSwipeInput = (opinion : Opinion) : SwipeInput => {
-        return {
-            userID: randomUUID(),
-            swipedUserID: userID,
-            action: opinion
+            userID: userID,
+            swipedUserID: swipedUserID,
+            action: action
         }
     }
 
@@ -67,9 +62,9 @@ describe("swipe", () => {
 
     it("should delete all swipes", async () => {
         await Promise.all([
-            funcs.createSwipe(createSwipeInput("Like",true)),
-            funcs.createSwipe(createSwipeInput("Like",true)),
-            funcs.createSwipe(createSwipeInput("Like",true))
+            funcs.createSwipe(createSwipeInput("Like",userID)),
+            funcs.createSwipe(createSwipeInput("Like",userID)),
+            funcs.createSwipe(createSwipeInput("Like",userID))
         ])
 
         expect(await funcs.deleteAllSwipes()).toEqual(3);
@@ -90,14 +85,14 @@ describe("swipe", () => {
         const week3Start = subWeeks(week0Start, 3);
 
         await Promise.all([
-            funcs.createSwipe(createSwipeInput("Like",false,true), new Date(10)),
-            funcs.createSwipe(createSwipeInput("Like",false,true), week1Start),
-            funcs.createSwipe(createSwipeInput("Like",false,true), week1Start),
-            funcs.createSwipe(createSwipeInput("Dislike",false,true), week3Start),
+            funcs.createSwipe(createSwipeInput("Like",userID), new Date(10)),
+            funcs.createSwipe(createSwipeInput("Like",userID), week1Start),
+            funcs.createSwipe(createSwipeInput("Like",userID), week1Start),
+            funcs.createSwipe(createSwipeInput("Dislike",userID), week3Start),
 
-            funcs.createSwipe(createReverseSwipeInput("Like"), week2Start),
-            funcs.createSwipe(createReverseSwipeInput("Dislike"), week2Start),
-            funcs.createSwipe(createReverseSwipeInput("Dislike"), new Date()),
+            funcs.createSwipe(createSwipeInput("Like",randomUUID(),userID), week2Start),
+            funcs.createSwipe(createSwipeInput("Dislike",randomUUID(),userID), week2Start),
+            funcs.createSwipe(createSwipeInput("Dislike",randomUUID(),userID), new Date())
         ])
 
         const stats = await funcs.getUserSwipeStats(userID);
@@ -112,5 +107,31 @@ describe("swipe", () => {
         expect(stats.weekly[0].dislikedMe).toEqual(1);
         expect(stats.weekly[2].likedMe).toEqual(1);
         expect(stats.weekly[2].dislikedMe).toEqual(1);
+    })
+
+    it("should get all matches", async () => {
+        const userID_3 = "userID_3";
+
+        await Promise.all([
+            funcs.createSwipe(createSwipeInput("Like",userID,userID_2), new Date(1)),
+            funcs.createSwipe(createSwipeInput("Like",userID,userID_3),new Date(2)),
+            funcs.createSwipe(createSwipeInput("Like",userID)),
+            funcs.createSwipe(createSwipeInput("Dislike",userID)),
+
+            funcs.createSwipe(createSwipeInput("Like",userID_2,userID), new Date(4)),
+            funcs.createSwipe(createSwipeInput("Like",userID_3,userID), new Date(3)),
+            funcs.createSwipe(createSwipeInput("Like",randomUUID(),userID)),
+            funcs.createSwipe(createSwipeInput("Dislike",randomUUID(),userID)),
+        ])
+
+
+        const matches = await funcs.getAllMatches(userID,new Date(5));
+        expect(matches).toHaveLength(2);
+        expect(matches[0]).toEqual(userID_2);
+        expect(matches[1]).toEqual(userID_3);
+
+        const matches_2 = await funcs.getAllMatches(userID,new Date(3));
+        expect(matches_2).toHaveLength(1);
+        expect(matches_2[0]).toEqual(userID_3);
     })
 })

@@ -8,7 +8,7 @@ import { SwipeHandler } from "./handlers/swipe";
 import { MessageHandler } from "./handlers/message";
 import { ReportHandler } from "./handlers/report";
 import { StripePaymentHandler } from "./handlers/pay";
-import { ChatPreview, DeleteImageInput, EditUserInput, GetChatPreviewsInput, ImageHandler, MessageInput, PaymentHandler, RequestReportInput, RequestUserInput, SwipeInput, UnlikeInput, UnlikeOutput, UploadImageInput, UserInput } from "./interfaces";
+import { ChatPreview, DeleteImageInput, EditUserInput, GetChatPreviewsInput, ImageHandler, MessageInput, NewMatchInput, PaymentHandler, PublicProfile, RequestReportInput, RequestUserInput, SwipeInput, UnlikeInput, UnlikeOutput, UploadImageInput, UserInput } from "./interfaces";
 import { globals } from "./globals";
 import { FreeTrialHandler } from "./handlers/freetrial";
 
@@ -318,5 +318,33 @@ export class Handler {
             deletedMessages: messagesDeleted,
             newSwipe: newSwipe as Swipe
         };
+    }
+
+    public async getNewMatches(input : NewMatchInput) : Promise<PublicProfile[]|null> {
+        const user = await this.user.getUserByID(input.userID);
+
+        if (!user) return null;
+
+        const matches = await this.swipe.getAllMatches(input.userID,input.fromTime);
+        const messages = await Promise.all(matches.map( matchUserID => 
+            this.message.getChat({
+                userID: input.userID,
+                fromTime: new Date(),
+                withID: matchUserID
+            })    
+        ));
+
+        const newMatches = matches.filter( 
+            (_,index) => messages[index].length == 0
+        ).slice(0,globals.usersLoadedInPreview);
+
+        const publicProfiles = await Promise.all(
+            newMatches.map( val => this.user.getPublicProfile(val))
+        );
+        const filteredProfiles = publicProfiles.filter(
+            val => val != null
+        ) as PublicProfile[];
+
+        return filteredProfiles
     }
 }

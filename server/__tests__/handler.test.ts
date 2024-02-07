@@ -4,7 +4,7 @@ import { globals } from "../src/globals";
 import { createUserInput, validRequestUserInput } from "./user.test";
 import { User } from "@prisma/client";
 import { makeMessageInput, makeMessageInputWithOneRandom, makeMessageInputWithRandoms } from "./message.test";
-import { ChatPreview } from "../src/interfaces";
+import { ChatPreview, PublicProfile } from "../src/interfaces";
 import { randomUUID } from "crypto";
 import { getImageDetails } from "./image.test";
 
@@ -518,5 +518,38 @@ describe("handler", () => {
         })
         expect(deleted?.deletedMessages).toEqual(2);
         expect(deleted?.newSwipe).not.toEqual(null);
+    })
+
+    it("should not get new matches from nonuser", async () => {
+        expect(await handler.getNewMatches({
+            userID: "random",
+            fromTime: new Date()
+        })).toEqual(null);
+    })
+
+    it("should not get new matches if sent message", async () => {
+        const {user, user_2} = await makeTwoUsersAndMatch();
+        await handler.message.sendMessage({
+            message: "",
+            userID: user.id,
+            recepientID: user_2.id
+        });
+        const newMatches = await handler.getNewMatches({
+            userID: user.id,
+            fromTime: new Date()
+        }) as PublicProfile[];
+
+        expect(newMatches).toHaveLength(0);
+    })
+
+    it("should get new matches", async () => {
+        const {user, user_2} = await makeTwoUsersAndMatch();
+        const newMatches = await handler.getNewMatches({
+            userID: user.id,
+            fromTime: new Date()
+        }) as PublicProfile[];
+
+        expect(newMatches).toHaveLength(1);
+        expect(newMatches[0].id).toEqual(user_2.id)
     })
 })

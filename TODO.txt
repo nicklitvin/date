@@ -1,8 +1,12 @@
 TODO
 /getSwipeFeed
-/getNewMatches
 
-dont show reported users 
+get matches
+    x likes user
+    user likes x
+
+filter by which have no messages
+
 insetad of returning null, return error message
 swiping elo
 server catch errors write to client errors

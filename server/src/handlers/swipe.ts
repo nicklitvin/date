@@ -124,4 +124,59 @@ export class SwipeHandler {
             weekly: [week0, week1, week2, week3]
         }
     }
+
+    public async getAllMatches(userID: string, fromTime: Date) : Promise<string[]> {
+        const [myLikes, likedMe] = await Promise.all([
+            this.prisma.swipe.findMany({
+                where: {
+                    userID: userID,
+                    action: "Like",
+                },
+                select: {
+                    swipedUserID: true,
+                    timestamp: true
+                }
+            }),
+            this.prisma.swipe.findMany({
+                where: {
+                    swipedUserID: userID,
+                    action: "Like",
+                },
+                select: {
+                    userID: true,
+                    timestamp: true
+                }
+            })
+        ]);
+
+        const matches : {
+            matchUserID: string
+            matchTimestamp: Date
+        }[] = [];
+
+        const record = new Map<string,Date>();
+
+        for (const myLike of myLikes) {
+            record.set(myLike.swipedUserID, myLike.timestamp);
+        }
+
+        for(const liked of likedMe) {
+            const myLikeTimestamp = record.get(liked.userID);
+            if (myLikeTimestamp) {
+                matches.push({
+                    matchUserID: liked.userID,
+                    matchTimestamp: liked.timestamp.getTime() > myLikeTimestamp.getTime() ?
+                        liked.timestamp : myLikeTimestamp
+                })
+            }
+        }
+
+        const filteredMatches = matches.filter( 
+            match => match.matchTimestamp.getTime() <= fromTime.getTime()
+        );
+        filteredMatches.sort( 
+            (a,b) => b.matchTimestamp.getTime() - a.matchTimestamp.getTime()
+        );
+        return filteredMatches.map( val => val.matchUserID);
+    }
 }
