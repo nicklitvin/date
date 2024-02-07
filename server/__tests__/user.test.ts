@@ -1,51 +1,13 @@
 import { afterEach, describe, expect, it } from "@jest/globals";
 import { handler } from "../jest.setup";
-import { FileUpload, RequestUserInput, UserInput } from "../src/interfaces";
 import { differenceInMonths } from "date-fns";
 import { globals } from "../src/globals";
-import fs from "fs/promises";
+import { createUserInput, validRequestUserInput } from "./utils/easySetup";
+import { EloAction } from "../src/interfaces";
 
 afterEach( async () => {
     await handler.user.deleteAllUsers();
 })
-
-const imageFilePath = "./__tests__/images/goodImage.jpg";
-
-export const validRequestUserInput = async () : Promise<RequestUserInput> => { 
-    const buffer = await fs.readFile(imageFilePath);
-    return {
-        age: globals.minAge,
-        attributes: Array.from({length: globals.maxAttributes}, (_,index) => `${index}`),
-        interestedIn: ["Male", "Female"],
-        email: "a@berkeley.edu",
-        gender: "Male",
-        files: [
-            {
-                buffer: buffer,
-                mimetype: "image/jpeg"
-            },
-            {
-                buffer: buffer,
-                mimetype: "image/jpeg"
-            },
-        ],
-        name: "a".repeat(globals.maxNameLength),
-        description: "a".repeat(globals.maxDescriptionLength)
-    }
-}
-
-export const createUserInput = (email = "a@berkeley.edu") : UserInput => {
-    return {
-        email: email,
-        name: "a",
-        age: 21,
-        gender: "Male",
-        interestedIn: ["Male"],
-        attributes: ["Basketball"],
-        images: ["imageURL"],
-        description: "description"
-    }
-}
 
 describe("user", () => {
     const funcs = handler.user;
@@ -180,6 +142,114 @@ describe("user", () => {
         input = await validRequestUserInput();
         input.files = Array(globals.maxImagesCount + 1).fill(input.files[0]);
         expect(funcs.isInputValid(input)).toEqual(false);
+    })
+
+    it("should give more elo when liked by higher elo", async () => {
+        const eloDiff = 10;
+        const likedByHigherElo = funcs.getEloChange({
+            action: EloAction.Like,
+            eloDiff: eloDiff,
+            userElo: globals.eloStart
+        });
+        const likedByLowerElo = funcs.getEloChange({
+            action: EloAction.Like,
+            eloDiff: -eloDiff,
+            userElo: globals.eloStart
+        });
+
+        expect(likedByHigherElo).toBeGreaterThan(0);
+        expect(likedByLowerElo).toBeGreaterThan(0);
+        expect(likedByHigherElo).toBeGreaterThan(likedByLowerElo);
+    })
+
+    it("should lose more elo when disliked by lower elo", async () => {
+        const eloDiff = 10;
+        const dislikedByHigherElo = funcs.getEloChange({
+            action: EloAction.Dislike,
+            eloDiff: eloDiff,
+            userElo: globals.eloStart
+        });
+        const dislikedByLowerElo = funcs.getEloChange({
+            action: EloAction.Dislike,
+            eloDiff: -eloDiff,
+            userElo: globals.eloStart
+        });
+
+        expect(dislikedByHigherElo).toBeLessThan(0);
+        expect(dislikedByLowerElo).toBeLessThan(0);
+        expect(dislikedByLowerElo).toBeLessThan(dislikedByHigherElo);
+    })
+
+    it("should give more elo when messaged by higher elo", async () => {
+        const eloDiff = 10;
+        const messagedByHigherElo = funcs.getEloChange({
+            action: EloAction.Like,
+            eloDiff: eloDiff,
+            userElo: globals.eloStart
+        });
+        const messagedByLowerElo = funcs.getEloChange({
+            action: EloAction.Like,
+            eloDiff: -eloDiff,
+            userElo: globals.eloStart
+        });
+
+        expect(messagedByHigherElo).toBeGreaterThan(0);
+        expect(messagedByLowerElo).toBeGreaterThan(0);
+        expect(messagedByHigherElo).toBeGreaterThan(messagedByLowerElo);
+    })
+
+    it("should give more elo when higher elo logs on", async () => {
+        const eloDiff = 10;
+        const loginByHigherElo = funcs.getEloChange({
+            action: EloAction.Login,
+            userElo: globals.eloStart + eloDiff,
+            eloDiff: eloDiff
+        });
+        const loginByLowerElo = funcs.getEloChange({
+            action: EloAction.Login,
+            userElo: globals.eloStart - eloDiff,
+            eloDiff: -eloDiff
+        });
+
+        expect(loginByHigherElo).toBeGreaterThan(0);
+        expect(loginByLowerElo).toBeGreaterThan(0);
+        expect(loginByHigherElo).toBeGreaterThan(loginByLowerElo);
+    })
+
+    it("should give more elo when lower elo subscribes", async () => {
+        const eloDiff = 10;
+        const subscribeByHigherElo = funcs.getEloChange({
+            action: EloAction.Subscribe,
+            userElo: globals.eloStart + eloDiff,
+            eloDiff: eloDiff
+        });
+        const subscribeByLowerElo = funcs.getEloChange({
+            action: EloAction.Subscribe,
+            userElo: globals.eloStart - eloDiff,
+            eloDiff: -eloDiff
+        });
+
+        expect(subscribeByHigherElo).toBeGreaterThan(0);
+        expect(subscribeByLowerElo).toBeGreaterThan(0);
+        expect(subscribeByLowerElo).toBeGreaterThan(subscribeByHigherElo);
+    })
+
+    it("should remove more elo when higher elo unsubscribes", async () => {
+        const eloDiff = 10;
+        const unsubscribeByHigherElo = funcs.getEloChange({
+            action: EloAction.Unsubscribe,
+            userElo: globals.eloStart + eloDiff,
+            eloDiff: eloDiff
+        });
+        const unsubscribeByLowerElo = funcs.getEloChange({
+            action: EloAction.Unsubscribe,
+            userElo: globals.eloStart - eloDiff,
+            eloDiff: -eloDiff
+        });
+
+        expect(unsubscribeByHigherElo).toBeLessThan(0);
+        expect(unsubscribeByLowerElo).toBeLessThan(0);
+        expect(unsubscribeByHigherElo).toBeLessThan(unsubscribeByLowerElo);
     })
 })
 

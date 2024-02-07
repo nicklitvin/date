@@ -1,5 +1,5 @@
 import { PrismaClient, User } from "@prisma/client";
-import { EditUserInput, PublicProfile, RequestUserInput, UserInput } from "../interfaces";
+import { EditUserInput, EloAction, EloUpdateInput, PublicProfile, RequestUserInput, UserInput } from "../interfaces";
 import { randomUUID } from "crypto";
 import { addMonths } from "date-fns";
 import { globals } from "../globals";
@@ -28,7 +28,8 @@ export class UserHandler {
                 university: this.getUniversityFromEmail(input.email),
                 subscribeEnd: new Date(),
                 isSubscribed: false,
-                subscriptionID: null
+                subscriptionID: null,
+                elo: globals.eloStart
             }
         })
     }
@@ -139,5 +140,44 @@ export class UserHandler {
                 globals.acceptaleImageFormats.includes(val.mimetype)
             ).length
         )
+    }
+
+    public getEloChange(input : EloUpdateInput) : number {
+        let change : number = 0;
+        switch(input.action) {
+            case (EloAction.Like): 
+                change = globals.eloLikeMaxChange * 1 / (1 + Math.pow(10,
+                    -input.eloDiff!/globals.eloDiffToMaxChange)
+                );
+                break;
+            case (EloAction.Dislike):
+                change = -globals.eloLikeMaxChange * 1 / (1 + Math.pow(10,
+                    input.eloDiff!/globals.eloDiffToMaxChange)
+                );
+                break;
+            case (EloAction.Message):
+                change = globals.eloMessageMaxChange * 1 / (1 + Math.pow(10,
+                    -input.eloDiff!/globals.eloDiffToMaxChange)
+                );
+                break;
+            case (EloAction.Login):
+                change = globals.eloMessageMaxChange * 1 / (1 + Math.pow(10,
+                    -input.eloDiff!/globals.eloDiffToMaxChange)
+                );
+                break;
+            case (EloAction.Subscribe):
+                change = globals.eloSubscribeMaxChange * 1 / (1 + Math.pow(10,
+                    input.eloDiff!/globals.eloDiffToMaxChange)
+                );
+                break;
+            case (EloAction.Unsubscribe):
+                change = -globals.eloSubscribeMaxChange * 1 / (1 + Math.pow(10,
+                    -input.eloDiff!/globals.eloDiffToMaxChange)
+                );
+                break;
+            
+        }
+
+        return change;
     }
 }

@@ -1,9 +1,9 @@
 import { afterEach, describe, expect, it } from "@jest/globals";
 import { handler } from "../jest.setup";
-import { SwipeInput } from "../src/interfaces";
-import { Opinion, Swipe } from "@prisma/client";
+import { Swipe } from "@prisma/client";
 import { randomUUID } from "crypto";
 import { startOfWeek, subWeeks } from "date-fns";
+import { createSwipeInput } from "./utils/easySetup";
 
 afterEach( async () => {
     await handler.swipe.deleteAllSwipes();
@@ -13,19 +13,6 @@ describe("swipe", () => {
     const funcs = handler.swipe;
     const userID = "userID";
     const userID_2 = "userID_2";
-
-    const createSwipeInput = (
-        action : Opinion,
-        userID: string = randomUUID(), 
-        swipedUserID: string = randomUUID()
-        ) : SwipeInput => 
-    {
-        return {
-            userID: userID,
-            swipedUserID: swipedUserID,
-            action: action
-        }
-    }
 
     it("should create swipe", async () => {
         expect(await funcs.createSwipe(createSwipeInput("Like"))).not.toEqual(null);

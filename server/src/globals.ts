@@ -17,6 +17,15 @@ export const globals = {
     messagesLoadedInChat: 10,
     maxReportCount: 10,
     freeTrialDays: 7,
+
+    // elo
+    eloStart: 1000,
+    eloDiffToMaxChange: 200,
+    eloLikeMaxChange: 20,
+    eloMessageMaxChange: 2,
+    eloLoginMaxChange: 0.5,
+    eloSubscribeMaxChange: 200,
+
 }
 
 // import { AttributeType } from "@prisma/client",

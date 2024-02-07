@@ -171,14 +171,25 @@ export interface NewMatchInput {
     fromTime: Date
 }
 
+export interface EloUpdateInput {
+    userElo: number,
+    action: EloAction,
+    /** Positive => higher elo than user, Negative => lower elo */
+    eloDiff: number
+}
+
+export enum EloAction {
+    Like,
+    Dislike,
+    Message,
+    Subscribe,
+    Unsubscribe,
+    Login
+}
+
 // OLD
 
 // export type SwipeFeed = {
 //     feed: PublicProfile[]
 //     likedMeIDs: string[]
-// }
-
-// export type MatchPreview = {
-//     profile: PublicProfile
-//     lastMessages: Message[]
 // }

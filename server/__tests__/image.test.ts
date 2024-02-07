@@ -1,33 +1,15 @@
 import { afterEach, describe, expect, it } from "@jest/globals";
 import { handler, usingMocks } from "../jest.setup";
-import { ImageInput } from "../src/interfaces";
-import fs from "fs/promises";
-import mime from "mime-types";
 import axios from "axios";
 import sizeOf from "image-size";
+import { getImageDetails } from "./utils/easySetup";
 
 afterEach( async () => {
     await handler.image.deleteAllImages();
 })
 
-const imageFilePath = "./__tests__/images/goodImage.jpg";
-const badImageFilePath = "./__tests__/images/badImage.txt";
-export const getImageDetails = async (good : boolean) : Promise<ImageInput> => {
-    return {
-        buffer: await fs.readFile(good ? imageFilePath : badImageFilePath),
-        mimetype: mime.lookup(good ? imageFilePath : badImageFilePath) as string
-    }
-}
-
 describe("image", () => {
     const funcs = handler.image;
-    
-    const getImageDetails = async (good : boolean) : Promise<ImageInput> => {
-        return {
-            buffer: await fs.readFile(good ? imageFilePath : badImageFilePath),
-            mimetype: mime.lookup(good ? imageFilePath : badImageFilePath) as string
-        }
-    }
 
     it("should upload image", async () => {
         expect(await funcs.uploadImage(await getImageDetails(true))).not.toEqual(null);

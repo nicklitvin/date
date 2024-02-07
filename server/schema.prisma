@@ -46,6 +46,7 @@ model User {
     subscribeEnd    DateTime
     isSubscribed    Boolean
     subscriptionID  String?
+    elo             Float
 }
 
 model Swipe {

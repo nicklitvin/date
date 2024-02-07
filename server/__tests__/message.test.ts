@@ -2,38 +2,11 @@ import { afterEach, describe, expect, it } from "@jest/globals";
 import { handler } from "../jest.setup";
 import { MessageInput } from "../src/interfaces";
 import { randomUUID } from "crypto";
+import { makeMessageInput, makeMessageInputWithOneRandom, makeMessageInputWithRandoms } from "./utils/easySetup";
 
 afterEach( async () => {
     await handler.message.deleteAllMessages()
 })
-
-export const makeMessageInput = (userID : string, userID_2 : string) : 
-    MessageInput => 
-{
-    return {
-        userID: userID,
-        recepientID: userID_2,
-        message: "message"
-    }
-}
-
-export const makeMessageInputWithRandoms = () : MessageInput => {
-    return {
-        userID: randomUUID(),
-        recepientID: randomUUID(),
-        message: "message"
-    }
-}
-
-export const makeMessageInputWithOneRandom = (userID : string, flipUsers = false) : 
-    MessageInput => 
-{
-    return {
-        userID: flipUsers ? randomUUID() : userID,
-        recepientID: flipUsers ? userID : randomUUID(),
-        message: "message",
-    }
-}
 
 describe("message suite", () => {
     const funcs = handler.message;

@@ -1,7 +1,6 @@
 import { afterEach, describe, expect, it } from "@jest/globals";
 import { handler } from "../jest.setup";
-import { UserReportInput } from "../src/interfaces";
-import { randomUUID } from "crypto";
+import { createReportInput } from "./utils/easySetup";
 
 afterEach( async () => {
     await handler.report.deleteAllReports();
@@ -10,24 +9,17 @@ afterEach( async () => {
 describe("report", () => {
     const funcs = handler.report;
 
-    const makeReport = (randomID = false) : UserReportInput => {
-        return {
-            userID: randomID ? randomUUID() : "userID",
-            reportedEmail: "email"
-        }
-    }
-
     it("should report user", async () => {
-        expect(await funcs.makeReport(makeReport())).not.toEqual(null);
+        expect(await funcs.makeReport(createReportInput())).not.toEqual(null);
     })
 
     it("should get user reports", async () => {
-        const report = makeReport();
+        const report = createReportInput();
 
         await Promise.all([
-            funcs.makeReport(makeReport(true)),
-            funcs.makeReport(makeReport(true)),
-            funcs.makeReport(makeReport(true))
+            funcs.makeReport(createReportInput(true)),
+            funcs.makeReport(createReportInput(true)),
+            funcs.makeReport(createReportInput(true))
         ])
 
         expect(await funcs.getReportCountForEmail(report.reportedEmail)).toEqual(3);
@@ -35,9 +27,9 @@ describe("report", () => {
 
     it("should delete all reports", async () => {
         await Promise.all([
-            funcs.makeReport(makeReport(true)),
-            funcs.makeReport(makeReport(true)),
-            funcs.makeReport(makeReport(true))
+            funcs.makeReport(createReportInput(true)),
+            funcs.makeReport(createReportInput(true)),
+            funcs.makeReport(createReportInput(true))
         ]);
 
         expect(await funcs.deleteAllReports()).toEqual(3);

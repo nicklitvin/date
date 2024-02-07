@@ -1,38 +1,14 @@
 import { afterEach, describe, expect, it } from "@jest/globals";
 import { handler } from "../jest.setup";
 import { globals } from "../src/globals";
-import { createUserInput, validRequestUserInput } from "./user.test";
 import { User } from "@prisma/client";
-import { makeMessageInput, makeMessageInputWithOneRandom, makeMessageInputWithRandoms } from "./message.test";
 import { ChatPreview, PublicProfile } from "../src/interfaces";
 import { randomUUID } from "crypto";
-import { getImageDetails } from "./image.test";
+import { createUserInput, getImageDetails, makeMessageInputWithOneRandom, makeMessageInputWithRandoms, makeTwoUsersAndMatch, matchUsers, validRequestUserInput } from "./utils/easySetup";
 
 afterEach( async () => {
     await handler.deleteEverything()
 })
-
-const matchUsers = async (userID : string, userID_2 : string) => {
-    await Promise.all([
-        handler.makeSwipe({
-            userID: userID,
-            swipedUserID: userID_2,
-            action: "Like"
-        }),
-        handler.makeSwipe({
-            userID: userID_2,
-            swipedUserID: userID,
-            action: "Like"
-        })
-    ])
-}
-
-const makeTwoUsersAndMatch = async () => {
-    const user = await handler.user.createUser(createUserInput("a@berkeley.edu"));
-    const user_2 = await handler.user.createUser(createUserInput("b@berkeley.edu"));
-    await matchUsers(user.id, user_2.id);
-    return {user, user_2};
-}
 
 describe("handler", () => {
     it("should not create user with invalid input", async () => {
