@@ -180,4 +180,17 @@ export class UserHandler {
 
         return change;
     }
+
+    public async updateElo(userID: string, eloChange: number) : Promise<User|null> {
+        return await this.prisma.user.update({
+            data: {
+                elo: {
+                    increment: eloChange
+                }
+            },
+            where: {
+                id: userID
+            }
+        })
+    }
 }

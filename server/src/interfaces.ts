@@ -144,6 +144,11 @@ export interface DeleteImageInput {
     imageID: string
 }
 
+export interface SubscribeInput {
+    userID: string
+    subscriptionID: string
+}
+
 export interface PaymentExtractOutput {
     userID: string
     subscriptionID: string

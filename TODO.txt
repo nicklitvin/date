@@ -1,16 +1,8 @@
 TODO
 /getSwipeFeed
-
-get avg
-like/dislike -> more elo if liked by high
-sentMessage/receivedMessage -> more elo if send to low/ more elo if received by high
-login -> more elo if higher elo
-subscribe -> more elo if lower elo, aim for 2/3 percentile
-
-max-change * 1/ (1 + 10^(-diff/diff-to-max))
-logging on => max-change * logging-on-percent
-sendMessage => max-change * message-percent
-
+colors based on university colors
+change elo constants with api?
+messagelowerelo is rewarded?
 add devices to user notification list
 insetad of returning null, return error message
 server catch errors write to client errors

@@ -116,8 +116,13 @@ export async function matchUsers(userID : string, userID_2 : string) {
 }
 
 export async function makeTwoUsersAndMatch() {
+    const {user, user_2} = await makeTwoUsers();
+    await matchUsers(user.id, user_2.id);
+    return {user, user_2};
+}
+
+export async function makeTwoUsers() {
     const user = await handler.user.createUser(createUserInput("a@berkeley.edu"));
     const user_2 = await handler.user.createUser(createUserInput("b@berkeley.edu"));
-    await matchUsers(user.id, user_2.id);
     return {user, user_2};
 }

@@ -4,7 +4,7 @@ import { globals } from "../src/globals";
 import { User } from "@prisma/client";
 import { ChatPreview, PublicProfile } from "../src/interfaces";
 import { randomUUID } from "crypto";
-import { createUserInput, getImageDetails, makeMessageInputWithOneRandom, makeMessageInputWithRandoms, makeTwoUsersAndMatch, matchUsers, validRequestUserInput } from "./utils/easySetup";
+import { createUserInput, getImageDetails, makeMessageInputWithOneRandom, makeMessageInputWithRandoms, makeTwoUsers, makeTwoUsersAndMatch, matchUsers, validRequestUserInput } from "./utils/easySetup";
 
 afterEach( async () => {
     await handler.deleteEverything()
@@ -527,5 +527,69 @@ describe("handler", () => {
 
         expect(newMatches).toHaveLength(1);
         expect(newMatches[0].id).toEqual(user_2.id)
+    })
+
+    it("should increase elo when user receives like", async () => {
+        const {user, user_2} = await makeTwoUsers();
+        await handler.makeSwipe({
+            userID: user.id,
+            swipedUserID: user_2.id,
+            action: "Like"
+        });
+        const after = await handler.user.getUserByID(user_2.id);
+        expect(after?.elo).toBeGreaterThan(user_2.elo);
+    })
+
+    it("should decrease elo when user receives dislike", async () => {
+        const {user, user_2} = await makeTwoUsers();
+        await handler.makeSwipe({
+            userID: user.id,
+            swipedUserID: user_2.id,
+            action: "Dislike"
+        });
+        const after = await handler.user.getUserByID(user_2.id);
+        expect(after?.elo).toBeLessThan(user_2.elo);
+    })
+
+    it("should increase elo when user receives message", async () => {
+        const {user, user_2} = await makeTwoUsersAndMatch();
+        await handler.sendMessage({
+            message: "",
+            recepientID: user_2.id,
+            userID: user.id
+        });
+        const after = await handler.user.getUserByID(user_2.id);
+        expect(after?.elo).toBeGreaterThan(user_2.elo);
+    })
+
+    it("should update subscription when user pays", async () => {
+        const subscriptionID = "id";
+        const user = await handler.user.createUser(createUserInput("a@berkeley.edu"));
+        const after = await handler.processSubscriptionPay({
+            userID: user.id,
+            subscriptionID: subscriptionID
+        });
+
+        expect(after?.subscriptionID).toEqual(subscriptionID);
+        expect(after?.isSubscribed).toEqual(true);
+    })
+
+    it("should increase elo when user pays", async () => {
+        const user = await handler.user.createUser(createUserInput("a@berkeley.edu"));
+        const after = await handler.processSubscriptionPay({
+            userID: user.id,
+            subscriptionID: "id"
+        });
+        expect(after?.elo).toBeGreaterThan(user.elo);
+    })
+
+    it("should decrease elo when user cancels", async () => {
+        const user = await handler.user.createUser(createUserInput("a@berkeley.edu"));
+        const before = await handler.processSubscriptionPay({
+            userID: user.id,
+            subscriptionID: "id"
+        });
+        const after = await handler.cancelSubscription(user.id);
+        expect(after!.elo).toBeLessThan(before!.elo);
     })
 })

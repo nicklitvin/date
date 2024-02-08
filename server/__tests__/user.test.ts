@@ -251,5 +251,19 @@ describe("user", () => {
         expect(unsubscribeByLowerElo).toBeLessThan(0);
         expect(unsubscribeByHigherElo).toBeLessThan(unsubscribeByLowerElo);
     })
+
+    it("should increase user elo rating", async () => {
+        const eloDiff = 10;
+        const user = await funcs.createUser(createUserInput());
+        const after = await funcs.updateElo(user.id, eloDiff);
+        expect(after?.elo).toEqual(user.elo + eloDiff);
+    })
+
+    it("should descrease user elo rating", async () => {
+        const eloDiff = -10;
+        const user = await funcs.createUser(createUserInput());
+        const after = await funcs.updateElo(user.id, eloDiff);
+        expect(after?.elo).toEqual(user.elo + eloDiff);
+    })
 })
 

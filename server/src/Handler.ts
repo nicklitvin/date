@@ -8,7 +8,7 @@ import { SwipeHandler } from "./handlers/swipe";
 import { MessageHandler } from "./handlers/message";
 import { ReportHandler } from "./handlers/report";
 import { StripePaymentHandler } from "./handlers/pay";
-import { ChatPreview, DeleteImageInput, EditUserInput, GetChatPreviewsInput, ImageHandler, MessageInput, NewMatchInput, PaymentHandler, PublicProfile, RequestReportInput, RequestUserInput, SwipeInput, UnlikeInput, UnlikeOutput, UploadImageInput, UserInput } from "./interfaces";
+import { ChatPreview, DeleteImageInput, EditUserInput, EloAction, GetChatPreviewsInput, ImageHandler, MessageInput, NewMatchInput, PaymentExtractOutput, PaymentHandler, PublicProfile, RequestReportInput, RequestUserInput, SubscribeInput, SwipeInput, UnlikeInput, UnlikeOutput, UploadImageInput, UserInput } from "./interfaces";
 import { globals } from "./globals";
 import { FreeTrialHandler } from "./handlers/freetrial";
 
@@ -113,7 +113,16 @@ export class Handler {
 
         if (!user || !swipedUser || user.id == swipedUser.id || previousSwipe) return null;
 
-        return await this.swipe.createSwipe(input);
+        const [swipe, _] = await Promise.all([
+            this.swipe.createSwipe(input),
+            this.user.updateElo(swipedUser.id, this.user.getEloChange({
+                action: input.action == "Like" ? EloAction.Like : EloAction.Dislike,
+                eloDiff: user.elo - swipedUser.elo,
+                userElo: swipedUser.elo 
+            }))
+        ])
+
+        return swipe;
     }
 
     public async sendMessage(input : MessageInput) : Promise<Message|null> {
@@ -127,7 +136,15 @@ export class Handler {
         if (user && recepient && userOpinion?.action == "Like" && 
             recepientOpinion?.action == "Like"
         ) {
-            return await this.message.sendMessage(input);
+            const [message, _] = await Promise.all([
+                this.message.sendMessage(input),
+                this.user.updateElo(recepient.id, this.user.getEloChange({
+                    action: EloAction.Message,
+                    userElo: recepient.elo,
+                    eloDiff: user.elo - recepient.elo
+                }))
+            ])
+            return message
         }
         return null;
     }
@@ -279,11 +296,16 @@ export class Handler {
         return await this.pay.createSubscriptionSessionURL(userID, !usedFreeTrial);
     }
 
-    public async processSubscriptionPay(request : Request) : Promise<void> {
-        const data = await this.pay.extractDataFromPayment(request);
-        if (data) {
-            await this.user.updateSubscriptionAfterPay(data.userID, data.subscriptionID);
-        }
+    public async processSubscriptionPay(input : SubscribeInput) : Promise<User|null> {
+        const user = await this.user.getUserByID(input.userID);
+        if (!user) return null;
+
+        await this.user.updateSubscriptionAfterPay(input.userID, input.subscriptionID)
+        return await this.user.updateElo(input.userID, this.user.getEloChange({
+            action: EloAction.Subscribe,
+            eloDiff: globals.eloStart - user.elo,
+            userElo: user.elo
+        }))
     }
 
     public async cancelSubscription(userID: string) : Promise<User|null> {
@@ -292,7 +314,12 @@ export class Handler {
         if (!user || !user.subscriptionID) return null;
 
         if (await this.pay.cancelSubscription(user.subscriptionID)) {
-            return await this.user.cancelSubscription(userID)
+            await this.user.cancelSubscription(userID)
+            return await this.user.updateElo(userID, this.user.getEloChange({
+                action: EloAction.Unsubscribe,
+                eloDiff: globals.eloStart - user.elo,
+                userElo: user.elo
+            }))
         }
         return null;
     }
