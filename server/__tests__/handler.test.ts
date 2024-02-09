@@ -5,6 +5,7 @@ import { User } from "@prisma/client";
 import { ChatPreview, PublicProfile } from "../src/interfaces";
 import { randomUUID } from "crypto";
 import { createUserInput, createUsersForSwipeFeed, getImageDetails, makeMessageInputWithOneRandom, makeMessageInputWithRandoms, makeTwoUsers, makeTwoUsersAndMatch, matchUsers, validRequestUserInput } from "./utils/easySetup";
+import { schoolColors } from "../src/colors";
 
 afterEach( async () => {
     await handler.deleteEverything()
@@ -660,5 +661,14 @@ describe("handler", () => {
         const {user, user2, user3, user4} = await createUsersForSwipeFeed();
         const feed = await handler.getSwipeFeed(user4.id);
         expect(feed?.profiles).toHaveLength(3);
+    })
+
+    it("should not get nonexisting school colors", async () => {
+        expect(handler.getSchoolColors("random")).toEqual(undefined);
+    })
+
+    it("should get school colors", async () => {
+        const schools = Array.from(schoolColors.keys());
+        expect(handler.getSchoolColors(schools[0])).not.toEqual(null);
     })
 })

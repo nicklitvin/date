@@ -206,3 +206,8 @@ export interface GetProfileListInput {
     exclude?: string[]
     count?: number
 }
+
+export interface SchoolColors {
+    primary: string
+    secondary: string
+}

@@ -1,5 +1,4 @@
 TODO
-colors based on university colors
 change elo constants with api?
 messagelowerelo is rewarded?
 add devices to user notification list
