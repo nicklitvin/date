@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it } from "@jest/globals";
 import { handler } from "../jest.setup";
 import { differenceInMonths } from "date-fns";
 import { globals } from "../src/globals";
-import { createUserInput, validRequestUserInput } from "./utils/easySetup";
+import { createUserInput, createUsersForSwipeFeed, validRequestUserInput } from "./utils/easySetup";
 import { EloAction } from "../src/interfaces";
 
 afterEach( async () => {
@@ -116,11 +116,19 @@ describe("user", () => {
         expect(funcs.isInputValid(input)).toEqual(false);
 
         input = await validRequestUserInput();
+        input.ageInterest = [];
+        expect(funcs.isInputValid(input)).toEqual(false);
+
+        input = await validRequestUserInput();
+        input.ageInterest = [globals.minAge - 1,20];
+        expect(funcs.isInputValid(input)).toEqual(false);
+
+        input = await validRequestUserInput();
         input.name = "a".repeat(globals.maxNameLength + 1);
         expect(funcs.isInputValid(input)).toEqual(false);
 
         input = await validRequestUserInput();
-        input.interestedIn = ["Male", "Female", "Female"];
+        input.genderInterest = ["Male", "Female", "Female"];
         expect(funcs.isInputValid(input)).toEqual(false);
 
         input = await validRequestUserInput();
@@ -264,6 +272,40 @@ describe("user", () => {
         const user = await funcs.createUser(createUserInput());
         const after = await funcs.updateElo(user.id, eloDiff);
         expect(after?.elo).toEqual(user.elo + eloDiff);
+    })
+
+    it("should get public profiles", async () => {
+        const {user, user2, user3, user4} = await createUsersForSwipeFeed();
+
+        const profiles = await funcs.getPublicProfilesFromCriteria({
+            ageRange: [20,20],
+            gender: ["Male", "Female"]
+        });
+        expect(profiles).toHaveLength(2);
+        expect(profiles[0].id).toEqual(user3.id);
+        expect(profiles[1].id).toEqual(user2.id);
+
+        const profiles2 = await funcs.getPublicProfilesFromCriteria({
+            ageRange: [24,30],
+            gender: ["Female"]
+        });
+        expect(profiles2).toHaveLength(0);
+
+        const profiles3 = await funcs.getPublicProfilesFromCriteria({
+            ageRange: [18,30],
+            gender: ["Female","Male"],
+            include: [user.id]
+        });
+        expect(profiles3).toHaveLength(1);
+        expect(profiles3[0].id).toEqual(user.id);
+
+        const profiles4 = await funcs.getPublicProfilesFromCriteria({
+            ageRange: [18,30],
+            gender: ["Female","Male"],
+            exclude: [user.id, user2.id, user4.id]
+        });
+        expect(profiles4).toHaveLength(1);
+        expect(profiles4[0].id).toEqual(user3.id);
     })
 })
 

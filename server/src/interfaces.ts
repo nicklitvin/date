@@ -21,8 +21,9 @@ interface BasicUserInput {
     email: string
     name: string
     age: number
+    ageInterest: number[]
     gender: Gender
-    interestedIn: Gender[]
+    genderInterest: Gender[]
     attributes: string[]
     description: string
 }
@@ -192,9 +193,16 @@ export enum EloAction {
     Login
 }
 
-// OLD
+export interface SwipeFeed {
+    profiles: PublicProfile[]
+    likedMeIDs: string[]
+}
 
-// export type SwipeFeed = {
-//     feed: PublicProfile[]
-//     likedMeIDs: string[]
-// }
+export interface GetProfileListInput {
+    ageRange: number[]
+    gender: Gender[]
+
+    include?: string[]
+    exclude?: string[]
+    count?: number
+}

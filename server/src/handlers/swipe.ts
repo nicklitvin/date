@@ -179,4 +179,21 @@ export class SwipeHandler {
         );
         return filteredMatches.map( val => val.matchUserID);
     }
+    
+    public async getLikedMeUsers(userID: string) : Promise<string[]> {
+        return await this.prisma.swipe.findMany({
+            where: {
+                swipedUserID: userID,
+                action: "Like"
+            }
+        }).then(users => users.map(user => user.userID))
+    }
+
+    public async getSwipedUsers(userID: string) : Promise<string[]> {
+        return await this.prisma.swipe.findMany({
+            where: {
+                userID: userID
+            }
+        }).then(users => users.map(user => user.swipedUserID));
+    }
 }

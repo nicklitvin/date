@@ -12,15 +12,6 @@ enum Gender {
     Female
 }
 
-enum SchoolYear {
-    Freshman
-    Sophomore
-    Junior
-    Senior
-    Graduate
-    Alumni
-}
-
 enum Opinion {
     Like
     Dislike
@@ -36,8 +27,9 @@ model User {
     email           String
     name            String
     age             Int
+    ageInterest     Int[]
     gender          Gender
-    interestedIn    Gender[]
+    genderInterest  Gender[]
     attributes      String[]
     images          String[]
     description     String

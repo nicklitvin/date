@@ -5,7 +5,8 @@
   "scripts": {
     "start": "npx ts-node ./src/index.ts",
     "test": "jest --runInBand --use-mocks=true --testPathIgnorePatterns \"./__tests__/image.test.ts\" \"./__tests__/pay.test.ts\" \".__tests__/utils\"",
-    "test-real": "jest --runInBand \".__tests__/utils\""
+    "test-real": "jest --runInBand \".__tests__/utils\"",
+    "test-single": "jest --use-mocks=true --testPathIgnorePatterns \".__tests__/utils\" -t"
   },
   "keywords": [],
   "author": "",

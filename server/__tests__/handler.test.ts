@@ -4,7 +4,7 @@ import { globals } from "../src/globals";
 import { User } from "@prisma/client";
 import { ChatPreview, PublicProfile } from "../src/interfaces";
 import { randomUUID } from "crypto";
-import { createUserInput, getImageDetails, makeMessageInputWithOneRandom, makeMessageInputWithRandoms, makeTwoUsers, makeTwoUsersAndMatch, matchUsers, validRequestUserInput } from "./utils/easySetup";
+import { createUserInput, createUsersForSwipeFeed, getImageDetails, makeMessageInputWithOneRandom, makeMessageInputWithRandoms, makeTwoUsers, makeTwoUsersAndMatch, matchUsers, validRequestUserInput } from "./utils/easySetup";
 
 afterEach( async () => {
     await handler.deleteEverything()
@@ -221,6 +221,16 @@ describe("handler", () => {
             userID: user.id,
             reportedID: user.id
         })).toEqual(null);
+    })
+
+    it("should disliked swipe if report", async () => {
+        const { user, user_2 } = await makeTwoUsers();
+        await handler.reportUser({
+            userID: user.id,
+            reportedID: user_2.id
+        })
+        const swipe = await handler.swipe.getSwipeByUsers(user.id, user_2.id);
+        expect(swipe?.action).toEqual("Dislike");
     })
 
     it("should report user, unmatch, and delete chat", async () => {
@@ -591,5 +601,64 @@ describe("handler", () => {
         });
         const after = await handler.cancelSubscription(user.id);
         expect(after!.elo).toBeLessThan(before!.elo);
+    })
+
+    it("should not get swipe feed for nonuser", async () => {
+        expect(await handler.getSwipeFeed("random")).toEqual(null);
+    })
+
+    it("should get swipe feed, no swipes done", async () => {
+        const {user, user2, user3, user4} = await createUsersForSwipeFeed();
+
+        const feed = await handler.getSwipeFeed(user.id);
+        expect(feed?.profiles).toHaveLength(2);
+        const profileIDs = feed?.profiles.map( val => val.id);
+        expect(profileIDs?.includes(user4.id)).toEqual(true);
+        expect(profileIDs?.includes(user3.id)).toEqual(true);
+    })
+
+    it("should get swipe feed with like", async () => {
+        const {user, user2, user3, user4} = await createUsersForSwipeFeed();
+        await handler.makeSwipe({
+            userID: user3.id,
+            action: "Like",
+            swipedUserID: user.id
+        });
+        
+        const feed = await handler.getSwipeFeed(user.id);
+        expect(feed?.likedMeIDs.includes(user3.id)).toEqual(true);
+    })
+
+    it("should not include like from nonGenderInterest in swipe feed", async () => {
+        const {user, user2, user3, user4} = await createUsersForSwipeFeed();
+        await handler.makeSwipe({
+            userID: user2.id,
+            action: "Like",
+            swipedUserID: user.id
+        });
+        
+        const feed = await handler.getSwipeFeed(user.id);
+        expect(feed?.profiles).toHaveLength(2);
+        const profileIDs = feed?.profiles.map( val => val.id);
+        expect(profileIDs?.includes(user2.id)).toEqual(false);
+    })
+
+    it("should not include already swiped user", async () => {
+        const {user, user2, user3, user4} = await createUsersForSwipeFeed();
+        await handler.makeSwipe({
+            userID: user.id,
+            action: "Like",
+            swipedUserID: user3.id
+        });
+        const feed = await handler.getSwipeFeed(user.id);
+        expect(feed?.profiles).toHaveLength(1);
+        const profileIDs = feed?.profiles.map( val => val.id);
+        expect(profileIDs?.includes(user3.id)).toEqual(false);
+    })
+
+    it("should include multiple genders in feed if interested", async () => {
+        const {user, user2, user3, user4} = await createUsersForSwipeFeed();
+        const feed = await handler.getSwipeFeed(user4.id);
+        expect(feed?.profiles).toHaveLength(3);
     })
 })

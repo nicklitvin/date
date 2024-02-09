@@ -1,5 +1,5 @@
-import { PrismaClient, User } from "@prisma/client";
-import { EditUserInput, EloAction, EloUpdateInput, PublicProfile, RequestUserInput, UserInput } from "../interfaces";
+import { Gender, PrismaClient, User } from "@prisma/client";
+import { EditUserInput, EloAction, EloUpdateInput, GetProfileListInput, PublicProfile, RequestUserInput, UserInput } from "../interfaces";
 import { randomUUID } from "crypto";
 import { addMonths } from "date-fns";
 import { globals } from "../globals";
@@ -128,9 +128,13 @@ export class UserHandler {
         return (
             input.age >= globals.minAge &&
             input.age <= globals.maxAge &&
+            input.ageInterest.length == 2 &&
+            input.ageInterest[0] < input.ageInterest[1] &&
+            input.ageInterest[0] >= globals.minAge && 
             input.name.length <= globals.maxNameLength &&
-            input.interestedIn.length <= globals.maxInterestedIn &&
-            input.interestedIn.length == Array.from(new Set(input.interestedIn)).length &&
+            input.genderInterest.length <= globals.maxInterestedIn &&
+            input.genderInterest.length == Array.from(
+                new Set(input.genderInterest)).length &&
             input.attributes.length <= globals.maxAttributes && 
             input.attributes.length == Array.from(new Set(input.attributes)).length &&
             input.description.length <= globals.maxDescriptionLength && 
@@ -191,6 +195,30 @@ export class UserHandler {
             where: {
                 id: userID
             }
+        })
+    }
+
+    public async getPublicProfilesFromCriteria(input : GetProfileListInput) : 
+        Promise<PublicProfile[]> 
+    {
+        return await this.prisma.user.findMany({
+            where: {
+                id: {
+                    in: input.include,
+                    notIn: input.exclude
+                },
+                gender: {
+                    in: input.gender
+                },
+                age: {
+                    lte: input.ageRange[1],
+                    gte: input.ageRange[0]
+                }
+            },
+            orderBy: {
+                elo: "desc"
+            },
+            take: input.count
         })
     }
 }

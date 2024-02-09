@@ -20,10 +20,11 @@ export async function validRequestUserInput() : Promise<RequestUserInput> {
     const upload = await getImageDetails(true);
     return {
         age: globals.minAge,
+        ageInterest: [18,25],
         attributes: Array.from({length: globals.maxAttributes}, (_,index) => `${index}`),
-        interestedIn: ["Male", "Female"],
         email: "a@berkeley.edu",
         gender: "Male",
+        genderInterest: ["Male", "Female"],
         files: [
             {
                 buffer: upload.buffer,
@@ -44,8 +45,9 @@ export function createUserInput(email = "a@berkeley.edu") : UserInput {
         email: email,
         name: "a",
         age: 21,
+        ageInterest: [18,25],
         gender: "Male",
-        interestedIn: ["Male"],
+        genderInterest: ["Male"],
         attributes: ["Basketball"],
         images: ["imageURL"],
         description: "description"
@@ -125,4 +127,58 @@ export async function makeTwoUsers() {
     const user = await handler.user.createUser(createUserInput("a@berkeley.edu"));
     const user_2 = await handler.user.createUser(createUserInput("b@berkeley.edu"));
     return {user, user_2};
+}
+
+export async function createUsersForSwipeFeed() {
+    const uInput = createUserInput("a@berkeley.edu");
+    uInput.gender = "Male";
+    uInput.genderInterest = ["Female"];
+    uInput.ageInterest = [18,30];
+    uInput.age = 30;
+
+    const uInput2 = createUserInput("b@berkeley.edu");
+    uInput2.gender = "Male";
+    uInput2.age = 20;
+
+    const uInput3 = createUserInput("c@berkeley.edu");
+    uInput3.gender = "Female";
+    uInput3.age = 20;
+
+    const uInput4 = createUserInput("d@berkeley.edu");
+    uInput4.gender = "Female";
+    uInput4.genderInterest = ["Male", "Female"];
+    uInput4.age = 21;
+    uInput4.ageInterest = [18,30];
+
+    const [user, user2, user3, user4] = await Promise.all([
+        handler.user.createUser(uInput),
+        handler.user.createUser(uInput2),
+        handler.user.createUser(uInput3),
+        handler.user.createUser(uInput4),
+    ])
+
+    await Promise.all([
+        handler.user.editUser({
+            setting: "elo",
+            userID: user.id,
+            value: 5
+        }),
+        handler.user.editUser({
+            setting: "elo",
+            userID: user2.id,
+            value: 3
+        }),
+        handler.user.editUser({
+            setting: "elo",
+            userID: user3.id,
+            value: 4
+        }),
+        handler.user.editUser({
+            setting: "elo",
+            userID: user4.id,
+            value: 6
+        })
+    ])
+    
+    return { user, user2, user3, user4 }
 }

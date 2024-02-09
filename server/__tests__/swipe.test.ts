@@ -121,4 +121,26 @@ describe("swipe", () => {
         expect(matches_2).toHaveLength(1);
         expect(matches_2[0]).toEqual(userID_3);
     })
+
+    it("should get likedMe users", async () => {
+        await Promise.all([
+            funcs.createSwipe(createSwipeInput("Like",randomUUID(),userID)),
+            funcs.createSwipe(createSwipeInput("Like",randomUUID(),userID)),
+            funcs.createSwipe(createSwipeInput("Like",userID,randomUUID())),
+            funcs.createSwipe(createSwipeInput("Dislike",randomUUID(),userID))
+        ])
+
+        expect(await funcs.getLikedMeUsers(userID)).toHaveLength(2);
+    })
+
+    it("should get my swiped users", async () => {
+        await Promise.all([
+            funcs.createSwipe(createSwipeInput("Like",userID)),
+            funcs.createSwipe(createSwipeInput("Like",userID)),
+            funcs.createSwipe(createSwipeInput("Dislike",userID,randomUUID())),
+            funcs.createSwipe(createSwipeInput("Like",randomUUID(),userID))
+        ])
+
+        expect(await funcs.getSwipedUsers(userID)).toHaveLength(3);
+    })
 })

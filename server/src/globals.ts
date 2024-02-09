@@ -12,12 +12,6 @@ export const globals = {
     maxDescriptionLength : 100,
     allowedAttributeEdits: ["age"], 
 
-    // Other
-    usersLoadedInPreview : 10,
-    messagesLoadedInChat: 10,
-    maxReportCount: 10,
-    freeTrialDays: 7,
-
     // elo
     eloStart: 1000,
     eloDiffToMaxChange: 200,
@@ -26,6 +20,12 @@ export const globals = {
     eloLoginMaxChange: 0.5,
     eloSubscribeMaxChange: 200,
 
+    // Other
+    usersLoadedInPreview : 10,
+    messagesLoadedInChat: 10,
+    maxReportCount: 10,
+    freeTrialDays: 7,
+    usersInSwipeFeed: 10,
 }
 
 // import { AttributeType } from "@prisma/client",

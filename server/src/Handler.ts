@@ -8,7 +8,7 @@ import { SwipeHandler } from "./handlers/swipe";
 import { MessageHandler } from "./handlers/message";
 import { ReportHandler } from "./handlers/report";
 import { StripePaymentHandler } from "./handlers/pay";
-import { ChatPreview, DeleteImageInput, EditUserInput, EloAction, GetChatPreviewsInput, ImageHandler, MessageInput, NewMatchInput, PaymentExtractOutput, PaymentHandler, PublicProfile, RequestReportInput, RequestUserInput, SubscribeInput, SwipeInput, UnlikeInput, UnlikeOutput, UploadImageInput, UserInput } from "./interfaces";
+import { ChatPreview, DeleteImageInput, EditUserInput, EloAction, GetChatPreviewsInput, ImageHandler, MessageInput, NewMatchInput, PaymentHandler, PublicProfile, RequestReportInput, RequestUserInput, SubscribeInput, SwipeFeed, SwipeInput, UnlikeInput, UnlikeOutput, UploadImageInput, UserInput } from "./interfaces";
 import { globals } from "./globals";
 import { FreeTrialHandler } from "./handlers/freetrial";
 
@@ -77,7 +77,8 @@ export class Handler {
             description: input.description,
             email: input.email, 
             gender: input.gender,
-            interestedIn: input.interestedIn,
+            ageInterest: input.ageInterest,
+            genderInterest: input.genderInterest,
             name: input.name,
             images: imageIDs as string[]
         }
@@ -209,19 +210,19 @@ export class Handler {
 
         const swipe = await this.swipe.getSwipeByUsers(user.id, reportedUser.id);
 
-        const [] = await Promise.all([
+        const [report] = await Promise.all([
             this.report.makeReport({
                 userID: input.userID,
                 reportedEmail: reportedUser.email
             }),
-            swipe ? this.swipe.updateSwipe(swipe.id, "Dislike") : Promise.resolve(null),
+            swipe ? this.swipe.updateSwipe(swipe.id, "Dislike") : 
+                this.swipe.createSwipe({
+                    userID: input.userID, 
+                    swipedUserID: input.reportedID,
+                    action: "Dislike"
+                }),
             this.message.deleteChat(user.id, reportedUser.id)
         ])
-
-        const report = await this.report.makeReport({
-            userID: input.userID,
-            reportedEmail: reportedUser.email
-        });
 
         if (reportCount == globals.maxReportCount) await this.deleteUser(reportedUser.id);
 
@@ -373,5 +374,40 @@ export class Handler {
         ) as PublicProfile[];
 
         return filteredProfiles
+    }
+
+    public async getSwipeFeed(userID: string) : Promise<SwipeFeed|null> {
+        const user = await this.user.getUserByID(userID);
+
+        if (!user) return null;
+
+        const [alreadySwipedIDs, likedMeUserIDs] = await Promise.all([
+            this.swipe.getSwipedUsers(userID),
+            this.swipe.getLikedMeUsers(userID)
+        ]);
+
+        const likedMeProfiles = await this.user.getPublicProfilesFromCriteria({
+            include: likedMeUserIDs,
+            count: globals.usersInSwipeFeed / 2,
+            ageRange: user.ageInterest,
+            gender: user.genderInterest
+        });
+        const likedMeProfileIDs = likedMeProfiles.map(val => val.id);
+
+        const otherUsers = await this.user.getPublicProfilesFromCriteria({
+            exclude: [...alreadySwipedIDs, userID, ...likedMeProfileIDs],
+            count: globals.usersInSwipeFeed - likedMeProfiles.length,
+            ageRange: user.ageInterest,
+            gender: user.genderInterest
+        });
+
+        const combined = likedMeProfiles.concat(otherUsers).sort(
+            (a,b) => a.id.localeCompare(b.id)
+        );
+
+        return {
+            profiles: combined,
+            likedMeIDs: likedMeProfileIDs          
+        }
     }
 }

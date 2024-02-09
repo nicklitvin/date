@@ -1,11 +1,11 @@
 TODO
-/getSwipeFeed
 colors based on university colors
 change elo constants with api?
 messagelowerelo is rewarded?
 add devices to user notification list
 insetad of returning null, return error message
 server catch errors write to client errors
+show swipes from users not in user's interest
 
 NOTES
 to make prisma client autofill:
