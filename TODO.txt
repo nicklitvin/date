@@ -1,10 +1,13 @@
 TODO
+return signed download of each image requested
 change elo constants with api?
 messagelowerelo is rewarded?
 add devices to user notification list
 insetad of returning null, return error message
 server catch errors write to client errors
 show swipes from users not in user's interest
+undo like/dislike, distance pref
+add major, school year
 
 NOTES
 to make prisma client autofill:
@@ -17,17 +20,12 @@ double quotes for table names
 select * from "<table>"
 
 premium 
-    read status of other person
-    better filters
-    more impressions
-    more likes/day
+    better filters?
+    more likes/day?
     stats
-    reason for swiping no include
-
-age preference/distance
+    improved elo
 
 if ever try catch error, send post to server with message
-
 Make different user authentication rules list of functions that must pass
 
 PUBLIC
@@ -110,3 +108,23 @@ Wine Tasting
 Photography
 Beach Days
 
+MOBILE APP
+apple/google login with personal email - verify email
+
+Theme: Black and white until themes
+
+Login page (sign in with google)
+
+Sign-up
+    - dont worry (you can change all)
+    - user input pages
+    - uploading... (slow transition theme if match)
+
+
+Messages - Chat list, new match icons, enable/disable notifications icon
+Stats - all time as circle, weekly graphs, all time/weekly icon
+Profile - profile pic, edit profile, subscription status / cancel, settings icon
+Swipe Feed - preferences icon 
+
+Preferences - ageInterest, genderInterest
+Settings - notifications, logout/delete

@@ -11,7 +11,6 @@ import { StripePaymentHandler } from "./handlers/pay";
 import { ChatPreview, DeleteImageInput, EditUserInput, EloAction, GetChatPreviewsInput, ImageHandler, MessageInput, NewMatchInput, PaymentHandler, PublicProfile, RequestReportInput, RequestUserInput, SchoolColors, SubscribeInput, SwipeFeed, SwipeInput, UnlikeInput, UnlikeOutput, UploadImageInput, UserInput } from "./interfaces";
 import { globals } from "./globals";
 import { FreeTrialHandler } from "./handlers/freetrial";
-import { schoolColors } from "./colors";
 
 export class Handler {
     public announcement : AnnouncementHandler;
@@ -410,9 +409,5 @@ export class Handler {
             profiles: combined,
             likedMeIDs: likedMeProfileIDs          
         }
-    }
-
-    public getSchoolColors(school : string) : SchoolColors|undefined {
-        return schoolColors.get(school);
     }
 }
