@@ -1,13 +1,13 @@
 import { Opinion } from "@prisma/client";
-import { globals } from "../../src/globals";
-import { ImageInput, MessageInput, RequestUserInput, SwipeInput, UserInput, UserReportInput } from "../../src/interfaces";
+import { globals } from "../src/globals";
+import { ImageInput, MessageInput, RequestUserInput, SwipeInput, UserInput, UserReportInput } from "../src/interfaces";
 import fs from "fs/promises";
 import { randomUUID } from "crypto";
 import mime from "mime-types";
-import { handler } from "../../jest.setup";
+import { handler } from "../jest.setup";
 
-const imageFilePath = "./__tests__/utils/goodImage.jpg";
-const badImageFilePath = "./__tests__/utils/badImage.txt";
+const imageFilePath = "./__testUtils__/goodImage.jpg";
+const badImageFilePath = "./__testUtils__/badImage.txt";
 
 export async function getImageDetails(good : boolean) : Promise<ImageInput> {
     return {

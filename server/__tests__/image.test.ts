@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it } from "@jest/globals";
 import { handler, usingMocks } from "../jest.setup";
 import axios from "axios";
 import sizeOf from "image-size";
-import { getImageDetails } from "./utils/easySetup";
+import { getImageDetails } from "../__testUtils__/easySetup";
 
 afterEach( async () => {
     await handler.image.deleteAllImages();

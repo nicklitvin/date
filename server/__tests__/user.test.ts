@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it } from "@jest/globals";
 import { handler } from "../jest.setup";
 import { differenceInMonths } from "date-fns";
 import { globals } from "../src/globals";
-import { createUserInput, createUsersForSwipeFeed, validRequestUserInput } from "./utils/easySetup";
+import { createUserInput, createUsersForSwipeFeed, validRequestUserInput } from "../__testUtils__/easySetup";
 import { EloAction } from "../src/interfaces";
 
 afterEach( async () => {

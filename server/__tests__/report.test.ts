@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from "@jest/globals";
 import { handler } from "../jest.setup";
-import { createReportInput } from "./utils/easySetup";
+import { createReportInput } from "../__testUtils__/easySetup";
 
 afterEach( async () => {
     await handler.report.deleteAllReports();

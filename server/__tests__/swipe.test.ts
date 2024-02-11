@@ -3,7 +3,7 @@ import { handler } from "../jest.setup";
 import { Swipe } from "@prisma/client";
 import { randomUUID } from "crypto";
 import { startOfWeek, subWeeks } from "date-fns";
-import { createSwipeInput } from "./utils/easySetup";
+import { createSwipeInput } from "../__testUtils__/easySetup";
 
 afterEach( async () => {
     await handler.swipe.deleteAllSwipes();

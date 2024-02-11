@@ -4,7 +4,7 @@ import { globals } from "../src/globals";
 import { User } from "@prisma/client";
 import { ChatPreview, PublicProfile } from "../src/interfaces";
 import { randomUUID } from "crypto";
-import { createUserInput, createUsersForSwipeFeed, getImageDetails, makeMessageInputWithOneRandom, makeMessageInputWithRandoms, makeTwoUsers, makeTwoUsersAndMatch, matchUsers, validRequestUserInput } from "./utils/easySetup";
+import { createUserInput, createUsersForSwipeFeed, getImageDetails, makeMessageInputWithOneRandom, makeMessageInputWithRandoms, makeTwoUsers, makeTwoUsersAndMatch, matchUsers, validRequestUserInput } from "../__testUtils__/easySetup";
 
 afterEach( async () => {
     await handler.deleteEverything()

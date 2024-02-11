@@ -22,32 +22,6 @@ enum AttributeType {
     Music
 }
 
-// enum SchoolYear {
-//     Freshman
-//     Sophomore
-//     Junior
-//     Senior
-//     Graduate
-//     Alumni
-// }
-
-// enum SchoolMajor {
-//     Mathematics
-//     ComputerScience
-//     ElectricalEngineering
-//     MechanicalEngineering
-//     Economics
-//     Accounting
-//     Business
-//     Biology
-//     Chemistry
-//     Physics
-//     English
-//     History
-//     Psychology
-//     Other
-// }
-
 model User {
     id              String          @id
     email           String
@@ -115,4 +89,12 @@ model Announcement {
 model FreeTrialUsedUser {
     email           String          @id
     timestamp       DateTime
+}
+
+model Verification {
+    email           String          @id
+    userID          String
+    code            Int
+    expires         DateTime
+    verified        Boolean         
 }

@@ -11,6 +11,7 @@ import { StripePaymentHandler } from "./handlers/pay";
 import { ChatPreview, DeleteImageInput, EditUserInput, EloAction, GetChatPreviewsInput, ImageHandler, MessageInput, NewMatchInput, PaymentHandler, PublicProfile, RequestReportInput, RequestUserInput, SchoolColors, SubscribeInput, SwipeFeed, SwipeInput, UnlikeInput, UnlikeOutput, UploadImageInput, UserInput } from "./interfaces";
 import { globals } from "./globals";
 import { FreeTrialHandler } from "./handlers/freetrial";
+import { VerificationHandler } from "./handlers/verification";
 
 export class Handler {
     public announcement : AnnouncementHandler;
@@ -23,6 +24,7 @@ export class Handler {
     public report : ReportHandler;
     public pay : PaymentHandler;
     public freeTrial : FreeTrialHandler;
+    public verification : VerificationHandler;
 
     constructor(prisma : PrismaClient, 
         customImageHandler : ImageHandler = new S3ImageHandler(),
@@ -39,6 +41,7 @@ export class Handler {
         this.message = new MessageHandler(prisma);
         this.report = new ReportHandler(prisma);
         this.freeTrial = new FreeTrialHandler(prisma);
+        this.verification = new VerificationHandler(prisma);
     }
 
     public async deleteEverything() {
@@ -51,7 +54,8 @@ export class Handler {
             this.swipe.deleteAllSwipes(),
             this.message.deleteAllMessages(),
             this.report.deleteAllReports(),
-            this.freeTrial.deleteAllFreeTrialUsedUsers()
+            this.freeTrial.deleteAllFreeTrialUsedUsers(),
+            this.verification.deleteAllVerifications()
         ])
     }
 

@@ -25,4 +25,6 @@ export const globals = {
     maxReportCount: 10,
     freeTrialDays: 7,
     usersInSwipeFeed: 10,
+    verificationCodeLength: 4,
+    verificationExpireMinutes: 5
 }

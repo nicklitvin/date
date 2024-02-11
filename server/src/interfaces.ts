@@ -211,3 +211,14 @@ export interface SchoolColors {
     primary: string
     secondary: string
 }
+
+export interface MakeVerificationInput {
+    userID: string
+    email: string
+}
+
+export interface GetVerificationInput {
+    userID: string
+    email: string
+    code: number
+}
