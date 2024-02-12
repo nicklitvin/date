@@ -1,4 +1,6 @@
 TODO
+check if edu account is valid in verification
+
 log in to normal account -> userID
 give edu email -> reserve verification if does not exist
 code -> confirm verification

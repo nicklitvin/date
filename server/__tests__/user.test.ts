@@ -13,11 +13,11 @@ describe("user", () => {
     const funcs = handler.user;
 
     it("should validate email", () => {
-        expect(funcs.isEmailValid("a@gmail.com")).toEqual(false);
-        expect(funcs.isEmailValid("a.edu@gmail.com")).toEqual(false);
-        expect(funcs.isEmailValid("edu@gmail.com")).toEqual(false);
-        expect(funcs.isEmailValid("a@edu.com")).toEqual(false);
-        expect(funcs.isEmailValid("a@berkeley.edu")).toEqual(true);
+        expect(funcs.isSchoolEmailValid("a@gmail.com")).toEqual(false);
+        expect(funcs.isSchoolEmailValid("a.edu@gmail.com")).toEqual(false);
+        expect(funcs.isSchoolEmailValid("edu@gmail.com")).toEqual(false);
+        expect(funcs.isSchoolEmailValid("a@edu.com")).toEqual(false);
+        expect(funcs.isSchoolEmailValid("a@berkeley.edu")).toEqual(true);
     })
 
     it("should get university from email", () => {

@@ -1,7 +1,7 @@
 import { PrismaClient, Verification } from "@prisma/client";
 import { globals } from "../globals";
 import { addMinutes } from "date-fns";
-import { GetVerificationInput, MakeVerificationInput } from "../interfaces";
+import { NewVerificationInput, ConfirmVerificationInput} from "../interfaces";
 
 export class VerificationHandler {
     private prisma : PrismaClient;
@@ -16,14 +16,14 @@ export class VerificationHandler {
         return Math.floor(Math.random() * (big - small + 1) + small);
     }
 
-    public async makeVerificationEntry(input : MakeVerificationInput,
+    public async makeVerificationEntry(input : NewVerificationInput,
         customExpireTime = addMinutes(new Date(), globals.verificationExpireMinutes) 
         ) : Promise<number> 
     {
         return await this.prisma.verification.create({
             data: {
-                email: input.email,
-                userID: input.userID,
+                schoolEmail: input.schoolEmail,
+                personalEmail: input.personalEmail,
                 code: this.generateDigitCode(),
                 expires: customExpireTime,
                 verified: false
@@ -34,13 +34,13 @@ export class VerificationHandler {
         }).then(res => res.code);
     }
 
-    public async getVerificationWithCode(input : GetVerificationInput) : 
+    public async getVerificationWithCode(input : ConfirmVerificationInput) : 
         Promise<Verification|null> 
     {
         return await this.prisma.verification.findFirst({
             where: {
-                email: input.email,
-                userID: input.userID,
+                personalEmail: input.personalEmail,
+                schoolEmail: input.schoolEmail,
                 code: input.code,
                 expires: {
                     gte: new Date()
@@ -49,10 +49,10 @@ export class VerificationHandler {
         })
     }
 
-    public async verifyUser(email : string) : Promise<Verification|null> {
+    public async verifyUser(schoolEmail : string) : Promise<Verification|null> {
         return await this.prisma.verification.update({
             where: {
-                email: email,
+                schoolEmail: schoolEmail,
             },
             data: {
                 verified: true
@@ -60,23 +60,23 @@ export class VerificationHandler {
         })
     }
 
-    public async getVerificationByEmail(email: string) : Promise<Verification|null> {
+    public async getVerificationBySchoolEmail(email: string) : Promise<Verification|null> {
         return await this.prisma.verification.findUnique({
             where: {
-                email: email
+                schoolEmail: email
             }
         })
     }
 
-    public async getVerificationByUserID(userID: string) : Promise<Verification|null> {
+    public async getVerificationByPersonalEmail(email: string) : Promise<Verification|null> {
         return await this.prisma.verification.findFirst({
             where: {
-                userID: userID
+                personalEmail: email
             }
         })
     }
 
-    public async regenerateVerificationCode(email : string, code : number) : 
+    public async regenerateVerificationCode(schoolEmail : string, code : number) : 
         Promise<Verification> 
     {
         return await this.prisma.verification.update({
@@ -85,7 +85,7 @@ export class VerificationHandler {
                 code: code
             },
             where: {
-                email: email
+                schoolEmail: schoolEmail
             }
         })
     }
@@ -102,10 +102,10 @@ export class VerificationHandler {
         return deleted.count;
     }
 
-    public async deleteVerification(email : string) : Promise<Verification|null> {
+    public async deleteVerification(schoolEmail : string) : Promise<Verification|null> {
         return await this.prisma.verification.delete({
             where: {
-                email: email
+                schoolEmail: schoolEmail
             }
         })
     }
@@ -113,5 +113,9 @@ export class VerificationHandler {
     public async deleteAllVerifications() : Promise<number> {
         const deleted = await this.prisma.verification.deleteMany();
         return deleted.count;
+    }
+
+    public async getVerificationCount() : Promise<number> {
+        return await this.prisma.verification.count();
     }
 }

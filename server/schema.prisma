@@ -92,8 +92,8 @@ model FreeTrialUsedUser {
 }
 
 model Verification {
-    email           String          @id
-    userID          String
+    schoolEmail     String          @id
+    personalEmail   String          
     code            Int
     expires         DateTime
     verified        Boolean         

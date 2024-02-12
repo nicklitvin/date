@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it } from "@jest/globals";
 import { handler } from "../jest.setup";
 import { globals } from "../src/globals";
 import { addMinutes } from "date-fns";
+import { makeVerificationInput } from "../__testUtils__/easySetup";
 
 afterEach( async () => {
     await handler.verification.deleteAllVerifications();
@@ -9,8 +10,8 @@ afterEach( async () => {
 
 describe("verification", () => {
     const funcs = handler.verification;
-    const email = "a@berkeley.edu";
-    const userID = "userID";
+    const schoolEmail = "a@berkeley.edu";
+    const personalEmail = "a@gmail.com";
 
     it("should generate digit code", () => {
         for (let i = 0; i < 100; i++) {
@@ -24,112 +25,105 @@ describe("verification", () => {
         }
     })
 
-    it("should make verification entry", async () => {
-        expect(await funcs.makeVerificationEntry({
-            email: email,
-            userID: userID
-        })).not.toEqual(null);
+    it("should generate verification code", async () => {
+        expect(await funcs.makeVerificationEntry(makeVerificationInput())).not.toEqual(null);
     })
 
     it("should not get nonverification", async () => {
         expect(await funcs.getVerificationWithCode({
-            userID: userID,
-            email: email,
+            personalEmail: personalEmail,
+            schoolEmail: schoolEmail,
             code: 1234
         })).toEqual(null);
     })
 
-    it("should get verification", async () => {
-        const code = await funcs.makeVerificationEntry({
-            email: email,
-            userID: userID
-        });
+    it("should get verification with code", async () => {
+        const input = makeVerificationInput();
+        const code = await funcs.makeVerificationEntry(input);
 
         expect(await funcs.getVerificationWithCode({
             code: code,
-            email: email,
-            userID: userID
+            personalEmail: input.personalEmail,
+            schoolEmail: input.schoolEmail
         })).not.toEqual(null);
     })
 
     it("should not get expired verification", async () => {
-        const code = await funcs.makeVerificationEntry({
-            email: email,
-            userID: userID
-        }, addMinutes(new Date(), -1));
-
+        const input = makeVerificationInput();
+        const code = await funcs.makeVerificationEntry(input,addMinutes(new Date(), -1));
         
         expect(await funcs.getVerificationWithCode({
             code: code,
-            email: email,
-            userID: userID
+            personalEmail: input.personalEmail,
+            schoolEmail: input.schoolEmail
         })).toEqual(null);
     })
 
-    it("should verify email", async () => {
-        await funcs.makeVerificationEntry({
-            email: email,
-            userID: "random"
-        });
-        expect(await funcs.verifyUser(email)).not.toEqual(null);
+    it("should verify school email", async () => {
+        const input = makeVerificationInput();
+        await funcs.makeVerificationEntry(input);
+        expect(await funcs.verifyUser(input.schoolEmail)).not.toEqual(null);
     })
 
     it("should get verification by email/userID", async () => {
-        await funcs.makeVerificationEntry({
-            email: email,
-            userID: userID
-        });
+        const input = makeVerificationInput();
+        await funcs.makeVerificationEntry(input);
 
-        expect(await funcs.getVerificationByEmail(email)).not.toEqual(null);
-        expect(await funcs.getVerificationByUserID(userID)).not.toEqual(null);
+        expect(await funcs.getVerificationByPersonalEmail(input.personalEmail)).not.toEqual(null);
+        expect(await funcs.getVerificationBySchoolEmail(input.schoolEmail)).not.toEqual(null);
     })
 
     it("should regenerate code", async () => {
-        const code = await funcs.makeVerificationEntry({
-            email: email,
-            userID: userID
-        });
-
-        const newCode = await funcs.regenerateVerificationCode(email, code + 1);
+        const input = makeVerificationInput();
+        const code = await funcs.makeVerificationEntry(input);
+        const newCode = await funcs.regenerateVerificationCode(input.schoolEmail, code + 1);
         expect(newCode.code).not.toEqual(code);
     })
 
     it("should delete expired verifications", async () => {
+        const input1 = makeVerificationInput("a","b");
+        const input2 = makeVerificationInput("c","d");
+        const input3 = makeVerificationInput("e","f");
+        
         await Promise.all([
-            funcs.makeVerificationEntry({email: "a", userID: "1"}, 
-                addMinutes(new Date(), -2)
-            ),
-            funcs.makeVerificationEntry({email: "b", userID: "1"}, 
-                addMinutes(new Date(), 2)
-            ),
-            funcs.makeVerificationEntry({email: "c", userID: "1"}, 
-                addMinutes(new Date(), -10)
-            ),
+            funcs.makeVerificationEntry(input1, addMinutes(new Date(), -2)),
+            funcs.makeVerificationEntry(input2, addMinutes(new Date(), 2)),
+            funcs.makeVerificationEntry(input3, addMinutes(new Date(), -10)),
         ])
         expect(await funcs.removeExpiredVerifications()).toEqual(2);
     })
 
     it("should delete verification", async () => {
-        await funcs.makeVerificationEntry({
-            email: email,
-            userID: userID
-        });
-        expect(await funcs.deleteVerification(email)).not.toEqual(null);
+        const input = makeVerificationInput();
+        await funcs.makeVerificationEntry(input);
+        expect(await funcs.deleteVerification(input.schoolEmail)).not.toEqual(null);
     })
 
     it("should delete all verifications", async () => {
+        const input1 = makeVerificationInput("a","b");
+        const input2 = makeVerificationInput("c","d");
+        const input3 = makeVerificationInput("e","f");
+        
         await Promise.all([
-            funcs.makeVerificationEntry({email: "a", userID: "1"}, 
-                addMinutes(new Date(), -2)
-            ),
-            funcs.makeVerificationEntry({email: "b", userID: "1"}, 
-                addMinutes(new Date(), 2)
-            ),
-            funcs.makeVerificationEntry({email: "c", userID: "1"}, 
-                addMinutes(new Date(), -10)
-            ),
+            funcs.makeVerificationEntry(input1, addMinutes(new Date(), -2)),
+            funcs.makeVerificationEntry(input2, addMinutes(new Date(), 2)),
+            funcs.makeVerificationEntry(input3, addMinutes(new Date(), -10)),
         ])
 
         expect(await funcs.deleteAllVerifications()).toEqual(3);
+    })
+
+    it("should get verification count", async () => {
+        const input1 = makeVerificationInput("a","b");
+        const input2 = makeVerificationInput("c","d");
+        const input3 = makeVerificationInput("e","f");
+        
+        await Promise.all([
+            funcs.makeVerificationEntry(input1, addMinutes(new Date(), -2)),
+            funcs.makeVerificationEntry(input2, addMinutes(new Date(), 2)),
+            funcs.makeVerificationEntry(input3, addMinutes(new Date(), -10)),
+        ])
+
+        expect(await funcs.getVerificationCount()).toEqual(3);
     })
 })

@@ -11,7 +11,7 @@ export class UserHandler {
         this.prisma = prisma;
     }
 
-    public isEmailValid(email : string) : boolean {
+    public isSchoolEmailValid(email : string) : boolean {
         return email.endsWith(".edu");
     }
 

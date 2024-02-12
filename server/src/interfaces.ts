@@ -207,18 +207,13 @@ export interface GetProfileListInput {
     count?: number
 }
 
-export interface SchoolColors {
-    primary: string
-    secondary: string
+export interface NewVerificationInput {
+    personalEmail: string
+    schoolEmail: string
 }
 
-export interface MakeVerificationInput {
-    userID: string
-    email: string
-}
-
-export interface GetVerificationInput {
-    userID: string
-    email: string
+export interface ConfirmVerificationInput {
+    personalEmail: string
+    schoolEmail: string
     code: number
 }

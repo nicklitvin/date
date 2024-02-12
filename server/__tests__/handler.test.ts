@@ -4,7 +4,8 @@ import { globals } from "../src/globals";
 import { User } from "@prisma/client";
 import { ChatPreview, PublicProfile } from "../src/interfaces";
 import { randomUUID } from "crypto";
-import { createUserInput, createUsersForSwipeFeed, getImageDetails, makeMessageInputWithOneRandom, makeMessageInputWithRandoms, makeTwoUsers, makeTwoUsersAndMatch, matchUsers, validRequestUserInput } from "../__testUtils__/easySetup";
+import { createUserInput, createUsersForSwipeFeed, getImageDetails, makeMessageInputWithOneRandom, makeMessageInputWithRandoms, makeTwoUsers, makeTwoUsersAndMatch, makeVerificationInput, matchUsers, validRequestUserInput } from "../__testUtils__/easySetup";
+import { addMinutes } from "date-fns";
 
 afterEach( async () => {
     await handler.deleteEverything()
@@ -661,4 +662,80 @@ describe("handler", () => {
         const feed = await handler.getSwipeFeed(user4.id);
         expect(feed?.profiles).toHaveLength(3);
     })
+
+    it("should not create verification code if email taken", async () => {
+        const input = makeVerificationInput();
+        await handler.verification.makeVerificationEntry(input);
+        expect(await handler.getVerificationCode(input)).toEqual(null);
+    })
+
+    it("should not create verification for bad school email", async () => {
+        const input = makeVerificationInput();
+        input.schoolEmail = "bad";
+        expect(await handler.getVerificationCode(input)).toEqual(null);
+    })
+
+    it("should not create verification code if school email taken", async () => {
+        const input = makeVerificationInput();
+        const input2 = makeVerificationInput();
+        input2.personalEmail = "other@gmail.com";
+
+        await handler.verification.makeVerificationEntry(input);
+        expect(await handler.getVerificationCode(input2)).toEqual(null);
+    })
+
+    it("should create verification code", async () => {
+        const input = makeVerificationInput();
+        expect(await handler.getVerificationCode(input)).not.toEqual(null);
+    })
+
+    it("should not verify user if wrong code", async () => {
+        const input = makeVerificationInput();
+        const code = await handler.verification.makeVerificationEntry(input);
+        expect(await handler.verifyUserWithCode({
+            code: code + 1,
+            personalEmail: input.personalEmail,
+            schoolEmail: input.schoolEmail
+        })).toEqual(null);
+    })
+
+    it("should verify user if correct code", async () => {
+        const input = makeVerificationInput();
+        const code = await handler.verification.makeVerificationEntry(input);
+        expect(await handler.verifyUserWithCode({
+            code: code,
+            personalEmail: input.personalEmail,
+            schoolEmail: input.schoolEmail
+        })).not.toEqual(null);
+    })
+
+    it("should not regenerate code if schoolEmail is not verifying", async () => {
+        expect(await handler.regenerateVerificationCode("random")).toEqual(null);
+    })
+
+    it("should regenerate verification code", async () => {
+        const input = makeVerificationInput();
+        await handler.verification.makeVerificationEntry(input);
+        expect(await handler.regenerateVerificationCode(input.schoolEmail)).not.toEqual(null);
+    })
+
+    it("should delete expired verifications when verifying", async () => {
+        const input = makeVerificationInput();
+        const input2 = makeVerificationInput();
+        input2.schoolEmail = "b@berkeley.edu";
+        const badInput = makeVerificationInput();
+        badInput.schoolEmail = "bad";
+
+        await Promise.all([
+            handler.verification.makeVerificationEntry(input, addMinutes(new Date(), -2)),
+            handler.verification.makeVerificationEntry(input2, addMinutes(new Date(), -10)),
+        ]);
+        expect(await handler.verification.getVerificationCount()).toEqual(2);
+        await handler.getVerificationCode(badInput);
+        expect(await handler.verification.getVerificationCount()).toEqual(0);
+    })
+
+    // it("should not create user if not verified", async () => {
+
+    // })
 })

@@ -1,6 +1,6 @@
 import { Opinion } from "@prisma/client";
 import { globals } from "../src/globals";
-import { ImageInput, MessageInput, RequestUserInput, SwipeInput, UserInput, UserReportInput } from "../src/interfaces";
+import { ImageInput, MessageInput, NewVerificationInput, RequestUserInput, SwipeInput, UserInput, UserReportInput } from "../src/interfaces";
 import fs from "fs/promises";
 import { randomUUID } from "crypto";
 import mime from "mime-types";
@@ -181,4 +181,13 @@ export async function createUsersForSwipeFeed() {
     ])
     
     return { user, user2, user3, user4 }
+}
+
+export function makeVerificationInput(personalEmail? : string, schoolEmail? : string) 
+    : NewVerificationInput 
+{
+    return {
+        personalEmail: personalEmail ?? "a@gmail.com",
+        schoolEmail: schoolEmail ?? "a@berkeley.edu"
+    }
 }

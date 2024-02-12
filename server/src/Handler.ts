@@ -1,4 +1,4 @@
-import { Message, PrismaClient, Swipe, User, UserReport } from "@prisma/client";
+import { Message, PrismaClient, Swipe, User, UserReport, Verification } from "@prisma/client";
 import { AnnouncementHandler } from "./handlers/announcement";
 import { AttributeHandler } from "./handlers/attribute";
 import { ErrorLogHandler } from "./handlers/errorlog";
@@ -8,7 +8,7 @@ import { SwipeHandler } from "./handlers/swipe";
 import { MessageHandler } from "./handlers/message";
 import { ReportHandler } from "./handlers/report";
 import { StripePaymentHandler } from "./handlers/pay";
-import { ChatPreview, DeleteImageInput, EditUserInput, EloAction, GetChatPreviewsInput, ImageHandler, MessageInput, NewMatchInput, PaymentHandler, PublicProfile, RequestReportInput, RequestUserInput, SchoolColors, SubscribeInput, SwipeFeed, SwipeInput, UnlikeInput, UnlikeOutput, UploadImageInput, UserInput } from "./interfaces";
+import { ChatPreview, ConfirmVerificationInput, DeleteImageInput, EditUserInput, EloAction, GetChatPreviewsInput, ImageHandler, MessageInput, NewMatchInput, NewVerificationInput, PaymentHandler, PublicProfile, RequestReportInput, RequestUserInput, SubscribeInput, SwipeFeed, SwipeInput, UnlikeInput, UnlikeOutput, UploadImageInput, UserInput } from "./interfaces";
 import { globals } from "./globals";
 import { FreeTrialHandler } from "./handlers/freetrial";
 import { VerificationHandler } from "./handlers/verification";
@@ -59,11 +59,6 @@ export class Handler {
         ])
     }
 
-    /**
-     * 
-     * @param user (images: string[] will be ignored in UserInput)
-     * @param images 
-     */
     public async createUser(input : RequestUserInput) : Promise<User|null> {
         if ( await this.user.getUserByEmail(input.email) || 
             !this.user.isInputValid(input) )
@@ -116,7 +111,9 @@ export class Handler {
             this.swipe.getSwipeByUsers(input.userID, input.swipedUserID)
         ])
 
-        if (!user || !swipedUser || user.id == swipedUser.id || previousSwipe) return null;
+        if (!user || !swipedUser || user.id == swipedUser.id || previousSwipe) {
+            return null;
+        }
 
         const [swipe, _] = await Promise.all([
             this.swipe.createSwipe(input),
@@ -164,7 +161,9 @@ export class Handler {
         const combined = messages.messagesFromUserID.concat(messages.messagesToUserID).
             sort( (a,b) => b.timestamp.getTime() - a.timestamp.getTime())
 
-        const getChatPreview = async (message : Message) : Promise<ChatPreview|null> => {
+        const getChatPreview = async (message : Message) : 
+            Promise<ChatPreview|null> => 
+        {
             const [profile, messages] = await Promise.all([
                 message.userID == input.userID ?
                     this.user.getPublicProfile(message.recepientID) :
@@ -228,7 +227,9 @@ export class Handler {
             this.message.deleteChat(user.id, reportedUser.id)
         ])
 
-        if (reportCount == globals.maxReportCount) await this.deleteUser(reportedUser.id);
+        if (reportCount == globals.maxReportCount) {
+            await this.deleteUser(reportedUser.id);
+        }
 
         return report
     }
@@ -352,7 +353,9 @@ export class Handler {
         };
     }
 
-    public async getNewMatches(input : NewMatchInput) : Promise<PublicProfile[]|null> {
+    public async getNewMatches(input : NewMatchInput) : 
+        Promise<PublicProfile[]|null> 
+    {
         const user = await this.user.getUserByID(input.userID);
 
         if (!user) return null;
@@ -413,5 +416,46 @@ export class Handler {
             profiles: combined,
             likedMeIDs: likedMeProfileIDs          
         }
+    }
+
+    public async getVerificationCode(input : NewVerificationInput) : 
+        Promise<number|null> 
+    {
+        await this.verification.removeExpiredVerifications();
+
+        const [schoolValid, personalTaken, schoolTaken] = await Promise.all([
+            this.user.isSchoolEmailValid(input.schoolEmail),
+            this.verification.getVerificationByPersonalEmail(input.personalEmail),
+            this.verification.getVerificationBySchoolEmail(input.schoolEmail)
+        ]);
+
+        if (!schoolValid || schoolTaken || personalTaken) return null;
+
+        return await this.verification.makeVerificationEntry(input);
+    }
+
+    public async verifyUserWithCode(input : ConfirmVerificationInput) : 
+        Promise<Verification|null> 
+    {
+        return await this.verification.getVerificationWithCode(input) ? 
+            await this.verification.verifyUser(input.schoolEmail) :
+            null;
+    }
+
+    public async regenerateVerificationCode(email : string) : Promise<number|null> {
+        const verification = await this.verification.getVerificationBySchoolEmail(
+            email
+        );
+        if (!verification) return null;
+
+        let newCode : number|undefined; 
+        while (true) {
+            newCode = this.verification.generateDigitCode();
+            if (newCode != verification.code) break;
+        }
+        const newVerification = await this.verification.regenerateVerificationCode(
+            email, newCode
+        );
+        return newVerification.code;
     }
 }
