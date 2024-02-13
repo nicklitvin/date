@@ -1,12 +1,6 @@
 TODO
-check if edu account is valid in verification
 
-log in to normal account -> userID
-give edu email -> reserve verification if does not exist
-code -> confirm verification
-resend code -> change code + update 
-else verification expires
-
+BACKEND TODO
 return signed download of each image requested
 change elo constants with api?
 messagelowerelo is rewarded?

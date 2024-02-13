@@ -26,12 +26,15 @@ export class Handler {
     public freeTrial : FreeTrialHandler;
     public verification : VerificationHandler;
 
-    constructor(prisma : PrismaClient, 
+    private ignoreVerification : boolean;
+
+    constructor(prisma : PrismaClient, ignoreVerification : boolean,
         customImageHandler : ImageHandler = new S3ImageHandler(),
-        customPaymentHandler : PaymentHandler = new StripePaymentHandler()
+        customPaymentHandler : PaymentHandler = new StripePaymentHandler(),
     ) {
         this.image = customImageHandler,
         this.pay = customPaymentHandler;
+        this.ignoreVerification = ignoreVerification;
 
         this.announcement = new AnnouncementHandler(prisma);
         this.attribute = new AttributeHandler(prisma);
@@ -59,30 +62,35 @@ export class Handler {
         ])
     }
 
-    public async createUser(input : RequestUserInput) : Promise<User|null> {
-        if ( await this.user.getUserByEmail(input.email) || 
-            !this.user.isInputValid(input) )
-        {
-            return null;
+    public async createUser(input : RequestUserInput, 
+        ignoreVerification = this.ignoreVerification) : Promise<User|null> 
+    {
+        const [user, verification] = await Promise.all([
+            this.user.getUserByEmail(input.email),
+            this.verification.getVerificationByPersonalEmail(input.email)
+        ])
+        if (user || !this.user.isInputValid(input)) return null;
+
+        if (verification && verification.verified || ignoreVerification) {
+            const imageIDs = await Promise.all(
+                input.files.map( val => this.image.uploadImage(val))
+            );
+    
+            const userInput : UserInput = {
+                age: input.age,
+                attributes: input.attributes,
+                description: input.description,
+                email: input.email, 
+                gender: input.gender,
+                ageInterest: input.ageInterest,
+                genderInterest: input.genderInterest,
+                name: input.name,
+                images: imageIDs as string[]
+            }
+    
+            return await this.user.createUser(userInput);
         }
-
-        const imageIDs = await Promise.all(
-            input.files.map( val => this.image.uploadImage(val))
-        );
-
-        const userInput : UserInput = {
-            age: input.age,
-            attributes: input.attributes,
-            description: input.description,
-            email: input.email, 
-            gender: input.gender,
-            ageInterest: input.ageInterest,
-            genderInterest: input.genderInterest,
-            name: input.name,
-            images: imageIDs as string[]
-        }
-
-        return await this.user.createUser(userInput);
+        return null;
     }
 
     public async deleteUser(userID : string) {

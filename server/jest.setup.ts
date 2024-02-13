@@ -7,6 +7,7 @@ import { MockPaymentHandler } from "./__testExtras__/pay";
 export const usingMocks = process.argv.includes('--use-mocks=true');
 export const handler = new Handler(
     new PrismaClient(), 
+    true,
     usingMocks ? new MockImageHandler() : undefined,
     usingMocks ? new MockPaymentHandler() : undefined,
 );

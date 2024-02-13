@@ -665,6 +665,7 @@ describe("handler", () => {
 
     it("should not create verification code if email taken", async () => {
         const input = makeVerificationInput();
+        input.schoolEmail = "b@berkeley.edu"
         await handler.verification.makeVerificationEntry(input);
         expect(await handler.getVerificationCode(input)).toEqual(null);
     })
@@ -735,7 +736,31 @@ describe("handler", () => {
         expect(await handler.verification.getVerificationCount()).toEqual(0);
     })
 
-    // it("should not create user if not verified", async () => {
+    it("should not create user if not verified", async () => {
+        const input = await validRequestUserInput();
+        expect(await handler.createUser(input, false)).toEqual(null);
+        
+        await handler.getVerificationCode({
+            personalEmail: input.email,
+            schoolEmail: "a@berkeley.edu"
+        })
+        expect(await handler.createUser(input, false)).toEqual(null);
+    })
 
-    // })
+    it("should create user after verification", async () => {
+        const input = await validRequestUserInput();
+        const eduEmail = "a@berkeley.edu";
+        const code = await handler.getVerificationCode({
+            personalEmail: input.email,
+            schoolEmail: eduEmail
+        })
+
+        await handler.verifyUserWithCode({
+            code: code!,
+            personalEmail: input.email,
+            schoolEmail: eduEmail
+        })
+
+        expect(await handler.createUser(input)).not.toEqual(null);
+    })
 })
