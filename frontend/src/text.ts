@@ -17,5 +17,13 @@ export const myText = {
     genderInputSubtitle: "What is your gender?",
 
     genderPreferenceInputTitle: "Gender Preference",
-    genderPreferenceInputSubtitle: "Who would you like to see?"
+    genderPreferenceInputSubtitle: "Who would you like to see?",
+
+    descriptionInputTitle: "About You",
+    descriptionInputSubtitle: "Run a fun description about yourself",
+    decsriptionPlaceholder: "Describe yourself here...",
+    descriptionErrorMessage: "Invalid Description",
+
+    attributesInputTitle: "Attributes",
+    attributesInputSubtitle: "Select some of your favorite interests"
 }

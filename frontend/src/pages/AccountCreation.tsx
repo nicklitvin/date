@@ -5,10 +5,12 @@ import { MySimplePage } from "../components/SimplePage";
 import { MyTextInput } from "../components/TextInput";
 import { MyDateInput } from "../components/DateInput";
 import { globals } from "../globals";
+import { StyledButton, StyledText, StyledView } from "../styledElements";
 
-type PageType = "Create Profile" | "Name" | "Birthday" | "Gender" | "Gender Preference";
+type PageType = "Create Profile" | "Name" | "Birthday" | "Gender" | "Gender Preference" |
+    "Description" | "Attributes";
 export const pageOrder : PageType[] = [
-    "Create Profile","Name","Birthday", "Gender", "Gender Preference"
+    "Create Profile","Name","Birthday", "Gender", "Gender Preference", "Description", "Attributes"
 ]
 
 interface Props {
@@ -22,6 +24,8 @@ export function AccountCreation(props : Props) {
     const [birthday, setBirthday] = useState<Date>(new Date());
     const [gender, setGender] = useState<string|null>(null);
     const [genderPreference, setGenderPreference] = useState<string[]>([]);
+    const [description, setDescription] = useState<string>("");
+    const [attributes, setAttributes] = useState<string[]>([]);
 
     switch (pageOrder[currentPage]) {
         case "Create Profile":
@@ -115,6 +119,63 @@ export function AccountCreation(props : Props) {
                             text={myText.continue}
                             onPressFunction={() => {
                                 if (genderPreference.length > 0) {
+                                    setCurrentPage(currentPage + 1)
+                                }
+                            }}
+                        />
+                    </>
+                }
+            />
+        case "Description":
+            return <MySimplePage
+                title={myText.descriptionInputTitle}
+                subtitle={myText.descriptionInputSubtitle}
+                content={
+                    <MyTextInput
+                        placeholder={myText.decsriptionPlaceholder}
+                        errorMessage={myText.descriptionErrorMessage}
+                        saveMessage={setDescription}
+                        afterSubmit={ () => setCurrentPage(currentPage + 1)}
+                    />
+                }
+            />
+        case "Attributes":
+            return <MySimplePage
+                title={myText.attributesInputTitle}
+                subtitle={myText.attributesInputSubtitle}
+                content={
+                    <>
+                        {Object.entries(globals.attributes).map( (entry) =>
+                            <StyledView key={`attributeType-${entry}`}>
+                                <StyledText>
+                                    {entry[0]}
+                                </StyledText>
+                                {entry[1].map( (content) =>
+                                    <MyButton
+                                        key={`attribute-${content.value}`}
+                                        text={content.value}
+                                        onPressFunction={ () => {
+                                            const index = attributes.findIndex( 
+                                                selected => selected == content.value
+                                            )
+                                            if (index > -1) {
+                                                setAttributes(
+                                                    attributes.splice(index,1)
+                                                )
+                                            } else {
+                                                setGenderPreference(
+                                                    [...attributes, content.value]
+                                                )
+                                            }
+                                        }}
+                                    />
+                                )}
+                            </StyledView>
+                        )}
+                        <MyButton
+                            text={myText.continue}
+                            onPressFunction={ () => {
+                                if (attributes.length > 0) {
                                     setCurrentPage(currentPage + 1)
                                 }
                             }}

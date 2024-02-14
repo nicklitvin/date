@@ -41,4 +41,16 @@ describe("accountCreation", () => {
     
         expect(screen.queryByText(myText.genderInputTitle)).not.toEqual(null);
     })
+
+    it("should generate all attributes", async () => {
+        const pageStart = pageOrder.findIndex(page => page == "Attributes") as number;
+        render(<AccountCreation customPageStart={pageStart}/>);
+
+        for (const entry of Object.entries(globals.attributes)) {
+            expect(screen.queryByText(entry[0])).not.toEqual(null);
+            for (const attribute of entry[1]) {
+                expect(screen.queryByText(attribute.value)).not.toEqual(null);
+            }
+        }
+    })
 })
