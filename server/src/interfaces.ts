@@ -18,7 +18,7 @@ export interface ErrorLogInput {
 }
 
 interface BasicUserInput {
-    email: string
+    email: string   
     name: string
     age: number
     ageInterest: number[]
