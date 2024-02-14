@@ -21,6 +21,7 @@ export function AccountCreation(props : Props) {
     const [name, setName] = useState<string>("");
     const [birthday, setBirthday] = useState<Date>(new Date());
     const [gender, setGender] = useState<string|null>(null);
+    const [genderPreference, setGenderPreference] = useState<string[]>([]);
 
     switch (pageOrder[currentPage]) {
         case "Create Profile":
@@ -77,6 +78,43 @@ export function AccountCreation(props : Props) {
                             text={myText.continue}
                             onPressFunction={() => {
                                 if (gender) {
+                                    setCurrentPage(currentPage + 1)
+                                }
+                            }}
+                        />
+                    </>
+                }
+            />
+        case "Gender Preference":
+            return <MySimplePage
+                title={myText.genderPreferenceInputTitle}
+                subtitle={myText.genderPreferenceInputSubtitle}
+                content={
+                    <>
+                        {globals.genders.map( (val) => 
+                            <MyButton
+                                key={`gender-pref-${val}`}
+                                text={val}
+                                onPressFunction={() => {
+                                    const index = genderPreference.findIndex( 
+                                        selected => selected == val
+                                    )
+                                    if (index > -1) {
+                                        setGenderPreference(
+                                            genderPreference.splice(index,1)
+                                        )
+                                    } else {
+                                        setGenderPreference(
+                                            [...genderPreference, val]
+                                        )
+                                    }
+                                }}
+                            />
+                        )}
+                        <MyButton
+                            text={myText.continue}
+                            onPressFunction={() => {
+                                if (genderPreference.length > 0) {
                                     setCurrentPage(currentPage + 1)
                                 }
                             }}
