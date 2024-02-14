@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { StyledInput, StyledText } from "./styledElements"
+import { StyledInput, StyledText } from "../styledElements"
 import classNames from "classnames"
 
 interface Props {
@@ -9,9 +9,9 @@ interface Props {
     afterSubmit: Function
 }
 
-export function MyInput(props : Props) {
+export function MyTextInput(props : Props) {
     const [message, setMessage] = useState<string>("");
-    const [isBadMessage, setIsBadMessage] = useState<boolean>(false);
+    const [showError, setShowError] = useState<boolean>(false);
 
     return (  
         <>
@@ -22,7 +22,7 @@ export function MyInput(props : Props) {
                 placeholder={props.placeholder} 
                 onSubmitEditing={() => {
                     if (message.length == 0) {
-                        setIsBadMessage(true);
+                        setShowError(true);
                     } else {
                         props.saveMessage(message)
                         props.afterSubmit()
@@ -30,7 +30,7 @@ export function MyInput(props : Props) {
                 }}
             />
             <StyledText className={classNames(
-                isBadMessage ? "block" : "hidden"
+                showError ? "block" : "hidden"
             )}>
                 {props.errorMessage}
             </StyledText>

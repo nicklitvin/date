@@ -1,4 +1,4 @@
-import { StyledText, StyledView } from "./styledElements";
+import { StyledText, StyledView } from "../styledElements";
 
 interface Props {
     title: string

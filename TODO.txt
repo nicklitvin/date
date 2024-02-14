@@ -3,6 +3,7 @@ does element that has no visibility get detected by find
 test error message with empty input
 
 BACKEND TODO
+change age to birthday on backend
 return signed download of each image requested
 change elo constants with api?
 messagelowerelo is rewarded?

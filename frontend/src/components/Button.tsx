@@ -1,4 +1,4 @@
-import { StyledButton, StyledText } from "./styledElements";
+import { StyledButton, StyledText } from "../styledElements";
 
 interface Props {
     text: string
