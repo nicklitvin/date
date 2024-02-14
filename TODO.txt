@@ -1,6 +1,4 @@
 TODO
-does element that has no visibility get detected by find
-test error message with empty input
 
 BACKEND TODO
 change age to birthday on backend

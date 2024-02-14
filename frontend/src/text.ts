@@ -1,6 +1,8 @@
 export const myText = {
+    continue: "continue",
+
     createProfileTitle: "Create Profile",
-    createProfileSubtitle: "Time to show off your beautiful self, and you can change anything later so don’t worry",
+    createProfileSubtitle: "Time to show off your beautiful self, and you can change anything later so do not worry",
     
     nameInputTitle: "Name",
     nameInputSubtitle: "What do you want others to call you?",
@@ -11,5 +13,9 @@ export const myText = {
     birthdayInputSubtitle: "When is your birthday?",
     birthdayInputError: "Invalid Birthday",
 
-    continue: "continue"
+    genderInputTitle: "Gender",
+    genderInputSubtitle: "What is your gender?",
+
+    genderPreferenceInputTitle: "Gender Preference",
+    genderPreferenceInputSubtitle: "Who would you like to see?"
 }

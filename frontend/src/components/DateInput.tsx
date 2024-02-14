@@ -12,6 +12,7 @@ interface Props {
     customDate?: Date
 }
 
+// Can change to normal text input with validation
 export function MyDateInput(props: Props) {
     const [date, setDate] = useState<Date>(props.customDate ?? new Date(2000,0,1));
     const [showError, setShowError] = useState<boolean>(false);
