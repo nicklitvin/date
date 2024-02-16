@@ -2,11 +2,8 @@ import { act, fireEvent, render, screen } from "@testing-library/react-native"
 import { AccountCreation, pageOrder } from "../src/pages/AccountCreation"
 import { myText } from "../src/text";
 import { globals } from "../src/globals";
-import { App, CustomApp, CustomAppDefault } from "../src/App";
-import { GlobalState } from "../src/store/globalState";
 import { RootStore, createStoreProvider } from "../src/store/RootStore";
-import { UserInput } from "../src/interfaces";
-import { action } from "mobx";
+import { FileUploadAndURI } from "../src/interfaces";
 
 describe("accountCreation", () => {
     it("should continue to next page", async () => {
@@ -100,6 +97,11 @@ describe("accountCreation", () => {
         const myDescription = "description";
         const myGender = globals.genders[0]; 
         const myGenderPreference = [globals.genders[0], globals.genders[1]];
+        const customUploads : FileUploadAndURI[] = [{
+            buffer: Buffer.from("a"),
+            mimetype: "image/jpeg",
+            uri: "file://random"
+        }];
         const myAttributes = [
             globals.attributes.Music[1].value,
             globals.attributes.Sports[0].value
@@ -111,6 +113,7 @@ describe("accountCreation", () => {
             <StoreProvider value={store}>
                 <AccountCreation 
                     customBirthday={myBirthday}
+                    customUploads={customUploads}
                     returnPageNumber={returnPageNumber}
                 />
             </StoreProvider>
@@ -207,7 +210,7 @@ describe("accountCreation", () => {
         expect(userInput?.ageInterest[0]).toEqual(globals.minAge);
         expect(userInput?.ageInterest[1]).toEqual(globals.maxAge);
         expect(userInput?.genderInterest).toHaveLength(2);
-        expect(userInput?.files).toHaveLength(0);
+        expect(userInput?.files).toHaveLength(1);
         expect(userInput?.attributes).toHaveLength(2);
         expect(userInput?.description).toEqual(myDescription);
     })

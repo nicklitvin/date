@@ -5,12 +5,15 @@ import { MySimplePage } from "../components/SimplePage";
 import { MyTextInput } from "../components/TextInput";
 import { MyDateInput } from "../components/DateInput";
 import { globals } from "../globals";
-import { StyledText, StyledView } from "../styledElements";
+import { StyledButton, StyledText, StyledView } from "../styledElements";
 import { AgePreferenceInput } from "../components/AgePreferenceInput";
-import { UserInput } from "../interfaces";
+import { FileUploadAndURI, UserInput } from "../interfaces";
 import axios from "axios";
 import { observer } from "mobx-react-lite";
 import { useStore } from "../store/RootStore";
+import * as ImagePicker from "expo-image-picker";
+import { Image } from "expo-image";
+import * as FileSystem from "expo-file-system";
 
 type PageType = "Create Profile" | "Name" | "Birthday" | "Gender" | "Gender Preference" |
     "Description" | "Attributes" | "Pictures" | "Age Preference" | "Final";
@@ -22,7 +25,8 @@ export const pageOrder : PageType[] = [
 
 interface Props {
     customPageStart? : number
-    customBirthday?: Date,
+    customBirthday?: Date
+    customUploads?: FileUploadAndURI[]
     returnPageNumber?: (input : number) => number
 }
 
@@ -30,7 +34,7 @@ export function AccountCreation(props : Props) {
     const [currentPage, setCurrentPage] = useState<number>(props.customPageStart ?? 0);
 
     const [name, setName] = useState<string>("");
-    const [birthday, setBirthday] = useState<Date>(new Date());
+    const [birthday, setBirthday] = useState<Date>(props.customBirthday ?? new Date());
     const [gender, setGender] = useState<string|null>(null);
     const [genderPreference, setGenderPreference] = useState<string[]>([]);
     const [description, setDescription] = useState<string>("");
@@ -38,6 +42,8 @@ export function AccountCreation(props : Props) {
     const [minAge, setMinAge] = useState<number>(globals.minAge);
     const [maxAge, setMaxAge] = useState<number>(globals.maxAge);
     const { globalState } = useStore();
+
+    const [uploads, setUploads] = useState<FileUploadAndURI[]>(props.customUploads ?? []);
 
     const goToNextPage = () => {
         setCurrentPage(currentPage + 1);
@@ -58,7 +64,12 @@ export function AccountCreation(props : Props) {
             email: globalState.email as string,
             gender: gender,
             genderInterest: genderPreference,
-            files: []
+            files: uploads.map( upload => {
+                return {
+                    buffer: upload.buffer,
+                    mimetype: upload.mimetype
+                }
+            })
         };
         try {
             if (globalState.useHttp) {
@@ -67,6 +78,37 @@ export function AccountCreation(props : Props) {
                 globalState.setUserInput(userInput);
             }
         } catch (err) {}
+    }
+
+    const uploadImage = async () => {
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            selectionLimit: globals.maxUploads - uploads.length 
+        });
+
+        if (result.canceled) return
+
+
+        const newUploads : FileUploadAndURI[] = [];
+        for (const asset of result.assets) {
+            try {
+                const assetString = await FileSystem.readAsStringAsync(asset.uri, {
+                    encoding: FileSystem.EncodingType.Base64
+                })
+                const buffer = Buffer.from(assetString);
+                newUploads.push({
+                    buffer: buffer,
+                    mimetype: asset.mimeType as string,
+                    uri: asset.uri
+                })
+            } catch (err) {}
+        }
+
+        setUploads(uploads.concat(newUploads));
+    }
+
+    const removeImage = async (uri : string) => {
+        setUploads(uploads.filter( upload => upload.uri != uri));
     }
 
     switch (pageOrder[currentPage]) {
@@ -267,10 +309,29 @@ export function AccountCreation(props : Props) {
                 title={myText.uploadInputTitle}
                 subtitle={myText.uploadInputSubtitle}
                 content={
-                    <MyButton
-                        text={myText.continue}
-                        onPressFunction={goToNextPage}
-                    />
+                    <>
+                        {uploads.map( (upload) => {
+                            <StyledView key={`image-${upload.uri}`}>
+                                <Image 
+                                    source={upload.uri}
+                                />
+                                <StyledButton
+                                    onPress={() => removeImage(upload.uri)}
+                                />
+                            </StyledView>
+                        })}
+                        <MyButton
+                            text="Upload Image"
+                            onPressFunction={uploadImage}
+                        />
+                        <MyButton
+                            text={myText.continue}
+                            onPressFunction={() => {
+                                if (uploads.length > 0)
+                                    goToNextPage()
+                            }}
+                        />
+                    </>
                 }
             />
     }

@@ -2,6 +2,7 @@ export const globals = {
     genders: ["Male", "Female"],
     minAge: 18,
     maxAge: 99,
+    maxUploads: 6,
 
     attributes: {
         "Sports": [

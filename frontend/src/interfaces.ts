@@ -14,3 +14,7 @@ export interface FileUpload {
     buffer: Buffer
     mimetype: string
 }
+
+export interface FileUploadAndURI extends FileUpload {
+    uri: string
+}
