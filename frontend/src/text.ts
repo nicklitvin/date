@@ -1,4 +1,4 @@
-export const myText = {
+export const accountCreationText = {
     continue: "continue",
 
     createProfileTitle: "Create Profile",
@@ -39,4 +39,15 @@ export const myText = {
 
     finalInputTitle: "That's It!",
     finalInputSubtitle: "Ready to begin your journey",
+    finalInputError: "Cannot create your profile"
+}
+
+export const errorText = {
+    title: "Error",
+    subtitle: "Something went wrong"
+}
+
+export const chatText = {
+    inputPlaceholder: "Type your message here",
+    inputError: "Cannot send message"
 }

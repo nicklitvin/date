@@ -16,5 +16,6 @@ export const globals = {
     },
 
     URLServer: "http:",
-    URLCreateUser: "/createUser"
+    URLCreateUser: "/createUser",
+    URLSendMessage: "/sendMessage"
 }

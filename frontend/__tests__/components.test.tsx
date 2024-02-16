@@ -2,7 +2,7 @@ import { act, fireEvent, render, screen } from "@testing-library/react-native";
 import { MyButton } from "../src/components/Button";
 import { MyTextInput } from "../src/components/TextInput";
 import { MyDateInput } from "../src/components/DateInput";
-import { myText } from "../src/text";
+import { accountCreationText } from "../src/text";
 
 describe("components", () => {
     it("should call myButton function", async () => {
@@ -82,7 +82,7 @@ describe("components", () => {
         render(<MyDateInput afterSubmit={afterSubmit} saveDate={saveDate} 
             customDate={new Date()}
         />);
-        expect(screen.queryByText(myText.birthdayInputError)).not.toEqual(null);
+        expect(screen.queryByText(accountCreationText.birthdayInputError)).not.toEqual(null);
     })
 
     it("should submit myDateInput", async () => {
@@ -93,7 +93,7 @@ describe("components", () => {
         render(<MyDateInput afterSubmit={afterSubmit} saveDate={saveDate} 
             customDate={chosenDate}
         />);
-        const continueButton = screen.getByText(myText.continue);
+        const continueButton = screen.getByText(accountCreationText.continue);
         await act( () => {
             fireEvent(continueButton, "press");
         });

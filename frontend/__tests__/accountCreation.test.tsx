@@ -1,6 +1,6 @@
 import { act, fireEvent, render, screen } from "@testing-library/react-native"
 import { AccountCreation, pageOrder } from "../src/pages/AccountCreation"
-import { myText } from "../src/text";
+import { accountCreationText } from "../src/text";
 import { globals } from "../src/globals";
 import { RootStore, createStoreProvider } from "../src/store/RootStore";
 import { FileUploadAndURI } from "../src/interfaces";
@@ -15,12 +15,12 @@ describe("accountCreation", () => {
             </StoreProvider>
         );
 
-        expect(screen.queryByText(myText.createProfileTitle)).not.toEqual(null);
-        const continueButton = screen.getByText(myText.continue);
+        expect(screen.queryByText(accountCreationText.createProfileTitle)).not.toEqual(null);
+        const continueButton = screen.getByText(accountCreationText.continue);
         await act( () => {
             fireEvent(continueButton, "press")
         });
-        expect(screen.queryByText(myText.nameInputTitle)).not.toEqual(null);
+        expect(screen.queryByText(accountCreationText.nameInputTitle)).not.toEqual(null);
     })
 
     it("should not continue if gender not selected", async () => {
@@ -33,13 +33,13 @@ describe("accountCreation", () => {
             </StoreProvider>
         );
 
-        expect(screen.queryByText(myText.genderInputTitle)).not.toEqual(null);
-        const continueButton = screen.getByText(myText.continue);
+        expect(screen.queryByText(accountCreationText.genderInputTitle)).not.toEqual(null);
+        const continueButton = screen.getByText(accountCreationText.continue);
         await act( () => {
             fireEvent(continueButton, "press");
         })
 
-        expect(screen.queryByText(myText.genderInputTitle)).not.toEqual(null);
+        expect(screen.queryByText(accountCreationText.genderInputTitle)).not.toEqual(null);
     })
 
     it("should unselect gender", async () => {
@@ -53,14 +53,14 @@ describe("accountCreation", () => {
         );
 
         const genderButton = screen.getByText(globals.genders[0]);
-        const continueButton = screen.getByText(myText.continue);
+        const continueButton = screen.getByText(accountCreationText.continue);
         await act( () => {
             fireEvent(genderButton, "press")
             fireEvent(genderButton, "press")
             fireEvent(continueButton, "press")
         })
     
-        expect(screen.queryByText(myText.genderInputTitle)).not.toEqual(null);
+        expect(screen.queryByText(accountCreationText.genderInputTitle)).not.toEqual(null);
     })
 
     it("should generate all attributes", async () => {
@@ -116,12 +116,12 @@ describe("accountCreation", () => {
 
         // create profile
         await act( () => {
-            fireEvent(screen.getByText(myText.continue), "press")
+            fireEvent(screen.getByText(accountCreationText.continue), "press")
         })
         expect(returnPageNumber).toHaveLastReturnedWith(1);
 
         //my name
-        const nameInput = screen.getByPlaceholderText(myText.nameInputPlaceholder);
+        const nameInput = screen.getByPlaceholderText(accountCreationText.nameInputPlaceholder);
         await act( () => {
             fireEvent(nameInput, "changeText", myName);
         })
@@ -132,7 +132,7 @@ describe("accountCreation", () => {
 
         // birthday
         await act( () => {
-            fireEvent(screen.getByText(myText.continue), "press")
+            fireEvent(screen.getByText(accountCreationText.continue), "press")
         })
         expect(returnPageNumber).toHaveLastReturnedWith(3);
 
@@ -141,13 +141,13 @@ describe("accountCreation", () => {
             fireEvent(screen.getByText(myGender),"press");
         })
         await act( () => {
-            fireEvent(screen.getByText(myText.continue), "press")
+            fireEvent(screen.getByText(accountCreationText.continue), "press")
         })
         expect(returnPageNumber).toHaveLastReturnedWith(4);
 
         // age preference
         await act( () => {
-            fireEvent(screen.getByText(myText.continue), "press")
+            fireEvent(screen.getByText(accountCreationText.continue), "press")
         })
         expect(returnPageNumber).toHaveLastReturnedWith(5);
 
@@ -158,13 +158,13 @@ describe("accountCreation", () => {
             })
         }
         await act( () => {
-            fireEvent(screen.getByText(myText.continue), "press")
+            fireEvent(screen.getByText(accountCreationText.continue), "press")
         })
         expect(returnPageNumber).toHaveLastReturnedWith(6);
 
         // pictures
         await act( () => {
-            fireEvent(screen.getByText(myText.continue), "press")
+            fireEvent(screen.getByText(accountCreationText.continue), "press")
         })
         expect(returnPageNumber).toHaveLastReturnedWith(7);
 
@@ -175,13 +175,13 @@ describe("accountCreation", () => {
             })
         }
         await act( () => {
-            fireEvent(screen.getByText(myText.continue), "press")
+            fireEvent(screen.getByText(accountCreationText.continue), "press")
         })
         expect(returnPageNumber).toHaveLastReturnedWith(8);
 
         // description
         const descriptionInput = screen.getByPlaceholderText(
-            myText.decsriptionPlaceholder
+            accountCreationText.decsriptionPlaceholder
         );
         await act( () => {
             fireEvent(descriptionInput, "changeText", myDescription);
@@ -194,7 +194,7 @@ describe("accountCreation", () => {
 
         //final
         await act( () => {
-            fireEvent(screen.getByText(myText.continue), "press");
+            fireEvent(screen.getByText(accountCreationText.continue), "press");
         })
 
         const userInput = store.globalState.userInput;
@@ -217,16 +217,18 @@ describe("accountCreation", () => {
         const StoreProvider = createStoreProvider(store);
         const pageStart = pageOrder.findIndex(page => page == "Pictures") as number;
 
+        const imageURI = "a";
+        const imageURI_2 = "b";
         const fileUploads : FileUploadAndURI[] = [
             {
                 buffer: Buffer.from("a"),
                 mimetype: "image/jpeg",
-                uri: "a"
+                uri: imageURI
             },
             {
                 buffer: Buffer.from("b"),
                 mimetype: "image/jpeg",
-                uri: "b"
+                uri: imageURI_2
             }
         ]
         const returnFileOrder = jest.fn((input : string[]) => 
@@ -246,19 +248,19 @@ describe("accountCreation", () => {
             </StoreProvider>
         );
 
-        const switchButton = screen.getByText(myText.uploadSwitch);
+        const switchButton = screen.getByText(accountCreationText.uploadSwitch);
 
         await act( () => {
             fireEvent(switchButton, "press");
         })
-        const image1 = screen.getByTestId(`image-a`);
-        const image2 = screen.getByTestId(`image-b`);
+        const image1 = screen.getByTestId(`image-${imageURI}`);
+        const image2 = screen.getByTestId(`image-${imageURI_2}`);
         await act( () => {
             fireEvent(image1, "press");
         })
         await act( () => {
             fireEvent(image2, "press");
         })
-        expect(returnFileOrder).toHaveLastReturnedWith(`ba`)
+        expect(returnFileOrder).toHaveLastReturnedWith(`${imageURI_2}${imageURI}`)
     })
 })

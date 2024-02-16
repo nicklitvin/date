@@ -1,7 +1,7 @@
 import Slider from "@react-native-community/slider"
 import { StyledText } from "../styledElements";
 import classNames from "classnames";
-import { myText } from "../text";
+import { accountCreationText } from "../text";
 
 interface Props {
     minAge: number
@@ -26,7 +26,7 @@ export function AgePreferenceInput(props : Props) {
                 props.minAge > props.maxAge ? "block" : "hidden"
             )}
             >
-                {myText.agePreferenceInputError}
+                {accountCreationText.agePreferenceInputError}
             </StyledText>
         </>
     )

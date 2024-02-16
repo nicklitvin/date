@@ -18,3 +18,29 @@ export interface FileUpload {
 export interface FileUploadAndURI extends FileUpload {
     uri: string
 }
+
+export interface MessageInput {
+    userID: string
+    recepientID: string
+    message: string
+}
+
+export interface Message {
+    id: string;
+    timestamp: Date;
+    userID: string;
+    recepientID: string;
+    message: string;
+    readStatus: boolean;
+}
+
+export interface PublicProfile {
+    id: string
+    name: string
+    age: number
+    gender: string
+    attributes: string[]
+    images: string[]
+    description: string
+    university: string
+}

@@ -41,7 +41,7 @@ interface CustomAppProps {
 
 export function CustomApp(props : CustomAppProps) {
     const StoreProvider = createStoreProvider(props.customStore);
-    
+
     return (
         <StoreProvider value={props.customStore}>
             <HomeMob/>

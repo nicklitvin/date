@@ -5,8 +5,8 @@ import classNames from "classnames"
 interface Props {
     placeholder: string
     errorMessage: string
-    saveMessage: (message: string) => void
     afterSubmit: Function
+    saveMessage?: (message: string) => void
 }
 
 export function MyTextInput(props : Props) {
@@ -24,8 +24,10 @@ export function MyTextInput(props : Props) {
                     if (message.length == 0) {
                         setShowError(true);
                     } else {
-                        props.saveMessage(message)
-                        props.afterSubmit()
+                        if (props.saveMessage)
+                            props.saveMessage(message)
+                        props.afterSubmit(message)
+                        setMessage("");
                     }
                 }}
             />

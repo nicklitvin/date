@@ -4,7 +4,7 @@ import { StyledText } from '../styledElements';
 import { differenceInCalendarYears } from 'date-fns';
 import classNames from 'classnames';
 import { MyButton } from './Button';
-import { myText } from '../text';
+import { accountCreationText } from '../text';
 
 interface Props {
     saveDate: (date : Date) => void
@@ -29,10 +29,10 @@ export function MyDateInput(props: Props) {
             <StyledText className={classNames(
                 showError ? "block" : "hidden"
             )}>
-                {myText.birthdayInputError}
+                {accountCreationText.birthdayInputError}
             </StyledText>
             <MyButton
-                text={myText.continue}
+                text={accountCreationText.continue}
                 onPressFunction={() => {
                     if (!showError) {
                         props.saveDate(date);

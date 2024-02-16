@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { myText } from "../text";
+import { accountCreationText } from "../text";
 import { MyButton } from "../components/Button";
 import { MySimplePage } from "../components/SimplePage";
 import { MyTextInput } from "../components/TextInput";
@@ -15,11 +15,9 @@ import * as ImagePicker from "expo-image-picker";
 import { Image } from "expo-image";
 import * as FileSystem from "expo-file-system";
 import classNames from "classnames";
+import { AccountCreationType } from "../types";
 
-type PageType = "Create Profile" | "Name" | "Birthday" | "Gender" | "Gender Preference" |
-    "Description" | "Attributes" | "Pictures" | "Age Preference" | "Final";
-
-export const pageOrder : PageType[] = [
+export const pageOrder : AccountCreationType[] = [
     "Create Profile","Name","Birthday", "Gender", "Age Preference", "Gender Preference",
     "Pictures", "Attributes", "Description", "Final"
 ]
@@ -48,6 +46,7 @@ export function AccountCreation(props : Props) {
 
     const [switching, setSwitching] = useState<boolean>(false);
     const [switchURI, setSwitchURI] = useState<string|null>(null);
+    const [showUserError, setShowUserError] = useState<boolean>(false);
 
     const goToNextPage = () => {
         setCurrentPage(currentPage + 1);
@@ -86,7 +85,9 @@ export function AccountCreation(props : Props) {
             } else {
                 globalState.setUserInput(userInput);
             }
-        } catch (err) {}
+        } catch (err) {
+            setShowUserError(true);
+        }
     }
 
     const uploadImage = async () => {
@@ -142,23 +143,23 @@ export function AccountCreation(props : Props) {
     switch (pageOrder[currentPage]) {
         case "Create Profile":
             return <MySimplePage
-                title={myText.createProfileTitle}
-                subtitle={myText.createProfileSubtitle}
+                title={accountCreationText.createProfileTitle}
+                subtitle={accountCreationText.createProfileSubtitle}
                 content={
                     <MyButton
-                        text={myText.continue}
+                        text={accountCreationText.continue}
                         onPressFunction={goToNextPage}
                     />
                 }
             />
         case "Name":
             return <MySimplePage
-                title={myText.nameInputTitle}
-                subtitle={myText.nameInputSubtitle}
+                title={accountCreationText.nameInputTitle}
+                subtitle={accountCreationText.nameInputSubtitle}
                 content={
                     <MyTextInput
-                        placeholder={myText.nameInputPlaceholder}
-                        errorMessage={myText.nameInputError}
+                        placeholder={accountCreationText.nameInputPlaceholder}
+                        errorMessage={accountCreationText.nameInputError}
                         saveMessage={setName}
                         afterSubmit={goToNextPage}
                     />
@@ -166,8 +167,8 @@ export function AccountCreation(props : Props) {
             />
         case "Birthday":
             return <MySimplePage
-                title={myText.birthdayInputTitle}
-                subtitle={myText.birthdayInputSubtitle}
+                title={accountCreationText.birthdayInputTitle}
+                subtitle={accountCreationText.birthdayInputSubtitle}
                 content={
                     <MyDateInput
                         afterSubmit={goToNextPage}
@@ -178,8 +179,8 @@ export function AccountCreation(props : Props) {
             />
         case "Gender":
             return <MySimplePage
-                title={myText.genderInputTitle}
-                subtitle={myText.genderInputSubtitle}
+                title={accountCreationText.genderInputTitle}
+                subtitle={accountCreationText.genderInputSubtitle}
                 content={
                     <>
                         {globals.genders.map( (val) => 
@@ -192,7 +193,7 @@ export function AccountCreation(props : Props) {
                             />
                         )}
                         <MyButton
-                            text={myText.continue}
+                            text={accountCreationText.continue}
                             onPressFunction={() => {
                                 if (gender) {
                                     goToNextPage()
@@ -204,8 +205,8 @@ export function AccountCreation(props : Props) {
             />
         case "Gender Preference":
             return <MySimplePage
-                title={myText.genderPreferenceInputTitle}
-                subtitle={myText.genderPreferenceInputSubtitle}
+                title={accountCreationText.genderPreferenceInputTitle}
+                subtitle={accountCreationText.genderPreferenceInputSubtitle}
                 content={
                     <>
                         {globals.genders.map( (val) => 
@@ -229,7 +230,7 @@ export function AccountCreation(props : Props) {
                             />
                         )}
                         <MyButton
-                            text={myText.continue}
+                            text={accountCreationText.continue}
                             onPressFunction={() => {
                                 if (genderPreference.length > 0) {
                                     goToNextPage()
@@ -241,12 +242,12 @@ export function AccountCreation(props : Props) {
             />
         case "Description":
             return <MySimplePage
-                title={myText.descriptionInputTitle}
-                subtitle={myText.descriptionInputSubtitle}
+                title={accountCreationText.descriptionInputTitle}
+                subtitle={accountCreationText.descriptionInputSubtitle}
                 content={
                     <MyTextInput
-                        placeholder={myText.decsriptionPlaceholder}
-                        errorMessage={myText.descriptionErrorMessage}
+                        placeholder={accountCreationText.decsriptionPlaceholder}
+                        errorMessage={accountCreationText.descriptionErrorMessage}
                         saveMessage={setDescription}
                         afterSubmit={goToNextPage}
                     />
@@ -254,8 +255,8 @@ export function AccountCreation(props : Props) {
             />
         case "Attributes":
             return <MySimplePage
-                title={myText.attributesInputTitle}
-                subtitle={myText.attributesInputSubtitle}
+                title={accountCreationText.attributesInputTitle}
+                subtitle={accountCreationText.attributesInputSubtitle}
                 content={
                     <>
                         {Object.entries(globals.attributes).map( (entry) =>
@@ -288,7 +289,7 @@ export function AccountCreation(props : Props) {
                             </StyledView>
                         )}
                         <MyButton
-                            text={myText.continue}
+                            text={accountCreationText.continue}
                             onPressFunction={ () => {
                                 if (attributes.length > 0) {
                                     goToNextPage()
@@ -300,8 +301,8 @@ export function AccountCreation(props : Props) {
             />
         case "Age Preference":
             return <MySimplePage
-                title={myText.agePreferenceInputTitle}
-                subtitle={myText.agePreferenceInputSubtitle}
+                title={accountCreationText.agePreferenceInputTitle}
+                subtitle={accountCreationText.agePreferenceInputSubtitle}
                 content={
                     <>
                         <AgePreferenceInput
@@ -311,7 +312,7 @@ export function AccountCreation(props : Props) {
                             setMaxAge={setMaxAge}
                         />
                         <MyButton
-                            text={myText.continue}
+                            text={accountCreationText.continue}
                             onPressFunction={ () => {
                                 if (minAge <= maxAge) {
                                     goToNextPage()
@@ -323,19 +324,26 @@ export function AccountCreation(props : Props) {
             />
         case "Final":
             return <MySimplePage
-                title={myText.finalInputTitle}
-                subtitle={myText.finalInputSubtitle}
+                title={accountCreationText.finalInputTitle}
+                subtitle={accountCreationText.finalInputSubtitle}
                 content={
-                    <MyButton
-                        text={myText.continue}
-                        onPressFunction={createUser}
-                    />
+                    <>
+                        <MyButton
+                            text={accountCreationText.continue}
+                            onPressFunction={createUser}
+                        />
+                        <StyledText className={classNames(
+                            showUserError ? "block" : "hidden"
+                        )}>
+                            {accountCreationText.finalInputError}
+                        </StyledText>
+                    </>
                 }
             />
         case "Pictures":
             return <MySimplePage
-                title={myText.uploadInputTitle}
-                subtitle={myText.uploadInputSubtitle}
+                title={accountCreationText.uploadInputTitle}
+                subtitle={accountCreationText.uploadInputSubtitle}
                 content={
                     <>
                         {uploads.map( (upload) => (
@@ -366,15 +374,15 @@ export function AccountCreation(props : Props) {
                             </StyledView>
                         ))}
                         <MyButton
-                            text={myText.uploadButton}
+                            text={accountCreationText.uploadButton}
                             onPressFunction={uploadImage}
                         />
                         <MyButton
-                            text={myText.uploadSwitch}
+                            text={accountCreationText.uploadSwitch}
                             onPressFunction={() => setSwitching(true)}
                         />
                         <MyButton
-                            text={myText.continue}
+                            text={accountCreationText.continue}
                             onPressFunction={() => {
                                 if (uploads.length > 0)
                                     goToNextPage()
