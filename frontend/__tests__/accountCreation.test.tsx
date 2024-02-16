@@ -86,11 +86,6 @@ describe("accountCreation", () => {
         store.globalState.setUseHttp(false);
         store.globalState.setEmail("email");
         const StoreProvider = createStoreProvider(store);
-        render(
-            <StoreProvider value={store}>
-                <AccountCreation/>
-            </StoreProvider>
-        );
 
         const myName = "name";
         const myBirthday = new Date(2000,2,1);
@@ -213,5 +208,57 @@ describe("accountCreation", () => {
         expect(userInput?.files).toHaveLength(1);
         expect(userInput?.attributes).toHaveLength(2);
         expect(userInput?.description).toEqual(myDescription);
+    })
+
+    it("should switch images", async () => {
+        const store = new RootStore()
+        store.globalState.setUseHttp(false);
+        store.globalState.setEmail("email");
+        const StoreProvider = createStoreProvider(store);
+        const pageStart = pageOrder.findIndex(page => page == "Pictures") as number;
+
+        const fileUploads : FileUploadAndURI[] = [
+            {
+                buffer: Buffer.from("a"),
+                mimetype: "image/jpeg",
+                uri: "a"
+            },
+            {
+                buffer: Buffer.from("b"),
+                mimetype: "image/jpeg",
+                uri: "b"
+            }
+        ]
+        const returnFileOrder = jest.fn((input : string[]) => 
+            input.reduce( (prev : string, curr : string) => {
+                return prev + curr
+            }, "")
+        );
+
+
+        render(
+            <StoreProvider value={store}>
+                <AccountCreation 
+                    customPageStart={pageStart}
+                    customUploads={fileUploads}
+                    returnUploadOrder={returnFileOrder}
+                />
+            </StoreProvider>
+        );
+
+        const switchButton = screen.getByText(myText.uploadSwitch);
+
+        await act( () => {
+            fireEvent(switchButton, "press");
+        })
+        const image1 = screen.getByTestId(`image-a`);
+        const image2 = screen.getByTestId(`image-b`);
+        await act( () => {
+            fireEvent(image1, "press");
+        })
+        await act( () => {
+            fireEvent(image2, "press");
+        })
+        expect(returnFileOrder).toHaveLastReturnedWith(`ba`)
     })
 })

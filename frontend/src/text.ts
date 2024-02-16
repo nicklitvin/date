@@ -30,6 +30,8 @@ export const myText = {
     uploadInputTitle: "Images",
     uploadInputSubtitle: "Upload pictures that show how awesome you are",
     uploadInputUploadText: "Upload File",
+    uploadSwitch: "Rearrange",
+    uploadButton: "Upload Image",
 
     agePreferenceInputTitle: "Age Preference",
     agePreferenceInputSubtitle: "We will only show people within this range (inclusive)",

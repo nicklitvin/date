@@ -14,6 +14,7 @@ import { useStore } from "../store/RootStore";
 import * as ImagePicker from "expo-image-picker";
 import { Image } from "expo-image";
 import * as FileSystem from "expo-file-system";
+import classNames from "classnames";
 
 type PageType = "Create Profile" | "Name" | "Birthday" | "Gender" | "Gender Preference" |
     "Description" | "Attributes" | "Pictures" | "Age Preference" | "Final";
@@ -28,10 +29,12 @@ interface Props {
     customBirthday?: Date
     customUploads?: FileUploadAndURI[]
     returnPageNumber?: (input : number) => number
+    returnUploadOrder?: (input : string[]) => string
 }
 
 export function AccountCreation(props : Props) {
     const [currentPage, setCurrentPage] = useState<number>(props.customPageStart ?? 0);
+    const { globalState } = useStore();
 
     const [name, setName] = useState<string>("");
     const [birthday, setBirthday] = useState<Date>(props.customBirthday ?? new Date());
@@ -41,9 +44,10 @@ export function AccountCreation(props : Props) {
     const [attributes, setAttributes] = useState<string[]>([]);
     const [minAge, setMinAge] = useState<number>(globals.minAge);
     const [maxAge, setMaxAge] = useState<number>(globals.maxAge);
-    const { globalState } = useStore();
-
     const [uploads, setUploads] = useState<FileUploadAndURI[]>(props.customUploads ?? []);
+
+    const [switching, setSwitching] = useState<boolean>(false);
+    const [switchURI, setSwitchURI] = useState<string|null>(null);
 
     const goToNextPage = () => {
         setCurrentPage(currentPage + 1);
@@ -53,6 +57,11 @@ export function AccountCreation(props : Props) {
         if (props.returnPageNumber)
             props.returnPageNumber(currentPage)
     }, [currentPage])
+
+    useEffect( () => {
+        if (props.returnUploadOrder) 
+            props.returnUploadOrder(uploads.map( val => val.uri))
+    }, [uploads])
 
     const createUser = async () => {
         const userInput : UserInput = {
@@ -107,8 +116,27 @@ export function AccountCreation(props : Props) {
         setUploads(uploads.concat(newUploads));
     }
 
-    const removeImage = async (uri : string) => {
+    const removeImage = (uri : string) => {
         setUploads(uploads.filter( upload => upload.uri != uri));
+    }
+
+    const performSwitch = async (uri : string) => {
+        if (!switching) return
+
+        if (switchURI == uri) setSwitchURI(null);
+        if (switchURI) {
+            const copy = [...uploads];
+            const index1 = copy.findIndex( val => val.uri == switchURI);
+            const index2 = copy.findIndex( val => val.uri == uri);
+            const saved = copy[index1];
+            copy[index1] = copy[index2];
+            copy[index2] = saved;
+            setUploads(copy);
+            setSwitching(false);
+            setSwitchURI(null);
+        } else {
+            setSwitchURI(uri);
+        }
     }
 
     switch (pageOrder[currentPage]) {
@@ -310,7 +338,24 @@ export function AccountCreation(props : Props) {
                 subtitle={myText.uploadInputSubtitle}
                 content={
                     <>
-                        {uploads.map( (upload) => {
+                        {uploads.map( (upload) => (
+                            switching ?
+                            <StyledView 
+                                key={`image-${upload.uri}`} 
+                                className={classNames(
+                                    switchURI == upload.uri ? "" : ""
+                                )
+                            }>
+                                <StyledButton 
+                                    onPress={() => performSwitch(upload.uri)}
+                                    testID={`image-${upload.uri}`} 
+                                >
+                                    <Image 
+                                        source={upload.uri}
+                                    />
+                                    <StyledButton/>
+                                </StyledButton>
+                            </StyledView> :
                             <StyledView key={`image-${upload.uri}`}>
                                 <Image 
                                     source={upload.uri}
@@ -319,10 +364,14 @@ export function AccountCreation(props : Props) {
                                     onPress={() => removeImage(upload.uri)}
                                 />
                             </StyledView>
-                        })}
+                        ))}
                         <MyButton
-                            text="Upload Image"
+                            text={myText.uploadButton}
                             onPressFunction={uploadImage}
+                        />
+                        <MyButton
+                            text={myText.uploadSwitch}
+                            onPressFunction={() => setSwitching(true)}
                         />
                         <MyButton
                             text={myText.continue}

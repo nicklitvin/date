@@ -5,7 +5,6 @@ export class GlobalState {
     @observable public useHttp : boolean = true;
     @observable public email : string|null = null;
     @observable public userInput : UserInput|null = null;
-    @observable public useImage : boolean = true;
 
     constructor() {
         makeAutoObservable(this);
@@ -25,10 +24,4 @@ export class GlobalState {
     setUserInput(input : UserInput) {
         this.userInput = input;
     }
-
-    @action
-    setUseImage(value : boolean) {
-        this.useImage = value;
-    }
-
 }
