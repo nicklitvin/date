@@ -1,11 +1,11 @@
 import { createContext, useContext } from "react";
-import { SampleStore } from "./sampleStore";
+import { GlobalState } from "./globalState";
 
 export class RootStore {
-    public counter : SampleStore;
+    public globalState : GlobalState;
 
     constructor() {
-        this.counter = new SampleStore();
+        this.globalState = new GlobalState();
     }
 }
 
@@ -14,3 +14,4 @@ export const createRootInstance = () => new RootStore();
 const StoreContext = createContext(createRootInstance());
 export const StoreProvider = StoreContext.Provider;
 export const useStore = () => useContext(StoreContext);
+

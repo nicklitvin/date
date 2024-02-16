@@ -11,6 +11,7 @@ server catch errors write to client errors
 show swipes from users not in user's interest
 undo like/dislike, distance pref
 add major, school year
+tiktok video community 
 
 NOTES
 to make prisma client autofill:

@@ -1,5 +1,7 @@
 export const globals = {
     genders: ["Male", "Female"],
+    minAge: 18,
+    maxAge: 99,
 
     attributes: {
         "Sports": [
@@ -10,5 +12,8 @@ export const globals = {
             {id: "id3", value: "pop"},
             {id: "id4", value: "rap"},
         ]
-    }
+    },
+
+    URLServer: "http:",
+    URLCreateUser: "/createUser"
 }

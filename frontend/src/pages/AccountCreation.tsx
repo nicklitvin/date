@@ -1,20 +1,31 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { myText } from "../text";
 import { MyButton } from "../components/Button";
 import { MySimplePage } from "../components/SimplePage";
 import { MyTextInput } from "../components/TextInput";
 import { MyDateInput } from "../components/DateInput";
 import { globals } from "../globals";
-import { StyledButton, StyledText, StyledView } from "../styledElements";
+import { StyledText, StyledView } from "../styledElements";
+import { AgePreferenceInput } from "../components/AgePreferenceInput";
+import { UserInput } from "../interfaces";
+import axios from "axios";
+import { observer } from "mobx-react-lite";
+import { RootStore, useStore } from "../store/RootStore";
+import { action } from "mobx";
 
 type PageType = "Create Profile" | "Name" | "Birthday" | "Gender" | "Gender Preference" |
-    "Description" | "Attributes";
+    "Description" | "Attributes" | "Pictures" | "Age Preference" | "Final";
+
 export const pageOrder : PageType[] = [
-    "Create Profile","Name","Birthday", "Gender", "Gender Preference", "Description", "Attributes"
+    "Create Profile","Name","Birthday", "Gender", "Age Preference", "Gender Preference",
+    "Pictures", "Attributes", "Description", "Final"
 ]
 
 interface Props {
     customPageStart? : number
+    rootStore?: RootStore
+    customBirthday?: Date,
+    returnPageNumber?: (input : number) => number
 }
 
 export function AccountCreation(props : Props) {
@@ -26,6 +37,40 @@ export function AccountCreation(props : Props) {
     const [genderPreference, setGenderPreference] = useState<string[]>([]);
     const [description, setDescription] = useState<string>("");
     const [attributes, setAttributes] = useState<string[]>([]);
+    const [minAge, setMinAge] = useState<number>(globals.minAge);
+    const [maxAge, setMaxAge] = useState<number>(globals.maxAge);
+    const { globalState } = useStore();
+
+    const goToNextPage = () => {
+        setCurrentPage(currentPage + 1);
+    }
+
+    useEffect( () => {
+        if (props.returnPageNumber)
+            props.returnPageNumber(currentPage)
+    }, [currentPage])
+
+    const createUser = async () => {
+        const userInput : UserInput = {
+            name: name,
+            birthday: birthday,
+            ageInterest: [minAge, maxAge],
+            attributes: attributes,
+            description: description,
+            email: props.rootStore?.globalState.email || globalState.email as string,
+            gender: gender,
+            genderInterest: genderPreference,
+            files: []
+        };
+        try {
+            console.log(globalState.useHttp, globalState.email);
+            if (globalState.useHttp) {
+                await axios.post(globals.URLServer + globals.URLCreateUser, userInput);
+            } else {
+                globalState.setUserInput(userInput);
+            }
+        } catch (err) {}
+    }
 
     switch (pageOrder[currentPage]) {
         case "Create Profile":
@@ -35,7 +80,7 @@ export function AccountCreation(props : Props) {
                 content={
                     <MyButton
                         text={myText.continue}
-                        onPressFunction={() => setCurrentPage(currentPage + 1)}
+                        onPressFunction={goToNextPage}
                     />
                 }
             />
@@ -48,7 +93,7 @@ export function AccountCreation(props : Props) {
                         placeholder={myText.nameInputPlaceholder}
                         errorMessage={myText.nameInputError}
                         saveMessage={setName}
-                        afterSubmit={ () => setCurrentPage(currentPage + 1)}
+                        afterSubmit={goToNextPage}
                     />
                 }
             />
@@ -58,8 +103,9 @@ export function AccountCreation(props : Props) {
                 subtitle={myText.birthdayInputSubtitle}
                 content={
                     <MyDateInput
-                        afterSubmit={ () => setCurrentPage(currentPage + 1)}
+                        afterSubmit={goToNextPage}
                         saveDate={setBirthday}
+                        customDate={props.customBirthday}
                     />
                 }
             />
@@ -74,7 +120,7 @@ export function AccountCreation(props : Props) {
                                 key={`gender-${val}`}
                                 text={val}
                                 onPressFunction={() => {
-                                    gender == val ? setGender(val) : setGender(null);
+                                    gender == val ? setGender(null) : setGender(val);
                                 }}
                             />
                         )}
@@ -82,7 +128,7 @@ export function AccountCreation(props : Props) {
                             text={myText.continue}
                             onPressFunction={() => {
                                 if (gender) {
-                                    setCurrentPage(currentPage + 1)
+                                    goToNextPage()
                                 }
                             }}
                         />
@@ -119,7 +165,7 @@ export function AccountCreation(props : Props) {
                             text={myText.continue}
                             onPressFunction={() => {
                                 if (genderPreference.length > 0) {
-                                    setCurrentPage(currentPage + 1)
+                                    goToNextPage()
                                 }
                             }}
                         />
@@ -135,7 +181,7 @@ export function AccountCreation(props : Props) {
                         placeholder={myText.decsriptionPlaceholder}
                         errorMessage={myText.descriptionErrorMessage}
                         saveMessage={setDescription}
-                        afterSubmit={ () => setCurrentPage(currentPage + 1)}
+                        afterSubmit={goToNextPage}
                     />
                 }
             />
@@ -155,15 +201,17 @@ export function AccountCreation(props : Props) {
                                         key={`attribute-${content.value}`}
                                         text={content.value}
                                         onPressFunction={ () => {
-                                            const index = attributes.findIndex( 
+                                            const foundIndex = attributes.findIndex( 
                                                 selected => selected == content.value
                                             )
-                                            if (index > -1) {
+                                            if (foundIndex > -1) {
                                                 setAttributes(
-                                                    attributes.splice(index,1)
+                                                    attributes.filter( (_,index) =>
+                                                        foundIndex != index
+                                                    )
                                                 )
                                             } else {
-                                                setGenderPreference(
+                                                setAttributes(
                                                     [...attributes, content.value]
                                                 )
                                             }
@@ -176,12 +224,59 @@ export function AccountCreation(props : Props) {
                             text={myText.continue}
                             onPressFunction={ () => {
                                 if (attributes.length > 0) {
-                                    setCurrentPage(currentPage + 1)
+                                    goToNextPage()
                                 }
                             }}
                         />
                     </>
                 }
             />
+        case "Age Preference":
+            return <MySimplePage
+                title={myText.agePreferenceInputTitle}
+                subtitle={myText.agePreferenceInputSubtitle}
+                content={
+                    <>
+                        <AgePreferenceInput
+                            minAge={minAge}
+                            maxAge={maxAge}
+                            setMinAge={setMinAge}   
+                            setMaxAge={setMaxAge}
+                        />
+                        <MyButton
+                            text={myText.continue}
+                            onPressFunction={ () => {
+                                if (minAge <= maxAge) {
+                                    goToNextPage()
+                                }
+                            }}
+                        />
+                    </>
+                }
+            />
+        case "Final":
+            return <MySimplePage
+                title={myText.finalInputTitle}
+                subtitle={myText.finalInputSubtitle}
+                content={
+                    <MyButton
+                        text={myText.continue}
+                        onPressFunction={createUser}
+                    />
+                }
+            />
+        case "Pictures":
+            return <MySimplePage
+                title={myText.uploadInputTitle}
+                subtitle={myText.uploadInputSubtitle}
+                content={
+                    <MyButton
+                        text={myText.continue}
+                        onPressFunction={goToNextPage}
+                    />
+                }
+            />
     }
 }
+
+export const AccountCreationMob = observer(AccountCreation);

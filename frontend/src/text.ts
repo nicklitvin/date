@@ -25,5 +25,16 @@ export const myText = {
     descriptionErrorMessage: "Invalid Description",
 
     attributesInputTitle: "Attributes",
-    attributesInputSubtitle: "Select some of your favorite interests"
+    attributesInputSubtitle: "Select some of your favorite interests",
+
+    uploadInputTitle: "Images",
+    uploadInputSubtitle: "Upload pictures that show how awesome you are",
+    uploadInputUploadText: "Upload File",
+
+    agePreferenceInputTitle: "Age Preference",
+    agePreferenceInputSubtitle: "We will only show people within this range (inclusive)",
+    agePreferenceInputError: "Invalid Age Range",
+
+    finalInputTitle: "That's It!",
+    finalInputSubtitle: "Ready to begin your journey",
 }

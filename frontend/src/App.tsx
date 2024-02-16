@@ -1,4 +1,4 @@
-import { HomeX } from './pages/Home';
+import { HomeMob } from './pages/Home';
 import { StyleSheet } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { RootStore, StoreProvider, createRootInstance } from './store/RootStore';
@@ -8,26 +8,10 @@ export function App() {
         <SafeAreaProvider>
             <SafeAreaView style={styles.container}>
                 <StoreProvider value={createRootInstance()}>
-                    <HomeX/>
+                    <HomeMob/>
                 </StoreProvider>
             </SafeAreaView>
         </SafeAreaProvider>
-    )
-}   
-
-export function CustomAppDefault() {
-    return (
-        <StoreProvider value={createRootInstance()}>
-            <HomeX/>
-        </StoreProvider>
-    )
-} 
-
-export function CustomApp(customStore : RootStore) {
-    return (
-        <StoreProvider value={customStore}>
-            <HomeX/>
-        </StoreProvider>
     )
 }
 
@@ -37,3 +21,22 @@ const styles = StyleSheet.create({
     }
 })
 
+export function CustomAppDefault() {
+    return (
+        <StoreProvider value={createRootInstance()}>
+            <HomeMob/>
+        </StoreProvider>
+    )
+} 
+
+interface CustomAppProps { 
+    customStore : RootStore
+}
+
+export function CustomApp(props : CustomAppProps) {
+    return (
+        <StoreProvider value={props.customStore}>
+            <HomeMob/>
+        </StoreProvider>
+    )
+}
