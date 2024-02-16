@@ -22,7 +22,6 @@ export class GlobalState {
 
     @action
     setUserInput(input : UserInput) {
-        console.log(input);
         this.userInput = input;
     }
 

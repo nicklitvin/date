@@ -10,8 +10,7 @@ import { AgePreferenceInput } from "../components/AgePreferenceInput";
 import { UserInput } from "../interfaces";
 import axios from "axios";
 import { observer } from "mobx-react-lite";
-import { RootStore, useStore } from "../store/RootStore";
-import { action } from "mobx";
+import { useStore } from "../store/RootStore";
 
 type PageType = "Create Profile" | "Name" | "Birthday" | "Gender" | "Gender Preference" |
     "Description" | "Attributes" | "Pictures" | "Age Preference" | "Final";
@@ -23,7 +22,6 @@ export const pageOrder : PageType[] = [
 
 interface Props {
     customPageStart? : number
-    rootStore?: RootStore
     customBirthday?: Date,
     returnPageNumber?: (input : number) => number
 }
@@ -57,13 +55,12 @@ export function AccountCreation(props : Props) {
             ageInterest: [minAge, maxAge],
             attributes: attributes,
             description: description,
-            email: props.rootStore?.globalState.email || globalState.email as string,
+            email: globalState.email as string,
             gender: gender,
             genderInterest: genderPreference,
             files: []
         };
         try {
-            console.log(globalState.useHttp, globalState.email);
             if (globalState.useHttp) {
                 await axios.post(globals.URLServer + globals.URLCreateUser, userInput);
             } else {

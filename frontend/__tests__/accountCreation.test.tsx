@@ -4,13 +4,20 @@ import { myText } from "../src/text";
 import { globals } from "../src/globals";
 import { App, CustomApp, CustomAppDefault } from "../src/App";
 import { GlobalState } from "../src/store/globalState";
-import { RootStore } from "../src/store/RootStore";
+import { RootStore, createStoreProvider } from "../src/store/RootStore";
 import { UserInput } from "../src/interfaces";
 import { action } from "mobx";
 
 describe("accountCreation", () => {
     it("should continue to next page", async () => {
-        render(<AccountCreation/>);
+        const store = new RootStore()
+        const StoreProvider = createStoreProvider(store);
+        render(
+            <StoreProvider value={store}>
+                <AccountCreation/>
+            </StoreProvider>
+        );
+
         expect(screen.queryByText(myText.createProfileTitle)).not.toEqual(null);
         const continueButton = screen.getByText(myText.continue);
         await act( () => {
@@ -21,7 +28,13 @@ describe("accountCreation", () => {
 
     it("should not continue if gender not selected", async () => {
         const pageStart = pageOrder.findIndex(page => page == "Gender") as number;
-        render(<AccountCreation customPageStart={pageStart}/>);
+        const store = new RootStore()
+        const StoreProvider = createStoreProvider(store);
+        render(
+            <StoreProvider value={store}>
+                <AccountCreation customPageStart={pageStart}/>
+            </StoreProvider>
+        );
 
         expect(screen.queryByText(myText.genderInputTitle)).not.toEqual(null);
         const continueButton = screen.getByText(myText.continue);
@@ -34,7 +47,13 @@ describe("accountCreation", () => {
 
     it("should unselect gender", async () => {
         const pageStart = pageOrder.findIndex(page => page == "Gender") as number;
-        render(<AccountCreation customPageStart={pageStart}/>);
+        const store = new RootStore()
+        const StoreProvider = createStoreProvider(store);
+        render(
+            <StoreProvider value={store}>
+                <AccountCreation customPageStart={pageStart}/>
+            </StoreProvider>
+        );
 
         const genderButton = screen.getByText(globals.genders[0]);
         const continueButton = screen.getByText(myText.continue);
@@ -49,7 +68,13 @@ describe("accountCreation", () => {
 
     it("should generate all attributes", async () => {
         const pageStart = pageOrder.findIndex(page => page == "Attributes") as number;
-        render(<AccountCreation customPageStart={pageStart}/>);
+        const store = new RootStore()
+        const StoreProvider = createStoreProvider(store);
+        render(
+            <StoreProvider value={store}>
+                <AccountCreation customPageStart={pageStart}/>
+            </StoreProvider>
+        );
 
         for (const entry of Object.entries(globals.attributes)) {
             expect(screen.queryByText(entry[0])).not.toEqual(null);
@@ -60,9 +85,15 @@ describe("accountCreation", () => {
     })
 
     it("should create userInput", async () => {
-        const rootStore = new RootStore();
-        rootStore.globalState.setEmail("a");
-        rootStore.globalState.setUseHttp(false);
+        const store = new RootStore()
+        store.globalState.setUseHttp(false);
+        store.globalState.setEmail("email");
+        const StoreProvider = createStoreProvider(store);
+        render(
+            <StoreProvider value={store}>
+                <AccountCreation/>
+            </StoreProvider>
+        );
 
         const myName = "name";
         const myBirthday = new Date(2000,2,1);
@@ -76,11 +107,14 @@ describe("accountCreation", () => {
 
         const returnPageNumber = jest.fn((input : number) => input);
 
-        render(<AccountCreation 
-            rootStore={rootStore} 
-            customBirthday={myBirthday}
-            returnPageNumber={returnPageNumber}
-        />);
+        render(
+            <StoreProvider value={store}>
+                <AccountCreation 
+                    customBirthday={myBirthday}
+                    returnPageNumber={returnPageNumber}
+                />
+            </StoreProvider>
+        );
 
         // create profile
         await act( () => {
@@ -165,20 +199,16 @@ describe("accountCreation", () => {
             fireEvent(screen.getByText(myText.continue), "press");
         })
 
-        console.log(rootStore.globalState.userInput);
+        const userInput = store.globalState.userInput;
 
-        // const userInput = rootStore.globalState.userInput;
-        // console.log(userInput);
-
-
-        // expect(userInput?.name).toEqual(myName);
-        // expect(userInput?.birthday.getDate()).toEqual(myBirthday.getTime());
-        // expect(userInput?.gender).toEqual(myGender);
-        // expect(userInput?.ageInterest[0]).toEqual(globals.minAge);
-        // expect(userInput?.ageInterest[1]).toEqual(globals.maxAge);
-        // expect(userInput?.genderInterest).toHaveLength(2);
-        // expect(userInput?.files).toHaveLength(0);
-        // expect(userInput?.attributes).toHaveLength(2);
-        // expect(userInput?.description).toEqual(myDescription);
+        expect(userInput?.name).toEqual(myName);
+        expect(userInput?.birthday.getTime()).toEqual(myBirthday.getTime());
+        expect(userInput?.gender).toEqual(myGender);
+        expect(userInput?.ageInterest[0]).toEqual(globals.minAge);
+        expect(userInput?.ageInterest[1]).toEqual(globals.maxAge);
+        expect(userInput?.genderInterest).toHaveLength(2);
+        expect(userInput?.files).toHaveLength(0);
+        expect(userInput?.attributes).toHaveLength(2);
+        expect(userInput?.description).toEqual(myDescription);
     })
 })

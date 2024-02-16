@@ -1,13 +1,16 @@
 import { HomeMob } from './pages/Home';
 import { StyleSheet } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import { RootStore, StoreProvider, createRootInstance } from './store/RootStore';
+import { RootStore, createStoreProvider} from './store/RootStore';
 
 export function App() {
+    const rootStore = new RootStore();
+    const StoreProvider = createStoreProvider(rootStore);
+
     return (
         <SafeAreaProvider>
             <SafeAreaView style={styles.container}>
-                <StoreProvider value={createRootInstance()}>
+                <StoreProvider value={rootStore}>
                     <HomeMob/>
                 </StoreProvider>
             </SafeAreaView>
@@ -22,8 +25,11 @@ const styles = StyleSheet.create({
 })
 
 export function CustomAppDefault() {
+    const rootStore = new RootStore();
+    const StoreProvider = createStoreProvider(rootStore);
+
     return (
-        <StoreProvider value={createRootInstance()}>
+        <StoreProvider value={rootStore}>
             <HomeMob/>
         </StoreProvider>
     )
@@ -34,6 +40,8 @@ interface CustomAppProps {
 }
 
 export function CustomApp(props : CustomAppProps) {
+    const StoreProvider = createStoreProvider(props.customStore);
+    
     return (
         <StoreProvider value={props.customStore}>
             <HomeMob/>

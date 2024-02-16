@@ -9,9 +9,13 @@ export class RootStore {
     }
 }
 
-export const createRootInstance = () => new RootStore();
+let context : React.Context<RootStore>;
 
-const StoreContext = createContext(createRootInstance());
-export const StoreProvider = StoreContext.Provider;
-export const useStore = () => useContext(StoreContext);
+export function createStoreProvider(store : RootStore) {
+    context = createContext(store);
+    return context.Provider
+}
 
+export function useStore() {
+    return useContext(context);
+}
