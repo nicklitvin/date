@@ -3,21 +3,30 @@ import { MyTextInput } from "../components/TextInput";
 import { chatText } from "../text";
 import { useEffect, useState } from "react";
 import { useStore } from "../store/RootStore";
-import { Message, MessageInput, PublicProfile } from "../interfaces";
+import { GetChatInput, Message, MessageInput, PublicProfile } from "../interfaces";
 import axios from "axios";
 import { globals } from "../globals";
 import { MyMessage } from "../components/message";
-import { StyledText, StyledView } from "../styledElements";
+import { StyledScroll, StyledText, StyledView } from "../styledElements";
 import { Image } from "expo-image";
+import { testIDS } from "../testIDs";
 
 interface Props {
     publicProfile: PublicProfile
     latestMessages: Message[]
+    customNextChatLoad?: Message[]
+    customGetChatLength?: (input : number) => number
 }
 
 export function Chat(props : Props) {
     const [chat, setChat] = useState<Message[]>(props.latestMessages ?? []);
     const { globalState } = useStore();
+
+    useEffect( () => {
+        if (props.customGetChatLength) {
+            props.customGetChatLength(chat.length);
+        }
+    }, [chat])
 
     const sendMessage = async (sentMessage : string) => {
         const messageInput : MessageInput = {
@@ -31,9 +40,31 @@ export function Chat(props : Props) {
             } else {
                 globalState.setSentMessage(messageInput);
             }
-        } catch (err) {
+        } catch (err) {}
+    }
 
-        }
+    const handleScroll = async () => {
+        try {
+            let moreChats : Message[];
+            if (globalState.useHttp && chat.length > 0) {
+                const input : GetChatInput = {
+                    userID: globalState.userID!,
+                    withID: props.publicProfile.id,
+                    fromTime: chat.at(-1)!.timestamp
+                }
+                const response = await axios.post(
+                    globals.URLServer + globals.URLGetChat, input
+                );
+                moreChats = response.data;
+            } else {
+                moreChats = props.customNextChatLoad!;
+            }
+            const uniqueMessages = new Set<Message>(moreChats.concat(chat));
+            const orderedMessages = Array.from(uniqueMessages).sort( (a,b) => 
+                a.timestamp.getTime() - b.timestamp.getTime()
+            )
+            setChat(orderedMessages);
+        } catch (err) {}
     }
 
     return (
@@ -46,12 +77,19 @@ export function Chat(props : Props) {
                     {props.publicProfile.name}
                 </StyledText>
             </StyledView>
-            {chat.map( message => (
-                <MyMessage
-                    text={message.message}
-                    invert={message.recepientID == globalState.userID}
-                />
-            ))}        
+            <StyledScroll 
+                onScrollToTop={handleScroll}
+                testID={testIDS.chatScroll}
+                className="flex flex-row-reverse"
+            >
+                {chat.map( message => (
+                    <MyMessage
+                        key={message.id}
+                        text={message.message}
+                        invert={message.recepientID == globalState.userID}
+                    />
+                ))}        
+            </StyledScroll>
             <MyTextInput
                 placeholder={chatText.inputPlaceholder}
                 errorMessage={chatText.inputError}

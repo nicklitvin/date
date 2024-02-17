@@ -17,5 +17,6 @@ export const globals = {
 
     URLServer: "http:",
     URLCreateUser: "/createUser",
-    URLSendMessage: "/sendMessage"
+    URLSendMessage: "/sendMessage",
+    URLGetChat: "/getChat"
 }

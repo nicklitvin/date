@@ -44,3 +44,9 @@ export interface PublicProfile {
     description: string
     university: string
 }
+
+export interface GetChatInput {
+    userID: string
+    withID: string
+    fromTime: Date
+}
