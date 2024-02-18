@@ -4,6 +4,7 @@ import { ChatMob } from "../src/pages/Chat";
 import { Message, PublicProfile } from "../src/interfaces";
 import { chatText } from "../src/text";
 import { testIDS } from "../src/testIDs";
+import { getChatTimestamp } from "../src/utils";
 
 describe("chat", () => {
     const myUserID = "userID";
@@ -23,7 +24,7 @@ describe("chat", () => {
             message: "hi",
             readStatus: true,
             recepientID: recepientProfile.id,
-            timestamp: new Date(1),
+            timestamp: new Date(Date.UTC(2000, 0, 1, 8, 0)),
             userID: myUserID
         },
         {
@@ -31,18 +32,18 @@ describe("chat", () => {
             message: "hey",
             readStatus: true,
             recepientID: myUserID,
-            timestamp: new Date(2),
+            timestamp: new Date(Date.UTC(2000, 0, 1, 8, 0)),
             userID: recepientProfile.id
         }
     ]
     const moreMessages : Message[] = [
         latestMessages[1],
         {
-            id: "id3",
+            id: "id2",
             message: "sooo",
             readStatus: false,
             recepientID: recepientProfile.id,
-            timestamp: new Date(2),
+            timestamp: new Date(Date.UTC(2000, 0, 1, 6, 0)),
             userID: myUserID
         } 
     ]
@@ -51,6 +52,8 @@ describe("chat", () => {
         const store = new RootStore();
         store.globalState.setUserID(myUserID);
         store.globalState.setUseHttp(false);
+        store.globalState.setTimezone("PST");
+
         const StoreProvider = createStoreProvider(store);
         render(
             <StoreProvider value={store}>
@@ -80,6 +83,7 @@ describe("chat", () => {
         const store = new RootStore();
         store.globalState.setUserID(myUserID);
         store.globalState.setUseHttp(false);
+        store.globalState.setTimezone("PST");
         const StoreProvider = createStoreProvider(store);
         const getChatLength = jest.fn( (input) => input);
 
@@ -108,6 +112,8 @@ describe("chat", () => {
         const store = new RootStore();
         store.globalState.setUserID(myUserID);
         store.globalState.setUseHttp(false);
+        store.globalState.setTimezone("PST");
+
         const StoreProvider = createStoreProvider(store);
 
         render(
@@ -128,5 +134,33 @@ describe("chat", () => {
         const userReport = store.globalState.lastReport;
         expect(userReport?.userID).toEqual(myUserID);
         expect(userReport?.reportedID).toEqual(recepientProfile.id);
+    })
+
+    it("should show timestamps", async () => {
+        const store = new RootStore();
+        store.globalState.setUserID(myUserID);
+        store.globalState.setUseHttp(false);
+        store.globalState.setTimezone("PST");
+        const StoreProvider = createStoreProvider(store);
+
+        render(
+            <StoreProvider value={store}>
+                <ChatMob
+                    latestMessages={latestMessages}
+                    publicProfile={recepientProfile}
+                    customNextChatLoad={moreMessages}
+                />
+            </StoreProvider>
+        );
+
+        expect(screen.queryByText(getChatTimestamp(latestMessages[0].timestamp, "PST"))).not.toEqual(null);
+        expect(screen.queryByText(getChatTimestamp(moreMessages[1].timestamp, "PST"))).toEqual(null);
+        
+        const scroll = screen.getByTestId(testIDS.chatScroll);
+        await act( () => {
+            fireEvent(scroll, "scrollToTop")
+        })
+        expect(screen.queryByText(getChatTimestamp(moreMessages[1].timestamp, "PST"))).not.toEqual(null);
+        expect(screen.queryByText(getChatTimestamp(latestMessages[0].timestamp, "PST"))).not.toEqual(null);
     })
 })

@@ -10,6 +10,7 @@ export class GlobalState {
     @observable public sentMessage : MessageInput|null = null;
     @observable public userID : string|null = null;
     @observable public lastReport : RequestReportInput|null = null;
+    @observable public timeZone : string|null = "";
 
     constructor() {
         makeAutoObservable(this);
@@ -48,5 +49,10 @@ export class GlobalState {
     @action
     setLastReport(value : RequestReportInput) {
         this.lastReport = value;
+    }
+
+    @action
+    setTimezone(value : string) {
+        this.timeZone= value;
     }
 }

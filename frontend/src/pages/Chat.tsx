@@ -10,6 +10,8 @@ import { MyMessage } from "../components/message";
 import { StyledButton, StyledScroll, StyledText, StyledView } from "../styledElements";
 import { Image } from "expo-image";
 import { testIDS } from "../testIDs";
+import { getChatTimestamp } from "../utils";
+import * as Localization from "expo-localization";
 
 interface Props {
     publicProfile: PublicProfile
@@ -100,14 +102,25 @@ export function Chat(props : Props) {
             <StyledScroll 
                 onScrollToTop={handleScroll}
                 testID={testIDS.chatScroll}
-                className="flex flex-row-reverse"
             >
-                {chat.map( message => (
-                    <MyMessage
-                        key={message.id}
-                        text={message.message}
-                        invert={message.recepientID == globalState.userID}
-                    />
+                {chat.map( (message, index) => (
+                    <StyledView key={message.id}>
+                        {
+                            (
+                                index == 0 || 
+                                message.timestamp.getTime() - chat[index - 1].timestamp.getTime() >
+                                globals.timeBeforeChatTimestamp
+                            ) ? 
+                            <StyledText>
+                                {getChatTimestamp(message.timestamp, globalState.timeZone!)}
+                            </StyledText> : 
+                            null
+                        }
+                        <MyMessage
+                            text={message.message}
+                            invert={message.recepientID == globalState.userID}
+                        />
+                    </StyledView>
                 ))}        
             </StyledScroll>
             <MyTextInput
