@@ -11,7 +11,6 @@ import { StyledButton, StyledScroll, StyledText, StyledView } from "../styledEle
 import { Image } from "expo-image";
 import { testIDS } from "../testIDs";
 import { getChatTimestamp } from "../utils";
-import * as Localization from "expo-localization";
 
 interface Props {
     publicProfile: PublicProfile
@@ -22,9 +21,15 @@ interface Props {
 
 export function Chat(props : Props) {
     const [chat, setChat] = useState<Message[]>(props.latestMessages ?? []);
+    const [lastSentChatID, setLastSentChatID] = useState<string>("");
     const { globalState } = useStore();
 
     useEffect( () => {
+        for (let i = chat.length - 1; i >= 0 ; i--) {
+            if (chat[i].recepientID == props.publicProfile.id) {
+                setLastSentChatID(chat[i].id)
+            }
+        }
         if (props.customGetChatLength) {
             props.customGetChatLength(chat.length);
         }
@@ -104,7 +109,7 @@ export function Chat(props : Props) {
                 testID={testIDS.chatScroll}
             >
                 {chat.map( (message, index) => (
-                    <StyledView key={message.id}>
+                    <StyledView key={`view-${message.id}-${index}`}>
                         {
                             (
                                 index == 0 || 
@@ -120,6 +125,12 @@ export function Chat(props : Props) {
                             text={message.message}
                             invert={message.recepientID == globalState.userID}
                         />
+                        {
+                            message.id == lastSentChatID ?
+                            <StyledText testID={`readStatus-${message.id}`}>
+                                {message.readStatus ? chatText.read : chatText.delivered}
+                            </StyledText> : null
+                        }
                     </StyledView>
                 ))}        
             </StyledScroll>

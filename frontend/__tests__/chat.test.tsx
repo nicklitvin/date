@@ -160,7 +160,41 @@ describe("chat", () => {
         await act( () => {
             fireEvent(scroll, "scrollToTop")
         })
+
         expect(screen.queryByText(getChatTimestamp(moreMessages[1].timestamp, "PST"))).not.toEqual(null);
         expect(screen.queryByText(getChatTimestamp(latestMessages[0].timestamp, "PST"))).not.toEqual(null);
+    })
+
+    it("should show read/delivered read status", async () => {
+        const store = new RootStore();
+        store.globalState.setUserID(myUserID);
+        store.globalState.setUseHttp(false);
+        store.globalState.setTimezone("PST");
+        const StoreProvider = createStoreProvider(store);
+
+        render(
+            <StoreProvider value={store}>
+                <ChatMob
+                    latestMessages={latestMessages}
+                    publicProfile={recepientProfile}
+                    customNextChatLoad={moreMessages}
+                />
+            </StoreProvider>
+        );
+
+        expect(screen.queryByText(chatText.delivered)).toEqual(null);
+        expect(screen.getByTestId(`readStatus-${latestMessages[0].id}`)).not.toEqual(null);
+        
+        const scroll = screen.getByTestId(testIDS.chatScroll);
+        await act( () => {
+            fireEvent(scroll, "scrollToTop")
+        })
+
+        await act( () => {
+            fireEvent(scroll,"scrollToTop");
+        })
+
+        expect(screen.queryByText(chatText.read)).toEqual(null);
+        expect(screen.getByTestId(`readStatus-${moreMessages[1].id}`)).not.toEqual(null);
     })
 })

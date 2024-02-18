@@ -49,5 +49,7 @@ export const errorText = {
 
 export const chatText = {
     inputPlaceholder: "Type your message here",
-    inputError: "Cannot send message"
+    inputError: "Cannot send message",
+    read: "read",
+    delivered: "delivered"
 }
