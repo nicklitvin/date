@@ -9,6 +9,7 @@ import { useStore } from "../store/RootStore";
 import axios from "axios";
 import { globals } from "../globals";
 import { testIDS } from "../testIDs";
+import { PageHeader } from "../components/PageHeader";
 
 interface Props {
     newMatches: PublicProfile[]
@@ -73,6 +74,10 @@ export function Matches(props : Props) {
 
     return (
         <StyledView>
+            <PageHeader
+                title={matchesText.pageTitle}
+                imageSource={""}
+            />
             <StyledText>
                 {`${matchesText.newMatches}`}
             </StyledText>

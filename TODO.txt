@@ -1,6 +1,7 @@
 TODO
+switch for notifications
+double slider
 react hot toast for success report, removed user
-unlike user instead of just report, unlike in chat preview page as slide left
 
 BACKEND TODO
 change age to birthday on backend

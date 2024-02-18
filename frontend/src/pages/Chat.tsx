@@ -11,6 +11,7 @@ import { StyledButton, StyledScroll, StyledText, StyledView } from "../styledEle
 import { Image } from "expo-image";
 import { testIDS } from "../testIDs";
 import { getChatTimestamp } from "../utils";
+import { PageHeader } from "../components/PageHeader";
 
 interface Props {
     publicProfile: PublicProfile
@@ -91,16 +92,15 @@ export function Chat(props : Props) {
 
     return (
         <>
-            <StyledView>
-                <Image
-                    source={props.publicProfile.images[0]}
-                />
-                <StyledText>
-                    {props.publicProfile.name}
-                </StyledText>
-                <StyledButton onPress={reportUser} testID={testIDS.reportUser}>
-                </StyledButton>
-            </StyledView>
+            <PageHeader
+                imageSource={props.publicProfile.images[0]}
+                title={props.publicProfile.name}
+                swapTitleAndImage={true}
+                rightContent={
+                    <StyledButton onPress={reportUser} testID={testIDS.reportUser}>
+                    </StyledButton>    
+                }
+            />
             <StyledScroll 
                 onScrollToTop={handleScroll}
                 testID={testIDS.chatScroll}

@@ -56,5 +56,6 @@ export const chatText = {
 
 export const matchesText = {
     newMatches: "New Matches",
-    chats: "Chats"
+    chats: "Chats",
+    pageTitle: "Matches"
 }
