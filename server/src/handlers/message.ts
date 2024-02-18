@@ -62,6 +62,11 @@ export class MessageHandler {
         return deleted.count;
     }
 
+    /**
+     * 
+     * @param input 
+     * @returns array of messages between 2 users with latest messages coming first 
+     */
     public async getChat(input : GetChatInput) : Promise<Message[]> {
         return await this.prisma.message.findMany({
             where: {

@@ -52,3 +52,8 @@ export interface GetChatInput {
 export interface RequestReportInput {
     reportedID: string
 }
+
+export interface ChatPreview {
+    profile: PublicProfile
+    messages: Message[]
+}

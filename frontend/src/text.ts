@@ -53,3 +53,8 @@ export const chatText = {
     read: "read",
     delivered: "delivered"
 }
+
+export const matchesText = {
+    newMatches: "New Matches",
+    chats: "Chats"
+}

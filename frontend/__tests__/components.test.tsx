@@ -3,6 +3,9 @@ import { MyButton } from "../src/components/Button";
 import { MyTextInput } from "../src/components/TextInput";
 import { MyDateInput } from "../src/components/DateInput";
 import { accountCreationText } from "../src/text";
+import { ChatPreviewBox } from "../src/components/ChatPreviewBox";
+import { ChatPreview } from "../src/interfaces";
+import { otherProfile, receivedMessage, sentMessage } from "../__testUtils__/easySetup";
 
 describe("components", () => {
     it("should call myButton function", async () => {
@@ -100,5 +103,74 @@ describe("components", () => {
 
         expect(afterSubmit).toHaveBeenCalledTimes(1);
         expect(saveDate).toHaveBeenCalledWith(chosenDate)
+    })
+
+    it("should show all chatpreviewbox components", async () => {
+        const chatPreview : ChatPreview = {
+            profile: otherProfile,
+            messages: [sentMessage, receivedMessage]
+        }
+        render(
+            <ChatPreviewBox
+                chatPreview={chatPreview}
+            />
+        )
+
+        expect(screen.queryByText(otherProfile.name)).not.toEqual(null);
+        expect(screen.queryByText(`You: ${sentMessage.message}`)).not.toEqual(null);
+    })
+
+    it("should show notification dot", async () => {
+        const lastMessage = receivedMessage;
+        lastMessage.readStatus = false;
+
+        const chatPreview : ChatPreview = {
+            profile: otherProfile,
+            messages: [lastMessage, sentMessage]
+        }
+
+        render(
+            <ChatPreviewBox
+                chatPreview={chatPreview}
+            />
+        )
+
+        expect(screen.getByTestId(`unread-${otherProfile.id}`)).not.toEqual(null);
+    })
+
+    it("should not show notification dot if read", async () => {
+        const lastMessage = receivedMessage;
+        lastMessage.readStatus = true;
+
+        const chatPreview : ChatPreview = {
+            profile: otherProfile,
+            messages: [lastMessage, sentMessage]
+        }
+
+        render(
+            <ChatPreviewBox
+                chatPreview={chatPreview}
+            />
+        )
+
+        expect(screen.queryByTestId(`unread-${otherProfile.id}`)).toEqual(null);
+    })
+
+    it("should not show notification dot if other unread", async () => {
+        const lastMessage = sentMessage;
+        lastMessage.readStatus = false;
+
+        const chatPreview : ChatPreview = {
+            profile: otherProfile,
+            messages: [lastMessage, sentMessage]
+        }
+
+        render(
+            <ChatPreviewBox
+                chatPreview={chatPreview}
+            />
+        )
+
+        expect(screen.queryByTestId(`unread-${otherProfile.id}`)).toEqual(null);
     })
 })
