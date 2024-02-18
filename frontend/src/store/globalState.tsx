@@ -1,5 +1,5 @@
 import { action, makeAutoObservable, observable } from "mobx";
-import { MessageInput, UserInput } from "../interfaces";
+import { MessageInput, RequestReportInput, UserInput } from "../interfaces";
 import { AppPage } from "../types";
 
 export class GlobalState {
@@ -9,6 +9,7 @@ export class GlobalState {
     @observable public appPage : AppPage = "Account Creation";
     @observable public sentMessage : MessageInput|null = null;
     @observable public userID : string|null = null;
+    @observable public lastReport : RequestReportInput|null = null;
 
     constructor() {
         makeAutoObservable(this);
@@ -42,5 +43,10 @@ export class GlobalState {
     @action
     setUserID(value : string) {
         this.userID = value;
+    }
+
+    @action
+    setLastReport(value : RequestReportInput) {
+        this.lastReport = value;
     }
 }

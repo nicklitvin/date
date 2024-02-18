@@ -3,11 +3,11 @@ import { MyTextInput } from "../components/TextInput";
 import { chatText } from "../text";
 import { useEffect, useState } from "react";
 import { useStore } from "../store/RootStore";
-import { GetChatInput, Message, MessageInput, PublicProfile } from "../interfaces";
+import { GetChatInput, Message, MessageInput, PublicProfile, RequestReportInput } from "../interfaces";
 import axios from "axios";
 import { globals } from "../globals";
 import { MyMessage } from "../components/message";
-import { StyledScroll, StyledText, StyledView } from "../styledElements";
+import { StyledButton, StyledScroll, StyledText, StyledView } from "../styledElements";
 import { Image } from "expo-image";
 import { testIDS } from "../testIDs";
 
@@ -64,7 +64,25 @@ export function Chat(props : Props) {
                 a.timestamp.getTime() - b.timestamp.getTime()
             )
             setChat(orderedMessages);
-        } catch (err) {}
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+    const reportUser = async () => {
+        try {
+            const myReport : RequestReportInput = {
+                userID: globalState.userID!,
+                reportedID: props.publicProfile.id
+            }
+            if (globalState.useHttp) {
+                await axios.post(globals.URLServer + globals.URLReportUser, myReport)
+            } else {
+                globalState.setLastReport(myReport)
+            }
+        } catch (err) {
+            console.log(err);
+        }
     }
 
     return (
@@ -76,6 +94,8 @@ export function Chat(props : Props) {
                 <StyledText>
                     {props.publicProfile.name}
                 </StyledText>
+                <StyledButton onPress={reportUser} testID={testIDS.reportUser}>
+                </StyledButton>
             </StyledView>
             <StyledScroll 
                 onScrollToTop={handleScroll}

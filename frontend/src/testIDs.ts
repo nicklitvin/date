@@ -1,3 +1,4 @@
 export const testIDS = {
-    chatScroll: "chatScroll"   
+    chatScroll: "chatScroll",
+    reportUser: "reportUser"
 }

@@ -103,4 +103,30 @@ describe("chat", () => {
 
         expect(getChatLength).toHaveLastReturnedWith(3);
     })
+
+    it("should report user", async () => {
+        const store = new RootStore();
+        store.globalState.setUserID(myUserID);
+        store.globalState.setUseHttp(false);
+        const StoreProvider = createStoreProvider(store);
+
+        render(
+            <StoreProvider value={store}>
+                <ChatMob
+                    latestMessages={latestMessages}
+                    publicProfile={recepientProfile}
+                    customNextChatLoad={moreMessages}
+                />
+            </StoreProvider>
+        );
+
+        const reportButton = screen.getByTestId(testIDS.reportUser);
+        await act( () => {
+            fireEvent(reportButton, "press")
+        })
+
+        const userReport = store.globalState.lastReport;
+        expect(userReport?.userID).toEqual(myUserID);
+        expect(userReport?.reportedID).toEqual(recepientProfile.id);
+    })
 })
