@@ -9,7 +9,7 @@ export class GlobalState {
     @observable public appPage : AppPage = "Account Creation";
     @observable public sentMessage : MessageInput|null = null;
     @observable public lastReport : RequestReportInput|null = null;
-    @observable public timeZone : string|null = "";
+    @observable public timeZone : string = "PST";
 
     constructor() {
         makeAutoObservable(this);

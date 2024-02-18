@@ -1,4 +1,7 @@
 export const testIDS = {
     chatScroll: "chatScroll",
-    reportUser: "reportUser"
+    reportUser: "reportUser",
+
+    newMatchScroll: "newMatchScroll",
+    chatPreviewScroll: "chatPreviewScroll"
 }

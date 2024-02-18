@@ -5,7 +5,7 @@ import { MyDateInput } from "../src/components/DateInput";
 import { accountCreationText } from "../src/text";
 import { ChatPreviewBox } from "../src/components/ChatPreviewBox";
 import { ChatPreview } from "../src/interfaces";
-import { otherProfile, receivedMessage, sentMessage } from "../__testUtils__/easySetup";
+import { makePublicProfile, makeReceivedMessage, makeSentMessage } from "../__testUtils__/easySetup";
 
 describe("components", () => {
     it("should call myButton function", async () => {
@@ -106,6 +106,10 @@ describe("components", () => {
     })
 
     it("should show all chatpreviewbox components", async () => {
+        const otherProfile = makePublicProfile();
+        const sentMessage = makeSentMessage();
+        const receivedMessage = makeReceivedMessage();
+
         const chatPreview : ChatPreview = {
             profile: otherProfile,
             messages: [sentMessage, receivedMessage]
@@ -121,12 +125,13 @@ describe("components", () => {
     })
 
     it("should show notification dot", async () => {
-        const lastMessage = receivedMessage;
-        lastMessage.readStatus = false;
+        const otherProfile = makePublicProfile();
+        const receivedMessage = makeReceivedMessage();
+        receivedMessage.readStatus = false;
 
         const chatPreview : ChatPreview = {
             profile: otherProfile,
-            messages: [lastMessage, sentMessage]
+            messages: [receivedMessage]
         }
 
         render(
@@ -139,12 +144,13 @@ describe("components", () => {
     })
 
     it("should not show notification dot if read", async () => {
-        const lastMessage = receivedMessage;
-        lastMessage.readStatus = true;
+        const otherProfile = makePublicProfile();
+        const receivedMessage = makeReceivedMessage();
+        receivedMessage.readStatus = true;
 
         const chatPreview : ChatPreview = {
             profile: otherProfile,
-            messages: [lastMessage, sentMessage]
+            messages: [receivedMessage]
         }
 
         render(
@@ -157,12 +163,13 @@ describe("components", () => {
     })
 
     it("should not show notification dot if other unread", async () => {
-        const lastMessage = sentMessage;
-        lastMessage.readStatus = false;
+        const otherProfile = makePublicProfile();
+        const sentMessage = makeSentMessage();
+        sentMessage.readStatus = false;
 
         const chatPreview : ChatPreview = {
             profile: otherProfile,
-            messages: [lastMessage, sentMessage]
+            messages: [sentMessage]
         }
 
         render(

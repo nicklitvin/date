@@ -20,5 +20,7 @@ export const globals = {
     URLCreateUser: "/createUser",
     URLSendMessage: "/sendMessage",
     URLGetChat: "/getChat",
-    URLReportUser: "/reportUser"
+    URLReportUser: "/reportUser",
+    URLGetNewMatches: "/getNewMatches",
+    URLGetNewChatPreviews: "/getChatPreviews",
 }

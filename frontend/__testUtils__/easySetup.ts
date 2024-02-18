@@ -1,7 +1,9 @@
 import { Message, PublicProfile } from "../src/interfaces";
 
-export const otherProfile : PublicProfile = {
-    id: "otherProfileID",
+export const myUserID = "userID";
+
+export const makePublicProfile = (id : string = "otherProfileID") : PublicProfile => ({
+    id: id,
     age: 21,
     attributes: [],
     description: "",
@@ -9,22 +11,22 @@ export const otherProfile : PublicProfile = {
     images: ["imageURL"],
     name: "Michael",
     university: "berkeley"
-}
+})
 
-export const sentMessage : Message = {
+export const makeSentMessage = (recepientID : string = makePublicProfile().id) : Message => ({
     id: "sentID",
     message: "sentMessage",
     readStatus: true,
-    recepientID: otherProfile.id,
+    recepientID: recepientID,
     timestamp: new Date(),
-    userID: "myUserID"
-}
+    userID: myUserID
+})
 
-export const receivedMessage : Message = {
+export const makeReceivedMessage = (sentID : string = makePublicProfile().id) : Message => ({
     id: "receivedID",
     message: "receivedMessage",
     readStatus: true,
-    recepientID: "myUserID",
+    recepientID: myUserID,
     timestamp: new Date(),
-    userID: otherProfile.id
-}
+    userID: sentID
+})
