@@ -1,5 +1,4 @@
 TODO
-add chat read, delivered status
 react hot toast for success report, removed user
 unlike user instead of just report, unlike in chat preview page as slide left
 

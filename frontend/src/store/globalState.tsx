@@ -8,7 +8,6 @@ export class GlobalState {
     @observable public userInput : UserInput|null = null;
     @observable public appPage : AppPage = "Account Creation";
     @observable public sentMessage : MessageInput|null = null;
-    @observable public userID : string|null = null;
     @observable public lastReport : RequestReportInput|null = null;
     @observable public timeZone : string|null = "";
 
@@ -39,11 +38,6 @@ export class GlobalState {
     @action
     setSentMessage(value : MessageInput) {
         this.sentMessage = value;
-    }
-
-    @action
-    setUserID(value : string) {
-        this.userID = value;
     }
 
     @action

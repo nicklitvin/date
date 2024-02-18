@@ -37,7 +37,6 @@ export function Chat(props : Props) {
 
     const sendMessage = async (sentMessage : string) => {
         const messageInput : MessageInput = {
-            userID: globalState.userID!,
             recepientID: props.publicProfile.id,
             message: sentMessage
         }
@@ -55,7 +54,6 @@ export function Chat(props : Props) {
             let moreChats : Message[];
             if (globalState.useHttp && chat.length > 0) {
                 const input : GetChatInput = {
-                    userID: globalState.userID!,
                     withID: props.publicProfile.id,
                     fromTime: chat.at(-1)!.timestamp
                 }
@@ -79,7 +77,6 @@ export function Chat(props : Props) {
     const reportUser = async () => {
         try {
             const myReport : RequestReportInput = {
-                userID: globalState.userID!,
                 reportedID: props.publicProfile.id
             }
             if (globalState.useHttp) {
@@ -123,7 +120,7 @@ export function Chat(props : Props) {
                         }
                         <MyMessage
                             text={message.message}
-                            invert={message.recepientID == globalState.userID}
+                            invert={message.userID == props.publicProfile.id}
                         />
                         {
                             message.id == lastSentChatID ?

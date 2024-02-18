@@ -20,7 +20,6 @@ export interface FileUploadAndURI extends FileUpload {
 }
 
 export interface MessageInput {
-    userID: string
     recepientID: string
     message: string
 }
@@ -46,12 +45,10 @@ export interface PublicProfile {
 }
 
 export interface GetChatInput {
-    userID: string
     withID: string
     fromTime: Date
 }
 
 export interface RequestReportInput {
-    userID: string
     reportedID: string
 }

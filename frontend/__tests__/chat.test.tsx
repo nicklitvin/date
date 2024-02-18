@@ -50,7 +50,6 @@ describe("chat", () => {
 
     it("should send message", async () => {
         const store = new RootStore();
-        store.globalState.setUserID(myUserID);
         store.globalState.setUseHttp(false);
         store.globalState.setTimezone("PST");
 
@@ -75,13 +74,11 @@ describe("chat", () => {
 
         const sentMessage = store.globalState.sentMessage;
         expect(sentMessage?.message).toEqual(myMessage);
-        expect(sentMessage?.userID).toEqual(myUserID);
         expect(sentMessage?.recepientID).toEqual(recepientProfile.id);
     })
 
     it("should load older messages", async () => {
         const store = new RootStore();
-        store.globalState.setUserID(myUserID);
         store.globalState.setUseHttp(false);
         store.globalState.setTimezone("PST");
         const StoreProvider = createStoreProvider(store);
@@ -110,7 +107,6 @@ describe("chat", () => {
 
     it("should report user", async () => {
         const store = new RootStore();
-        store.globalState.setUserID(myUserID);
         store.globalState.setUseHttp(false);
         store.globalState.setTimezone("PST");
 
@@ -132,13 +128,11 @@ describe("chat", () => {
         })
 
         const userReport = store.globalState.lastReport;
-        expect(userReport?.userID).toEqual(myUserID);
         expect(userReport?.reportedID).toEqual(recepientProfile.id);
     })
 
     it("should show timestamps", async () => {
         const store = new RootStore();
-        store.globalState.setUserID(myUserID);
         store.globalState.setUseHttp(false);
         store.globalState.setTimezone("PST");
         const StoreProvider = createStoreProvider(store);
@@ -167,7 +161,6 @@ describe("chat", () => {
 
     it("should show read/delivered read status", async () => {
         const store = new RootStore();
-        store.globalState.setUserID(myUserID);
         store.globalState.setUseHttp(false);
         store.globalState.setTimezone("PST");
         const StoreProvider = createStoreProvider(store);
