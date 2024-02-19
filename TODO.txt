@@ -1,11 +1,9 @@
 TODO
 change age to birthday on backend but public profile returns age
 add time matched to newmatches
-test profile view and swipe feed
-
+return signed download of each image requested in public profile
 
 BACKEND TODO
-return signed download of each image requested
 change elo constants with api?
 messagelowerelo is rewarded?
 add devices to user notification list

@@ -12,12 +12,14 @@ import { URLs } from "../urls";
 interface Props {
     feed: PublicProfile[]
     customLoadFeed?: PublicProfile[]
+    customReturnFeedLength? (input : number) : number
+    customReturnFeedIndex? (input : number) : number
 }
 
 export function Feed(props : Props) {
     const [feed, setFeed] = useState<PublicProfile[]>(props.feed ?? []);
     const [feedIndex, setFeedIndex] = useState<number>(0);
-    const {globalState} = useStore();
+    const {globalState, savedAPICalls} = useStore();
 
     const loadMoreFeed = async () => {
         try {
@@ -36,6 +38,15 @@ export function Feed(props : Props) {
     }
 
     useEffect( () => {
+        if (props.customReturnFeedLength) {
+            props.customReturnFeedLength(feed.length);
+        }
+    }, [feed])
+
+    useEffect( () => {
+        if (props.customReturnFeedIndex) {
+            props.customReturnFeedIndex(feedIndex);
+        }
         if (feedIndex == feed.length) {
             loadMoreFeed();
         }

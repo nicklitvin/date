@@ -39,19 +39,19 @@ export function Matches(props : Props) {
 
     const loadMoreNewMatches = async () => {
         try {
-            let newMatches : PublicProfile[] = [];
+            let receivedNewMatches : PublicProfile[] = [];
             const input : NewMatchDataInput = {
                 timestamp: new Date()
             }
 
             if (globalState.useHttp) {
                 const response = await axios.post(URLs.server + URLs.getNewMatches, input); 
-                newMatches = response.data;
+                receivedNewMatches = response.data;
             } else {
                 savedAPICalls.setNewMatchDataInput(input);
-                newMatches = props.customNewMatches!;
+                receivedNewMatches = props.customNewMatches!;
             }   
-            const uniqueNewMatches = new Set<PublicProfile>(newMatches.concat(newMatches));
+            const uniqueNewMatches = new Set<PublicProfile>(newMatches.concat(receivedNewMatches));
             setNewMatches(Array.from(uniqueNewMatches));
         } catch (err) {
             console.log(err);
