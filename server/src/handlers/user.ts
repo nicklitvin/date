@@ -1,7 +1,7 @@
 import { Gender, PrismaClient, User } from "@prisma/client";
 import { EditUserInput, EloAction, EloUpdateInput, GetProfileListInput, PublicProfile, RequestUserInput, UserInput } from "../interfaces";
 import { randomUUID } from "crypto";
-import { addMonths } from "date-fns";
+import { addMonths, differenceInYears } from "date-fns";
 import { globals } from "../globals";
 
 export class UserHandler {
@@ -51,20 +51,12 @@ export class UserHandler {
     }
 
     public async getPublicProfile(id : string) : Promise<PublicProfile|null> {
-        return await this.prisma.user.findUnique({
+        const data = await this.prisma.user.findUnique({
             where: {
                 id: id
-            }, select: {
-                id: true,
-                name: true,
-                age: true,
-                gender: true,
-                attributes: true,
-                images: true,
-                description: true,
-                university: true
             }
         });
+        return data ? this.convertUserToPublicProfile(data) : null
     }
 
     public async deleteUser(id : string) : Promise<User|null> {
@@ -126,8 +118,8 @@ export class UserHandler {
 
     public isInputValid(input : RequestUserInput) : boolean {
         return (
-            input.age >= globals.minAge &&
-            input.age <= globals.maxAge &&
+            differenceInYears(new Date(), input.birthday) >= globals.minAge &&
+            differenceInYears(new Date(), input.birthday) <= globals.maxAge &&
             input.ageInterest.length == 2 &&
             input.ageInterest[0] < input.ageInterest[1] &&
             input.ageInterest[0] >= globals.minAge && 
@@ -201,7 +193,7 @@ export class UserHandler {
     public async getPublicProfilesFromCriteria(input : GetProfileListInput) : 
         Promise<PublicProfile[]> 
     {
-        return await this.prisma.user.findMany({
+        const users = await this.prisma.user.findMany({
             where: {
                 id: {
                     in: input.include,
@@ -210,9 +202,9 @@ export class UserHandler {
                 gender: {
                     in: input.gender
                 },
-                age: {
-                    lte: input.ageRange[1],
-                    gte: input.ageRange[0]
+                birthday: {
+                    lte: input.maxDate,
+                    gt: input.minDate
                 }
             },
             orderBy: {
@@ -220,5 +212,19 @@ export class UserHandler {
             },
             take: input.count
         })
+        return users.map( user => this.convertUserToPublicProfile(user));
+    }
+
+    public convertUserToPublicProfile(input : User) : PublicProfile {
+        const age = differenceInYears(new Date(), input.birthday);
+        return {
+            id: input.id,
+            name: input.name,
+            age: age,
+            attributes: input.attributes,
+            description: input.description,
+            gender: input.gender,
+            images: input.images,
+        }
     }
 }

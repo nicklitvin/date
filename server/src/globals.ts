@@ -9,7 +9,6 @@ export const globals = {
     acceptaleImageFormats : ["image/jpeg","image/png"],
     maxNameLength : 16,
     maxDescriptionLength : 100,
-    allowedAttributeEdits: ["age"], 
 
     // elo
     eloStart: 1000,

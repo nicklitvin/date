@@ -12,6 +12,8 @@ import { ChatPreview, ConfirmVerificationInput, DeleteImageInput, EditUserInput,
 import { globals } from "./globals";
 import { FreeTrialHandler } from "./handlers/freetrial";
 import { VerificationHandler } from "./handlers/verification";
+import { addYears } from "date-fns";
+import { allowedAttributeEdits } from "./others";
 
 export class Handler {
     public announcement : AnnouncementHandler;
@@ -77,7 +79,7 @@ export class Handler {
             );
     
             const userInput : UserInput = {
-                age: input.age,
+                birthday: input.birthday,
                 attributes: input.attributes,
                 description: input.description,
                 email: input.email, 
@@ -276,7 +278,7 @@ export class Handler {
     public async editUser(input : EditUserInput) : Promise<User|null> {
         const user = await this.user.getUserByID(input.userID);
 
-        if (!user || !globals.allowedAttributeEdits.includes(input.setting)) {
+        if (!user || !allowedAttributeEdits.includes(input.setting)) {
             return null;
         }
 
@@ -401,18 +403,23 @@ export class Handler {
             this.swipe.getLikedMeUsers(userID)
         ]);
 
+        const minDate = addYears(new Date(), -(user.ageInterest[1] + 1));
+        const maxDate = addYears(new Date(), -user.ageInterest[0]);
+
         const likedMeProfiles = await this.user.getPublicProfilesFromCriteria({
             include: likedMeUserIDs,
             count: globals.usersInSwipeFeed / 2,
-            ageRange: user.ageInterest,
-            gender: user.genderInterest
+            gender: user.genderInterest,
+            minDate: minDate,
+            maxDate: maxDate
         });
         const likedMeProfileIDs = likedMeProfiles.map(val => val.id);
 
         const otherUsers = await this.user.getPublicProfilesFromCriteria({
             exclude: [...alreadySwipedIDs, userID, ...likedMeProfileIDs],
             count: globals.usersInSwipeFeed - likedMeProfiles.length,
-            ageRange: user.ageInterest,
+            maxDate: maxDate,
+            minDate: minDate,
             gender: user.genderInterest
         });
 

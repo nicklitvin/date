@@ -5,7 +5,7 @@ import { User } from "@prisma/client";
 import { ChatPreview, PublicProfile } from "../src/interfaces";
 import { randomUUID } from "crypto";
 import { createUserInput, createUsersForSwipeFeed, getImageDetails, makeMessageInputWithOneRandom, makeMessageInputWithRandoms, makeTwoUsers, makeTwoUsersAndMatch, makeVerificationInput, matchUsers, validRequestUserInput } from "../__testUtils__/easySetup";
-import { addMinutes } from "date-fns";
+import { addMinutes, addYears } from "date-fns";
 
 afterEach( async () => {
     await handler.deleteEverything()
@@ -14,7 +14,7 @@ afterEach( async () => {
 describe("handler", () => {
     it("should not create user with invalid input", async () => {
         const invalidInput = await validRequestUserInput();
-        invalidInput.age = globals.minAge - 1;
+        invalidInput.birthday = addYears(new Date(), -(globals.minAge - 1))
 
         expect(await handler.createUser(invalidInput)).toEqual(null);
     })
@@ -361,8 +361,8 @@ describe("handler", () => {
         const user = await handler.user.createUser(createUserInput("a@berkeley.edu"));
         expect(await handler.editUser({
             userID: user.id,
-            setting: "age",
-            value: "12"
+            setting: "birthday",
+            value: new Date()
         })).toEqual(null);
     })
 
@@ -370,8 +370,8 @@ describe("handler", () => {
         const user = await handler.user.createUser(createUserInput("a@berkeley.edu"));
         expect(await handler.editUser({
             userID: user.id,
-            setting: "age",
-            value: 12
+            setting: "genderInterest",
+            value: ["Female"]
         })).not.toEqual(null);
     })
 

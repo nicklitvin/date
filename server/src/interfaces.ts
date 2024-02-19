@@ -20,7 +20,7 @@ export interface ErrorLogInput {
 interface BasicUserInput {
     email: string   
     name: string
-    age: number
+    birthday: Date
     ageInterest: number[]
     gender: Gender
     genderInterest: Gender[]
@@ -96,7 +96,6 @@ export interface PublicProfile {
     attributes: string[]
     images: string[]
     description: string
-    university: string
 }
 
 export interface UserSwipeStats {
@@ -198,7 +197,8 @@ export interface SwipeFeed {
 }
 
 export interface GetProfileListInput {
-    ageRange: number[]
+    minDate: Date,
+    maxDate: Date,
     gender: Gender[]
 
     include?: string[]

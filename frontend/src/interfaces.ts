@@ -43,7 +43,6 @@ export interface PublicProfile {
     attributes: string[]
     images: string[]
     description: string
-    university: string
 }
 
 export interface GetChatInput {

@@ -5,6 +5,7 @@ import fs from "fs/promises";
 import { randomUUID } from "crypto";
 import mime from "mime-types";
 import { handler } from "../jest.setup";
+import { addYears } from "date-fns";
 
 const imageFilePath = "./__testUtils__/goodImage.jpg";
 const badImageFilePath = "./__testUtils__/badImage.txt";
@@ -19,7 +20,7 @@ export async function getImageDetails(good : boolean) : Promise<ImageInput> {
 export async function validRequestUserInput() : Promise<RequestUserInput> { 
     const upload = await getImageDetails(true);
     return {
-        age: globals.minAge,
+        birthday: addYears(new Date(), -globals.minAge),
         ageInterest: [18,25],
         attributes: Array.from({length: globals.maxAttributes}, (_,index) => `${index}`),
         email: "a@berkeley.edu",
@@ -44,7 +45,7 @@ export function createUserInput(email = "a@berkeley.edu") : UserInput {
     return {
         email: email,
         name: "a",
-        age: 21,
+        birthday: addYears(new Date(), -21),
         ageInterest: [18,25],
         gender: "Male",
         genderInterest: ["Male"],
@@ -134,20 +135,20 @@ export async function createUsersForSwipeFeed() {
     uInput.gender = "Male";
     uInput.genderInterest = ["Female"];
     uInput.ageInterest = [18,30];
-    uInput.age = 30;
+    uInput.birthday = addYears(new Date(),-30);
 
     const uInput2 = createUserInput("b@berkeley.edu");
     uInput2.gender = "Male";
-    uInput2.age = 20;
+    uInput2.birthday = addYears(new Date(),-20);
 
     const uInput3 = createUserInput("c@berkeley.edu");
     uInput3.gender = "Female";
-    uInput3.age = 20;
+    uInput3.birthday = addYears(new Date(),-20);
 
     const uInput4 = createUserInput("d@berkeley.edu");
     uInput4.gender = "Female";
     uInput4.genderInterest = ["Male", "Female"];
-    uInput4.age = 21;
+    uInput4.birthday = addYears(new Date(),-21);
     uInput4.ageInterest = [18,30];
 
     const [user, user2, user3, user4] = await Promise.all([
