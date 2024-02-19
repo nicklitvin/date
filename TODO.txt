@@ -1,5 +1,4 @@
 TODO
-return signed download of each image requested in public profile
 
 BACKEND TODO
 change elo constants with api?

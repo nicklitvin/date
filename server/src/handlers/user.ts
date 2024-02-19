@@ -1,14 +1,16 @@
-import { Gender, PrismaClient, User } from "@prisma/client";
-import { EditUserInput, EloAction, EloUpdateInput, GetProfileListInput, PublicProfile, RequestUserInput, UserInput } from "../interfaces";
+import { PrismaClient, User } from "@prisma/client";
+import { EditUserInput, EloAction, EloUpdateInput, GetProfileListInput, ImageHandler, PublicProfile, RequestUserInput, UserInput } from "../interfaces";
 import { randomUUID } from "crypto";
 import { addMonths, differenceInYears } from "date-fns";
 import { globals } from "../globals";
 
 export class UserHandler {
     private prisma : PrismaClient;
+    private imageHandler: ImageHandler|undefined;
 
-    constructor(prisma : PrismaClient) {
+    constructor(prisma : PrismaClient, imageHandler?: ImageHandler) {
         this.prisma = prisma;
+        this.imageHandler = imageHandler;
     }
 
     public isSchoolEmailValid(email : string) : boolean {
@@ -212,11 +214,23 @@ export class UserHandler {
             },
             take: input.count
         })
-        return users.map( user => this.convertUserToPublicProfile(user));
+        const profiles = await Promise.all(
+            users.map( user => this.convertUserToPublicProfile(user))
+        )
+        return profiles;
     }
 
-    public convertUserToPublicProfile(input : User) : PublicProfile {
+    public async convertUserToPublicProfile(input : User) : Promise<PublicProfile> {
         const age = differenceInYears(new Date(), input.birthday);
+        let imageIDs = input.images;
+
+        if (this.imageHandler) {
+            const imageURLs = await Promise.all(
+                imageIDs.map( imageID => this.imageHandler!.getImageURL(imageID))
+            )
+            imageIDs = imageURLs.filter( imageURL => imageURL) as string[];
+        }
+
         return {
             id: input.id,
             name: input.name,
@@ -224,7 +238,7 @@ export class UserHandler {
             attributes: input.attributes,
             description: input.description,
             gender: input.gender,
-            images: input.images,
+            images: imageIDs,
         }
     }
 }

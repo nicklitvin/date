@@ -44,7 +44,9 @@ describe("user", () => {
 
     it("should get public profile of user", async () => {
         const user = await funcs.createUser(createUserInput()) ;
-        expect(await funcs.getPublicProfile(user.id)).not.toEqual(null);
+        const profile = await funcs.getPublicProfile(user.id);
+        expect(profile).not.toEqual(null);
+        expect(profile?.images[0].includes("url"));
     })
 
     it("should not delete nonuser", async () => {

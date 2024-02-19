@@ -41,7 +41,7 @@ export class Handler {
         this.announcement = new AnnouncementHandler(prisma);
         this.attribute = new AttributeHandler(prisma);
         this.errorLog = new ErrorLogHandler(prisma);
-        this.user = new UserHandler(prisma);
+        this.user = new UserHandler(prisma, customImageHandler);
         this.swipe = new SwipeHandler(prisma);
         this.message = new MessageHandler(prisma);
         this.report = new ReportHandler(prisma);
