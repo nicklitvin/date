@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { StyledScroll, StyledText, StyledView } from "../styledElements";
 import { matchesText } from "../text";
-import { ChatPreview, NewMatchDataInput, PublicProfile } from "../interfaces";
+import { ChatPreview, NewMatch, NewMatchDataInput, PublicProfile } from "../interfaces";
 import { Image } from "expo-image";
 import { ChatPreviewBox } from "../components/ChatPreviewBox";
 import { useEffect, useState } from "react";
@@ -12,16 +12,16 @@ import { PageHeader } from "../components/PageHeader";
 import { URLs } from "../urls";
 
 interface Props {
-    newMatches: PublicProfile[]
+    newMatches: NewMatch[]
     chatPreviews: ChatPreview[]
-    customNewMatches?: PublicProfile[]
+    customNewMatches?: NewMatch[]
     customNewChatPreviews?: ChatPreview[]
     customNewMatchesLength?: (input : number) => number
     customNewChatPreviewsLength?: (input : number) => number
 }
 
 export function Matches(props : Props) {
-    const [newMatches, setNewMatches] = useState<PublicProfile[]>(props.newMatches ?? []);
+    const [newMatches, setNewMatches] = useState<NewMatch[]>(props.newMatches ?? []);
     const [chatPreviews, setChatPreviews] = useState<ChatPreview[]>(props.chatPreviews ?? []);
     const {globalState,savedAPICalls} = useStore();
 
@@ -39,9 +39,9 @@ export function Matches(props : Props) {
 
     const loadMoreNewMatches = async () => {
         try {
-            let receivedNewMatches : PublicProfile[] = [];
+            let receivedNewMatches : NewMatch[] = [];
             const input : NewMatchDataInput = {
-                timestamp: new Date()
+                timestamp: new Date(newMatches.at(-1)!.timestamp.getTime() - 1)
             }
 
             if (globalState.useHttp) {
@@ -51,8 +51,8 @@ export function Matches(props : Props) {
                 savedAPICalls.setNewMatchDataInput(input);
                 receivedNewMatches = props.customNewMatches!;
             }   
-            const uniqueNewMatches = new Set<PublicProfile>(newMatches.concat(receivedNewMatches));
-            setNewMatches(Array.from(uniqueNewMatches));
+
+            setNewMatches(newMatches.concat(receivedNewMatches));
         } catch (err) {
             console.log(err);
         }
@@ -62,7 +62,7 @@ export function Matches(props : Props) {
         try {
             let newChatPreviews : ChatPreview[] = [];
             const input : NewMatchDataInput = {
-                timestamp: chatPreviews[0].messages.at(-1)!.timestamp
+                timestamp: new Date(chatPreviews.at(-1)!.messages[0].timestamp.getTime() - 1)
             }
 
             if (globalState.useHttp) {
@@ -72,11 +72,7 @@ export function Matches(props : Props) {
                 savedAPICalls.setNewMatchDataInput(input);
                 newChatPreviews = props.customNewChatPreviews!;
             }
-            const uniqueChatPreviews = new Set<ChatPreview>(newChatPreviews.concat(chatPreviews));
-            const orderedPreviews = Array.from(uniqueChatPreviews).sort( (a,b) => 
-                a.messages.at(-1)!.timestamp.getTime() - b.messages.at(-1)!.timestamp.getTime()
-            )
-            setChatPreviews(orderedPreviews);
+            setChatPreviews(chatPreviews.concat(newChatPreviews));
         } catch (err) {
             console.log(err)
         }
@@ -98,8 +94,8 @@ export function Matches(props : Props) {
             >
                 {newMatches.map( (match, index) => (
                     <Image
-                        key={`${match.id}-${index}`}
-                        source={match.images[0]}
+                        key={`${match.profile.id}-${index}`}
+                        source={match.profile.images[0]}
                     />
                 ))}
             </StyledScroll>

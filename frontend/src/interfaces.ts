@@ -67,3 +67,8 @@ export interface SwipeInput {
 export interface NewMatchDataInput {
     timestamp: Date
 }
+
+export interface NewMatch {
+    profile: PublicProfile
+    timestamp: Date
+}

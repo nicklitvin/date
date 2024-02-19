@@ -26,9 +26,9 @@ export function Chat(props : Props) {
     const { globalState, savedAPICalls } = useStore();
 
     useEffect( () => {
-        for (let i = chat.length - 1; i >= 0 ; i--) {
-            if (chat[i].recepientID == props.publicProfile.id) {
-                setLastSentChatID(chat[i].id)
+        for (const message of [...chat].reverse()) {
+            if (message.recepientID == props.publicProfile.id) {
+                setLastSentChatID(message.id)
             }
         }
         if (props.customGetChatLength) {
@@ -58,7 +58,7 @@ export function Chat(props : Props) {
 
             const input : GetChatInput = {
                 withID: props.publicProfile.id,
-                fromTime: chat.at(-1)!.timestamp
+                fromTime: new Date(chat.at(-1)!.timestamp.getTime() - 1)
             }
 
             if (globalState.useHttp) {
@@ -69,11 +69,7 @@ export function Chat(props : Props) {
                 moreChats = props.customNextChatLoad!;
             }
 
-            const uniqueMessages = new Set<Message>(moreChats.concat(chat));
-            const orderedMessages = Array.from(uniqueMessages).sort( (a,b) => 
-                a.timestamp.getTime() - b.timestamp.getTime()
-            )
-            setChat(orderedMessages);
+            setChat(chat.concat(moreChats));
         } catch (err) {
             console.log(err);
         }
@@ -110,11 +106,11 @@ export function Chat(props : Props) {
                 testID={testIDS.chatScroll}
             >
                 {chat.map( (message, index) => (
-                    <StyledView key={`view-${message.id}-${index}`}>
+                    <StyledView key={`view-${message.id}`}>
                         {
                             (
-                                index == 0 || 
-                                message.timestamp.getTime() - chat[index - 1].timestamp.getTime() >
+                                index == chat.length - 1 || 
+                                message.timestamp.getTime() - chat[index + 1].timestamp.getTime() >
                                 globals.timeBeforeChatTimestamp
                             ) ? 
                             <StyledText>

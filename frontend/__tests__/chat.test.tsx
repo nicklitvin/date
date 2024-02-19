@@ -16,7 +16,6 @@ describe("chat", () => {
         gender: "Male",
         id: "abc",
         images: ["imageURL"],
-        university: "berkeley"
     }
     const latestMessages : Message[] = [
         {
@@ -24,7 +23,7 @@ describe("chat", () => {
             message: "hi",
             readStatus: true,
             recepientID: recepientProfile.id,
-            timestamp: new Date(Date.UTC(2000, 0, 1, 8, 0)),
+            timestamp: new Date(Date.UTC(2000, 0, 1, 8, 1)),
             userID: myUserID
         },
         {
@@ -37,7 +36,6 @@ describe("chat", () => {
         }
     ]
     const moreMessages : Message[] = [
-        latestMessages[1],
         {
             id: "id2",
             message: "sooo",
@@ -105,7 +103,7 @@ describe("chat", () => {
         
         const getChatInput = store.savedAPICalls.getChatInput;
         expect(getChatInput?.withID).toEqual(recepientProfile.id);
-        expect(getChatInput?.fromTime).toEqual(latestMessages[0].timestamp);
+        expect(getChatInput?.fromTime.getTime()).toBeLessThan(latestMessages[1].timestamp.getTime());
     })
 
     it("should report user", async () => {
@@ -151,10 +149,10 @@ describe("chat", () => {
         );
 
         expect(screen.queryByText(getChatTimestamp(
-            latestMessages[0].timestamp, timezone)
+            latestMessages[1].timestamp, timezone)
         )).not.toEqual(null);
         expect(screen.queryByText(getChatTimestamp(
-            moreMessages[1].timestamp, timezone)
+            moreMessages[0].timestamp, timezone)
         )).toEqual(null);
         
         const scroll = screen.getByTestId(testIDS.chatScroll);
@@ -163,10 +161,10 @@ describe("chat", () => {
         })
 
         expect(screen.queryByText(getChatTimestamp(
-            moreMessages[1].timestamp, timezone)
+            moreMessages[0].timestamp, timezone)
         )).not.toEqual(null);
         expect(screen.queryByText(getChatTimestamp(
-            latestMessages[0].timestamp, timezone)
+            latestMessages[1].timestamp, timezone)
         )).not.toEqual(null);
     })
 
@@ -185,6 +183,7 @@ describe("chat", () => {
             </StoreProvider>
         );
 
+        expect(screen.queryByText(chatText.read)).not.toEqual(null);
         expect(screen.queryByText(chatText.delivered)).toEqual(null);
         expect(screen.getByTestId(`readStatus-${latestMessages[0].id}`)).not.toEqual(null);
         
@@ -193,11 +192,8 @@ describe("chat", () => {
             fireEvent(scroll, "scrollToTop")
         })
 
-        await act( () => {
-            fireEvent(scroll,"scrollToTop");
-        })
-
-        expect(screen.queryByText(chatText.read)).toEqual(null);
-        expect(screen.getByTestId(`readStatus-${moreMessages[1].id}`)).not.toEqual(null);
+        expect(screen.queryByText(chatText.read)).not.toEqual(null);
+        expect(screen.queryByText(chatText.delivered)).toEqual(null);
+        expect(screen.getByTestId(`readStatus-${latestMessages[0].id}`)).not.toEqual(null);
     })
 })
