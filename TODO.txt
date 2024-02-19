@@ -1,10 +1,10 @@
 TODO
-switch for notifications
-double slider
-react hot toast for success report, removed user
+change age to birthday on backend but public profile returns age
+add time matched to newmatches
+test profile view and swipe feed
+
 
 BACKEND TODO
-change age to birthday on backend
 return signed download of each image requested
 change elo constants with api?
 messagelowerelo is rewarded?

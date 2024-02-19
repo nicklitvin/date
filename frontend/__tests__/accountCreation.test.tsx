@@ -56,11 +56,40 @@ describe("accountCreation", () => {
         const continueButton = screen.getByText(accountCreationText.continue);
         await act( () => {
             fireEvent(genderButton, "press")
+        })
+        await act( () => {
             fireEvent(genderButton, "press")
+        })
+        await act( () => {
             fireEvent(continueButton, "press")
         })
     
         expect(screen.queryByText(accountCreationText.genderInputTitle)).not.toEqual(null);
+    })
+
+    it("should select multiple gender preferences", async () => {
+        const pageStart = pageOrder.findIndex(page => page == "Gender Preference") as number;
+        const store = new RootStore()
+        const StoreProvider = createStoreProvider(store);
+        const returnGenderCount = jest.fn( (input : number) => input);
+        
+        render(
+            <StoreProvider value={store}>
+                <AccountCreation 
+                    customPageStart={pageStart} 
+                    returnGenderPreferences={returnGenderCount}
+                />
+            </StoreProvider>
+        );
+
+        await act( () => {
+            fireEvent(screen.getByText(globals.genders[0]), "press");
+        })
+        await act( () => {
+            fireEvent(screen.getByText(globals.genders[1]), "press");
+        })
+
+        expect(returnGenderCount).toHaveLastReturnedWith(2);
     })
 
     it("should generate all attributes", async () => {
@@ -197,7 +226,7 @@ describe("accountCreation", () => {
             fireEvent(screen.getByText(accountCreationText.continue), "press");
         })
 
-        const userInput = store.globalState.userInput;
+        const userInput = store.savedAPICalls.createUser;
 
         expect(userInput?.name).toEqual(myName);
         expect(userInput?.birthday.getTime()).toEqual(myBirthday.getTime());
@@ -213,7 +242,6 @@ describe("accountCreation", () => {
     it("should switch images", async () => {
         const store = new RootStore()
         store.globalState.setUseHttp(false);
-        store.globalState.setEmail("email");
         const StoreProvider = createStoreProvider(store);
         const pageStart = pageOrder.findIndex(page => page == "Pictures") as number;
 

@@ -15,12 +15,4 @@ export const globals = {
             {id: "id4", value: "rap"},
         ]
     },
-
-    URLServer: "http:",
-    URLCreateUser: "/createUser",
-    URLSendMessage: "/sendMessage",
-    URLGetChat: "/getChat",
-    URLReportUser: "/reportUser",
-    URLGetNewMatches: "/getNewMatches",
-    URLGetNewChatPreviews: "/getChatPreviews",
 }

@@ -13,20 +13,26 @@ export const makePublicProfile = (id : string = "otherProfileID") : PublicProfil
     university: "berkeley"
 })
 
-export const makeSentMessage = (recepientID : string = makePublicProfile().id) : Message => ({
+export const makeSentMessage = (
+    recepientID : string = makePublicProfile().id,
+    timestamp: Date = new Date()
+) : Message => ({
     id: "sentID",
     message: "sentMessage",
     readStatus: true,
     recepientID: recepientID,
-    timestamp: new Date(),
+    timestamp: timestamp,
     userID: myUserID
 })
 
-export const makeReceivedMessage = (sentID : string = makePublicProfile().id) : Message => ({
+export const makeReceivedMessage = (
+    sentID : string = makePublicProfile().id,
+    timestamp : Date = new Date()
+) : Message => ({
     id: "receivedID",
     message: "receivedMessage",
     readStatus: true,
     recepientID: myUserID,
-    timestamp: new Date(),
+    timestamp: timestamp,
     userID: sentID
 })

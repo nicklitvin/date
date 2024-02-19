@@ -59,3 +59,12 @@ export const matchesText = {
     chats: "Chats",
     pageTitle: "Matches"
 }
+
+export const feedText = {
+    pageTitle: "Feed",
+    noMoreFeed: "No more people to see right now"
+}
+
+export const profileViewText = {
+    pageTitle: "Public View",
+}

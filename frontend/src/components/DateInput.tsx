@@ -20,7 +20,7 @@ export function MyDateInput(props: Props) {
         if (differenceInCalendarYears(new Date(), date) < 18) {
             setShowError(true);
         }
-    }, [date, showError])
+    }, [date])
 
     return (
         <>

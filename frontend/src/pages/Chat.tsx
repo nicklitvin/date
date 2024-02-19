@@ -6,12 +6,12 @@ import { useStore } from "../store/RootStore";
 import { GetChatInput, Message, MessageInput, PublicProfile, RequestReportInput } from "../interfaces";
 import axios from "axios";
 import { globals } from "../globals";
-import { MyMessage } from "../components/message";
 import { StyledButton, StyledScroll, StyledText, StyledView } from "../styledElements";
-import { Image } from "expo-image";
 import { testIDS } from "../testIDs";
 import { getChatTimestamp } from "../utils";
 import { PageHeader } from "../components/PageHeader";
+import { MyMessage } from "../components/Message";
+import { URLs } from "../urls";
 
 interface Props {
     publicProfile: PublicProfile
@@ -23,7 +23,7 @@ interface Props {
 export function Chat(props : Props) {
     const [chat, setChat] = useState<Message[]>(props.latestMessages ?? []);
     const [lastSentChatID, setLastSentChatID] = useState<string>("");
-    const { globalState } = useStore();
+    const { globalState, savedAPICalls } = useStore();
 
     useEffect( () => {
         for (let i = chat.length - 1; i >= 0 ; i--) {
@@ -42,10 +42,11 @@ export function Chat(props : Props) {
             message: sentMessage
         }
         try {
+            const endpoint = URLs.server + URLs.sendMessage;
             if (globalState.useHttp) {
-                await axios.post(globals.URLServer + globals.URLSendMessage, messageInput);
+                await axios.post(endpoint, messageInput);
             } else {
-                globalState.setSentMessage(messageInput);
+                savedAPICalls.setSentMessage(messageInput);
             }
         } catch (err) {}
     }
@@ -53,18 +54,21 @@ export function Chat(props : Props) {
     const handleScroll = async () => {
         try {
             let moreChats : Message[];
-            if (globalState.useHttp && chat.length > 0) {
-                const input : GetChatInput = {
-                    withID: props.publicProfile.id,
-                    fromTime: chat.at(-1)!.timestamp
-                }
-                const response = await axios.post(
-                    globals.URLServer + globals.URLGetChat, input
-                );
+            if (chat.length == 0) return
+
+            const input : GetChatInput = {
+                withID: props.publicProfile.id,
+                fromTime: chat.at(-1)!.timestamp
+            }
+
+            if (globalState.useHttp) {
+                const response = await axios.post(URLs.server + URLs.getChat, input);
                 moreChats = response.data;
             } else {
+                savedAPICalls.setGetChatInput(input);
                 moreChats = props.customNextChatLoad!;
             }
+
             const uniqueMessages = new Set<Message>(moreChats.concat(chat));
             const orderedMessages = Array.from(uniqueMessages).sort( (a,b) => 
                 a.timestamp.getTime() - b.timestamp.getTime()
@@ -81,9 +85,9 @@ export function Chat(props : Props) {
                 reportedID: props.publicProfile.id
             }
             if (globalState.useHttp) {
-                await axios.post(globals.URLServer + globals.URLReportUser, myReport)
+                await axios.post(URLs.server + URLs.reportUser, myReport)
             } else {
-                globalState.setLastReport(myReport)
+                savedAPICalls.setRequestReportInput(myReport)
             }
         } catch (err) {
             console.log(err);
@@ -91,7 +95,7 @@ export function Chat(props : Props) {
     }
 
     return (
-        <>
+        <StyledView>
             <PageHeader
                 imageSource={props.publicProfile.images[0]}
                 title={props.publicProfile.name}
@@ -136,7 +140,7 @@ export function Chat(props : Props) {
                 errorMessage={chatText.inputError}
                 afterSubmit={sendMessage}
             />  
-        </>
+        </StyledView>
     )
 }
 

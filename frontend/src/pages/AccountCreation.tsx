@@ -16,6 +16,7 @@ import { Image } from "expo-image";
 import * as FileSystem from "expo-file-system";
 import classNames from "classnames";
 import { AccountCreationType } from "../types";
+import { URLs } from "../urls";
 
 export const pageOrder : AccountCreationType[] = [
     "Create Profile","Name","Birthday", "Gender", "Age Preference", "Gender Preference",
@@ -28,11 +29,12 @@ interface Props {
     customUploads?: FileUploadAndURI[]
     returnPageNumber?: (input : number) => number
     returnUploadOrder?: (input : string[]) => string
+    returnGenderPreferences?: (input : number) => number
 }
 
 export function AccountCreation(props : Props) {
     const [currentPage, setCurrentPage] = useState<number>(props.customPageStart ?? 0);
-    const { globalState } = useStore();
+    const { globalState, savedAPICalls } = useStore();
 
     const [name, setName] = useState<string>("");
     const [birthday, setBirthday] = useState<Date>(props.customBirthday ?? new Date());
@@ -62,6 +64,12 @@ export function AccountCreation(props : Props) {
             props.returnUploadOrder(uploads.map( val => val.uri))
     }, [uploads])
 
+    useEffect( () => {
+        if (props.returnGenderPreferences) {
+            props.returnGenderPreferences(genderPreference.length);
+        }
+    })
+
     const createUser = async () => {
         const userInput : UserInput = {
             name: name,
@@ -80,10 +88,11 @@ export function AccountCreation(props : Props) {
             })
         };
         try {
+            const endpoint = URLs.server + URLs.createUser;
             if (globalState.useHttp) {
-                await axios.post(globals.URLServer + globals.URLCreateUser, userInput);
+                await axios.post(endpoint, userInput);
             } else {
-                globalState.setUserInput(userInput);
+                savedAPICalls.setCreateUser(userInput);
             }
         } catch (err) {
             setShowUserError(true);
@@ -97,7 +106,6 @@ export function AccountCreation(props : Props) {
         });
 
         if (result.canceled) return
-
 
         const newUploads : FileUploadAndURI[] = [];
         for (const asset of result.assets) {

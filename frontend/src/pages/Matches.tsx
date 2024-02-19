@@ -1,15 +1,15 @@
 import { observer } from "mobx-react-lite";
 import { StyledScroll, StyledText, StyledView } from "../styledElements";
 import { matchesText } from "../text";
-import { ChatPreview, PublicProfile } from "../interfaces";
+import { ChatPreview, NewMatchDataInput, PublicProfile } from "../interfaces";
 import { Image } from "expo-image";
 import { ChatPreviewBox } from "../components/ChatPreviewBox";
 import { useEffect, useState } from "react";
 import { useStore } from "../store/RootStore";
 import axios from "axios";
-import { globals } from "../globals";
 import { testIDS } from "../testIDs";
 import { PageHeader } from "../components/PageHeader";
+import { URLs } from "../urls";
 
 interface Props {
     newMatches: PublicProfile[]
@@ -23,7 +23,7 @@ interface Props {
 export function Matches(props : Props) {
     const [newMatches, setNewMatches] = useState<PublicProfile[]>(props.newMatches ?? []);
     const [chatPreviews, setChatPreviews] = useState<ChatPreview[]>(props.chatPreviews ?? []);
-    const {globalState} = useStore();
+    const {globalState,savedAPICalls} = useStore();
 
     useEffect( () => {
         if (props.customNewChatPreviewsLength) {
@@ -40,10 +40,15 @@ export function Matches(props : Props) {
     const loadMoreNewMatches = async () => {
         try {
             let newMatches : PublicProfile[] = [];
+            const input : NewMatchDataInput = {
+                timestamp: new Date()
+            }
+
             if (globalState.useHttp) {
-                const response = await axios.post(globals.URLServer + globals.URLGetNewMatches); 
+                const response = await axios.post(URLs.server + URLs.getNewMatches, input); 
                 newMatches = response.data;
             } else {
+                savedAPICalls.setNewMatchDataInput(input);
                 newMatches = props.customNewMatches!;
             }   
             const uniqueNewMatches = new Set<PublicProfile>(newMatches.concat(newMatches));
@@ -56,15 +61,20 @@ export function Matches(props : Props) {
     const loadMoreChatPreviews = async () => {
         try {
             let newChatPreviews : ChatPreview[] = [];
+            const input : NewMatchDataInput = {
+                timestamp: chatPreviews[0].messages.at(-1)!.timestamp
+            }
+
             if (globalState.useHttp) {
-                const response = await axios.post(globals.URLServer + globals.URLGetNewChatPreviews);
+                const response = await axios.post(URLs.server + URLs.getNewChatPreviews, input);
                 newChatPreviews = response.data;
             } else {
+                savedAPICalls.setNewMatchDataInput(input);
                 newChatPreviews = props.customNewChatPreviews!;
             }
             const uniqueChatPreviews = new Set<ChatPreview>(newChatPreviews.concat(chatPreviews));
             const orderedPreviews = Array.from(uniqueChatPreviews).sort( (a,b) => 
-                b.messages.at(-1)!.timestamp.getTime() - a.messages.at(-1)!.timestamp.getTime()
+                a.messages.at(-1)!.timestamp.getTime() - b.messages.at(-1)!.timestamp.getTime()
             )
             setChatPreviews(orderedPreviews);
         } catch (err) {

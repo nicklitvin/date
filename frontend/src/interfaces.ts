@@ -1,3 +1,5 @@
+import { Action } from "./types"
+
 export interface UserInput {
     email: string
     name: string 
@@ -56,4 +58,13 @@ export interface RequestReportInput {
 export interface ChatPreview {
     profile: PublicProfile
     messages: Message[]
+}
+
+export interface SwipeInput {
+    swipedUserID: string
+    action: Action
+}
+
+export interface NewMatchDataInput {
+    timestamp: Date
 }

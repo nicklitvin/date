@@ -6,7 +6,6 @@ import { accountCreationText } from "../text";
 interface Props {
     minAge: number
     maxAge: number
-
     setMinAge: React.Dispatch<React.SetStateAction<number>>
     setMaxAge: React.Dispatch<React.SetStateAction<number>>
 }

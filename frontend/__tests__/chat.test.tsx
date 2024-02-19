@@ -51,7 +51,6 @@ describe("chat", () => {
     it("should send message", async () => {
         const store = new RootStore();
         store.globalState.setUseHttp(false);
-        store.globalState.setTimezone("PST");
 
         const StoreProvider = createStoreProvider(store);
         render(
@@ -72,7 +71,7 @@ describe("chat", () => {
             fireEvent(myInput, "submitEditing");
         })
 
-        const sentMessage = store.globalState.sentMessage;
+        const sentMessage = store.savedAPICalls.sentMessage;
         expect(sentMessage?.message).toEqual(myMessage);
         expect(sentMessage?.recepientID).toEqual(recepientProfile.id);
     })
@@ -103,12 +102,15 @@ describe("chat", () => {
         })
 
         expect(getChatLength).toHaveLastReturnedWith(3);
+        
+        const getChatInput = store.savedAPICalls.getChatInput;
+        expect(getChatInput?.withID).toEqual(recepientProfile.id);
+        expect(getChatInput?.fromTime).toEqual(latestMessages[0].timestamp);
     })
 
     it("should report user", async () => {
         const store = new RootStore();
         store.globalState.setUseHttp(false);
-        store.globalState.setTimezone("PST");
 
         const StoreProvider = createStoreProvider(store);
 
@@ -127,14 +129,15 @@ describe("chat", () => {
             fireEvent(reportButton, "press")
         })
 
-        const userReport = store.globalState.lastReport;
+        const userReport = store.savedAPICalls.requestReportInput;
         expect(userReport?.reportedID).toEqual(recepientProfile.id);
     })
 
     it("should show timestamps", async () => {
+        const timezone = "PST";
         const store = new RootStore();
         store.globalState.setUseHttp(false);
-        store.globalState.setTimezone("PST");
+        store.globalState.setTimezone(timezone);
         const StoreProvider = createStoreProvider(store);
 
         render(
@@ -147,22 +150,29 @@ describe("chat", () => {
             </StoreProvider>
         );
 
-        expect(screen.queryByText(getChatTimestamp(latestMessages[0].timestamp, "PST"))).not.toEqual(null);
-        expect(screen.queryByText(getChatTimestamp(moreMessages[1].timestamp, "PST"))).toEqual(null);
+        expect(screen.queryByText(getChatTimestamp(
+            latestMessages[0].timestamp, timezone)
+        )).not.toEqual(null);
+        expect(screen.queryByText(getChatTimestamp(
+            moreMessages[1].timestamp, timezone)
+        )).toEqual(null);
         
         const scroll = screen.getByTestId(testIDS.chatScroll);
         await act( () => {
             fireEvent(scroll, "scrollToTop")
         })
 
-        expect(screen.queryByText(getChatTimestamp(moreMessages[1].timestamp, "PST"))).not.toEqual(null);
-        expect(screen.queryByText(getChatTimestamp(latestMessages[0].timestamp, "PST"))).not.toEqual(null);
+        expect(screen.queryByText(getChatTimestamp(
+            moreMessages[1].timestamp, timezone)
+        )).not.toEqual(null);
+        expect(screen.queryByText(getChatTimestamp(
+            latestMessages[0].timestamp, timezone)
+        )).not.toEqual(null);
     })
 
     it("should show read/delivered read status", async () => {
         const store = new RootStore();
         store.globalState.setUseHttp(false);
-        store.globalState.setTimezone("PST");
         const StoreProvider = createStoreProvider(store);
 
         render(

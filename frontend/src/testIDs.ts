@@ -3,5 +3,9 @@ export const testIDS = {
     reportUser: "reportUser",
 
     newMatchScroll: "newMatchScroll",
-    chatPreviewScroll: "chatPreviewScroll"
+    chatPreviewScroll: "chatPreviewScroll",
+
+    swipeLike: "Like",
+    swipeDislike: "Dislike",
+
 }

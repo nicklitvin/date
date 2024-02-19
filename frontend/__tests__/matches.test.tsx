@@ -2,7 +2,7 @@ import { act, fireEvent, render, screen } from "@testing-library/react-native"
 import { RootStore, createStoreProvider } from "../src/store/RootStore";
 import { MatchesMob } from "../src/pages/Matches";
 import { ChatPreview, Message, PublicProfile } from "../src/interfaces";
-import { makePublicProfile, makeReceivedMessage, makeSentMessage } from "../__testUtils__/easySetup";
+import { makePublicProfile, makeSentMessage } from "../__testUtils__/easySetup";
 import { testIDS } from "../src/testIDs";
 
 describe("matches", () => {
@@ -13,9 +13,10 @@ describe("matches", () => {
 
         const profile1 = makePublicProfile("id1");
         const profile2 = makePublicProfile("id2");
+        const profile3 = makePublicProfile("id3");
 
-        const newMatches : PublicProfile[] = [profile1];
-        const loadMoreProfiles = [profile1, profile2]
+        const newMatches : PublicProfile[] = [profile1, profile2];
+        const loadMoreProfiles = [profile2, profile3]
         const getNewMatchLength = jest.fn( (input : number) => input);
 
         render(
@@ -29,14 +30,18 @@ describe("matches", () => {
             </StoreProvider>
         );
 
-        expect(getNewMatchLength).toHaveLastReturnedWith(1);
+        expect(getNewMatchLength).toHaveLastReturnedWith(2);
         
         const scroll = screen.getByTestId(testIDS.newMatchScroll);
         await act( () => {
             fireEvent(scroll, "scrollToTop")
         })
 
-        expect(getNewMatchLength).toHaveLastReturnedWith(2);
+        // TODO
+        // const input = store.savedAPICalls.newMatchDataInput;
+        // expect(input?.timestamp.getTime()).toEqual(new Date().getTime())
+
+        expect(getNewMatchLength).toHaveLastReturnedWith(3);
     })
 
     it("should get new chat previews and more on load", async () => {
@@ -46,8 +51,15 @@ describe("matches", () => {
 
         const profile1 = makePublicProfile("id1");
         const profile2 = makePublicProfile("id2");
-        const messages1 : Message[] = [makeSentMessage(profile1.id)];
-        const messages2 : Message[] = [makeSentMessage(profile2.id)];
+        const profile3 = makePublicProfile("id3");
+
+        const messages1 : Message[] = [makeSentMessage(profile1.id, new Date(3))];
+        const messages2 : Message[] = [
+            makeSentMessage(profile2.id, new Date(1)),
+            makeSentMessage(profile2.id, new Date(2)),
+        ];
+        const messages3 : Message[] = [makeSentMessage(profile2.id, new Date(0))];
+
         const chatPreview1 : ChatPreview = {
             messages: messages1,
             profile: profile1
@@ -56,26 +68,34 @@ describe("matches", () => {
             messages: messages2,
             profile: profile2
         }
+        const chatPreview3 : ChatPreview = {
+            messages: messages3,
+            profile: profile3
+        }
+
         const getChatPreviewLength = jest.fn( (input : number) => input);
 
         render(
             <StoreProvider value={store}>
                 <MatchesMob
                     newMatches={[]}
-                    chatPreviews={[chatPreview1]}
-                    customNewChatPreviews={[chatPreview1, chatPreview2]}
+                    chatPreviews={[chatPreview2,chatPreview1]}
+                    customNewChatPreviews={[chatPreview1, chatPreview3]}
                     customNewChatPreviewsLength={getChatPreviewLength}
                 />
             </StoreProvider>
         );
         
-        expect(getChatPreviewLength).toHaveLastReturnedWith(1);
+        expect(getChatPreviewLength).toHaveLastReturnedWith(2);
 
         const scroll = screen.getByTestId(testIDS.chatPreviewScroll);
         await act( () => {
             fireEvent(scroll, "scrollToTop");
         });
 
-        expect(getChatPreviewLength).toHaveLastReturnedWith(2);
+        const input = store.savedAPICalls.newMatchDataInput;
+        expect(input?.timestamp.getTime()).toEqual(messages2[1].timestamp.getTime());
+
+        expect(getChatPreviewLength).toHaveLastReturnedWith(3);
     })
 })

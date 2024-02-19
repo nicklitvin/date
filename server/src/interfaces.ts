@@ -126,7 +126,6 @@ export interface ChatPreview {
     messages: Message[]
 }
 
-
 export interface ImageHandler {
     uploadImage(input : ImageInput) : Promise<string|null>
     getImageURL(id : string) : Promise<string|null>
