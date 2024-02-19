@@ -524,20 +524,38 @@ describe("handler", () => {
         const newMatches = await handler.getNewMatches({
             userID: user.id,
             fromTime: new Date()
-        }) as PublicProfile[];
+        });
 
         expect(newMatches).toHaveLength(0);
     })
 
     it("should get new matches", async () => {
-        const {user, user_2} = await makeTwoUsersAndMatch();
+        const user = await handler.user.createUser(createUserInput("a@berkeley.edu"));
+        const user2 = await handler.user.createUser(createUserInput("b@berkeley.edu"));
+        const user3 = await handler.user.createUser(createUserInput("c@berkeley.edu"));
+
+        const match = await matchUsers(user.id, user2.id);
+        const match2 = await matchUsers(user.id, user3.id);
+        expect(match.getTime()).not.toEqual(match2.getTime());
+
         const newMatches = await handler.getNewMatches({
             userID: user.id,
             fromTime: new Date()
-        }) as PublicProfile[];
+        });
 
-        expect(newMatches).toHaveLength(1);
-        expect(newMatches[0].id).toEqual(user_2.id)
+        expect(newMatches).toHaveLength(2);
+        expect(newMatches![0].profile.id).toEqual(user3.id);
+        expect(newMatches![0].timestamp.getTime()).toEqual(match2.getTime());
+        expect(newMatches![1].profile.id).toEqual(user2.id);
+        expect(newMatches![1].timestamp.getTime()).toEqual(match.getTime());
+
+        const newMatches1 = await handler.getNewMatches({
+            userID: user.id,
+            fromTime: new Date(match2.getTime() - 1)
+        });
+        expect(newMatches1).toHaveLength(1);
+        expect(newMatches1![0].profile.id).toEqual(user2.id);
+        expect(newMatches1![0].timestamp.getTime()).toEqual(match.getTime());
     })
 
     it("should increase elo when user receives like", async () => {

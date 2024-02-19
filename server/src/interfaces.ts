@@ -216,3 +216,13 @@ export interface ConfirmVerificationInput {
     schoolEmail: string
     code: number
 }
+
+export interface MatchDataOutput {
+    userID: string
+    timestamp: Date
+}
+
+export interface NewMatchData {
+    profile: PublicProfile
+    timestamp: Date
+}

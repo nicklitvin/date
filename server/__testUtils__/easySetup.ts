@@ -103,8 +103,8 @@ export function makeMessageInputWithOneRandom(userID : string, flipUsers = false
     }
 }
 
-export async function matchUsers(userID : string, userID_2 : string) {
-    await Promise.all([
+export async function matchUsers(userID : string, userID_2 : string) : Promise<Date> {
+    const [_, swipe] = await Promise.all([
         handler.makeSwipe({
             userID: userID,
             swipedUserID: userID_2,
@@ -116,12 +116,13 @@ export async function matchUsers(userID : string, userID_2 : string) {
             action: "Like"
         })
     ])
+    return swipe!.timestamp;
 }
 
 export async function makeTwoUsersAndMatch() {
     const {user, user_2} = await makeTwoUsers();
-    await matchUsers(user.id, user_2.id);
-    return {user, user_2};
+    const timestamp = await matchUsers(user.id, user_2.id);
+    return {user, user_2, timestamp};
 }
 
 export async function makeTwoUsers() {

@@ -1,6 +1,6 @@
 import { Opinion, PrismaClient, Swipe } from "@prisma/client";
 import { randomUUID } from "crypto";
-import { SwipeBreakdown, SwipeInput, UserSwipeStats } from "../interfaces";
+import { MatchDataOutput, SwipeBreakdown, SwipeInput, UserSwipeStats } from "../interfaces";
 import { startOfWeek, subWeeks } from "date-fns";
 
 export class SwipeHandler {
@@ -125,7 +125,9 @@ export class SwipeHandler {
         }
     }
 
-    public async getAllMatches(userID: string, fromTime: Date) : Promise<string[]> {
+    public async getAllMatches(userID: string, fromTime: Date) : 
+        Promise<MatchDataOutput[]> 
+    {
         const [myLikes, likedMe] = await Promise.all([
             this.prisma.swipe.findMany({
                 where: {
@@ -149,10 +151,7 @@ export class SwipeHandler {
             })
         ]);
 
-        const matches : {
-            matchUserID: string
-            matchTimestamp: Date
-        }[] = [];
+        const matches : MatchDataOutput[] = [];
 
         const record = new Map<string,Date>();
 
@@ -164,20 +163,20 @@ export class SwipeHandler {
             const myLikeTimestamp = record.get(liked.userID);
             if (myLikeTimestamp) {
                 matches.push({
-                    matchUserID: liked.userID,
-                    matchTimestamp: liked.timestamp.getTime() > myLikeTimestamp.getTime() ?
+                    userID: liked.userID,
+                    timestamp: liked.timestamp.getTime() > myLikeTimestamp.getTime() ?
                         liked.timestamp : myLikeTimestamp
                 })
             }
         }
 
         const filteredMatches = matches.filter( 
-            match => match.matchTimestamp.getTime() <= fromTime.getTime()
+            match => match.timestamp.getTime() <= fromTime.getTime()
         );
         filteredMatches.sort( 
-            (a,b) => b.matchTimestamp.getTime() - a.matchTimestamp.getTime()
+            (a,b) => b.timestamp.getTime() - a.timestamp.getTime()
         );
-        return filteredMatches.map( val => val.matchUserID);
+        return filteredMatches;
     }
     
     public async getLikedMeUsers(userID: string) : Promise<string[]> {

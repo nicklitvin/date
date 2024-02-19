@@ -1,6 +1,4 @@
 TODO
-change age to birthday on backend but public profile returns age
-add time matched to newmatches
 return signed download of each image requested in public profile
 
 BACKEND TODO

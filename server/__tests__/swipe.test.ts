@@ -99,27 +99,31 @@ describe("swipe", () => {
     it("should get all matches", async () => {
         const userID_3 = "userID_3";
 
+        const user2_match = new Date(4);
+        const user3_match = new Date(3);
+
         await Promise.all([
             funcs.createSwipe(createSwipeInput("Like",userID,userID_2), new Date(1)),
             funcs.createSwipe(createSwipeInput("Like",userID,userID_3),new Date(2)),
             funcs.createSwipe(createSwipeInput("Like",userID)),
             funcs.createSwipe(createSwipeInput("Dislike",userID)),
 
-            funcs.createSwipe(createSwipeInput("Like",userID_2,userID), new Date(4)),
-            funcs.createSwipe(createSwipeInput("Like",userID_3,userID), new Date(3)),
+            funcs.createSwipe(createSwipeInput("Like",userID_2,userID), user2_match),
+            funcs.createSwipe(createSwipeInput("Like",userID_3,userID), user3_match),
             funcs.createSwipe(createSwipeInput("Like",randomUUID(),userID)),
             funcs.createSwipe(createSwipeInput("Dislike",randomUUID(),userID)),
         ])
 
-
         const matches = await funcs.getAllMatches(userID,new Date(5));
         expect(matches).toHaveLength(2);
-        expect(matches[0]).toEqual(userID_2);
-        expect(matches[1]).toEqual(userID_3);
+        expect(matches[1].userID).toEqual(userID_3);
+        expect(matches[1].timestamp.getTime()).toEqual(user3_match.getTime());
+        expect(matches[0].userID).toEqual(userID_2);
+        expect(matches[0].timestamp.getTime()).toEqual(user2_match.getTime());
 
-        const matches_2 = await funcs.getAllMatches(userID,new Date(3));
+        const matches_2 = await funcs.getAllMatches(userID,user3_match);
         expect(matches_2).toHaveLength(1);
-        expect(matches_2[0]).toEqual(userID_3);
+        expect(matches_2[0].userID).toEqual(userID_3);
     })
 
     it("should get likedMe users", async () => {

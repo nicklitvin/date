@@ -8,7 +8,7 @@ import { SwipeHandler } from "./handlers/swipe";
 import { MessageHandler } from "./handlers/message";
 import { ReportHandler } from "./handlers/report";
 import { StripePaymentHandler } from "./handlers/pay";
-import { ChatPreview, ConfirmVerificationInput, DeleteImageInput, EditUserInput, EloAction, GetChatPreviewsInput, ImageHandler, MessageInput, NewMatchInput, NewVerificationInput, PaymentHandler, PublicProfile, RequestReportInput, RequestUserInput, SubscribeInput, SwipeFeed, SwipeInput, UnlikeInput, UnlikeOutput, UploadImageInput, UserInput } from "./interfaces";
+import { ChatPreview, ConfirmVerificationInput, DeleteImageInput, EditUserInput, EloAction, GetChatPreviewsInput, ImageHandler, MessageInput, NewMatchData, NewMatchInput, NewVerificationInput, PaymentHandler, PublicProfile, RequestReportInput, RequestUserInput, SubscribeInput, SwipeFeed, SwipeInput, UnlikeInput, UnlikeOutput, UploadImageInput, UserInput } from "./interfaces";
 import { globals } from "./globals";
 import { FreeTrialHandler } from "./handlers/freetrial";
 import { VerificationHandler } from "./handlers/verification";
@@ -363,34 +363,26 @@ export class Handler {
         };
     }
 
-    public async getNewMatches(input : NewMatchInput) : 
-        Promise<PublicProfile[]|null> 
-    {
+    public async getNewMatches(input : NewMatchInput) : Promise<NewMatchData[]|null> {
         const user = await this.user.getUserByID(input.userID);
 
         if (!user) return null;
 
         const matches = await this.swipe.getAllMatches(input.userID,input.fromTime);
-        const messages = await Promise.all(matches.map( matchUserID => 
-            this.message.getChat({
+        const data = await Promise.all(matches.map( async (match) => ({
+            chat: await this.message.getChat({
                 userID: input.userID,
                 fromTime: new Date(),
-                withID: matchUserID
-            })    
-        ));
+                withID: match.userID
+            }),
+            profile: await this.user.getPublicProfile(match.userID),
+            timestamp: match.timestamp
+        })));
 
-        const newMatches = matches.filter( 
-            (_,index) => messages[index].length == 0
-        ).slice(0,globals.usersLoadedInPreview);
-
-        const publicProfiles = await Promise.all(
-            newMatches.map( val => this.user.getPublicProfile(val))
-        );
-        const filteredProfiles = publicProfiles.filter(
-            val => val != null
-        ) as PublicProfile[];
-
-        return filteredProfiles
+        return data.
+            filter( (_,index) => data[index].chat.length == 0).
+            slice(0, globals.usersLoadedInPreview).
+            map( val => ({profile: val.profile!, timestamp: val.timestamp}))
     }
 
     public async getSwipeFeed(userID: string) : Promise<SwipeFeed|null> {
