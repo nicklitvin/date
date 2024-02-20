@@ -1,27 +1,3 @@
-export const accountCreationText = {
-    continue: "continue",
-
-    genderPreferenceInputTitle: "Gender Preference",
-    genderPreferenceInputSubtitle: "Who would you like to see?",
-
-    attributesInputTitle: "Attributes",
-    attributesInputSubtitle: "Select some of your favorite interests",
-
-    uploadInputTitle: "Images",
-    uploadInputSubtitle: "Upload pictures that show how awesome you are",
-    uploadInputUploadText: "Upload File",
-    uploadSwitch: "Rearrange",
-    uploadButton: "Upload Image",
-
-    agePreferenceInputTitle: "Age Preference",
-    agePreferenceInputSubtitle: "We will only show people within this range (inclusive)",
-    agePreferenceInputError: "Invalid Age Range",
-
-    finalInputTitle: "That's It!",
-    finalInputSubtitle: "Ready to begin your journey",
-    finalInputError: "Cannot create your profile"
-}
-
 export const errorText = {
     title: "Error",
     subtitle: "Something went wrong"
@@ -83,3 +59,32 @@ export const generalText = {
     continue: "continue"
 }
 
+export const genderPreferenceText = {
+    pageTitle: "Gender Preference",
+    pageSubtitle: "Who would you like to see?",
+}
+
+export const attributesText = {
+    pageTitle: "Attributes",
+    pageSubtitle: "Select some of your favorite interests",
+}
+
+export const agePreferenceText = {
+    pageTitle: "Age Preference",
+    pageSubtitle: "We will only show people within this range (inclusive)",
+    inputError: "Invalid Age Range",
+}
+
+export const finalText = {
+    pageTitle: "That's It!",
+    pageSubtitle: "Ready to begin your journey",
+    inputError: "Cannot create your profile"
+}
+
+export const pictureText = {
+    pageTitle: "Images",
+    pageSubtitle: "Upload pictures that show how awesome you are",
+    uploadText: "Upload File",
+    uploadSwitch: "Rearrange",
+    uploadButton: "Upload Image",
+}

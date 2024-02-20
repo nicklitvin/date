@@ -1,4 +1,5 @@
 TODO
+move simple page tests to separate test page
 
 BACKEND TODO
 change elo constants with api?

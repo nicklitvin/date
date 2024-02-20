@@ -1,9 +1,10 @@
 import { act, fireEvent, render, screen } from "@testing-library/react-native"
 import { AccountCreation, pageOrder } from "../src/pages/AccountCreation"
-import { accountCreationText, createProfileText, descriptionText, genderText, myNameText } from "../src/text";
+import { birthdayText, createProfileText, descriptionText, genderText, generalText, myNameText, pictureText } from "../src/text";
 import { globals } from "../src/globals";
 import { RootStore, createStoreProvider } from "../src/store/RootStore";
 import { FileUploadAndURI } from "../src/interfaces";
+import { Birthday } from "../src/simplePages/Birthday";
 
 describe("accountCreation", () => {
     it("should continue to next page", async () => {
@@ -16,7 +17,7 @@ describe("accountCreation", () => {
         );
 
         expect(screen.queryByText(createProfileText.pageTitle)).not.toEqual(null);
-        const continueButton = screen.getByText(accountCreationText.continue);
+        const continueButton = screen.getByText(generalText.continue);
         await act( () => {
             fireEvent(continueButton, "press")
         });
@@ -34,12 +35,43 @@ describe("accountCreation", () => {
         );
 
         expect(screen.queryByText(genderText.pageTitle)).not.toEqual(null);
-        const continueButton = screen.getByText(accountCreationText.continue);
+        const continueButton = screen.getByText(generalText.continue);
         await act( () => {
             fireEvent(continueButton, "press");
         })
 
         expect(screen.queryByText(genderText.pageTitle)).not.toEqual(null);
+    })
+
+    it("should show error when bad date input", async () => {
+        const onSubmit = jest.fn( (input : Date) => input);
+
+        render(<Birthday
+            submitText={generalText.continue}
+            onSubmit={onSubmit}
+            customBirthday={new Date()}
+        />)
+
+        expect(screen.queryByText(birthdayText.inputError)).not.toEqual(null);
+    })
+
+    it("should submit myDateInput", async () => {
+        const onSubmit = jest.fn( (input : Date) => input);
+        const chosenDate = new Date(2000,0,1);
+
+        render(<Birthday
+            submitText={generalText.continue}
+            onSubmit={onSubmit}
+            customBirthday={chosenDate}
+        />)
+
+        const continueButton = screen.getByText(generalText.continue);
+        await act( () => {
+            fireEvent(continueButton, "press");
+        });
+
+        expect(onSubmit).toHaveBeenCalledTimes(1);
+        expect(onSubmit).toHaveLastReturnedWith(chosenDate)
     })
 
     it("should unselect gender", async () => {
@@ -53,7 +85,7 @@ describe("accountCreation", () => {
         );
 
         const genderButton = screen.getByText(globals.genders[0]);
-        const continueButton = screen.getByText(accountCreationText.continue);
+        const continueButton = screen.getByText(generalText.continue);
         await act( () => {
             fireEvent(genderButton, "press")
         })
@@ -87,6 +119,9 @@ describe("accountCreation", () => {
         })
         await act( () => {
             fireEvent(screen.getByText(globals.genders[1]), "press");
+        })
+        await act( () => {
+            fireEvent(screen.getByText(generalText.continue), "press");
         })
 
         expect(returnGenderCount).toHaveLastReturnedWith(2);
@@ -145,7 +180,7 @@ describe("accountCreation", () => {
 
         // create profile
         await act( () => {
-            fireEvent(screen.getByText(accountCreationText.continue), "press")
+            fireEvent(screen.getByText(generalText.continue), "press")
         })
         expect(returnPageNumber).toHaveLastReturnedWith(1);
 
@@ -161,7 +196,7 @@ describe("accountCreation", () => {
 
         // birthday
         await act( () => {
-            fireEvent(screen.getByText(accountCreationText.continue), "press")
+            fireEvent(screen.getByText(generalText.continue), "press")
         })
         expect(returnPageNumber).toHaveLastReturnedWith(3);
 
@@ -170,13 +205,13 @@ describe("accountCreation", () => {
             fireEvent(screen.getByText(myGender),"press");
         })
         await act( () => {
-            fireEvent(screen.getByText(accountCreationText.continue), "press")
+            fireEvent(screen.getByText(generalText.continue), "press")
         })
         expect(returnPageNumber).toHaveLastReturnedWith(4);
 
         // age preference
         await act( () => {
-            fireEvent(screen.getByText(accountCreationText.continue), "press")
+            fireEvent(screen.getByText(generalText.continue), "press")
         })
         expect(returnPageNumber).toHaveLastReturnedWith(5);
 
@@ -187,13 +222,13 @@ describe("accountCreation", () => {
             })
         }
         await act( () => {
-            fireEvent(screen.getByText(accountCreationText.continue), "press")
+            fireEvent(screen.getByText(generalText.continue), "press")
         })
         expect(returnPageNumber).toHaveLastReturnedWith(6);
 
         // pictures
         await act( () => {
-            fireEvent(screen.getByText(accountCreationText.continue), "press")
+            fireEvent(screen.getByText(generalText.continue), "press")
         })
         expect(returnPageNumber).toHaveLastReturnedWith(7);
 
@@ -204,7 +239,7 @@ describe("accountCreation", () => {
             })
         }
         await act( () => {
-            fireEvent(screen.getByText(accountCreationText.continue), "press")
+            fireEvent(screen.getByText(generalText.continue), "press")
         })
         expect(returnPageNumber).toHaveLastReturnedWith(8);
 
@@ -220,14 +255,12 @@ describe("accountCreation", () => {
         })
         expect(returnPageNumber).toHaveLastReturnedWith(9);
 
-
         //final
         await act( () => {
-            fireEvent(screen.getByText(accountCreationText.continue), "press");
+            fireEvent(screen.getByText(generalText.continue), "press");
         })
 
         const userInput = store.savedAPICalls.createUser;
-
         expect(userInput?.name).toEqual(myName);
         expect(userInput?.birthday.getTime()).toEqual(myBirthday.getTime());
         expect(userInput?.gender).toEqual(myGender);
@@ -276,18 +309,17 @@ describe("accountCreation", () => {
             </StoreProvider>
         );
 
-        const switchButton = screen.getByText(accountCreationText.uploadSwitch);
-
         await act( () => {
-            fireEvent(switchButton, "press");
-        })
-        const image1 = screen.getByTestId(`image-${imageURI}`);
-        const image2 = screen.getByTestId(`image-${imageURI_2}`);
-        await act( () => {
-            fireEvent(image1, "press");
+            fireEvent(screen.getByText(pictureText.uploadSwitch), "press");
         })
         await act( () => {
-            fireEvent(image2, "press");
+            fireEvent(screen.getByTestId(`image-${imageURI}`), "press");
+        })
+        await act( () => {
+            fireEvent(screen.getByTestId(`image-${imageURI_2}`), "press");
+        })
+        await act( () => {
+            fireEvent(screen.getByText(generalText.continue), "press")
         })
         expect(returnFileOrder).toHaveLastReturnedWith(`${imageURI_2}${imageURI}`)
     })

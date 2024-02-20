@@ -1,11 +1,9 @@
 import { act, fireEvent, render, screen } from "@testing-library/react-native";
 import { MyButton } from "../src/components/Button";
 import { MyTextInput } from "../src/components/TextInput";
-import { accountCreationText, birthdayText, generalText } from "../src/text";
 import { ChatPreviewBox } from "../src/components/ChatPreviewBox";
 import { ChatPreview } from "../src/interfaces";
 import { makePublicProfile, makeReceivedMessage, makeSentMessage } from "../__testUtils__/easySetup";
-import { Birthday } from "../src/simplePages/Birthday";
 
 describe("components", () => {
     it("should call myButton function", async () => {
@@ -71,37 +69,6 @@ describe("components", () => {
         })
 
         expect(screen.queryByText(errorMessage)).not.toEqual(null);
-    })
-
-    it("should show error when bad date input", async () => {
-        const onSubmit = jest.fn( (input : Date) => input);
-
-        render(<Birthday
-            submitText={generalText.continue}
-            onSubmit={onSubmit}
-            customBirthday={new Date()}
-        />)
-
-        expect(screen.queryByText(birthdayText.inputError)).not.toEqual(null);
-    })
-
-    it("should submit myDateInput", async () => {
-        const onSubmit = jest.fn( (input : Date) => input);
-        const chosenDate = new Date(2000,0,1);
-
-        render(<Birthday
-            submitText={generalText.continue}
-            onSubmit={onSubmit}
-            customBirthday={chosenDate}
-        />)
-
-        const continueButton = screen.getByText(generalText.continue);
-        await act( () => {
-            fireEvent(continueButton, "press");
-        });
-
-        expect(onSubmit).toHaveBeenCalledTimes(1);
-        expect(onSubmit).toHaveLastReturnedWith(chosenDate)
     })
 
     it("should show all chatpreviewbox components", async () => {
