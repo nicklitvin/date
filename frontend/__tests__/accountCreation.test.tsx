@@ -1,6 +1,6 @@
 import { act, fireEvent, render, screen } from "@testing-library/react-native"
 import { AccountCreation, pageOrder } from "../src/pages/AccountCreation"
-import { accountCreationText } from "../src/text";
+import { accountCreationText, createProfileText, descriptionText, genderText, myNameText } from "../src/text";
 import { globals } from "../src/globals";
 import { RootStore, createStoreProvider } from "../src/store/RootStore";
 import { FileUploadAndURI } from "../src/interfaces";
@@ -15,12 +15,12 @@ describe("accountCreation", () => {
             </StoreProvider>
         );
 
-        expect(screen.queryByText(accountCreationText.createProfileTitle)).not.toEqual(null);
+        expect(screen.queryByText(createProfileText.pageTitle)).not.toEqual(null);
         const continueButton = screen.getByText(accountCreationText.continue);
         await act( () => {
             fireEvent(continueButton, "press")
         });
-        expect(screen.queryByText(accountCreationText.nameInputTitle)).not.toEqual(null);
+        expect(screen.queryByText(myNameText.pageTitle)).not.toEqual(null);
     })
 
     it("should not continue if gender not selected", async () => {
@@ -33,13 +33,13 @@ describe("accountCreation", () => {
             </StoreProvider>
         );
 
-        expect(screen.queryByText(accountCreationText.genderInputTitle)).not.toEqual(null);
+        expect(screen.queryByText(genderText.pageTitle)).not.toEqual(null);
         const continueButton = screen.getByText(accountCreationText.continue);
         await act( () => {
             fireEvent(continueButton, "press");
         })
 
-        expect(screen.queryByText(accountCreationText.genderInputTitle)).not.toEqual(null);
+        expect(screen.queryByText(genderText.pageTitle)).not.toEqual(null);
     })
 
     it("should unselect gender", async () => {
@@ -64,7 +64,7 @@ describe("accountCreation", () => {
             fireEvent(continueButton, "press")
         })
     
-        expect(screen.queryByText(accountCreationText.genderInputTitle)).not.toEqual(null);
+        expect(screen.queryByText(genderText.pageTitle)).not.toEqual(null);
     })
 
     it("should select multiple gender preferences", async () => {
@@ -150,7 +150,7 @@ describe("accountCreation", () => {
         expect(returnPageNumber).toHaveLastReturnedWith(1);
 
         //my name
-        const nameInput = screen.getByPlaceholderText(accountCreationText.nameInputPlaceholder);
+        const nameInput = screen.getByPlaceholderText(myNameText.inputPlaceholder);
         await act( () => {
             fireEvent(nameInput, "changeText", myName);
         })
@@ -210,7 +210,7 @@ describe("accountCreation", () => {
 
         // description
         const descriptionInput = screen.getByPlaceholderText(
-            accountCreationText.decsriptionPlaceholder
+            descriptionText.inputPlaceholder
         );
         await act( () => {
             fireEvent(descriptionInput, "changeText", myDescription);

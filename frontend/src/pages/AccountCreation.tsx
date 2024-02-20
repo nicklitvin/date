@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
-import { accountCreationText } from "../text";
+import { accountCreationText, generalText } from "../text";
 import { MyButton } from "../components/Button";
 import { MySimplePage } from "../components/SimplePage";
-import { MyTextInput } from "../components/TextInput";
-import { MyDateInput } from "../components/DateInput";
 import { globals } from "../globals";
 import { StyledButton, StyledText, StyledView } from "../styledElements";
 import { AgePreferenceInput } from "../components/AgePreferenceInput";
@@ -17,6 +15,11 @@ import * as FileSystem from "expo-file-system";
 import classNames from "classnames";
 import { AccountCreationType } from "../types";
 import { URLs } from "../urls";
+import { Description } from "../simplePages/Description";
+import { MyName } from "../simplePages/MyName";
+import { Gender } from "../simplePages/Gender";
+import { CreateProfile } from "../simplePages/CreateProfile";
+import { Birthday } from "../simplePages/Birthday";
 
 export const pageOrder : AccountCreationType[] = [
     "Create Profile","Name","Birthday", "Gender", "Age Preference", "Gender Preference",
@@ -150,66 +153,34 @@ export function AccountCreation(props : Props) {
 
     switch (pageOrder[currentPage]) {
         case "Create Profile":
-            return <MySimplePage
-                title={accountCreationText.createProfileTitle}
-                subtitle={accountCreationText.createProfileSubtitle}
-                content={
-                    <MyButton
-                        text={accountCreationText.continue}
-                        onPressFunction={goToNextPage}
-                    />
-                }
+            return <CreateProfile
+                submitText={generalText.continue}
+                onSubmit={goToNextPage}
             />
         case "Name":
-            return <MySimplePage
-                title={accountCreationText.nameInputTitle}
-                subtitle={accountCreationText.nameInputSubtitle}
-                content={
-                    <MyTextInput
-                        placeholder={accountCreationText.nameInputPlaceholder}
-                        errorMessage={accountCreationText.nameInputError}
-                        saveMessage={setName}
-                        afterSubmit={goToNextPage}
-                    />
-                }
+            return <MyName
+                onSubmit={(input : string) => {
+                    setName(input);
+                    goToNextPage();
+                }}
             />
         case "Birthday":
-            return <MySimplePage
-                title={accountCreationText.birthdayInputTitle}
-                subtitle={accountCreationText.birthdayInputSubtitle}
-                content={
-                    <MyDateInput
-                        afterSubmit={goToNextPage}
-                        saveDate={setBirthday}
-                        customDate={props.customBirthday}
-                    />
-                }
+            return <Birthday
+                customBirthday={props.customBirthday}
+                submitText={generalText.continue}
+                onSubmit={(input : Date) => {
+                    setBirthday(input);
+                    goToNextPage();
+                }}
             />
         case "Gender":
-            return <MySimplePage
-                title={accountCreationText.genderInputTitle}
-                subtitle={accountCreationText.genderInputSubtitle}
-                content={
-                    <>
-                        {globals.genders.map( (val) => 
-                            <MyButton
-                                key={`gender-${val}`}
-                                text={val}
-                                onPressFunction={() => {
-                                    gender == val ? setGender(null) : setGender(val);
-                                }}
-                            />
-                        )}
-                        <MyButton
-                            text={accountCreationText.continue}
-                            onPressFunction={() => {
-                                if (gender) {
-                                    goToNextPage()
-                                }
-                            }}
-                        />
-                    </>
-                }
+            return <Gender
+                genders={globals.genders}
+                submitText={generalText.continue}
+                onSubmit={(input : string) => {
+                    setGender(input);
+                    goToNextPage();
+                }}
             />
         case "Gender Preference":
             return <MySimplePage
@@ -249,17 +220,10 @@ export function AccountCreation(props : Props) {
                 }
             />
         case "Description":
-            return <MySimplePage
-                title={accountCreationText.descriptionInputTitle}
-                subtitle={accountCreationText.descriptionInputSubtitle}
-                content={
-                    <MyTextInput
-                        placeholder={accountCreationText.decsriptionPlaceholder}
-                        errorMessage={accountCreationText.descriptionErrorMessage}
-                        saveMessage={setDescription}
-                        afterSubmit={goToNextPage}
-                    />
-                }
+            return <Description onSubmit={(input : string) => {
+                    setDescription(input);
+                    goToNextPage();
+                }}
             />
         case "Attributes":
             return <MySimplePage

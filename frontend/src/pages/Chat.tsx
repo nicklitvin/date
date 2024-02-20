@@ -134,7 +134,7 @@ export function Chat(props : Props) {
             <MyTextInput
                 placeholder={chatText.inputPlaceholder}
                 errorMessage={chatText.inputError}
-                afterSubmit={sendMessage}
+                onSubmit={sendMessage}
             />  
         </StyledView>
     )

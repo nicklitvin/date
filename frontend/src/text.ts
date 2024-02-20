@@ -1,28 +1,8 @@
 export const accountCreationText = {
     continue: "continue",
 
-    createProfileTitle: "Create Profile",
-    createProfileSubtitle: "Time to show off your beautiful self, and you can change anything later so do not worry",
-    
-    nameInputTitle: "Name",
-    nameInputSubtitle: "What do you want others to call you?",
-    nameInputPlaceholder: "Type your name here...",
-    nameInputError: "Invalid Name",
-
-    birthdayInputTitle: "Age",
-    birthdayInputSubtitle: "When is your birthday?",
-    birthdayInputError: "Invalid Birthday",
-
-    genderInputTitle: "Gender",
-    genderInputSubtitle: "What is your gender?",
-
     genderPreferenceInputTitle: "Gender Preference",
     genderPreferenceInputSubtitle: "Who would you like to see?",
-
-    descriptionInputTitle: "About You",
-    descriptionInputSubtitle: "Run a fun description about yourself",
-    decsriptionPlaceholder: "Describe yourself here...",
-    descriptionErrorMessage: "Invalid Description",
 
     attributesInputTitle: "Attributes",
     attributesInputSubtitle: "Select some of your favorite interests",
@@ -68,3 +48,38 @@ export const feedText = {
 export const profileViewText = {
     pageTitle: "Public View",
 }
+
+export const descriptionText = {
+    pageTitle: "About You",
+    pageSubtitle: "Run a fun description about yourself",
+    inputPlaceholder: "Describe yourself here...",
+    errorMessage: "Invalid Description",
+}
+
+export const myNameText = {
+    pageTitle: "Name",
+    pageSubtitle: "What do you want others to call you?",
+    inputPlaceholder: "Type your name here...",
+    inputError: "Invalid Name",
+}
+
+export const genderText = {
+    pageTitle: "Gender",
+    pageSubtitle: "What is your gender?",
+}
+
+export const createProfileText = {
+    pageTitle: "Create Profile",
+    pageSubtitle: "Time to show off your beautiful self, and you can change anything later so do not worry",
+}
+
+export const birthdayText = {
+    pageTitle: "Age",
+    pageSubtitle: "When is your birthday?",
+    inputError: "Invalid Birthday",
+}
+
+export const generalText = {
+    continue: "continue"
+}
+

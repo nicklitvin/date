@@ -1,11 +1,11 @@
 import { act, fireEvent, render, screen } from "@testing-library/react-native";
 import { MyButton } from "../src/components/Button";
 import { MyTextInput } from "../src/components/TextInput";
-import { MyDateInput } from "../src/components/DateInput";
-import { accountCreationText } from "../src/text";
+import { accountCreationText, birthdayText, generalText } from "../src/text";
 import { ChatPreviewBox } from "../src/components/ChatPreviewBox";
 import { ChatPreview } from "../src/interfaces";
 import { makePublicProfile, makeReceivedMessage, makeSentMessage } from "../__testUtils__/easySetup";
+import { Birthday } from "../src/simplePages/Birthday";
 
 describe("components", () => {
     it("should call myButton function", async () => {
@@ -26,17 +26,14 @@ describe("components", () => {
     it("should submit myInput", async () => {
         const placeholder = "placeholder";
         const errorMessage = "error";
-        const afterSubmit = jest.fn();
-        const saveMessage = jest.fn();
-
+        const onSubmit = jest.fn( (input : string) => input);
         const typedMessage = "message";
 
         render(
             <MyTextInput 
                 placeholder={placeholder}
-                afterSubmit={afterSubmit}
                 errorMessage={errorMessage}
-                saveMessage={saveMessage}
+                onSubmit={onSubmit}
             />
         );
 
@@ -49,22 +46,20 @@ describe("components", () => {
             fireEvent(input, "submitEditing");
         })
 
-        expect(afterSubmit).toHaveBeenCalledTimes(1);
-        expect(saveMessage).toHaveBeenCalledWith(typedMessage);
+        expect(onSubmit).toHaveBeenCalledTimes(1);
+        expect(onSubmit).toHaveBeenCalledWith(typedMessage);
     })
 
     it("should show error when bad submit", async () => {
         const placeholder = "placeholder";
         const errorMessage = "error";
-        const afterSubmit = jest.fn();
-        const saveMessage = jest.fn();
+        const onSubmit = jest.fn( (input : string) => input);
 
         render(
             <MyTextInput 
                 placeholder={placeholder}
-                afterSubmit={afterSubmit}
                 errorMessage={errorMessage}
-                saveMessage={saveMessage}
+                onSubmit={onSubmit}
             />
         );
         
@@ -79,30 +74,34 @@ describe("components", () => {
     })
 
     it("should show error when bad date input", async () => {
-        const afterSubmit = jest.fn();
-        const saveDate = jest.fn();
+        const onSubmit = jest.fn( (input : Date) => input);
 
-        render(<MyDateInput afterSubmit={afterSubmit} saveDate={saveDate} 
-            customDate={new Date()}
-        />);
-        expect(screen.queryByText(accountCreationText.birthdayInputError)).not.toEqual(null);
+        render(<Birthday
+            submitText={generalText.continue}
+            onSubmit={onSubmit}
+            customBirthday={new Date()}
+        />)
+
+        expect(screen.queryByText(birthdayText.inputError)).not.toEqual(null);
     })
 
     it("should submit myDateInput", async () => {
-        const afterSubmit = jest.fn();
-        const saveDate = jest.fn();
+        const onSubmit = jest.fn( (input : Date) => input);
         const chosenDate = new Date(2000,0,1);
 
-        render(<MyDateInput afterSubmit={afterSubmit} saveDate={saveDate} 
-            customDate={chosenDate}
-        />);
-        const continueButton = screen.getByText(accountCreationText.continue);
+        render(<Birthday
+            submitText={generalText.continue}
+            onSubmit={onSubmit}
+            customBirthday={chosenDate}
+        />)
+
+        const continueButton = screen.getByText(generalText.continue);
         await act( () => {
             fireEvent(continueButton, "press");
         });
 
-        expect(afterSubmit).toHaveBeenCalledTimes(1);
-        expect(saveDate).toHaveBeenCalledWith(chosenDate)
+        expect(onSubmit).toHaveBeenCalledTimes(1);
+        expect(onSubmit).toHaveLastReturnedWith(chosenDate)
     })
 
     it("should show all chatpreviewbox components", async () => {
