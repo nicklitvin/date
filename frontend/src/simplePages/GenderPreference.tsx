@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { MyButton } from "../components/Button"
 import { MySimplePage } from "../components/SimplePage"
 import { genderPreferenceText } from "../text"
@@ -7,10 +7,15 @@ interface Props {
     genders: string[]
     onSubmit: (input : string[]) => any
     submitText: string
+    returnGenderCount?: (input : number) => number
 }
 
 export function GenderPreference(props : Props) {
     const [genderPreference, setGenderPreference] = useState<string[]>([]);
+
+    useEffect( () => {
+        if (props.returnGenderCount) props.returnGenderCount(genderPreference.length);
+    }, [genderPreference])
 
     return <MySimplePage
         title={genderPreferenceText.pageTitle}

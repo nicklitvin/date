@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MySimplePage } from "../components/SimplePage"
 import { FileUploadAndURI } from "../interfaces";
 import { pictureText } from "../text"
@@ -22,6 +22,8 @@ export function Pictures(props : Props) {
     const [switchURI, setSwitchURI] = useState<string|null>(null);
 
     const uploadImage = async () => {
+        if (switching) return
+
         const result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
             selectionLimit: globals.maxUploads - uploads.length 
@@ -48,6 +50,8 @@ export function Pictures(props : Props) {
     }
 
     const removeImage = (uri : string) => {
+        if (switching) return
+
         setUploads(uploads.filter( upload => upload.uri != uri));
     }
 
@@ -67,6 +71,15 @@ export function Pictures(props : Props) {
             setSwitchURI(null);
         } else {
             setSwitchURI(uri);
+        }
+    }
+
+    const activateSwitch = () => {
+        if (switching) {
+            setSwitching(false);
+            setSwitchURI(null);
+        } else {
+            setSwitching(true)
         }
     }
 
@@ -108,12 +121,12 @@ export function Pictures(props : Props) {
                 />
                 <MyButton
                     text={pictureText.uploadSwitch}
-                    onPressFunction={() => setSwitching(true)}
+                    onPressFunction={activateSwitch}
                 />
                 <MyButton
                     text={props.submitText}
                     onPressFunction={() => {
-                        if (uploads.length > 0)
+                        if (uploads.length > 0 && !switching)
                             props.onSubmit(uploads);
                     }}
                 />

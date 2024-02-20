@@ -28,8 +28,6 @@ interface Props {
     customBirthday?: Date
     customUploads?: FileUploadAndURI[]
     returnPageNumber?: (input : number) => number
-    returnUploadOrder?: (input : string[]) => string
-    returnGenderPreferences?: (input : number) => number
 }
 
 export function AccountCreation(props : Props) {
@@ -52,20 +50,9 @@ export function AccountCreation(props : Props) {
     }
 
     useEffect( () => {
-        if (props.returnPageNumber)
-            props.returnPageNumber(currentPage)
+        if (props.returnPageNumber) props.returnPageNumber(currentPage)
+            
     }, [currentPage])
-
-    useEffect( () => {
-        if (props.returnUploadOrder) 
-            props.returnUploadOrder(uploads.map( val => val.uri))
-    }, [uploads])
-
-    useEffect( () => {
-        if (props.returnGenderPreferences) {
-            props.returnGenderPreferences(genderPreference.length);
-        }
-    })
 
     const createUser = async () => {
         const userInput : UserInput = {
