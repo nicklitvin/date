@@ -1,5 +1,5 @@
 import { action, makeAutoObservable, observable } from "mobx";
-import { GetChatInput, MessageInput, NewMatchDataInput, RequestReportInput, SwipeInput, UserInput } from "../interfaces";
+import { GetChatInput, MessageInput, NewMatchDataInput, NewVerificationInput, RequestReportInput, SwipeInput, UserInput } from "../interfaces";
 
 export class SavedAPICalls {
     @observable public createUser : UserInput|null = null;
@@ -9,6 +9,7 @@ export class SavedAPICalls {
     @observable public newMatchDataInput: NewMatchDataInput|null = null;
     @observable public swipeInput : SwipeInput|null = null;
     @observable public getFeed : boolean|null = null;
+    @observable public newVerificationInput : NewVerificationInput|null = null;
 
     constructor() {
         makeAutoObservable(this)
@@ -34,4 +35,7 @@ export class SavedAPICalls {
 
     @action
     setCreateUser(input : UserInput) { this.createUser = input }
+
+    @action
+    setNewVerificationInput(input : NewVerificationInput) { this.newVerificationInput = input; }
 }

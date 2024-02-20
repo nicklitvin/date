@@ -72,3 +72,14 @@ export interface NewMatch {
     profile: PublicProfile
     timestamp: Date
 }
+
+export interface NewVerificationInput {
+    personalEmail: string
+    schoolEmail: string
+}
+
+export interface ConfirmVerificationInput {
+    personalEmail: string
+    schoolEmail: string
+    code: number
+}

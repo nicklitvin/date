@@ -16,8 +16,7 @@ import { URLs } from "../urls";
 interface Props {
     publicProfile: PublicProfile
     latestMessages: Message[]
-    customNextChatLoad?: Message[]
-    customGetChatLength?: (input : number) => number
+    returnChatLength?: (input : number) => number
 }
 
 export function Chat(props : Props) {
@@ -31,8 +30,8 @@ export function Chat(props : Props) {
                 setLastSentChatID(message.id)
             }
         }
-        if (props.customGetChatLength) {
-            props.customGetChatLength(chat.length);
+        if (props.returnChatLength) {
+            props.returnChatLength(chat.length);
         }
     }, [chat])
 
@@ -43,11 +42,7 @@ export function Chat(props : Props) {
         }
         try {
             const endpoint = URLs.server + URLs.sendMessage;
-            if (globalState.useHttp) {
-                await axios.post(endpoint, messageInput);
-            } else {
-                savedAPICalls.setSentMessage(messageInput);
-            }
+            const response = await axios.post(endpoint, messageInput);
         } catch (err) {}
     }
 
@@ -61,13 +56,12 @@ export function Chat(props : Props) {
                 fromTime: new Date(chat.at(-1)!.timestamp.getTime() - 1)
             }
 
-            if (globalState.useHttp) {
-                const response = await axios.post(URLs.server + URLs.getChat, input);
-                moreChats = response.data;
-            } else {
-                savedAPICalls.setGetChatInput(input);
-                moreChats = props.customNextChatLoad!;
-            }
+            const response = await axios.post(URLs.server + URLs.getChat, input);
+            moreChats = response.data.data as Message[];
+            moreChats = moreChats.map( message => ({
+                ...message, 
+                timestamp: new Date(message.timestamp)
+            }))
 
             setChat(chat.concat(moreChats));
         } catch (err) {
@@ -80,11 +74,7 @@ export function Chat(props : Props) {
             const myReport : RequestReportInput = {
                 reportedID: props.publicProfile.id
             }
-            if (globalState.useHttp) {
-                await axios.post(URLs.server + URLs.reportUser, myReport)
-            } else {
-                savedAPICalls.setRequestReportInput(myReport)
-            }
+            await axios.post(URLs.server + URLs.reportUser, myReport)
         } catch (err) {
             console.log(err);
         }

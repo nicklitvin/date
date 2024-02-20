@@ -8,4 +8,6 @@ export const URLs = {
     getNewChatPreviews: "/getChatPreviews",
     makeSwipe: "/makeSwipe",
     getFeed: "/getFeed",
+    newVerification: "/newVerification",
+    verifyUser: "/verifyUser"
 }

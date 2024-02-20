@@ -1,10 +1,13 @@
 import { act, fireEvent, render, screen } from "@testing-library/react-native";
 import { RootStore, createStoreProvider } from "../src/store/RootStore";
 import { ChatMob } from "../src/pages/Chat";
-import { Message, PublicProfile } from "../src/interfaces";
+import { GetChatInput, Message, MessageInput, PublicProfile, RequestReportInput } from "../src/interfaces";
 import { chatText } from "../src/text";
 import { testIDS } from "../src/testIDs";
 import { getChatTimestamp } from "../src/utils";
+import MockAdapter from "axios-mock-adapter";
+import axios from "axios";
+import { URLs } from "../src/urls";
 
 describe("chat", () => {
     const myUserID = "userID";
@@ -48,7 +51,17 @@ describe("chat", () => {
 
     it("should send message", async () => {
         const store = new RootStore();
-        store.globalState.setUseHttp(false);
+        const mock = new MockAdapter(axios);
+        const myMessage = "hi";
+
+        mock.onPost(URLs.server + URLs.sendMessage).reply(config => {
+            const payload = JSON.parse(config.data) as MessageInput;
+
+            expect(payload.message).toEqual(myMessage);
+            expect(payload.recepientID).toEqual(recepientProfile.id);
+
+            return [200]
+        })
 
         const StoreProvider = createStoreProvider(store);
         render(
@@ -60,7 +73,7 @@ describe("chat", () => {
             </StoreProvider>
         );
 
-        const myMessage = "hi";
+
         const myInput = screen.getByPlaceholderText(chatText.inputPlaceholder);
         await act( () => {
             fireEvent(myInput, "changeText", myMessage);
@@ -68,56 +81,64 @@ describe("chat", () => {
         await act( () => {
             fireEvent(myInput, "submitEditing");
         })
-
-        const sentMessage = store.savedAPICalls.sentMessage;
-        expect(sentMessage?.message).toEqual(myMessage);
-        expect(sentMessage?.recepientID).toEqual(recepientProfile.id);
     })
 
     it("should load older messages", async () => {
         const store = new RootStore();
-        store.globalState.setUseHttp(false);
         store.globalState.setTimezone("PST");
-        const StoreProvider = createStoreProvider(store);
-        const getChatLength = jest.fn( (input) => input);
+        const returnChatLength = jest.fn( (input) => input);
 
+        const mock = new MockAdapter(axios);
+        mock.onPost(URLs.server + URLs.getChat).reply(config => {
+            const payload = JSON.parse(config.data) as GetChatInput;
+
+            expect(new Date(payload.fromTime).getTime()).toBeLessThan(
+                latestMessages[1].timestamp.getTime()
+            )
+            expect(payload.withID).toEqual(recepientProfile.id);
+
+            return [200, {
+                data: moreMessages
+            }];
+        })
+
+        const StoreProvider = createStoreProvider(store);
         render(
             <StoreProvider value={store}>
                 <ChatMob
                     latestMessages={latestMessages}
                     publicProfile={recepientProfile}
-                    customNextChatLoad={moreMessages}
-                    customGetChatLength={getChatLength}
+                    returnChatLength={returnChatLength}
                 />
             </StoreProvider>
         );
 
-        expect(getChatLength).toHaveLastReturnedWith(2);
+        expect(returnChatLength).toHaveLastReturnedWith(2);
 
         const scroll = screen.getByTestId(testIDS.chatScroll);
         await act( () => {
             fireEvent(scroll, "scrollToTop")
         })
 
-        expect(getChatLength).toHaveLastReturnedWith(3);
-        
-        const getChatInput = store.savedAPICalls.getChatInput;
-        expect(getChatInput?.withID).toEqual(recepientProfile.id);
-        expect(getChatInput?.fromTime.getTime()).toBeLessThan(latestMessages[1].timestamp.getTime());
+        expect(returnChatLength).toHaveLastReturnedWith(3);
     })
 
     it("should report user", async () => {
         const store = new RootStore();
-        store.globalState.setUseHttp(false);
+
+        const mock = new MockAdapter(axios);
+        mock.onPost(URLs.server + URLs.reportUser).reply(config => {
+            const payload = JSON.parse(config.data) as RequestReportInput;
+            expect(payload.reportedID).toEqual(recepientProfile.id);
+            return [200]
+        })
 
         const StoreProvider = createStoreProvider(store);
-
         render(
             <StoreProvider value={store}>
                 <ChatMob
                     latestMessages={latestMessages}
                     publicProfile={recepientProfile}
-                    customNextChatLoad={moreMessages}
                 />
             </StoreProvider>
         );
@@ -126,24 +147,27 @@ describe("chat", () => {
         await act( () => {
             fireEvent(reportButton, "press")
         })
-
-        const userReport = store.savedAPICalls.requestReportInput;
-        expect(userReport?.reportedID).toEqual(recepientProfile.id);
     })
 
     it("should show timestamps", async () => {
         const timezone = "PST";
         const store = new RootStore();
-        store.globalState.setUseHttp(false);
         store.globalState.setTimezone(timezone);
-        const StoreProvider = createStoreProvider(store);
 
+        const mock = new MockAdapter(axios);
+        mock.onPost(URLs.server + URLs.getChat).reply(config => {
+            return [200, {
+                data: moreMessages
+            }];
+        })
+
+        const StoreProvider = createStoreProvider(store);
         render(
             <StoreProvider value={store}>
                 <ChatMob
                     latestMessages={latestMessages}
                     publicProfile={recepientProfile}
-                    customNextChatLoad={moreMessages}
+                    // customNextChatLoad={moreMessages}
                 />
             </StoreProvider>
         );
@@ -170,15 +194,20 @@ describe("chat", () => {
 
     it("should show read/delivered read status", async () => {
         const store = new RootStore();
-        store.globalState.setUseHttp(false);
         const StoreProvider = createStoreProvider(store);
+
+        const mock = new MockAdapter(axios);
+        mock.onPost(URLs.server + URLs.getChat).reply(config => {
+            return [200, {
+                data: moreMessages
+            }];
+        })
 
         render(
             <StoreProvider value={store}>
                 <ChatMob
                     latestMessages={latestMessages}
                     publicProfile={recepientProfile}
-                    customNextChatLoad={moreMessages}
                 />
             </StoreProvider>
         );

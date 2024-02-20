@@ -88,3 +88,10 @@ export const pictureText = {
     uploadSwitch: "Rearrange",
     uploadButton: "Upload Image",
 }
+
+export const eduEmailText = {
+    pageTitle: "Edu Email",
+    pageSubtitle: "What is your university email? It will only be used to send a 4-digit code for verification.",
+    inputPlaceholder: "Type your university email here...",
+    inputError: "Invalid email"
+}
