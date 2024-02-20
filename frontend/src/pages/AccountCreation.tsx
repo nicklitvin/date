@@ -32,7 +32,7 @@ interface Props {
 
 export function AccountCreation(props : Props) {
     const [currentPage, setCurrentPage] = useState<number>(props.customPageStart ?? 0);
-    const { globalState, savedAPICalls } = useStore();
+    const { globalState } = useStore();
 
     const [name, setName] = useState<string>("");
     const [birthday, setBirthday] = useState<Date>(props.customBirthday ?? new Date());
@@ -73,11 +73,7 @@ export function AccountCreation(props : Props) {
         };
      
         const endpoint = URLs.server + URLs.createUser;
-        if (globalState.useHttp) {
-            await axios.post(endpoint, userInput);
-        } else {
-            savedAPICalls.setCreateUser(userInput);
-        }
+        await axios.post(endpoint, userInput);
     }
 
     switch (pageOrder[currentPage]) {

@@ -1,38 +1,43 @@
 import { act, fireEvent, render, screen } from "@testing-library/react-native"
-import { RootStore, createStoreProvider } from "../src/store/RootStore";
 import { MatchesMob } from "../src/pages/Matches";
-import { ChatPreview, Message, NewMatch, PublicProfile } from "../src/interfaces";
+import { ChatPreview, Message, NewMatch, NewMatchDataInput, PublicProfile } from "../src/interfaces";
 import { makePublicProfile, makeSentMessage } from "../__testUtils__/easySetup";
 import { testIDS } from "../src/testIDs";
+import MockAdapter from "axios-mock-adapter";
+import axios from "axios";
+import { URLs } from "../src/urls";
 
 describe("matches", () => {
+    const profiles = [
+        makePublicProfile("id1"),
+        makePublicProfile("id2"),
+        makePublicProfile("id3")
+    ];
+
     it("should get new matches and more on load", async () => {
-        const store = new RootStore();
-        store.globalState.setUseHttp(false);
-        const StoreProvider = createStoreProvider(store);
-
-        const profile1 = makePublicProfile("id1");
-        const profile2 = makePublicProfile("id2");
-        const profile3 = makePublicProfile("id3");
-
         const newMatches : NewMatch[] = [
-            {profile: profile1, timestamp : new Date(5)},
-            {profile: profile2, timestamp : new Date(4)},
+            {profile: profiles[0], timestamp : new Date(5)},
+            {profile: profiles[1], timestamp : new Date(4)},
         ];
-        const loadMoreProfiles = [
-            {profile: profile3, timestamp : new Date(3)},
-        ]
-        const getNewMatchLength = jest.fn( (input : number) => input);
 
+        const mock = new MockAdapter(axios);
+        mock.onPost(URLs.server + URLs.getNewMatches).reply( config => {
+            const payload = JSON.parse(config.data) as NewMatchDataInput;
+            expect(new Date(payload.timestamp).getTime()).toEqual(
+                new Date(newMatches[1].timestamp.getTime() - 1).getTime()
+            );
+            return [200, {data: [
+                {profile: profiles[2], timestamp : new Date(3)},
+            ]}]
+        })
+        
+        const getNewMatchLength = jest.fn( (input : number) => input);
         render(
-            <StoreProvider value={store}>
-                <MatchesMob
-                    chatPreviews={[]}
-                    newMatches={newMatches}
-                    customNewMatches={loadMoreProfiles}
-                    customNewMatchesLength={getNewMatchLength}
-                />
-            </StoreProvider>
+            <MatchesMob
+                chatPreviews={[]}
+                newMatches={newMatches}
+                returnNewMatchesLength={getNewMatchLength}
+            />
         );
 
         expect(getNewMatchLength).toHaveLastReturnedWith(2);
@@ -42,52 +47,47 @@ describe("matches", () => {
             fireEvent(scroll, "scrollToTop")
         })
 
-        const input = store.savedAPICalls.newMatchDataInput;
-        expect(input?.timestamp.getTime()).toBeLessThan(newMatches[1].timestamp.getTime())
-
         expect(getNewMatchLength).toHaveLastReturnedWith(3);
     })
 
     it("should get new chat previews and more on load", async () => {
-        const store = new RootStore();
-        store.globalState.setUseHttp(false);
-        const StoreProvider = createStoreProvider(store);
-
-        const profile1 = makePublicProfile("id1");
-        const profile2 = makePublicProfile("id2");
-        const profile3 = makePublicProfile("id3");
-
-        const messages1 : Message[] = [makeSentMessage(profile1.id, new Date(4))];
+        const messages1 : Message[] = [makeSentMessage(profiles[0].id, new Date(4))];
         const messages2 : Message[] = [
-            makeSentMessage(profile2.id, new Date(3)),
-            makeSentMessage(profile2.id, new Date(2)),
+            makeSentMessage(profiles[1].id, new Date(3)),
+            makeSentMessage(profiles[1].id, new Date(2)),
         ];
-        const messages3 : Message[] = [makeSentMessage(profile2.id, new Date(1))];
+        const messages3 : Message[] = [makeSentMessage(profiles[2].id, new Date(1))];
 
         const chatPreview1 : ChatPreview = {
             messages: messages1,
-            profile: profile1
+            profile: profiles[0]
         }
         const chatPreview2 : ChatPreview = {
             messages: messages2,
-            profile: profile2
+            profile: profiles[1]
         }
         const chatPreview3 : ChatPreview = {
             messages: messages3,
-            profile: profile3
+            profile: profiles[2]
         }
 
-        const getChatPreviewLength = jest.fn( (input : number) => input);
+        const mock = new MockAdapter(axios);
+        mock.onPost(URLs.server + URLs.getNewChatPreviews).reply( config => {
+            const payload = JSON.parse(config.data) as NewMatchDataInput;
+            expect(new Date(payload.timestamp).getTime()).toEqual(
+                messages2[0].timestamp.getTime() - 1
+            )
 
+            return [200, {data: [chatPreview3]}]    
+        })
+
+        const getChatPreviewLength = jest.fn( (input : number) => input);
         render(
-            <StoreProvider value={store}>
-                <MatchesMob
-                    newMatches={[]}
-                    chatPreviews={[chatPreview1,chatPreview2]}
-                    customNewChatPreviews={[chatPreview3]}
-                    customNewChatPreviewsLength={getChatPreviewLength}
-                />
-            </StoreProvider>
+            <MatchesMob
+                newMatches={[]}
+                chatPreviews={[chatPreview1,chatPreview2]}
+                returnNewChatPreviewsLength={getChatPreviewLength}
+            />
         );
         
         expect(getChatPreviewLength).toHaveLastReturnedWith(2);
@@ -96,9 +96,6 @@ describe("matches", () => {
         await act( () => {
             fireEvent(scroll, "scrollToTop");
         });
-
-        const input = store.savedAPICalls.newMatchDataInput;
-        expect(input?.timestamp.getTime()).toBeLessThan(messages2[0].timestamp.getTime());
 
         expect(getChatPreviewLength).toHaveLastReturnedWith(3);
     })

@@ -1,14 +1,11 @@
 import { createContext, useContext } from "react";
 import { GlobalState } from "./globalState";
-import { SavedAPICalls } from "./savedAPICalls";
 
 export class RootStore {
     public globalState : GlobalState;
-    public savedAPICalls : SavedAPICalls;
 
     constructor() {
         this.globalState = new GlobalState();
-        this.savedAPICalls = new SavedAPICalls();
     }
 }
 

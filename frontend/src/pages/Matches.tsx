@@ -1,11 +1,10 @@
 import { observer } from "mobx-react-lite";
 import { StyledScroll, StyledText, StyledView } from "../styledElements";
 import { matchesText } from "../text";
-import { ChatPreview, NewMatch, NewMatchDataInput, PublicProfile } from "../interfaces";
+import { ChatPreview, NewMatch, NewMatchDataInput } from "../interfaces";
 import { Image } from "expo-image";
 import { ChatPreviewBox } from "../components/ChatPreviewBox";
 import { useEffect, useState } from "react";
-import { useStore } from "../store/RootStore";
 import axios from "axios";
 import { testIDS } from "../testIDs";
 import { PageHeader } from "../components/PageHeader";
@@ -14,26 +13,23 @@ import { URLs } from "../urls";
 interface Props {
     newMatches: NewMatch[]
     chatPreviews: ChatPreview[]
-    customNewMatches?: NewMatch[]
-    customNewChatPreviews?: ChatPreview[]
-    customNewMatchesLength?: (input : number) => number
-    customNewChatPreviewsLength?: (input : number) => number
+    returnNewMatchesLength?: (input : number) => number
+    returnNewChatPreviewsLength?: (input : number) => number
 }
 
 export function Matches(props : Props) {
     const [newMatches, setNewMatches] = useState<NewMatch[]>(props.newMatches ?? []);
     const [chatPreviews, setChatPreviews] = useState<ChatPreview[]>(props.chatPreviews ?? []);
-    const {globalState,savedAPICalls} = useStore();
 
     useEffect( () => {
-        if (props.customNewChatPreviewsLength) {
-            props.customNewChatPreviewsLength(chatPreviews.length)
+        if (props.returnNewChatPreviewsLength) {
+            props.returnNewChatPreviewsLength(chatPreviews.length)
         }
     }, [chatPreviews])
 
     useEffect( () => {
-        if (props.customNewMatchesLength) {
-            props.customNewMatchesLength(newMatches.length);
+        if (props.returnNewMatchesLength) {
+            props.returnNewMatchesLength(newMatches.length);
         }
     }, [newMatches])
 
@@ -44,13 +40,12 @@ export function Matches(props : Props) {
                 timestamp: new Date(newMatches.at(-1)!.timestamp.getTime() - 1)
             }
 
-            if (globalState.useHttp) {
-                const response = await axios.post(URLs.server + URLs.getNewMatches, input); 
-                receivedNewMatches = response.data;
-            } else {
-                savedAPICalls.setNewMatchDataInput(input);
-                receivedNewMatches = props.customNewMatches!;
-            }   
+            const response = await axios.post(URLs.server + URLs.getNewMatches, input); 
+            receivedNewMatches = response.data.data;
+            receivedNewMatches = receivedNewMatches.map( val => ({
+                ...val,
+                timestamp: new Date(val.timestamp)
+            }))
 
             setNewMatches(newMatches.concat(receivedNewMatches));
         } catch (err) {
@@ -65,13 +60,15 @@ export function Matches(props : Props) {
                 timestamp: new Date(chatPreviews.at(-1)!.messages[0].timestamp.getTime() - 1)
             }
 
-            if (globalState.useHttp) {
-                const response = await axios.post(URLs.server + URLs.getNewChatPreviews, input);
-                newChatPreviews = response.data;
-            } else {
-                savedAPICalls.setNewMatchDataInput(input);
-                newChatPreviews = props.customNewChatPreviews!;
-            }
+            const response = await axios.post(URLs.server + URLs.getNewChatPreviews, input);
+            newChatPreviews = response.data.data as ChatPreview[];
+            newChatPreviews = newChatPreviews.map( val => ({
+                ...val,
+                messages: val.messages.map( message => ({
+                    ...message,
+                    timestamp: new Date(message.timestamp)
+                }))
+            }))
             setChatPreviews(chatPreviews.concat(newChatPreviews));
         } catch (err) {
             console.log(err)

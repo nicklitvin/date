@@ -3,7 +3,10 @@ import { AccountCreation } from "../src/pages/AccountCreation"
 import { createProfileText, descriptionText, generalText, myNameText } from "../src/text";
 import { globals } from "../src/globals";
 import { RootStore, createStoreProvider } from "../src/store/RootStore";
-import { FileUploadAndURI } from "../src/interfaces";
+import { FileUploadAndURI, UserInput } from "../src/interfaces";
+import MockAdapter from "axios-mock-adapter";
+import axios from "axios";
+import { URLs } from "../src/urls";
 
 describe("accountCreation", () => {
     it("should continue to next page", async () => {
@@ -25,9 +28,7 @@ describe("accountCreation", () => {
 
     it("should create userInput", async () => {
         const store = new RootStore()
-        store.globalState.setUseHttp(false);
         store.globalState.setEmail("email");
-        const StoreProvider = createStoreProvider(store);
 
         const myName = "name";
         const myBirthday = new Date(2000,2,1);
@@ -44,8 +45,25 @@ describe("accountCreation", () => {
             globals.attributes.Sports[0].value
         ]
 
-        const returnPageNumber = jest.fn((input : number) => input);
+        const mock = new MockAdapter(axios);
+        mock.onPost(URLs.server + URLs.createUser).reply( config => {
+            const userInput = JSON.parse(config.data) as UserInput;
+            expect(userInput?.name).toEqual(myName);
+            expect(new Date(userInput?.birthday).getTime()).toEqual(myBirthday.getTime());
+            expect(userInput?.gender).toEqual(myGender);
+            expect(userInput?.ageInterest[0]).toEqual(globals.minAge);
+            expect(userInput?.ageInterest[1]).toEqual(globals.maxAge);
+            expect(userInput?.genderInterest).toHaveLength(2);
+            expect(userInput?.files).toHaveLength(1);
+            expect(userInput?.attributes).toHaveLength(2);
+            expect(userInput?.description).toEqual(myDescription);
+            
+            return [200]
+        })
 
+
+        const returnPageNumber = jest.fn((input : number) => input);
+        const StoreProvider = createStoreProvider(store);
         render(
             <StoreProvider value={store}>
                 <AccountCreation 
@@ -137,16 +155,5 @@ describe("accountCreation", () => {
         await act( () => {
             fireEvent(screen.getByText(generalText.continue), "press");
         })
-
-        const userInput = store.savedAPICalls.createUser;
-        expect(userInput?.name).toEqual(myName);
-        expect(userInput?.birthday.getTime()).toEqual(myBirthday.getTime());
-        expect(userInput?.gender).toEqual(myGender);
-        expect(userInput?.ageInterest[0]).toEqual(globals.minAge);
-        expect(userInput?.ageInterest[1]).toEqual(globals.maxAge);
-        expect(userInput?.genderInterest).toHaveLength(2);
-        expect(userInput?.files).toHaveLength(1);
-        expect(userInput?.attributes).toHaveLength(2);
-        expect(userInput?.description).toEqual(myDescription);
     })
 })

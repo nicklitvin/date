@@ -5,52 +5,46 @@ import { feedText } from "../text";
 import { PublicProfile } from "../interfaces";
 import { useEffect, useState } from "react";
 import { ProfileViewMob } from "./ProfileView";
-import { useStore } from "../store/RootStore";
 import axios from "axios";
 import { URLs } from "../urls";
 
 interface Props {
     feed: PublicProfile[]
-    customLoadFeed?: PublicProfile[]
-    customReturnFeedLength? (input : number) : number
-    customReturnFeedIndex? (input : number) : number
+    returnFeedLength? (input : number) : number
+    returnFeedIndex? (input : number) : number
 }
 
 export function Feed(props : Props) {
     const [feed, setFeed] = useState<PublicProfile[]>(props.feed ?? []);
     const [feedIndex, setFeedIndex] = useState<number>(0);
-    const {globalState, savedAPICalls} = useStore();
-
-    const loadMoreFeed = async () => {
-        try {
-            let moreFeed : PublicProfile[] = [];
-
-            if (globalState.useHttp) {
-                const response = await axios.post(URLs.server + URLs.getFeed);
-                moreFeed = response.data;
-            } else {
-                moreFeed = props.customLoadFeed ?? []
-            }
-            setFeed(feed.concat(moreFeed));
-        } catch (err) {
-            console.log(err);
-        }
-    }
 
     useEffect( () => {
-        if (props.customReturnFeedLength) {
-            props.customReturnFeedLength(feed.length);
+        if (props.returnFeedLength) {
+            props.returnFeedLength(feed.length);
         }
     }, [feed])
 
     useEffect( () => {
-        if (props.customReturnFeedIndex) {
-            props.customReturnFeedIndex(feedIndex);
+        if (props.returnFeedIndex) {
+            props.returnFeedIndex(feedIndex);
         }
         if (feedIndex == feed.length) {
             loadMoreFeed();
         }
     }, [feedIndex])
+
+    const loadMoreFeed = async () => {
+        if (feed.length == 0) return 
+        try {
+            let moreFeed : PublicProfile[] = [];
+
+            const response = await axios.post(URLs.server + URLs.getFeed);
+            moreFeed = response.data.data as PublicProfile[];
+            setFeed(feed.concat(moreFeed));
+        } catch (err) {
+            console.log(err);
+        }
+    }
 
     return (
         <StyledView>

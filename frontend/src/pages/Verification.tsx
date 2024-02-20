@@ -11,7 +11,7 @@ interface Props {
 
 export function Verification(props : Props) {
     const [currentPage, setCurrentPage] = useState<number>(0);
-    const {globalState, savedAPICalls} = useStore();
+    const {globalState} = useStore();
     const [eduEmail, setEduEmail] = useState<string>("");
 
     const sendVerification = async (eduEmail : string) => {
@@ -21,11 +21,7 @@ export function Verification(props : Props) {
                 schoolEmail: eduEmail
             }
 
-            if (globalState.useHttp) {
-                await axios.post(URLs.server + URLs.newVerification, input);
-            } else {
-                savedAPICalls.setNewVerificationInput(input);
-            }
+            await axios.post(URLs.server + URLs.newVerification, input);
 
             setEduEmail(eduEmail);
         } catch (err) {

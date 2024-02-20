@@ -4,7 +4,6 @@ import { PageHeader } from "../components/PageHeader";
 import { profileViewText } from "../text";
 import { PublicProfile, SwipeInput } from "../interfaces";
 import { Image } from "expo-image";
-import { useStore } from "../store/RootStore";
 import axios from "axios";
 import { Action } from "../types";
 import { testIDS } from "../testIDs";
@@ -17,19 +16,14 @@ interface Props {
 }
 
 export function ProfileView(props : Props) {
-    const {globalState, savedAPICalls} = useStore();
-
     const makeSwipe = async (opinion : Action) => {
         try {
             const input : SwipeInput = {
                 swipedUserID: props.profile.id,
                 action: opinion
             }
-            if (globalState.useHttp) {
-                await axios.post(URLs.server + URLs.makeSwipe, input);
-            } else {
-                savedAPICalls.setSwipeInput(input);
-            }
+            await axios.post(URLs.server + URLs.makeSwipe, input);
+
             if (props.afterSwipe) props.afterSwipe();
         } catch (err) {
             console.log(err);

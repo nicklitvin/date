@@ -50,19 +50,20 @@ describe("chat", () => {
     ]
 
     it("should send message", async () => {
-        const store = new RootStore();
-        const mock = new MockAdapter(axios);
         const myMessage = "hi";
+        let sent = false;
 
+        const mock = new MockAdapter(axios);
         mock.onPost(URLs.server + URLs.sendMessage).reply(config => {
             const payload = JSON.parse(config.data) as MessageInput;
-
             expect(payload.message).toEqual(myMessage);
             expect(payload.recepientID).toEqual(recepientProfile.id);
+            sent = true;
 
             return [200]
         })
 
+        const store = new RootStore();
         const StoreProvider = createStoreProvider(store);
         render(
             <StoreProvider value={store}>
@@ -81,19 +82,17 @@ describe("chat", () => {
         await act( () => {
             fireEvent(myInput, "submitEditing");
         })
+
+        expect(sent).toEqual(true);
     })
 
     it("should load older messages", async () => {
-        const store = new RootStore();
-        store.globalState.setTimezone("PST");
-        const returnChatLength = jest.fn( (input) => input);
-
         const mock = new MockAdapter(axios);
         mock.onPost(URLs.server + URLs.getChat).reply(config => {
             const payload = JSON.parse(config.data) as GetChatInput;
 
-            expect(new Date(payload.fromTime).getTime()).toBeLessThan(
-                latestMessages[1].timestamp.getTime()
+            expect(new Date(payload.fromTime).getTime()).toEqual(
+                latestMessages[1].timestamp.getTime() - 1
             )
             expect(payload.withID).toEqual(recepientProfile.id);
 
@@ -102,6 +101,9 @@ describe("chat", () => {
             }];
         })
 
+        const store = new RootStore();
+        store.globalState.setTimezone("PST");
+        const returnChatLength = jest.fn( (input) => input);
         const StoreProvider = createStoreProvider(store);
         render(
             <StoreProvider value={store}>
@@ -124,15 +126,17 @@ describe("chat", () => {
     })
 
     it("should report user", async () => {
-        const store = new RootStore();
+        let sent = false;
 
         const mock = new MockAdapter(axios);
         mock.onPost(URLs.server + URLs.reportUser).reply(config => {
             const payload = JSON.parse(config.data) as RequestReportInput;
             expect(payload.reportedID).toEqual(recepientProfile.id);
+            sent = true;
             return [200]
         })
 
+        const store = new RootStore();
         const StoreProvider = createStoreProvider(store);
         render(
             <StoreProvider value={store}>
@@ -147,13 +151,11 @@ describe("chat", () => {
         await act( () => {
             fireEvent(reportButton, "press")
         })
+
+        expect(sent).toEqual(true);
     })
 
     it("should show timestamps", async () => {
-        const timezone = "PST";
-        const store = new RootStore();
-        store.globalState.setTimezone(timezone);
-
         const mock = new MockAdapter(axios);
         mock.onPost(URLs.server + URLs.getChat).reply(config => {
             return [200, {
@@ -161,13 +163,15 @@ describe("chat", () => {
             }];
         })
 
+        const timezone = "PST";
+        const store = new RootStore();
+        store.globalState.setTimezone(timezone);
         const StoreProvider = createStoreProvider(store);
         render(
             <StoreProvider value={store}>
                 <ChatMob
                     latestMessages={latestMessages}
                     publicProfile={recepientProfile}
-                    // customNextChatLoad={moreMessages}
                 />
             </StoreProvider>
         );
@@ -193,9 +197,6 @@ describe("chat", () => {
     })
 
     it("should show read/delivered read status", async () => {
-        const store = new RootStore();
-        const StoreProvider = createStoreProvider(store);
-
         const mock = new MockAdapter(axios);
         mock.onPost(URLs.server + URLs.getChat).reply(config => {
             return [200, {
@@ -203,6 +204,8 @@ describe("chat", () => {
             }];
         })
 
+        const store = new RootStore();
+        const StoreProvider = createStoreProvider(store);
         render(
             <StoreProvider value={store}>
                 <ChatMob

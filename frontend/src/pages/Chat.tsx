@@ -22,7 +22,7 @@ interface Props {
 export function Chat(props : Props) {
     const [chat, setChat] = useState<Message[]>(props.latestMessages ?? []);
     const [lastSentChatID, setLastSentChatID] = useState<string>("");
-    const { globalState, savedAPICalls } = useStore();
+    const { globalState } = useStore();
 
     useEffect( () => {
         for (const message of [...chat].reverse()) {

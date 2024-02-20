@@ -1,27 +1,22 @@
 import { act, fireEvent, render, screen } from "@testing-library/react-native";
-import { RootStore, createStoreProvider } from "../src/store/RootStore"
 import { ProfileViewMob } from "../src/pages/ProfileView";
 import { makePublicProfile } from "../__testUtils__/easySetup";
 import { testIDS } from "../src/testIDs";
 import { profileViewText } from "../src/text";
+import MockAdapter from "axios-mock-adapter";
+import axios from "axios";
+import { URLs } from "../src/urls";
+import { SwipeInput } from "../src/interfaces";
 
 describe("profileview", () => {
     it("should render not swipe version", async () => {
-        const store = new RootStore();
-        store.globalState.setUseHttp(false);
-        const StoreProvider = createStoreProvider(store);
-
-        const afterSwipeFn = jest.fn();
         const profile = makePublicProfile("id");
 
         render(
-            <StoreProvider value={store}>
-                <ProfileViewMob
-                    isInSwipeFeed={false}
-                    afterSwipe={afterSwipeFn}
-                    profile={profile}
-                />
-            </StoreProvider>
+            <ProfileViewMob
+                isInSwipeFeed={false}
+                profile={profile}
+            />
         )
 
         expect(screen.queryByTestId(testIDS.swipeLike)).toEqual(null);
@@ -30,21 +25,12 @@ describe("profileview", () => {
     })
 
     it("should render swipe version", async () => {
-        const store = new RootStore();
-        store.globalState.setUseHttp(false);
-        const StoreProvider = createStoreProvider(store);
-
-        const afterSwipeFn = jest.fn();
         const profile = makePublicProfile("id");
-
         render(
-            <StoreProvider value={store}>
-                <ProfileViewMob
-                    isInSwipeFeed={true}
-                    afterSwipe={afterSwipeFn}
-                    profile={profile}
-                />
-            </StoreProvider>
+            <ProfileViewMob
+                isInSwipeFeed={true}
+                profile={profile}
+            />
         )
 
         expect(screen.queryByTestId(testIDS.swipeLike)).not.toEqual(null);
@@ -53,21 +39,25 @@ describe("profileview", () => {
     })
 
     it("should make swipe", async () => {
-        const store = new RootStore();
-        store.globalState.setUseHttp(false);
-        const StoreProvider = createStoreProvider(store);
-        
-        const afterSwipeFn = jest.fn();
         const profile = makePublicProfile("id");
+        let swipeMade = false;
 
+        const mock = new MockAdapter(axios);
+        mock.onPost(URLs.server + URLs.makeSwipe).reply( config => {
+            const payload = JSON.parse(config.data) as SwipeInput;
+            expect(payload.action).toEqual("Like");
+            expect(payload.swipedUserID).toEqual(profile.id);
+            swipeMade = true;
+            return [200]
+        })
+
+        const afterSwipeFn = jest.fn();
         render(
-            <StoreProvider value={store}>
-                <ProfileViewMob
-                    isInSwipeFeed={true}
-                    afterSwipe={afterSwipeFn}
-                    profile={profile}
-                />
-            </StoreProvider>
+            <ProfileViewMob
+                isInSwipeFeed={true}
+                afterSwipe={afterSwipeFn}
+                profile={profile}
+            />
         );
 
         const likeButton = screen.getByTestId(testIDS.swipeLike);
@@ -76,9 +66,6 @@ describe("profileview", () => {
         })
 
         expect(afterSwipeFn).toHaveBeenCalledTimes(1);
-        
-        const input = store.savedAPICalls.swipeInput;
-        expect(input?.action).toEqual("Like");
-        expect(input?.swipedUserID).toEqual(profile.id);
+        expect(swipeMade).toEqual(true);
     })
 })
