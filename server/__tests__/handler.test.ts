@@ -779,6 +779,28 @@ describe("handler", () => {
             schoolEmail: eduEmail
         })
 
-        expect(await handler.createUser(input)).not.toEqual(null);
+        expect(await handler.createUser(input, false)).not.toEqual(null);
+    })
+
+    it("should delete verification if user deleted", async () => {
+        const input = await validRequestUserInput();
+        const eduEmail = "a@berkeley.edu";
+        const code = await handler.getVerificationCode({
+            personalEmail: input.email,
+            schoolEmail: eduEmail
+        })
+
+        await handler.verifyUserWithCode({
+            code: code!,
+            personalEmail: input.email,
+            schoolEmail: eduEmail
+        })
+
+        const user = await handler.createUser(input, false);
+        await handler.deleteUser(user!.id);
+
+        expect(await handler.verification.getVerificationBySchoolEmail(
+            eduEmail
+        )).toEqual(null);
     })
 })

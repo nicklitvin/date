@@ -1,5 +1,4 @@
 TODO
-move simple page tests to separate test page
 
 BACKEND TODO
 change elo constants with api?
@@ -110,24 +109,3 @@ Art Exhibitions
 Wine Tasting
 Photography
 Beach Days
-
-MOBILE APP
-apple/google login with personal email - verify email
-
-Theme: Black and white until themes
-
-Login page (sign in with google)
-
-Sign-up
-    - dont worry (you can change all)
-    - user input pages
-    - uploading... (slow transition theme if match)
-
-
-Messages - Chat list, new match icons, enable/disable notifications icon
-Stats - all time as circle, weekly graphs, all time/weekly icon
-Profile - profile pic, edit profile, subscription status / cancel, settings icon
-Swipe Feed - preferences icon 
-
-Preferences - ageInterest, genderInterest
-Settings - notifications, logout/delete

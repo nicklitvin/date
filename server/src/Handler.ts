@@ -106,10 +106,17 @@ export class Handler {
             return deleted.length;
         }
 
+        const verification = await this.verification.getVerificationByPersonalEmail(
+            foundUser.email
+        );
+        if (verification) {
+            await this.verification.deleteVerification(verification!.schoolEmail)
+        }
+
         const [images, messages, user]= await Promise.all([
             deleteAllUserImages(),
             this.message.deleteAllChatsWithUser(foundUser.id),
-            this.user.deleteUser(foundUser.id)
+            this.user.deleteUser(foundUser.id),
         ])
         return {images, messages, user};
     }
