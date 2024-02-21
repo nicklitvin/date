@@ -9,5 +9,6 @@ export const URLs = {
     makeSwipe: "/makeSwipe",
     getFeed: "/getFeed",
     newVerification: "/newVerification",
-    verifyUser: "/verifyUser"
+    verifyUser: "/verifyUser",
+    newCode: "/newCode",
 }

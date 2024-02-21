@@ -83,3 +83,7 @@ export interface ConfirmVerificationInput {
     schoolEmail: string
     code: number
 }
+
+export interface NewCodeInput {
+    personalEmail: string
+}

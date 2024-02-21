@@ -4,6 +4,7 @@ export const globals = {
     maxAge: 99,
     maxUploads: 6,
     timeBeforeChatTimestamp: 1000 * 60 * 60,
+    minutesBeforeResend: 1,
 
     attributes: {
         "Sports": [

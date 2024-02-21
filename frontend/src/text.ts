@@ -95,3 +95,12 @@ export const eduEmailText = {
     inputPlaceholder: "Type your university email here...",
     inputError: "Invalid email"
 }
+
+export const verifyCodeText = {
+    pageTitle: "Verification",
+    pageSubtitle: "Check your university email account, What is the 4 digit code?",
+    inputPlaceholder: "Type the 4-digit code here...",
+    inputError: "Invalid Code",
+    resendButton: "Resend Code"
+}
+
