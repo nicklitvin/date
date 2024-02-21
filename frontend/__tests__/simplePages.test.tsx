@@ -56,13 +56,10 @@ describe("test pages", () => {
         );
 
         await act( () => {
-            fireEvent(screen.getByText(pictureText.uploadSwitch), "press");
+            fireEvent(screen.getByTestId(`picture-${imageURI}`), "press");
         })
         await act( () => {
-            fireEvent(screen.getByTestId(`image-${imageURI}`), "press");
-        })
-        await act( () => {
-            fireEvent(screen.getByTestId(`image-${imageURI_2}`), "press");
+            fireEvent(screen.getByTestId(`picture-${imageURI_2}`), "press");
         })
         await act( () => {
             fireEvent(screen.getByText(generalText.continue), "press")
@@ -70,7 +67,7 @@ describe("test pages", () => {
         expect(onSubmit).toHaveLastReturnedWith(`${imageURI_2}${imageURI}`)
     })
 
-    it("should not do anything if switching", async () => {
+    it("should remove picture", async () => {
         const imageURI = "a";
         const imageURI_2 = "b";
         const uploads : FileUploadAndURI[] = [
@@ -86,22 +83,62 @@ describe("test pages", () => {
             }
         ]
         const onSubmit = jest.fn();
+        const returnUploadLength = jest.fn( (input : number) => input);
 
         render(
             <Pictures
                 onSubmit={onSubmit}
                 submitText={generalText.continue}
                 uploads={uploads}
+                returnUploadLength={returnUploadLength}
             />
         );
 
         await act( () => {
-            fireEvent(screen.getByText(pictureText.uploadSwitch), "press");
+            fireEvent(screen.getByTestId(`remove-${imageURI}`), "press");
         })
+        
+        expect(returnUploadLength).toHaveLastReturnedWith(1);
+    })
+
+    it("should remove switchURI if removed picture", async () => {
+        const imageURI = "a";
+        const imageURI_2 = "b";
+        const uploads : FileUploadAndURI[] = [
+            {
+                buffer: Buffer.from("a"),
+                mimetype: "image/jpeg",
+                uri: imageURI
+            },
+            {
+                buffer: Buffer.from("b"),
+                mimetype: "image/jpeg",
+                uri: imageURI_2
+            }
+        ]
+        const onSubmit = jest.fn();
+        const returnSwitchURI = jest.fn( (input : string|null) => input)
+
+        render(
+            <Pictures
+                onSubmit={onSubmit}
+                submitText={generalText.continue}
+                uploads={uploads}
+                returnSwitchURI={returnSwitchURI}
+            />
+        );
+
         await act( () => {
-            fireEvent(screen.getByText(generalText.continue), "press");
+            fireEvent(screen.getByTestId(`picture-${imageURI}`), "press");
         })
-        expect(onSubmit).toHaveBeenCalledTimes(0);
+
+        expect(returnSwitchURI).toHaveLastReturnedWith(imageURI);
+
+        await act( () => {
+            fireEvent(screen.getByTestId(`remove-${imageURI}`), "press");
+        })
+        
+        expect(returnSwitchURI).toHaveLastReturnedWith(null);
     })
 
     it("should generate all attributes", async () => {

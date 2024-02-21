@@ -2,28 +2,34 @@ import { useEffect, useState } from "react";
 import { MySimplePage } from "../components/SimplePage"
 import { FileUploadAndURI } from "../interfaces";
 import { pictureText } from "../text"
-import { StyledButton, StyledView } from "../styledElements";
-import classNames from "classnames";
+import { StyledButton } from "../styledElements";
 import * as ImagePicker from "expo-image-picker";
 import { globals } from "../globals";
 import * as FileSystem from "expo-file-system";
-import { Image } from "expo-image";
 import { MyButton } from "../components/Button";
+import { Picture } from "../components/Picture";
 
 interface Props {
     uploads: FileUploadAndURI[]
     onSubmit: (input : FileUploadAndURI[]) => any
     submitText: string
+    returnUploadLength?: (input : number) => number
+    returnSwitchURI?: (input : string|null) => string|null
 }
 
 export function Pictures(props : Props) {
     const [uploads, setUploads] = useState<FileUploadAndURI[]>(props.uploads);
-    const [switching, setSwitching] = useState<boolean>(false);
     const [switchURI, setSwitchURI] = useState<string|null>(null);
 
-    const uploadImage = async () => {
-        if (switching) return
+    useEffect( () => {
+        if (props.returnSwitchURI) props.returnSwitchURI(switchURI);
+    }, [switchURI])
 
+    useEffect( () => {
+        if (props.returnUploadLength) props.returnUploadLength(uploads.length);
+    }, [uploads])
+
+    const uploadImage = async () => {
         const result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
             selectionLimit: globals.maxUploads - uploads.length 
@@ -50,14 +56,11 @@ export function Pictures(props : Props) {
     }
 
     const removeImage = (uri : string) => {
-        if (switching) return
-
         setUploads(uploads.filter( upload => upload.uri != uri));
+        if (switchURI == uri) setSwitchURI(null);
     }
 
     const performSwitch = async (uri : string) => {
-        if (!switching) return
-
         if (switchURI == uri) setSwitchURI(null);
         if (switchURI) {
             const copy = [...uploads];
@@ -67,19 +70,9 @@ export function Pictures(props : Props) {
             copy[index1] = copy[index2];
             copy[index2] = saved;
             setUploads(copy);
-            setSwitching(false);
             setSwitchURI(null);
         } else {
             setSwitchURI(uri);
-        }
-    }
-
-    const activateSwitch = () => {
-        if (switching) {
-            setSwitching(false);
-            setSwitchURI(null);
-        } else {
-            setSwitching(true)
         }
     }
 
@@ -88,45 +81,24 @@ export function Pictures(props : Props) {
         subtitle={pictureText.pageSubtitle}
         content={
             <>
-                {uploads.map( (upload) => (
-                    switching ?
-                    <StyledView 
-                        key={`image-${upload.uri}`} 
-                        className={classNames(
-                            switchURI == upload.uri ? "" : ""
-                        )
-                    }>
-                        <StyledButton 
-                            onPress={() => performSwitch(upload.uri)}
-                            testID={`image-${upload.uri}`} 
-                        >
-                            <Image 
-                                source={upload.uri}
-                            />
-                            <StyledButton/>
-                        </StyledButton>
-                    </StyledView> :
-                    <StyledView key={`image-${upload.uri}`}>
-                        <Image 
-                            source={upload.uri}
-                        />
-                        <StyledButton
-                            onPress={() => removeImage(upload.uri)}
-                        />
-                    </StyledView>
-                ))}
-                <MyButton
-                    text={pictureText.uploadButton}
-                    onPressFunction={uploadImage}
-                />
-                <MyButton
-                    text={pictureText.uploadSwitch}
-                    onPressFunction={activateSwitch}
-                />
+                {Array.from({length : globals.maxUploads}).map( (_,index) => 
+                    index < uploads.length ?
+                    <Picture
+                        key={`picture-${uploads[index].uri}`}
+                        source={uploads[index].uri}
+                        switching={uploads[index].uri == switchURI}
+                        onPress={() => performSwitch(uploads[index].uri)}
+                        onRemove={() => removeImage(uploads[index].uri)}
+                    /> :
+                    <StyledButton
+                        key={`empty-button-${index}`}
+                        onPress={uploadImage}
+                    />
+                )}
                 <MyButton
                     text={props.submitText}
                     onPressFunction={() => {
-                        if (uploads.length > 0 && !switching)
+                        if (uploads.length > 0)
                             props.onSubmit(uploads);
                     }}
                 />

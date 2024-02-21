@@ -84,8 +84,6 @@ export const finalText = {
 export const pictureText = {
     pageTitle: "Images",
     pageSubtitle: "Upload pictures that show how awesome you are",
-    uploadText: "Upload File",
-    uploadSwitch: "Rearrange",
     uploadButton: "Upload Image",
 }
 
