@@ -87,3 +87,16 @@ export interface ConfirmVerificationInput {
 export interface NewCodeInput {
     personalEmail: string
 }
+
+export interface DeleteImageInput {
+    imageID: string
+}
+
+export interface UploadImageInput {
+    image: FileUpload
+}
+
+export interface EditUserInput {
+    setting: string
+    value: any
+}

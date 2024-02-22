@@ -56,7 +56,8 @@ export const birthdayText = {
 }
 
 export const generalText = {
-    continue: "continue"
+    continue: "continue",
+    saveChanges: "Save Changes"
 }
 
 export const genderPreferenceText = {
@@ -102,3 +103,6 @@ export const verifyCodeText = {
     resendButton: "Resend Code"
 }
 
+export const editProfileText = {
+    pageTitle: "Edit Profile"
+}

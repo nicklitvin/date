@@ -5,6 +5,7 @@ export const globals = {
     maxUploads: 6,
     timeBeforeChatTimestamp: 1000 * 60 * 60,
     minutesBeforeResend: 1,
+    editImages: "images",
 
     attributes: {
         "Sports": [

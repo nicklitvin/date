@@ -61,8 +61,9 @@ export function Pictures(props : Props) {
     }
 
     const performSwitch = async (uri : string) => {
-        if (switchURI == uri) setSwitchURI(null);
-        if (switchURI) {
+        if (switchURI == uri) {
+            setSwitchURI(null);
+        } else if (switchURI) {
             const copy = [...uploads];
             const index1 = copy.findIndex( val => val.uri == switchURI);
             const index2 = copy.findIndex( val => val.uri == uri);

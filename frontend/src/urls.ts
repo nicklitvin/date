@@ -11,4 +11,7 @@ export const URLs = {
     newVerification: "/newVerification",
     verifyUser: "/verifyUser",
     newCode: "/newCode",
+    uploadImage: "/uploadImage",
+    deleteImage: "/deleteImage",
+    newOrder: "/newOrder"
 }
