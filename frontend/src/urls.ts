@@ -13,5 +13,6 @@ export const URLs = {
     newCode: "/newCode",
     uploadImage: "/uploadImage",
     deleteImage: "/deleteImage",
-    newOrder: "/newOrder"
+    newOrder: "/newOrder",
+    editUser: "/editUser"
 }

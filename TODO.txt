@@ -1,4 +1,6 @@
 TODO
+add modal for reporting/unliking user
+
 is clerks worth it?
 LOGIN with clerk
 

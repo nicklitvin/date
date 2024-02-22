@@ -2,7 +2,7 @@ import { observer } from "mobx-react-lite";
 import { PageHeader } from "../components/PageHeader";
 import { editProfileText } from "../text";
 import { useEffect, useState } from "react";
-import { StyledButton, StyledView } from "../styledElements";
+import { StyledButton, StyledText, StyledView } from "../styledElements";
 import { globals } from "../globals";
 import { Picture } from "../components/Picture";
 import axios from "axios";
@@ -10,20 +10,28 @@ import { DeleteImageInput, EditUserInput, FileUploadAndURI, UploadImageInput } f
 import { URLs } from "../urls";
 import { MediaTypeOptions, launchImageLibraryAsync } from "expo-image-picker";
 import { EncodingType, readAsStringAsync } from "expo-file-system";
+import { MyTextInput } from "../components/TextInput";
 
 interface Props {
     uploadURLs: string[]
+    description: string
     returnUploadURLsLength?: (input : number) => number
     uploadImageData?: FileUploadAndURI
+    returnDescription?: (input : string) => string
 }
 
 export function EditProfile(props : Props) {
     const [uploadURLs, setUploadURLs] = useState<string[]>(props.uploadURLs);
     const [switchURL, setSwitchURL] = useState<string|null>(null);
+    const [description, setDescription] = useState<string>(props.description);
 
     useEffect( () => {
         if (props.returnUploadURLsLength) props.returnUploadURLsLength(uploadURLs.length);
     }, [uploadURLs])
+
+    useEffect( () => {
+        if (props.returnDescription) props.returnDescription(description);
+    })
 
     const removeImage = async (url : string) => {
         try {
@@ -49,7 +57,7 @@ export function EditProfile(props : Props) {
             copy[index2] = saved;
             try {
                 const input : EditUserInput = {
-                    setting: "images",
+                    setting: globals.settingImages,
                     value: copy
                 }
                 await axios.post(URLs.server + URLs.newOrder, input);
@@ -99,6 +107,19 @@ export function EditProfile(props : Props) {
         }
     }
 
+    const editDescription = async (description : string) => {
+        try {
+            const input : EditUserInput = {
+                setting: globals.settingDescription,
+                value: description
+            }
+            const response = await axios.post(URLs.server + URLs.editUser, input);
+            setDescription(description);
+        } catch (err) {
+
+        }
+    }
+
     return (
         <>
             <PageHeader
@@ -106,6 +127,9 @@ export function EditProfile(props : Props) {
                 imageSource=""
             />
             <StyledView>
+                <StyledText>
+                    {editProfileText.headerPictures}
+                </StyledText>
                 {Array.from({length: globals.maxUploads}).map( (_,index) => (
                     index < props.uploadURLs.length ? 
                     <Picture
@@ -121,6 +145,17 @@ export function EditProfile(props : Props) {
                         onPress={uploadImage}
                     />
                 ))}
+            </StyledView>
+            <StyledView>
+                <StyledText>
+                    {editProfileText.headerDescription}
+                </StyledText>
+                    <MyTextInput
+                        initialInput={description}
+                        errorMessage={editProfileText.descriptionError}
+                        onSubmit={editDescription}
+                        placeholder={editProfileText.descriptionPlaceholder}
+                    />
             </StyledView>
         </>
     )

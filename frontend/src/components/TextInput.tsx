@@ -6,10 +6,11 @@ interface Props {
     placeholder: string
     errorMessage: string
     onSubmit: (message : string) => any
+    initialInput?: string
 }
 
 export function MyTextInput(props : Props) {
-    const [message, setMessage] = useState<string>("");
+    const [message, setMessage] = useState<string>(props.initialInput ?? "");
     const [showError, setShowError] = useState<boolean>(false);
 
     return (  

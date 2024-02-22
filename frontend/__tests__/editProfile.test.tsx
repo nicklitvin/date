@@ -4,8 +4,11 @@ import MockAdapter from "axios-mock-adapter";
 import axios from "axios";
 import { URLs } from "../src/urls";
 import { DeleteImageInput, EditUserInput, UploadImageInput } from "../src/interfaces";
+import { globals } from "../src/globals";
+import { editProfileText } from "../src/text";
 
 describe("editProfile", () => {
+    const description = "description";
     const uploadURLs = ["url_1", "url_2"];
 
     it("should remove image", async () => {
@@ -20,6 +23,7 @@ describe("editProfile", () => {
         render(<EditProfile
             uploadURLs={uploadURLs}
             returnUploadURLsLength={func}
+            description={description}
         />)
 
         expect(func).toHaveLastReturnedWith(2);
@@ -37,7 +41,7 @@ describe("editProfile", () => {
         const mock = new MockAdapter(axios);
         mock.onPost(URLs.server + URLs.newOrder).reply( config => {
             const payload = JSON.parse(config.data) as EditUserInput;
-            expect(payload.setting).toEqual("images");
+            expect(payload.setting).toEqual(globals.settingImages);
             expect(payload.value[0]).toEqual(uploadURLs[1]);
             expect(payload.value[1]).toEqual(uploadURLs[0]);
             sent = true;
@@ -46,6 +50,7 @@ describe("editProfile", () => {
 
         render(<EditProfile
             uploadURLs={uploadURLs}
+            description={description}
         />)
 
         await act( () => {
@@ -73,6 +78,7 @@ describe("editProfile", () => {
 
         render(
             <EditProfile
+                description={description}
                 uploadURLs={[]}
                 uploadImageData={{
                     buffer: Buffer.from("1"),
@@ -87,5 +93,34 @@ describe("editProfile", () => {
         })
 
         expect(sent).toEqual(true);
+    })
+
+    it("should edit description", async () => {
+        const newDescription = "newDescription";
+
+        const mock = new MockAdapter(axios);
+        mock.onPost(URLs.server + URLs.editUser).reply( config => {
+            const payload = JSON.parse(config.data) as EditUserInput;
+            expect(payload.setting).toEqual(globals.settingDescription);
+            expect(payload.value).toEqual(newDescription);
+            return [200]
+        })
+
+        const func = jest.fn( (input : string) => input);
+        render(<EditProfile
+            description={description}
+            uploadURLs={[]}
+            returnDescription={func}
+        />)
+
+        const input = screen.getByPlaceholderText(editProfileText.descriptionPlaceholder);
+        await act( () => {
+            fireEvent(input, "changeText", newDescription);
+        })
+        await act( () => {
+            fireEvent(input, "submitEditing");
+        })
+
+        expect(func).toHaveLastReturnedWith(newDescription);
     })
 })

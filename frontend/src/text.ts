@@ -104,5 +104,10 @@ export const verifyCodeText = {
 }
 
 export const editProfileText = {
-    pageTitle: "Edit Profile"
+    pageTitle: "Edit Profile",
+    headerPictures: "Pictures",
+    headerDescription: "Description",
+    headerAttributes: "Attributes",
+    descriptionPlaceholder: "Type your description here...",
+    descriptionError: "Invalid Description"
 }
