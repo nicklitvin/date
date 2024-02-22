@@ -109,5 +109,6 @@ export const editProfileText = {
     headerDescription: "Description",
     headerAttributes: "Attributes",
     descriptionPlaceholder: "Type your description here...",
-    descriptionError: "Invalid Description"
+    descriptionError: "Invalid Description",
+    attributeButton: "Change Attributes"
 }

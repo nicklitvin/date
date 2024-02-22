@@ -10,6 +10,7 @@ import { editProfileText } from "../src/text";
 describe("editProfile", () => {
     const description = "description";
     const uploadURLs = ["url_1", "url_2"];
+    const attributes = ["attribute_1", "attribute_2"];
 
     it("should remove image", async () => {
         const mock = new MockAdapter(axios);
@@ -21,6 +22,7 @@ describe("editProfile", () => {
 
         const func = jest.fn( (input : number) => input);
         render(<EditProfile
+            attributes={attributes}
             uploadURLs={uploadURLs}
             returnUploadURLsLength={func}
             description={description}
@@ -49,6 +51,7 @@ describe("editProfile", () => {
         });
 
         render(<EditProfile
+            attributes={attributes}
             uploadURLs={uploadURLs}
             description={description}
         />)
@@ -78,6 +81,7 @@ describe("editProfile", () => {
 
         render(
             <EditProfile
+                attributes={attributes}
                 description={description}
                 uploadURLs={[]}
                 uploadImageData={{
@@ -108,6 +112,7 @@ describe("editProfile", () => {
 
         const func = jest.fn( (input : string) => input);
         render(<EditProfile
+            attributes={attributes}
             description={description}
             uploadURLs={[]}
             returnDescription={func}

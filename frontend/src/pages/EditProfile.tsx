@@ -11,19 +11,23 @@ import { URLs } from "../urls";
 import { MediaTypeOptions, launchImageLibraryAsync } from "expo-image-picker";
 import { EncodingType, readAsStringAsync } from "expo-file-system";
 import { MyTextInput } from "../components/TextInput";
+import { MyButton } from "../components/Button";
 
 interface Props {
     uploadURLs: string[]
     description: string
-    returnUploadURLsLength?: (input : number) => number
+    attributes: string[]
     uploadImageData?: FileUploadAndURI
+    returnUploadURLsLength?: (input : number) => number
     returnDescription?: (input : string) => string
+    returnAttributeLength?: (input : number) => number
 }
 
 export function EditProfile(props : Props) {
     const [uploadURLs, setUploadURLs] = useState<string[]>(props.uploadURLs);
     const [switchURL, setSwitchURL] = useState<string|null>(null);
     const [description, setDescription] = useState<string>(props.description);
+    const [attributes, setAttributes] = useState<string[]>(props.attributes);
 
     useEffect( () => {
         if (props.returnUploadURLsLength) props.returnUploadURLsLength(uploadURLs.length);
@@ -31,6 +35,10 @@ export function EditProfile(props : Props) {
 
     useEffect( () => {
         if (props.returnDescription) props.returnDescription(description);
+    })
+
+    useEffect( () => {
+        if (props.returnAttributeLength) props.returnAttributeLength(attributes.length);
     })
 
     const removeImage = async (url : string) => {
@@ -120,6 +128,10 @@ export function EditProfile(props : Props) {
         }
     }
 
+    const editAttributes = () => {
+
+    }
+
     return (
         <>
             <PageHeader
@@ -156,6 +168,22 @@ export function EditProfile(props : Props) {
                         onSubmit={editDescription}
                         placeholder={editProfileText.descriptionPlaceholder}
                     />
+            </StyledView>
+            <StyledView>
+                <StyledText>
+                    {editProfileText.headerAttributes}
+                </StyledText>
+                {attributes.map( val => (
+                    <StyledText
+                        key={`attribute-${val}`}
+                    >
+                        {val}
+                    </StyledText>
+                ))}
+                <MyButton
+                    text={editProfileText.attributeButton}
+                    onPressFunction={editAttributes}
+                />
             </StyledView>
         </>
     )
