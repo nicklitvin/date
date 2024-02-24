@@ -7,6 +7,8 @@ export const globals = {
     minutesBeforeResend: 1,
     settingImages: "images",
     settingDescription: "description",
+    settingGenderPreference: "gender preference",
+    settingAgePreference: "age preference",
 
     attributes: {
         "Sports": [

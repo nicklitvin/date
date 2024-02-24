@@ -8,6 +8,8 @@ interface Props {
     onSubmit: (input : string[]) => any
     submitText: string
     returnGenderCount?: (input : number) => number
+    embed?: boolean
+    setGenders?: Function
 }
 
 export function GenderPreference(props : Props) {
@@ -17,31 +19,42 @@ export function GenderPreference(props : Props) {
         if (props.returnGenderCount) props.returnGenderCount(genderPreference.length);
     }, [genderPreference])
 
+    const makeContent = () => (
+        <>
+        {props.genders.map( (val) => 
+            <MyButton
+                key={`gender-pref-${val}`}
+                text={val}
+
+                onPressFunction={() => {
+                    const index = genderPreference.findIndex( 
+                        selected => selected == val
+                    )
+                    let copy = [...genderPreference];
+                    if (index > -1) {
+                        copy = copy.splice(index,1);
+                    } else {
+                        copy.push(val);
+                    }
+
+                    if (props.setGenders) props.setGenders(copy);
+                    setGenderPreference(copy);
+                }}
+            />
+        )}
+        </>
+    )
+
+    if (props.embed) {
+        return makeContent();
+    }
+
     return <MySimplePage
         title={genderPreferenceText.pageTitle}
         subtitle={genderPreferenceText.pageSubtitle}
         content={
             <>
-                {props.genders.map( (val) => 
-                    <MyButton
-                        key={`gender-pref-${val}`}
-                        text={val}
-                        onPressFunction={() => {
-                            const index = genderPreference.findIndex( 
-                                selected => selected == val
-                            )
-                            if (index > -1) {
-                                setGenderPreference(
-                                    genderPreference.splice(index,1)
-                                )
-                            } else {
-                                setGenderPreference(
-                                    [...genderPreference, val]
-                                )
-                            }
-                        }}
-                    />
-                )}
+                {makeContent()}
                 <MyButton
                     text={props.submitText}
                     onPressFunction={() => {

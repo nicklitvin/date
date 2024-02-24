@@ -92,7 +92,7 @@ export const eduEmailText = {
     pageTitle: "Edu Email",
     pageSubtitle: "What is your university email? It will only be used to send a 4-digit code for verification.",
     inputPlaceholder: "Type your university email here...",
-    inputError: "Invalid email"
+    inputError: "Invalid email" 
 }
 
 export const verifyCodeText = {
@@ -111,4 +111,10 @@ export const editProfileText = {
     descriptionPlaceholder: "Type your description here...",
     descriptionError: "Invalid Description",
     attributeButton: "Change Attributes"
+}
+
+export const preferencesText = {
+    pageTitle: "Preferences",
+    headerGender: "Gender",
+    headerAgePreference: "Age Preference"
 }
