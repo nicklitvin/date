@@ -100,3 +100,15 @@ export interface EditUserInput {
     setting: string
     value: any
 }
+
+export interface UserSwipeStats {
+    allTime: SwipeBreakdown
+    weekly: SwipeBreakdown[]
+}
+
+export interface SwipeBreakdown {
+    myLikes: number
+    myDislikes: number
+    likedMe: number
+    dislikedMe: number
+}

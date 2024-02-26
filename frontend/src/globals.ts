@@ -20,4 +20,7 @@ export const globals = {
             {id: "id4", value: "rap"},
         ]
     },
+
+    green: "#4A991A",
+    red: "#B81515"
 }

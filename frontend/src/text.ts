@@ -92,7 +92,7 @@ export const eduEmailText = {
     pageTitle: "Edu Email",
     pageSubtitle: "What is your university email? It will only be used to send a 4-digit code for verification.",
     inputPlaceholder: "Type your university email here...",
-    inputError: "Invalid email" 
+    inputError: "Invalid email"
 }
 
 export const verifyCodeText = {
@@ -117,4 +117,17 @@ export const preferencesText = {
     pageTitle: "Preferences",
     headerGender: "Gender",
     headerAgePreference: "Age Preference"
+}
+
+export const statsText = {
+    pageTitle: "Stats",
+    purchaseButton: "Purchase Premium",
+    purchaseText: `
+        Want to see how many people like/dislike your profile?
+        Want to see your improvement over the last few weeks?
+        Want improved visibility of your profile?
+    `,
+    allTime: "All Time",
+    weeklyReceived: "Weekly Received",
+    weeklySent: "Weekly Sent"
 }
