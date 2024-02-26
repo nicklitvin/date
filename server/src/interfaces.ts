@@ -226,3 +226,9 @@ export interface NewMatchData {
     profile: PublicProfile
     timestamp: Date
 }
+
+export interface SubscriptionData{
+    subscribed: boolean
+    ID?: string
+    endDate?: Date
+}

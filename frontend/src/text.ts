@@ -131,3 +131,14 @@ export const statsText = {
     weeklyReceived: "Weekly Received",
     weeklySent: "Weekly Sent"
 }
+
+export const profileText = {
+    pageTitle: "Profile",
+    viewProfile: "View Profile",
+    managePayment: "Manage Payment",
+    cancelSubscription: "Cancel Subscription",
+    subscriptionStatus: "Subscription Status",
+    purchasePremium: "Purchase Premium",
+    freeTier: "Free Tier",
+    premiumTier: "Premium Tier",
+}

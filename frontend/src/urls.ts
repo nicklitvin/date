@@ -14,5 +14,8 @@ export const URLs = {
     uploadImage: "/uploadImage",
     deleteImage: "/deleteImage",
     newOrder: "/newOrder",
-    editUser: "/editUser"
+    editUser: "/editUser",
+    getCheckoutPage: "/getCheckoutPage",
+    cancelSubscription: "/cancelSubscription",
+    manageSubscription: "/manageSubscription"
 }

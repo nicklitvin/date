@@ -1,11 +1,14 @@
 import { createContext, useContext } from "react";
 import { GlobalState } from "./globalState";
+import { ReceivedData } from "./ReceivedData";
 
 export class RootStore {
     public globalState : GlobalState;
+    public receivedData : ReceivedData;
 
     constructor() {
         this.globalState = new GlobalState();
+        this.receivedData = new ReceivedData();
     }
 }
 

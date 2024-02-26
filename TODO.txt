@@ -1,6 +1,8 @@
 TODO
 add modal for reporting/unliking user
-stack for edit attributes
+stackviewer for edit attributes
+add alc/smoke/drugs attributes
+move props to global state
 
 is clerks worth it?
 LOGIN with clerk

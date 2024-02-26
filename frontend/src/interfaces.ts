@@ -112,3 +112,9 @@ export interface SwipeBreakdown {
     likedMe: number
     dislikedMe: number
 }
+
+export interface SubscriptionData{
+    subscribed: boolean
+    ID?: string
+    endDate?: Date
+}

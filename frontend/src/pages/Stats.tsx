@@ -6,14 +6,29 @@ import { PageHeader } from "../components/PageHeader";
 import { MyButton } from "../components/Button";
 import { LineChart, PieChart, PieChartData, ChartProps } from "react-native-svg-charts";
 import { globals } from "../globals";
+import axios from "axios";
+import { URLs } from "../urls";
+import { Linking } from "react-native";
 
 interface Props {
     stats?: UserSwipeStats
+    openLinkFunc?: (url : string) => any
 }
 
 export function Stats(props : Props) {
+    const getCheckoutPage = async () => {
+        try {
+            const response = await axios.post(URLs.server + URLs.getCheckoutPage);
+            const url = response.data;
+            if (props.openLinkFunc) {
+                props.openLinkFunc(url);
+            } else {
+                await Linking.openURL(url);
+            }
+        } catch (err) {}
+    }
+    
     let content;
-
     if (!props.stats) {
         content = (
             <StyledView>
@@ -22,7 +37,7 @@ export function Stats(props : Props) {
                 </StyledText>
                 <MyButton
                     text={statsText.purchaseButton}
-                    onPressFunction={() => {}}
+                    onPressFunction={getCheckoutPage}
                 />
             </StyledView>
         ) 
