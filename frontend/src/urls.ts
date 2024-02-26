@@ -17,5 +17,6 @@ export const URLs = {
     editUser: "/editUser",
     getCheckoutPage: "/getCheckoutPage",
     cancelSubscription: "/cancelSubscription",
-    manageSubscription: "/manageSubscription"
+    manageSubscription: "/manageSubscription",
+    deleteAccount: "/deleteAccount"
 }

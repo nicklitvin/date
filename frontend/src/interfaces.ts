@@ -113,8 +113,13 @@ export interface SwipeBreakdown {
     dislikedMe: number
 }
 
-export interface SubscriptionData{
+export interface SubscriptionData {
     subscribed: boolean
     ID?: string
     endDate?: Date
+}
+
+export interface SettingData {
+    title: string
+    value: boolean
 }

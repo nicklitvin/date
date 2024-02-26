@@ -142,3 +142,9 @@ export const profileText = {
     freeTier: "Free Tier",
     premiumTier: "Premium Tier",
 }
+
+export const settingsText = {
+    pageTitle: "Settings",
+    signOut: "Sign Out",
+    deleteAccount: "Delete Account"
+}
