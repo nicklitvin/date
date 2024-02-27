@@ -56,7 +56,7 @@ export const birthdayText = {
 }
 
 export const generalText = {
-    continue: "continue",
+    continue: "Continue",
     saveChanges: "Save Changes"
 }
 

@@ -10,7 +10,6 @@ export const makePublicProfile = (id : string = "otherProfileID") : PublicProfil
     gender: "",
     images: ["imageURL"],
     name: "Michael",
-    university: "berkeley"
 })
 
 export const makeSentMessage = (

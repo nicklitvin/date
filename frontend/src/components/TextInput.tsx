@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { StyledInput, StyledText } from "../styledElements"
 import classNames from "classnames"
+import { Image } from "expo-image"
 
 interface Props {
     placeholder: string
@@ -16,6 +17,7 @@ export function MyTextInput(props : Props) {
     return (  
         <>
             <StyledInput 
+                className="bg-back border border-front rounded-3xl py-2 px-6"
                 value={message}
                 onChangeText={(text) => setMessage(text)}
 
@@ -29,6 +31,9 @@ export function MyTextInput(props : Props) {
                     }
                 }}
             />
+            {/* <Image
+                source="https://static-00.iconduck.com/assets.00/send-icon-512x505-rfnsb0it.png"
+            /> */}
             <StyledText className={classNames(
                 showError ? "block" : "hidden"
             )}>

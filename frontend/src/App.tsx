@@ -2,8 +2,9 @@ import { HomeMob } from './pages/Home';
 import { StyleSheet } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { RootStore, createStoreProvider} from './store/RootStore';
+import { StyledView } from './styledElements';
 
-export function App() {
+export default function App() {
     const rootStore = new RootStore();
     const StoreProvider = createStoreProvider(rootStore);
 
@@ -11,7 +12,11 @@ export function App() {
         <SafeAreaProvider>
             <SafeAreaView style={styles.container}>
                 <StoreProvider value={rootStore}>
-                    <HomeMob/>
+                    <StyledView className="w-full h-full flex items-center justify-center">
+                        <StyledView className="w-full h-full p-3 bg-back">
+                            <HomeMob/>
+                        </StyledView>
+                    </StyledView>
                 </StoreProvider>
             </SafeAreaView>
         </SafeAreaProvider>
