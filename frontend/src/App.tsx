@@ -1,5 +1,4 @@
 import { HomeMob } from './pages/Home';
-import { StyleSheet } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { RootStore, createStoreProvider} from './store/RootStore';
 import { StyledView } from './styledElements';
@@ -9,25 +8,21 @@ export default function App() {
     const StoreProvider = createStoreProvider(rootStore);
 
     return (
-        <SafeAreaProvider>
-            <SafeAreaView style={styles.container}>
-                <StoreProvider value={rootStore}>
-                    <StyledView className="w-full h-full flex items-center justify-center">
-                        <StyledView className="w-full h-full p-3 bg-back">
-                            <HomeMob/>
+        <StyledView className="flex-1 bg-back">
+            <SafeAreaProvider>
+                <SafeAreaView style={{flex: 1}}>
+                    <StoreProvider value={rootStore}>
+                        <StyledView className="w-full h-full flex items-center justify-center">
+                            <StyledView className="w-full h-full p-5">
+                                <HomeMob/>
+                            </StyledView>
                         </StyledView>
-                    </StyledView>
-                </StoreProvider>
-            </SafeAreaView>
-        </SafeAreaProvider>
+                    </StoreProvider>
+                </SafeAreaView>
+            </SafeAreaProvider>
+        </StyledView>
     )
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1
-    }
-})
 
 export function CustomAppDefault() {
     const rootStore = new RootStore();

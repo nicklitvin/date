@@ -9,6 +9,7 @@ export const globals = {
     settingDescription: "description",
     settingGenderPreference: "gender preference",
     settingAgePreference: "age preference",
+    maxPreviewMessageLength: 20,
 
     attributes: {
         "Sports": [

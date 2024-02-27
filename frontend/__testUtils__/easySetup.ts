@@ -8,13 +8,13 @@ export const makePublicProfile = (id : string = "otherProfileID") : PublicProfil
     attributes: [],
     description: "",
     gender: "",
-    images: ["imageURL"],
+    images: ["https://pbs.twimg.com/profile_images/1262372966073016321/DH4rOj9S_400x400.jpg"],
     name: "Michael",
 })
 
 export const makeSentMessage = (
     recepientID : string = makePublicProfile().id,
-    timestamp: Date = new Date()
+    timestamp: Date = new Date(),
 ) : Message => ({
     id: "sentID",
     message: "sentMessage",
@@ -26,11 +26,13 @@ export const makeSentMessage = (
 
 export const makeReceivedMessage = (
     sentID : string = makePublicProfile().id,
-    timestamp : Date = new Date()
+    timestamp : Date = new Date(),
+    read: boolean = true,
+    message: string = "asdasdasdasdadadaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 ) : Message => ({
     id: "receivedID",
-    message: "receivedMessage",
-    readStatus: true,
+    message: message,
+    readStatus: read,
     recepientID: myUserID,
     timestamp: timestamp,
     userID: sentID
