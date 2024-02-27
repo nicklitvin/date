@@ -4,11 +4,12 @@ import { MyTextInput } from "../components/TextInput";
 export function Home() {
     return (
         <>
-            <MyTextInput
+            {/* <MyTextInput
                 placeholder="placeholder"
                 onSubmit={() => {}}
                 errorMessage="error"
-            />
+                initialInput="asdhkashdkajhdkajshdaksjhdkasjhdkajshdkajssjkhdaksjdh"
+            /> */}
         </>
     )
 }

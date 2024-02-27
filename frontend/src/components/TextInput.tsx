@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { StyledInput, StyledText } from "../styledElements"
+import { StyledButton, StyledImage, StyledInput, StyledText, StyledView } from "../styledElements"
 import classNames from "classnames"
 import { Image } from "expo-image"
 
@@ -16,24 +16,35 @@ export function MyTextInput(props : Props) {
 
     return (  
         <>
-            <StyledInput 
-                className="bg-back border border-front rounded-3xl py-2 px-6"
-                value={message}
-                onChangeText={(text) => setMessage(text)}
-
-                placeholder={props.placeholder} 
-                onSubmitEditing={() => {
-                    if (message.length == 0) {
-                        setShowError(true);
-                    } else {
-                        props.onSubmit(message);
-                        setMessage("");
-                    }
-                }}
-            />
-            {/* <Image
-                source="https://static-00.iconduck.com/assets.00/send-icon-512x505-rfnsb0it.png"
-            /> */}
+            <StyledView className={classNames(
+                "flex justify-start",
+            )}>
+                <StyledInput 
+                    className="bg-back border border-front rounded-3xl py-2 pl-6 pr-12"
+                    value={message}
+                    onChangeText={(text) => setMessage(text)}
+                    multiline={true}
+                    numberOfLines={1}
+                    placeholder={props.placeholder} 
+                    onSubmitEditing={() => {
+                        if (message.length == 0) {
+                            setShowError(true);
+                        } else {
+                            props.onSubmit(message);
+                            setMessage("");
+                        }
+                    }}
+                />
+                <StyledButton 
+                    className="absolute right-5 w-[20px] h-full flex justify-center"
+                >
+                    <StyledImage
+                        className="w-[20px] h-[20px]"
+                        source={require("../../assets/SendTriangle.png")}
+                        style={{tintColor: "#000000"}}
+                    />
+                </StyledButton>
+            </StyledView>
             <StyledText className={classNames(
                 showError ? "block" : "hidden"
             )}>
