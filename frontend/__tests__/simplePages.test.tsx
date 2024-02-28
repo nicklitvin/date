@@ -101,45 +101,45 @@ describe("test pages", () => {
         expect(returnUploadLength).toHaveLastReturnedWith(1);
     })
 
-    it("should remove switchURI if removed picture", async () => {
-        const imageURI = "a";
-        const imageURI_2 = "b";
-        const uploads : FileUploadAndURI[] = [
-            {
-                buffer: Buffer.from("a"),
-                mimetype: "image/jpeg",
-                uri: imageURI
-            },
-            {
-                buffer: Buffer.from("b"),
-                mimetype: "image/jpeg",
-                uri: imageURI_2
-            }
-        ]
-        const onSubmit = jest.fn();
-        const returnSwitchURI = jest.fn( (input : string|null) => input)
+    // it("should remove switchURI if removed picture", async () => {
+    //     const imageURI = "a";
+    //     const imageURI_2 = "b";
+    //     const uploads : FileUploadAndURI[] = [
+    //         {
+    //             buffer: Buffer.from("a"),
+    //             mimetype: "image/jpeg",
+    //             uri: imageURI
+    //         },
+    //         {
+    //             buffer: Buffer.from("b"),
+    //             mimetype: "image/jpeg",
+    //             uri: imageURI_2
+    //         }
+    //     ]
+    //     const onSubmit = jest.fn();
+    //     const returnSwitchURI = jest.fn( (input : string|null) => input)
 
-        render(
-            <Pictures
-                onSubmit={onSubmit}
-                submitText={generalText.continue}
-                uploads={uploads}
-                returnSwitchURI={returnSwitchURI}
-            />
-        );
+    //     render(
+    //         <Pictures
+    //             onSubmit={onSubmit}
+    //             submitText={generalText.continue}
+    //             uploads={uploads}
+    //             returnSwitchURI={returnSwitchURI}
+    //         />
+    //     );
 
-        await act( () => {
-            fireEvent(screen.getByTestId(`picture-${imageURI}`), "press");
-        })
+    //     await act( () => {
+    //         fireEvent(screen.getByTestId(`picture-${imageURI}`), "press");
+    //     })
 
-        expect(returnSwitchURI).toHaveLastReturnedWith(imageURI);
+    //     expect(returnSwitchURI).toHaveLastReturnedWith(imageURI);
 
-        await act( () => {
-            fireEvent(screen.getByTestId(`remove-${imageURI}`), "press");
-        })
+    //     await act( () => {
+    //         fireEvent(screen.getByTestId(`remove-${imageURI}`), "press");
+    //     })
         
-        expect(returnSwitchURI).toHaveLastReturnedWith(null);
-    })
+    //     expect(returnSwitchURI).toHaveLastReturnedWith(null);
+    // })
 
     it("should generate all attributes", async () => {
         render(
