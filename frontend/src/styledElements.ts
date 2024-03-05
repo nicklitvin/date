@@ -9,6 +9,4 @@ export const StyledText = styled(RNText);
 export const StyledInput = styled(RNInput);
 export const StyledScroll = styled(RNScroll);
 export const StyledImage = styled(Image);
-
-
 export const StyledSlider = styled(Slider);

@@ -1,10 +1,11 @@
 import { useState } from "react"
 import { MyButton } from "../components/Button"
 import { MySimplePage } from "../components/SimplePage"
-import { StyledText, StyledView } from "../styledElements"
+import { StyledScroll, StyledText, StyledView } from "../styledElements"
 import { attributesText } from "../text"
 import { globals } from "../globals"
 import classNames from "classnames"
+import { ScrollView } from "react-native"
 
 interface Props {
     onSubmit: (input : string[]) => any
@@ -19,14 +20,35 @@ export function Attributes(props : Props) {
     return <MySimplePage
         title={attributesText.pageTitle}
         subtitle={attributesText.pageSubtitle}
+        marginTop="Attributes"
         content={
-            <>
+            <StyledView className="w-full flex items-center mt-3">
+                <StyledText className={classNames(
+                    "p-3",
+                    showError ? "opacity-1" : "opacity-0" 
+                )}>
+                    {attributesText.error}
+                </StyledText>
+                <MyButton
+                    text={props.submitText}
+                    onPressFunction={ () => {
+                        if (attributes.length > 0 && attributes.length < globals.maxAttributes) {
+                            props.onSubmit(attributes)
+                        } else {
+                            setShowError(true)
+                        }
+                    }}
+                />
+            </StyledView>
+        }
+        beforeGapContent={
+            <StyledScroll className="h-2/3">
                 {Object.entries(props.attributes).map( (entry) =>
                     <StyledView 
-                        className="w-full items-center"
+                        className="w-full items-center mb-8"
                         key={`attributeType-${entry}`}
                     >
-                        <StyledText className="text-lg mb-2">
+                        <StyledText className="text-xl mb-2">
                             {entry[0]}
                         </StyledText>
                         <StyledView className="flex w-full flex-wrap flex-row justify-center">
@@ -34,8 +56,7 @@ export function Attributes(props : Props) {
                                 <MyButton
                                     key={`attribute-${content.value}`}
                                     text={content.value}
-                                    customButtonClass="m-1 rounded-3xl"
-                                    customTextClass="px-4 py-1 text-md"
+                                    smallButton={true}
                                     invertColor={attributes.includes(content.value)}
                                     onPressFunction={ () => {
                                         setShowError(false);
@@ -59,25 +80,7 @@ export function Attributes(props : Props) {
                         </StyledView>
                     </StyledView>
                 )}
-                <StyledView className="w-full flex items-center mt-3">
-                    <StyledText className={classNames(
-                        "p-3",
-                        showError ? "opacity-1" : "opacity-0" 
-                    )}>
-                        {attributesText.error}
-                    </StyledText>
-                    <MyButton
-                        text={props.submitText}
-                        onPressFunction={ () => {
-                            if (attributes.length > 0 && attributes.length < globals.maxAttributes) {
-                                props.onSubmit(attributes)
-                            } else {
-                                setShowError(true)
-                            }
-                        }}
-                    />
-                </StyledView>
-            </>
+            </StyledScroll>
         }
     />
 }

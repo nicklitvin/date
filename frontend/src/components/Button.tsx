@@ -1,14 +1,12 @@
 import classNames from "classnames";
-import { StyledButton, StyledText, StyledView } from "../styledElements";
-import { styles } from "../styles";
+import { StyledButton, StyledText } from "../styledElements";
 
 interface Props {
     text: string
     onPressFunction: () => any,
     invertColor?: boolean 
     danger?: boolean
-    customButtonClass?: string
-    customTextClass?: string
+    smallButton?: boolean
 }
 
 export function MyButton(props : Props) {
@@ -16,7 +14,8 @@ export function MyButton(props : Props) {
         <StyledButton
             onPress={props.onPressFunction}
             className={classNames(
-                props.customButtonClass ?? styles.bigButton,
+                "border border-front",
+                props.smallButton ? "m-1 rounded-3xl" : "w-3/5 rounded-[50px] px-10 py-3",
                 props.invertColor ? "bg-front" : "bg-back",
             )}
             style={{
@@ -30,7 +29,7 @@ export function MyButton(props : Props) {
             }}
         >
             <StyledText className={classNames(
-                props.customTextClass ?? styles.bigButtonText, 
+                props.smallButton ? "px-4 py-1 text-base" : "text-center text-lg font-bold",
                 props.danger ? "text-danger" : (
                     props.invertColor ? "text-back" : "text-front"
                 )

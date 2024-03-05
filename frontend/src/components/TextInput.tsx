@@ -10,6 +10,7 @@ interface Props {
     initialInput?: string
     maxLength?: number
     returnError?: (input : boolean) => boolean
+    newLine?: boolean
 }
 
 export function MyTextInput(props : Props) {
@@ -44,7 +45,7 @@ export function MyTextInput(props : Props) {
                     placeholder={props.placeholder} 
                     onSubmitEditing={processSubmit}
                     maxLength={props.maxLength ?? 100}
-                    returnKeyType="go"
+                    multiline={props.newLine ?? false}
                 />
                 <StyledButton 
                     onPress={processSubmit}
@@ -58,6 +59,7 @@ export function MyTextInput(props : Props) {
                 </StyledButton>
             </StyledView>
             <StyledText className={classNames(
+                `text-center text-base`,
                 showError ? "block" : "opacity-0"
             )}>
                 {props.errorMessage}

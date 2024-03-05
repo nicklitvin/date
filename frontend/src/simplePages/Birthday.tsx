@@ -3,7 +3,7 @@ import { MySimplePage } from "../components/SimplePage"
 import { birthdayText } from "../text"
 import { differenceInCalendarYears } from "date-fns"
 import DatePicker from "react-native-date-picker"
-import { StyledText } from "../styledElements"
+import { StyledText, StyledView } from "../styledElements"
 import classNames from "classnames"
 import { MyButton } from "../components/Button"
 import { getBirthdayStamp } from "../utils"
@@ -34,7 +34,7 @@ export function Birthday(props : Props) {
     return <MySimplePage
         title={birthdayText.pageTitle}
         subtitle={birthdayText.pageSubtitle}
-        content={
+        beforeGapContent={
             <>
                 <DatePicker 
                     modal mode="date" date={birthday} open={open}
@@ -46,11 +46,15 @@ export function Birthday(props : Props) {
                     invertColor={true}
                 />
                 <StyledText className={classNames(
-                    "m-2",
+                    "m-2 text-base",
                     showError ? "opacity-100" : "opacity-0"
                 )}>
                     {birthdayText.inputError}
                 </StyledText>
+            </>
+        }
+        content={
+            <>
                 <MyButton
                     text={props.submitText}
                     onPressFunction={() => {

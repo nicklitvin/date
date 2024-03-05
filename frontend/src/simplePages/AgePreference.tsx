@@ -2,7 +2,7 @@ import { useState } from "react"
 import { MySimplePage } from "../components/SimplePage"
 import { agePreferenceText } from "../text"
 import Slider from "@react-native-community/slider"
-import { StyledSlider, StyledText } from "../styledElements"
+import { StyledSlider, StyledText, StyledView } from "../styledElements"
 import classNames from "classnames"
 import { MyButton } from "../components/Button"
 import { testIDS } from "../testIDs"
@@ -23,8 +23,8 @@ export function AgePreference(props : Props) {
     const [maxAge, setMaxAge] = useState<number>(props.maxAge);
 
     const makeContent = () => (
-        <>
-            <StyledText className="text-md mb-3">
+        <StyledView className="flex w-full items-center">
+            <StyledText className="text-lg mb-3">
                 {`Min Age: ${minAge}`}
             </StyledText>
             <StyledSlider
@@ -41,7 +41,7 @@ export function AgePreference(props : Props) {
                     if (props.setMinAge) props.setMinAge(value)
                 }}
             />
-            <StyledText className="text-md mb-3">
+            <StyledText className="text-lg mb-3">
                 {`Max Age: ${maxAge}`}
             </StyledText>
             <StyledSlider
@@ -65,7 +65,7 @@ export function AgePreference(props : Props) {
             >
                 {agePreferenceText.inputError}
             </StyledText>
-        </>
+        </StyledView>
     )
 
     if (props.embed) {
@@ -75,9 +75,13 @@ export function AgePreference(props : Props) {
     return <MySimplePage
         title={agePreferenceText.pageTitle}
         subtitle={agePreferenceText.pageSubtitle}
-        content={
+        beforeGapContent={
             <>
                 {makeContent()}
+            </>
+        }
+        content={
+            <>
                 <MyButton
                     text={props.submitText}
                     onPressFunction={ () => {

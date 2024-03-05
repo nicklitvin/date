@@ -61,9 +61,13 @@ export function GenderPreference(props : Props) {
     return <MySimplePage
         title={genderPreferenceText.pageTitle}
         subtitle={genderPreferenceText.pageSubtitle}
-        content={
+        beforeGapContent={
             <>
                 {makeContent()}
+            </>
+        }
+        content={
+            <>
                 <MyButton
                     text={props.submitText}
                     onPressFunction={() => {

@@ -10,11 +10,13 @@ export function Description(props : Props) {
     return <MySimplePage
         title={descriptionText.pageTitle}
         subtitle={descriptionText.pageSubtitle}
+        marginTop="Keyboard"
         content={
             <MyTextInput
                 placeholder={descriptionText.inputPlaceholder}
                 errorMessage={descriptionText.errorMessage}
                 onSubmit={props.onSubmit}
+                newLine={true}
             />
         }
     />

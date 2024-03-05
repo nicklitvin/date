@@ -80,7 +80,8 @@ export function Pictures(props : Props) {
     return <MySimplePage
         title={pictureText.pageTitle}
         subtitle={pictureText.pageSubtitle}
-        content={
+        marginTop="Pictures"
+        beforeGapContent={
             <>
                 <StyledView className="flex flex-row flex-wrap justify-center">
                     {Array.from({length : globals.maxUploads}).map( (_,index) => 
@@ -99,6 +100,10 @@ export function Pictures(props : Props) {
                         />
                     )}
                 </StyledView>
+            </>
+        }
+        content={
+            <>
                 <StyledView className="mt-3 w-full items-center">
                     <MyButton
                         text={props.submitText}

@@ -9,16 +9,21 @@ import { useState } from "react";
 import { MySimplePage } from "../components/SimplePage";
 import { MyButton } from "../components/Button";
 import { AccountCreationMob } from "./AccountCreation";
+import { MyName } from "../simplePages/MyName";
 
 export function Home() {
     const [x, setX] = useState<boolean>(false);
     return (
         <>
+            {/* <MyTextInput errorMessage="a" onSubmit={() => {console.log("asd")}} placeholder=""
+            />
+            <MyTextInput errorMessage="a" onSubmit={() => {console.log("asd")}} placeholder=""
+            /> */}
             {/* <MyButton
                 onPressFunction={()=>{}}
                 text="Continue"
             /> */}
-            <AccountCreationMob customPageStart={0}/>
+            {/* <AccountCreationMob customPageStart={8}/> */}
             {/* <MySimplePage
                 title="Create Profile"
                 subtitle="asdhaksdhaadsdsdadsadasdsadsasdadsaaaaaaaaaaaaaaaaaksjdhakjshdksajhdasjdhaksjdaksjhd"
