@@ -1,5 +1,6 @@
 import { MySimplePage } from "../components/SimplePage";
 import { MyTextInput } from "../components/TextInput";
+import { StyledView } from "../styledElements";
 import { myNameText } from "../text";
 
 interface Props {
@@ -11,11 +12,14 @@ export function MyName(props : Props) {
         title={myNameText.pageTitle}
         subtitle={myNameText.pageSubtitle}
         content={
-            <MyTextInput
-                placeholder={myNameText.inputPlaceholder}
-                errorMessage={myNameText.inputError}
-                onSubmit={props.onSubmit}
-            />
+            <>
+                <StyledView className="mt-[200px]"/>
+                <MyTextInput
+                    placeholder={myNameText.inputPlaceholder}
+                    errorMessage={myNameText.inputError}
+                    onSubmit={props.onSubmit}
+                />
+            </>
         }
     />
 }

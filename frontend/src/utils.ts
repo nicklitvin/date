@@ -31,3 +31,19 @@ export function getShortDate(date : Date, timezone : string) {
 
     return timestamp;
 }
+
+export function getBirthdayStamp(date : Date) {
+    let timestamp = date.toLocaleDateString(undefined, {
+        month: 'short', 
+        day: 'numeric', 
+        year: 'numeric' 
+    });
+
+    timestamp = timestamp.toLowerCase();
+    const isMay = timestamp.includes("may");
+
+    timestamp = timestamp.charAt(0).toUpperCase() + timestamp.slice(1,3) + (isMay ? "" : ".") +
+        timestamp.slice(3, timestamp.length);
+
+    return timestamp
+}

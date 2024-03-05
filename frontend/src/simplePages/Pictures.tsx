@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { MySimplePage } from "../components/SimplePage"
 import { FileUploadAndURI } from "../interfaces";
 import { pictureText } from "../text"
-import { StyledButton } from "../styledElements";
+import { StyledButton, StyledView } from "../styledElements";
 import * as ImagePicker from "expo-image-picker";
 import { globals } from "../globals";
 import * as FileSystem from "expo-file-system";
@@ -82,27 +82,32 @@ export function Pictures(props : Props) {
         subtitle={pictureText.pageSubtitle}
         content={
             <>
-                {Array.from({length : globals.maxUploads}).map( (_,index) => 
-                    index < uploads.length ?
-                    <Picture
-                        key={`picture-${uploads[index].uri}`}
-                        source={uploads[index].uri}
-                        switching={uploads[index].uri == switchURI}
-                        onPress={() => performSwitch(uploads[index].uri)}
-                        onRemove={() => removeImage(uploads[index].uri)}
-                    /> :
-                    <StyledButton
-                        key={`empty-button-${index}`}
-                        onPress={uploadImage}
+                <StyledView className="flex flex-row flex-wrap justify-center">
+                    {Array.from({length : globals.maxUploads}).map( (_,index) => 
+                        index < uploads.length ?
+                        <Picture
+                            key={`picture-${uploads[index].uri}`}
+                            source={uploads[index].uri}
+                            switching={uploads[index].uri == switchURI}
+                            onPress={() => performSwitch(uploads[index].uri)}
+                            onRemove={() => removeImage(uploads[index].uri)}
+                        /> :
+                        <StyledButton
+                            key={`empty-button-${index}`}
+                            className="w-[102px] h-[136px]  m-2 rounded-xl border border-front"
+                            onPress={uploadImage}
+                        />
+                    )}
+                </StyledView>
+                <StyledView className="mt-3 w-full items-center">
+                    <MyButton
+                        text={props.submitText}
+                        onPressFunction={() => {
+                            if (uploads.length > 0)
+                                props.onSubmit(uploads);
+                        }}
                     />
-                )}
-                <MyButton
-                    text={props.submitText}
-                    onPressFunction={() => {
-                        if (uploads.length > 0)
-                            props.onSubmit(uploads);
-                    }}
-                />
+                </StyledView>
             </>
         }
     />

@@ -6,11 +6,33 @@ import { PageHeader } from "../components/PageHeader";
 import { StyledImage, StyledView } from "../styledElements";
 import { Picture } from "../components/Picture";
 import { useState } from "react";
+import { MySimplePage } from "../components/SimplePage";
+import { MyButton } from "../components/Button";
+import { AccountCreationMob } from "./AccountCreation";
 
 export function Home() {
     const [x, setX] = useState<boolean>(false);
     return (
         <>
+            {/* <MyButton
+                onPressFunction={()=>{}}
+                text="Continue"
+            /> */}
+            <AccountCreationMob customPageStart={0}/>
+            {/* <MySimplePage
+                title="Create Profile"
+                subtitle="asdhaksdhaadsdsdadsadasdsadsasdadsaaaaaaaaaaaaaaaaaksjdhakjshdksajhdasjdhaksjdaksjhd"
+                content={
+                    <>
+                        <StyledView className="mt-[200px]"/>
+                        <MyButton
+                            text="Continue"
+                            onPressFunction={()=>{}}
+                        />
+                    </>
+                    
+                }
+            /> */}
             {/* <Picture
                 source="https://pbs.twimg.com/profile_images/1262372966073016321/DH4rOj9S_400x400.jpg"
                 onPress={()=> {setX(!x)}}

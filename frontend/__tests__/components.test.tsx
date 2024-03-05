@@ -52,23 +52,24 @@ describe("components", () => {
         const placeholder = "placeholder";
         const errorMessage = "error";
         const onSubmit = jest.fn( (input : string) => input);
+        const returnError = jest.fn( (input : boolean) => input);
 
         render(
             <MyTextInput 
                 placeholder={placeholder}
                 errorMessage={errorMessage}
                 onSubmit={onSubmit}
+                returnError={returnError}
             />
         );
         
-        const input = screen.getByPlaceholderText(placeholder); 
-        expect(screen.queryByText(errorMessage)).toEqual(null);
+        expect(returnError).toHaveLastReturnedWith(false);
 
         await act( () => {
-            fireEvent(input, "submitEditing");
+            fireEvent(screen.getByPlaceholderText(placeholder), "submitEditing");
         })
 
-        expect(screen.queryByText(errorMessage)).not.toEqual(null);
+        expect(returnError).toHaveLastReturnedWith(true);
     })
 
     it("should show all chatpreviewbox components", async () => {

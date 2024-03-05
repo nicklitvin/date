@@ -2,10 +2,11 @@ import { useState } from "react"
 import { MySimplePage } from "../components/SimplePage"
 import { agePreferenceText } from "../text"
 import Slider from "@react-native-community/slider"
-import { StyledText } from "../styledElements"
+import { StyledSlider, StyledText } from "../styledElements"
 import classNames from "classnames"
 import { MyButton } from "../components/Button"
 import { testIDS } from "../testIDs"
+import { globals } from "../globals"
 
 interface Props {
     minAge: number
@@ -23,14 +24,34 @@ export function AgePreference(props : Props) {
 
     const makeContent = () => (
         <>
-            <Slider
+            <StyledText className="text-md mb-3">
+                {`Min Age: ${minAge}`}
+            </StyledText>
+            <StyledSlider
+                minimumTrackTintColor={globals.dark}
+                thumbTintColor={globals.dark}
+                upperLimit={maxAge}
+                className="w-full h-10 mb-3"
+                minimumValue={globals.minAge}
+                maximumValue={globals.maxAge}
+                step={1}
                 value={minAge}
                 onValueChange={(value) => {
                     setMinAge(value);
                     if (props.setMinAge) props.setMinAge(value)
                 }}
             />
-            <Slider
+            <StyledText className="text-md mb-3">
+                {`Max Age: ${maxAge}`}
+            </StyledText>
+            <StyledSlider
+                className="w-full mb-3"
+                minimumTrackTintColor={globals.dark}
+                thumbTintColor={globals.dark}
+                minimumValue={globals.minAge}
+                maximumValue={globals.maxAge}
+                lowerLimit={minAge}
+                step={1}
                 value={maxAge}
                 onValueChange={(value) => {
                     setMaxAge(value);
@@ -38,7 +59,8 @@ export function AgePreference(props : Props) {
                 }}
             />
             <StyledText className={classNames(
-                minAge > maxAge ? "block" : "hidden"
+                "mb-3",
+                minAge > maxAge ? "opacity-1" : "opacity-0"
             )}
             >
                 {agePreferenceText.inputError}

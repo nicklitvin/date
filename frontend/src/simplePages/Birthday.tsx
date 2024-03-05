@@ -6,6 +6,7 @@ import DatePicker from "react-native-date-picker"
 import { StyledText } from "../styledElements"
 import classNames from "classnames"
 import { MyButton } from "../components/Button"
+import { getBirthdayStamp } from "../utils"
 
 interface Props {
     submitText: string
@@ -14,25 +15,39 @@ interface Props {
 }
 
 export function Birthday(props : Props) {
+    const [open, setOpen] = useState<boolean>(false);
     const [birthday, setBirthday] = useState<Date>(
         props.customBirthday ?? new Date(2000,0,1)
     );
     const [showError, setShowError] = useState<boolean>(false);
 
-    useEffect( () => {
-        if (differenceInCalendarYears(new Date(), birthday) < 18) {
+    const processDate = (date : Date) => {
+        setOpen(false);
+        if (differenceInCalendarYears(new Date(), date) < 18) {
             setShowError(true);
+        } else {
+            setShowError(false);
         }
-    }, [birthday])
+        setBirthday(date);
+    }
 
     return <MySimplePage
         title={birthdayText.pageTitle}
         subtitle={birthdayText.pageSubtitle}
         content={
             <>
-                <DatePicker date={birthday} onDateChange={setBirthday}/>
+                <DatePicker 
+                    modal mode="date" date={birthday} open={open}
+                    onConfirm={processDate} onCancel={() => setOpen(false)}
+                />
+                <MyButton
+                    text={getBirthdayStamp(birthday)}
+                    onPressFunction={() => setOpen(true)}
+                    invertColor={true}
+                />
                 <StyledText className={classNames(
-                    showError ? "block" : "hidden"
+                    "m-2",
+                    showError ? "opacity-100" : "opacity-0"
                 )}>
                     {birthdayText.inputError}
                 </StyledText>

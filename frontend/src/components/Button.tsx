@@ -1,12 +1,14 @@
 import classNames from "classnames";
 import { StyledButton, StyledText, StyledView } from "../styledElements";
-import { TouchableOpacity } from "react-native";
+import { styles } from "../styles";
 
 interface Props {
     text: string
     onPressFunction: () => any,
     invertColor?: boolean 
     danger?: boolean
+    customButtonClass?: string
+    customTextClass?: string
 }
 
 export function MyButton(props : Props) {
@@ -14,13 +16,21 @@ export function MyButton(props : Props) {
         <StyledButton
             onPress={props.onPressFunction}
             className={classNames(
-                "rounded-[50px] px-10 py-3 w-3/5",
-                props.invertColor ? "bg-front" : "bg-back border border-front",
-
+                props.customButtonClass ?? styles.bigButton,
+                props.invertColor ? "bg-front" : "bg-back",
             )}
+            style={{
+                // IOS
+                shadowColor: 'rgba(0,0,0, .4)', 
+                shadowOffset: { height: 1, width: 1 }, 
+                shadowOpacity: 1, 
+                shadowRadius: 1, 
+                // Android
+                elevation: 5
+            }}
         >
             <StyledText className={classNames(
-                "font-bold text-center text-lg",
+                props.customTextClass ?? styles.bigButtonText, 
                 props.danger ? "text-danger" : (
                     props.invertColor ? "text-back" : "text-front"
                 )

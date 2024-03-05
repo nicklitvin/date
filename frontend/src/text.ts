@@ -1,3 +1,5 @@
+import { globals } from "./globals"
+
 export const errorText = {
     title: "Error",
     subtitle: "Something went wrong"
@@ -68,6 +70,7 @@ export const genderPreferenceText = {
 export const attributesText = {
     pageTitle: "Attributes",
     pageSubtitle: "Select some of your favorite interests",
+    error: `Select between 1-${globals.maxAttributes} attributes`
 }
 
 export const agePreferenceText = {
