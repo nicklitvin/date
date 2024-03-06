@@ -88,7 +88,9 @@ export const finalText = {
 export const pictureText = {
     pageTitle: "Images",
     pageSubtitle: "Upload pictures that show how awesome you are",
-    uploadButton: "Upload Image",
+    uploadImageButton: "Add Pictures",
+    uploadDocumentButton: "Add From Files",
+    uploadError: "Images must be smaller than 5MB and JPG/PNG"
 }
 
 export const eduEmailText = {

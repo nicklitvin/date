@@ -1,6 +1,7 @@
 import { Image } from "expo-image";
 import { StyledButton, StyledImage, StyledView } from "../styledElements";
 import classNames from "classnames";
+import { globals } from "../globals";
 
 interface Props {
     switching: boolean
@@ -16,11 +17,13 @@ export function Picture(props : Props) {
         testID={`picture-${props.source}`}
     >
         <StyledButton
-            className="flex justify-start items-start w-[102px] h-[136px]"
+            className={`flex justify-start items-start w-[${globals.pictureWidth}px] 
+            h-[${globals.pictureHeight}px]`
+            }
             onPress={props.onPress}
         >
             <StyledImage
-                className="w-[102px] h-[136px] rounded-xl"
+                className={`w-[${globals.pictureWidth}px] h-[${globals.pictureHeight}px] rounded-xl`}
                 style={{
                     opacity: 0.5
                 }}
@@ -34,14 +37,14 @@ export function Picture(props : Props) {
     </StyledView> :
 
     <StyledView 
-        className="flex justify-start items-start w-[102px] h-[136px]"
+        className={`flex justify-start items-start w-[${globals.pictureWidth}px] h-[${globals.pictureHeight}px]`}
         testID={`picture-${props.source}`}
     >
         <StyledButton
             onPress={props.onPress}
         >
             <StyledImage
-                className="w-[102px] h-[136px] rounded-xl"
+                className={`w-[${globals.pictureWidth}px] h-[${globals.pictureHeight}px] rounded-xl`}
                 source={props.source}
             />
         </StyledButton>

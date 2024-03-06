@@ -21,7 +21,7 @@ export function MySimplePage(props : Props) {
                 <StyledView className={classNames(
                     "flex flex-col items-center",
                     props.marginTop == "Attributes" ? "" : (
-                        props.marginTop == "Pictures" ? "mt-[100px] h-[600px]" : (
+                        props.marginTop == "Pictures" ? "mt-[50px] h-[700px]" : (
                             props.marginTop == "Keyboard" ? "mt-[200px] h-[200px]" :
                                 "mt-[200px] h-[400px]"
                         )
@@ -34,7 +34,7 @@ export function MySimplePage(props : Props) {
                         {props.subtitle}
                     </StyledText>
                     {props.beforeGapContent}
-                    <StyledView className="flex-grow bg-red-500 w-full">
+                    <StyledView className="flex-grow w-full">
                     </StyledView>
                     {props.content}
                 </StyledView>

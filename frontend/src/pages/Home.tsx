@@ -10,11 +10,17 @@ import { MySimplePage } from "../components/SimplePage";
 import { MyButton } from "../components/Button";
 import { AccountCreationMob } from "./AccountCreation";
 import { MyName } from "../simplePages/MyName";
+import { Pictures } from "../simplePages/Pictures";
 
 export function Home() {
     const [x, setX] = useState<boolean>(false);
     return (
         <>
+            <Pictures
+                onSubmit={() => {}}
+                submitText="submit"
+                uploads={[]}
+            />
             {/* <MyTextInput errorMessage="a" onSubmit={() => {console.log("asd")}} placeholder=""
             />
             <MyTextInput errorMessage="a" onSubmit={() => {console.log("asd")}} placeholder=""
