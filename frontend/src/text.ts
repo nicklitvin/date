@@ -11,6 +11,7 @@ export const chatText = {
     read: "read",
     delivered: "delivered",
     unsent: "unsent",
+    sending: "sending..."
 }
 
 export const matchesText = {

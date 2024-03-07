@@ -30,6 +30,7 @@ export function Chat(props : Props) {
     const [sendingChats, setSendingChats] = useState<Message[]>([]);
     const [unsentChats, setUnsentChats] = useState<string[]>([]);
     const [currentID, setCurrentID] = useState<number>(0);
+    const [loadingIDs, setLoadingIDs] = useState<string[]>([]);
 
     useEffect( () => {
         if (props.returnUnsentChatLength) props.returnUnsentChatLength(unsentChats.length);
@@ -73,7 +74,7 @@ export function Chat(props : Props) {
             timestamp: new Date(),
             userID: ""
         }
-
+        setLoadingIDs(loadingIDs.concat(sendingID));
         setChat([sendingChat].concat(chat.filter( val => val.id != removeID)));
 
         try {
@@ -90,6 +91,7 @@ export function Chat(props : Props) {
         } catch (err) {
             setUnsentChats(unsentChats.filter(val => val != removeID).concat(sendingID))
         }
+        setLoadingIDs(loadingIDs.filter( val => val != sendingID))
     }
 
     const handleScroll = async (event: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -197,7 +199,9 @@ export function Chat(props : Props) {
                                             {
                                                 unsentChats.includes(message.id) ? chatText.unsent :
                                                 (
-                                                    message.readStatus ? chatText.read : chatText.delivered
+                                                    loadingIDs.includes(message.id) ? chatText.sending : (
+                                                        message.readStatus ? chatText.read : chatText.delivered
+                                                    )
                                                 )
                                             }
                                         </StyledText>
