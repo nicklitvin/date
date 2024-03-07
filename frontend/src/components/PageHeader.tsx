@@ -1,7 +1,7 @@
 import { Image } from "expo-image"
 import { StyledImage, StyledText, StyledView } from "../styledElements"
 
-type ImageName = "SendTriangle";
+type ImageName = "SendTriangle" | "Matches";
 
 interface Props {
     title: string
@@ -13,10 +13,12 @@ interface Props {
 
 export function PageHeader(props : Props) {
     const SendTriangle = require(`../../assets/SendTriangle.png`);
+    const MatchesBubble = require(`../../assets/Matches.png`);
 
     let imageData;
     switch (props.imageType) {
         case ("SendTriangle"): imageData = SendTriangle; break;
+        case ("Matches"): imageData = MatchesBubble; break;
     }
 
     const imageElement = props.imageSource ? 
@@ -35,7 +37,7 @@ export function PageHeader(props : Props) {
     const middle = <StyledView className="w-3"/>
 
     return (
-        <StyledView className="w-full flex flex-row items-center border-b py-2 px-5">
+        <StyledView className="w-full flex flex-row items-center py-2 px-5">
             {
             props.swapTitleAndImage ?
             <>

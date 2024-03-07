@@ -163,9 +163,12 @@ describe("chat", () => {
             </StoreProvider>
         );
 
-        const reportButton = screen.getByTestId(testIDS.reportUser);
+        
         await act( () => {
-            fireEvent(reportButton, "press")
+            fireEvent(screen.getByTestId(testIDS.reportUser), "press");
+        })
+        await act( () => {
+            fireEvent(screen.getByText(chatText.modalReport), "press")
         })
 
         expect(sent).toEqual(true);

@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { StyledScroll, StyledText, StyledView } from "../styledElements";
+import { StyledButton, StyledImage, StyledScroll, StyledText, StyledView } from "../styledElements";
 import { matchesText } from "../text";
 import { ChatPreview, NewMatch, NewMatchDataInput } from "../interfaces";
 import { Image } from "expo-image";
@@ -76,40 +76,58 @@ export function Matches(props : Props) {
     }
 
     return (
-        <StyledView>
+        <StyledView className="w-full h-full flex flex-col">
             <PageHeader
                 title={matchesText.pageTitle}
-                imageSource={""}
+                imageType="Matches"
             />
-            <StyledText>
+            <StyledText className="font-bold text-xl px-5">
                 {`${matchesText.newMatches}`}
             </StyledText>
-            <StyledScroll
-                horizontal={true}
-                onScrollToTop={loadMoreNewMatches}
-                testID={testIDS.newMatchScroll}
-            >
-                {newMatches.map( (match, index) => (
-                    <Image
-                        key={`${match.profile.id}-${index}`}
-                        source={match.profile.images[0]}
-                    />
-                ))}
-            </StyledScroll>
-            <StyledText>
+            <StyledView className="py-3 px-5">
+                <StyledScroll
+                    horizontal={true}
+                    // onScrollToTop={loadMoreNewMatches}
+                    testID={testIDS.newMatchScroll}
+                >
+                    {newMatches.map( (match, index) => (
+                        <StyledButton
+                            key={`${match.profile.id}-${index}`}    
+                            className="flex items-center pr-3"
+                        >
+                            <StyledImage
+                                source={match.profile.images[0]}
+                                className="w-[75px] h-[75px] rounded-full"
+                            />
+                            <StyledText className="text-base">
+                                {match.profile.name}
+                            </StyledText>
+                        </StyledButton>
+                    ))}
+                </StyledScroll>
+            </StyledView>
+            
+            <StyledText className="font-bold text-xl px-5">
                 {`${matchesText.chats}`}
             </StyledText>
             <StyledScroll
-                onScrollToTop={loadMoreChatPreviews}
                 testID={testIDS.chatPreviewScroll}
+                showsVerticalScrollIndicator={true}
             >
-                {chatPreviews.map( (match,index) => (
-                    <ChatPreviewBox
-                        key={`match-${match.profile.id}`}
-                        chatPreview={match}
-                    />
-                ))}
-            </StyledScroll>
+                <StyledView className="pb-2">
+                    {chatPreviews.map( (match,index) => (
+                        <StyledView 
+                            key={`match-${match.profile.id}`} 
+                            className="px-5 py-2"
+                        >
+                            <ChatPreviewBox
+                                chatPreview={match}
+                            />
+                        </StyledView>
+                        
+                    ))}
+                </StyledView>
+            </StyledScroll>                          
         </StyledView>
     )
 } 

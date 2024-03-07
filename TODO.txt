@@ -37,6 +37,7 @@ premium
     more likes/day?
     stats
     improved elo
+    matches count
 
 if ever try catch error, send post to server with message
 Make different user authentication rules list of functions that must pass

@@ -1,6 +1,6 @@
 import { globals } from "../globals";
 import { ChatPreview } from "../interfaces";
-import { StyledImage, StyledText, StyledView } from "../styledElements";
+import { StyledButton, StyledImage, StyledText, StyledView } from "../styledElements";
 import { Image } from "expo-image";
 
 interface Props {
@@ -33,8 +33,17 @@ export function ChatPreviewBox(props : Props) {
     }
 
     return (
-        <StyledView
+        <StyledButton
             className="rounded-3xl border border-front px-5 py-5 flex flex-row w-full items-center"
+            // style={{
+            //     // IOS
+            //     shadowColor: 'rgba(0,0,0, .4)', 
+            //     shadowOffset: { height: 1, width: 1 }, 
+            //     shadowOpacity: 1, 
+            //     shadowRadius: 1, 
+            //     // Android
+            //     elevation: 5
+            // }}
         >
             <StyledImage
                 className="w-[70px] h-[70px] rounded-full"
@@ -59,6 +68,6 @@ export function ChatPreviewBox(props : Props) {
                     {getBriefSummaryText()}
                 </StyledText>
             </StyledView>
-        </StyledView>
+        </StyledButton>
     )
 }

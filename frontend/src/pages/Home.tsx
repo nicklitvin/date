@@ -12,11 +12,12 @@ import { AccountCreationMob } from "./AccountCreation";
 import { MyName } from "../simplePages/MyName";
 import { Pictures } from "../simplePages/Pictures";
 import { Chat } from "./Chat";
-import { Message, PublicProfile } from "../interfaces";
+import { ChatPreview, Message, PublicProfile } from "../interfaces";
 import { Attributes } from "./Attributes";
 import { ScrollView } from "react-native";
 import { globals } from "../globals";
 import { MyModal } from "../components/Modal";
+import { Matches } from "./Matches";
 
 const myUserID = "userID";
 
@@ -86,13 +87,65 @@ export function Home() {
         } 
     ]
 
+    const profiles = [
+        makePublicProfile("id1"),
+        makePublicProfile("id2"),
+        makePublicProfile("id3"),
+        makePublicProfile("id4"),
+        makePublicProfile("id5"),
+        makePublicProfile("id6"),
+    ];
+
+    const messages1 : Message[] = [makeSentMessage(profiles[0].id, new Date(4))];
+    const messages2 : Message[] = [
+        makeSentMessage(profiles[1].id, new Date(3)),
+        makeSentMessage(profiles[1].id, new Date(2)),
+    ];
+    const messages3 : Message[] = [makeSentMessage(profiles[2].id, new Date(1))];
+
+    const chatPreview1 : ChatPreview = {
+        messages: messages1,
+        profile: profiles[0]
+    }
+    const chatPreview2 : ChatPreview = {
+        messages: messages2,
+        profile: profiles[1]
+    }
+    const chatPreview3 : ChatPreview = {
+        messages: messages3,
+        profile: profiles[2]
+    }
+    let chatPreviews = [chatPreview1, chatPreview2, chatPreview3];
+    let newMatches = [
+        {
+            profile: profiles[3],
+            timestamp: new Date()
+        },
+        {
+            profile: profiles[4],
+            timestamp: new Date()
+        },
+        {
+            profile: profiles[5],
+            timestamp: new Date()
+        }
+    ];
+    for (let i = 0; i < 2; i++) {
+        chatPreviews = chatPreviews.concat(chatPreviews);
+        newMatches = newMatches.concat(newMatches);
+    }
+    chatPreviews.at(-1)!.profile.name = "AS";
+
     return (
         <>
-            <Chat
+            <Matches
+                chatPreviews={chatPreviews}
+                newMatches={newMatches}
+            />
+            {/* <Chat
                 latestMessages={latestMessages}
                 publicProfile={recepientProfile}
-            />
-            
+            /> */}
             {/* <Pictures
                 onSubmit={() => {}}
                 submitText="submit"
