@@ -11,7 +11,10 @@ export const chatText = {
     read: "read",
     delivered: "delivered",
     unsent: "unsent",
-    sending: "sending..."
+    sending: "sending...",
+    modalTitle: "What would you like to do?",
+    modalReport: "Report User",
+    modalUnlike: "Unmatch User",
 }
 
 export const matchesText = {
@@ -61,7 +64,8 @@ export const birthdayText = {
 
 export const generalText = {
     continue: "Continue",
-    saveChanges: "Save Changes"
+    saveChanges: "Save Changes",
+    cancel: "Cancel"
 }
 
 export const genderPreferenceText = {

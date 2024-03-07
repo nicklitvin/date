@@ -123,3 +123,7 @@ export interface SettingData {
     title: string
     value: boolean
 }
+
+export interface UnlikeInput {
+    withID: string
+}

@@ -42,7 +42,7 @@ export function Attributes(props : Props) {
         }
         beforeGapContent={
             <StyledView className="w-full h-[600px]">
-                <StyledScroll>
+                <StyledScroll showsVerticalScrollIndicator={false}>
                     {Object.entries(globals.attributes).map( (entry) => (
                         <StyledView 
                             className="flex w-full items-center"

@@ -1,9 +1,9 @@
 import { observer } from "mobx-react-lite";
 import { MyTextInput } from "../components/TextInput";
-import { chatText } from "../text";
+import { chatText, generalText } from "../text";
 import { useEffect, useRef, useState } from "react";
 import { useStore } from "../store/RootStore";
-import { GetChatInput, Message, MessageInput, PublicProfile, RequestReportInput } from "../interfaces";
+import { GetChatInput, Message, MessageInput, PublicProfile, RequestReportInput, SwipeInput, UnlikeInput } from "../interfaces";
 import axios from "axios";
 import { globals } from "../globals";
 import { StyledButton, StyledImage, StyledScroll, StyledText, StyledView } from "../styledElements";
@@ -13,6 +13,7 @@ import { PageHeader } from "../components/PageHeader";
 import { MyMessage } from "../components/Message";
 import { URLs } from "../urls";
 import { NativeScrollEvent, NativeSyntheticEvent, ScrollView } from "react-native";
+import { MyModal } from "../components/Modal";
 
 interface Props {
     publicProfile: PublicProfile
@@ -31,6 +32,7 @@ export function Chat(props : Props) {
     const [unsentChats, setUnsentChats] = useState<string[]>([]);
     const [currentID, setCurrentID] = useState<number>(0);
     const [loadingIDs, setLoadingIDs] = useState<string[]>([]);
+    const [showModal, setShowModal] = useState<boolean>(false);
 
     useEffect( () => {
         if (props.returnUnsentChatLength) props.returnUnsentChatLength(unsentChats.length);
@@ -122,6 +124,7 @@ export function Chat(props : Props) {
 
     const reportUser = async () => {
         try {
+            setShowModal(false);
             const myReport : RequestReportInput = {
                 reportedID: props.publicProfile.id
             }
@@ -131,14 +134,49 @@ export function Chat(props : Props) {
         }
     }
 
+    const unlikeUser = async () => {
+        try {
+            setShowModal(false);
+            const unlike : UnlikeInput = {
+                withID: props.publicProfile.id
+            }
+            await axios.post(URLs.server + URLs.unlikeUser, unlike);
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
     return (
+        <>
+        <MyModal
+            show={showModal}
+            buttons={[
+                {
+                    text: chatText.modalReport,
+                    danger: true,
+                    function: reportUser
+                },
+                {
+                    text: chatText.modalUnlike,
+                    danger: false,
+                    function: unlikeUser
+                },
+                {
+                    text: generalText.cancel,
+                    danger: false,
+                    function: () => setShowModal(false)
+                }
+            ]}
+            text={chatText.modalTitle}
+            cancelButtonIndex={2}
+        />
         <StyledView className="w-full h-full">
             <PageHeader
                 imageSource={props.publicProfile.images[0]}
                 title={props.publicProfile.name}
                 swapTitleAndImage={true}
                 rightContent={
-                    <StyledButton onPress={reportUser} testID={testIDS.reportUser}>
+                    <StyledButton onPress={() => setShowModal(true)} testID={testIDS.reportUser}>
                         <StyledImage
                             source={require("../../assets/Report.png")}
                             alt=""
@@ -213,6 +251,7 @@ export function Chat(props : Props) {
                 </StyledScroll>
             </StyledView>
         </StyledView>
+        </>
     )
 }
 

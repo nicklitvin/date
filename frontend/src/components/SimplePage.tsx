@@ -16,8 +16,8 @@ export function MySimplePage(props : Props) {
     return (
         <StyledView className="flex-grow">
             <StyledView className={classNames(
-                "flex flex-col items-center",
-                props.marginTop == "Attributes" ? "" : (
+                "flex flex-col items-center p-5",
+                props.marginTop == "Attributes" ? "h-[700px]" : (
                     props.marginTop == "Pictures" ? "mt-[50px] h-[700px]" : (
                         props.marginTop == "Keyboard" ? "mt-[200px] h-[200px]" :
                             "mt-[200px] h-[400px]"

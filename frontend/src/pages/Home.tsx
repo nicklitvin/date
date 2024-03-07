@@ -16,6 +16,7 @@ import { Message, PublicProfile } from "../interfaces";
 import { Attributes } from "./Attributes";
 import { ScrollView } from "react-native";
 import { globals } from "../globals";
+import { MyModal } from "../components/Modal";
 
 const myUserID = "userID";
 
@@ -87,11 +88,11 @@ export function Home() {
 
     return (
         <>
-
             <Chat
                 latestMessages={latestMessages}
                 publicProfile={recepientProfile}
             />
+            
             {/* <Pictures
                 onSubmit={() => {}}
                 submitText="submit"
@@ -105,7 +106,7 @@ export function Home() {
                 onPressFunction={()=>{}}
                 text="Continue"
             /> */}
-            {/* <AccountCreationMob customPageStart={8}/> */}
+            {/* <AccountCreationMob customPageStart={0}/> */}
             {/* <MySimplePage
                 title="Create Profile"
                 subtitle="asdhaksdhaadsdsdadsadasdsadsasdadsaaaaaaaaaaaaaaaaaksjdhakjshdksajhdasjdhaksjdaksjhd"
