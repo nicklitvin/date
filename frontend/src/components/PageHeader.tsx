@@ -35,7 +35,7 @@ export function PageHeader(props : Props) {
     const middle = <StyledView className="w-3"/>
 
     return (
-        <StyledView className="w-full flex flex-row bg-danger items-center">
+        <StyledView className="w-full flex flex-row items-center border-b py-2 px-5">
             {
             props.swapTitleAndImage ?
             <>

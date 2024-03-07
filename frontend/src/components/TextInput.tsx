@@ -5,7 +5,7 @@ import { Image } from "expo-image"
 
 interface Props {
     placeholder: string
-    errorMessage: string
+    errorMessage?: string
     onSubmit: (message : string) => any
     initialInput?: string
     maxLength?: number
@@ -58,12 +58,14 @@ export function MyTextInput(props : Props) {
                     />
                 </StyledButton>
             </StyledView>
-            <StyledText className={classNames(
-                `text-center text-base`,
-                showError ? "block" : "opacity-0"
-            )}>
-                {props.errorMessage}
-            </StyledText>
+            {props.errorMessage ?
+                <StyledText className={classNames(
+                    `text-center text-base`,
+                    showError ? "block" : "opacity-0"
+                )}>
+                    {props.errorMessage}
+                </StyledText> : null
+            }
         </>  
     )
 }

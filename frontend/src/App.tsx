@@ -13,7 +13,7 @@ export default function App() {
                 <SafeAreaView style={{flex: 1}}>
                     <StoreProvider value={rootStore}>
                         <StyledView className="w-full h-full flex items-center justify-center">
-                            <StyledView className="w-full h-full p-5">
+                            <StyledView className="w-full h-full">
                                 <HomeMob/>
                             </StyledView>
                         </StyledView>

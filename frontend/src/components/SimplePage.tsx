@@ -14,31 +14,27 @@ interface Props {
 
 export function MySimplePage(props : Props) {
     return (
-        <TouchableWithoutFeedback 
-            onPress={Keyboard.dismiss}
-        >
-            <StyledView className="flex-grow">
-                <StyledView className={classNames(
-                    "flex flex-col items-center",
-                    props.marginTop == "Attributes" ? "" : (
-                        props.marginTop == "Pictures" ? "mt-[50px] h-[700px]" : (
-                            props.marginTop == "Keyboard" ? "mt-[200px] h-[200px]" :
-                                "mt-[200px] h-[400px]"
-                        )
-                    ) ,
-                )}>
-                    <StyledText className={`text-3xl font-bold text-center mb-5`}>
-                        {props.title}
-                    </StyledText>
-                    <StyledText className={`text-xl text-center mb-5`}>
-                        {props.subtitle}
-                    </StyledText>
-                    {props.beforeGapContent}
-                    <StyledView className="flex-grow w-full">
-                    </StyledView>
-                    {props.content}
+        <StyledView className="flex-grow">
+            <StyledView className={classNames(
+                "flex flex-col items-center",
+                props.marginTop == "Attributes" ? "" : (
+                    props.marginTop == "Pictures" ? "mt-[50px] h-[700px]" : (
+                        props.marginTop == "Keyboard" ? "mt-[200px] h-[200px]" :
+                            "mt-[200px] h-[400px]"
+                    )
+                ) ,
+            )}>
+                <StyledText className={`text-3xl font-bold text-center mb-5`}>
+                    {props.title}
+                </StyledText>
+                <StyledText className={`text-xl text-center mb-5`}>
+                    {props.subtitle}
+                </StyledText>
+                {props.beforeGapContent}
+                <StyledView className="flex-grow w-full">
                 </StyledView>
+                {props.content}
             </StyledView>
-        </TouchableWithoutFeedback>
+        </StyledView>
     )
 }

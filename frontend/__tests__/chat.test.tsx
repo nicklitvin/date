@@ -8,6 +8,7 @@ import { getChatTimestamp } from "../src/utils";
 import MockAdapter from "axios-mock-adapter";
 import axios from "axios";
 import { URLs } from "../src/urls";
+import { scrollToTopVal } from "../__testUtils__/easySetup";
 
 describe("chat", () => {
     const myUserID = "userID";
@@ -119,7 +120,7 @@ describe("chat", () => {
 
         const scroll = screen.getByTestId(testIDS.chatScroll);
         await act( () => {
-            fireEvent(scroll, "scrollToTop")
+            fireEvent(scroll, "scroll", scrollToTopVal)
         })
 
         expect(returnChatLength).toHaveLastReturnedWith(3);
@@ -185,7 +186,7 @@ describe("chat", () => {
         
         const scroll = screen.getByTestId(testIDS.chatScroll);
         await act( () => {
-            fireEvent(scroll, "scrollToTop")
+            fireEvent(scroll, "scroll", scrollToTopVal)
         })
 
         expect(screen.queryByText(getChatTimestamp(
@@ -221,7 +222,7 @@ describe("chat", () => {
         
         const scroll = screen.getByTestId(testIDS.chatScroll);
         await act( () => {
-            fireEvent(scroll, "scrollToTop")
+            fireEvent(scroll, "scroll", scrollToTopVal)
         })
 
         expect(screen.queryByText(chatText.read)).not.toEqual(null);

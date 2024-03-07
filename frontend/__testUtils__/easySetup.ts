@@ -37,3 +37,5 @@ export const makeReceivedMessage = (
     timestamp: timestamp,
     userID: sentID
 })
+
+export const scrollToTopVal = {nativeEvent: {contentOffset: {y: 0}}};

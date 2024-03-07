@@ -3,7 +3,7 @@ import { action, makeAutoObservable, observable } from "mobx";
 export class GlobalState {
     @observable public useHttp : boolean = true;
     @observable public email : string|null = null;
-    @observable public timeZone : string = "PST";
+    @observable public timeZone : string = "America/Los_Angeles";
 
     constructor() {
         makeAutoObservable(this);

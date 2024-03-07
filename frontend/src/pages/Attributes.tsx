@@ -5,7 +5,6 @@ import { StyledScroll, StyledText, StyledView } from "../styledElements"
 import { attributesText } from "../text"
 import { globals } from "../globals"
 import classNames from "classnames"
-import { ScrollView } from "react-native"
 
 interface Props {
     onSubmit: (input : string[]) => any
@@ -42,45 +41,50 @@ export function Attributes(props : Props) {
             </StyledView>
         }
         beforeGapContent={
-            <StyledScroll className="h-2/3">
-                {Object.entries(props.attributes).map( (entry) =>
-                    <StyledView 
-                        className="w-full items-center mb-8"
-                        key={`attributeType-${entry}`}
-                    >
-                        <StyledText className="text-xl mb-2">
-                            {entry[0]}
-                        </StyledText>
-                        <StyledView className="flex w-full flex-wrap flex-row justify-center">
-                            {entry[1].map( (content) =>
-                                <MyButton
-                                    key={`attribute-${content.value}`}
-                                    text={content.value}
-                                    smallButton={true}
-                                    invertColor={attributes.includes(content.value)}
-                                    onPressFunction={ () => {
-                                        setShowError(false);
-                                        const foundIndex = attributes.findIndex( 
-                                            selected => selected == content.value
-                                        )
-                                        if (foundIndex > -1) {
-                                            setAttributes(
-                                                attributes.filter( (_,index) =>
-                                                    foundIndex != index
+            <StyledView className="w-full h-[600px]">
+                <StyledScroll>
+                    {Object.entries(globals.attributes).map( (entry) => (
+                        <StyledView 
+                            className="flex w-full items-center"
+                            key={`type-${entry[0]}`}
+                        >
+                            <StyledText className="text-xl pb-2 w-full text-center font-bold">
+                                {entry[0]}
+                            </StyledText>
+                            <StyledView className="flex flex-row flex-wrap justify-center">
+                                {entry[1].map( (content) =>
+                                    <StyledView 
+                                        key={`attribute-${content.value}`}
+                                    >
+                                        <MyButton
+                                            text={content.value}
+                                            smallButton={true}
+                                            invertColor={attributes.includes(content.value)}
+                                            onPressFunction={ () => {
+                                                setShowError(false);
+                                                const foundIndex = attributes.findIndex( 
+                                                    selected => selected == content.value
                                                 )
-                                            )
-                                        } else {
-                                            setAttributes(
-                                                [...attributes, content.value]
-                                            )
-                                        }
-                                    }}
-                                />
-                            )}
+                                                if (foundIndex > -1) {
+                                                    setAttributes(
+                                                        attributes.filter( (_,index) =>
+                                                            foundIndex != index
+                                                        )
+                                                    )
+                                                } else {
+                                                    setAttributes(
+                                                        [...attributes, content.value]
+                                                    )
+                                                }
+                                            }}
+                                        />
+                                    </StyledView>
+                                )}    
+                            </StyledView>
                         </StyledView>
-                    </StyledView>
-                )}
-            </StyledScroll>
+                    ))}
+                </StyledScroll>
+            </StyledView> 
         }
     />
 }
