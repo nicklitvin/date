@@ -43,7 +43,7 @@ describe("chat", () => {
         {
             id: "id2",
             message: "sooo",
-            readStatus: false,
+            readStatus: true,
             recepientID: recepientProfile.id,
             timestamp: new Date(Date.UTC(2000, 0, 1, 6, 0)),
             userID: myUserID
@@ -61,16 +61,29 @@ describe("chat", () => {
             expect(payload.recepientID).toEqual(recepientProfile.id);
             sent = true;
 
-            return [200]
+            const message : Message = {
+                id: "randomID",
+                message: payload.message,
+                readStatus: false,
+                recepientID: recepientProfile.id,
+                timestamp: new Date(),
+                userID: "id"
+            }
+
+            return [200, message]
         })
 
         const store = new RootStore();
         const StoreProvider = createStoreProvider(store);
+        const getChatLength = jest.fn();
+        const getUnsentLength = jest.fn();
         render(
             <StoreProvider value={store}>
                 <ChatMob
                     publicProfile={recepientProfile}
                     latestMessages={[]}
+                    returnChatLength={getChatLength}
+                    returnUnsentChatLength={getUnsentLength}
                 />
             </StoreProvider>
         );
@@ -85,6 +98,8 @@ describe("chat", () => {
         })
 
         expect(sent).toEqual(true);
+        expect(getChatLength).toHaveBeenLastCalledWith(1);
+        expect(getUnsentLength).toHaveBeenLastCalledWith(0);
     })
 
     it("should load older messages", async () => {
@@ -228,5 +243,89 @@ describe("chat", () => {
         expect(screen.queryByText(chatText.read)).not.toEqual(null);
         expect(screen.queryByText(chatText.delivered)).toEqual(null);
         expect(screen.getByTestId(`readStatus-${latestMessages[0].id}`)).not.toEqual(null);
+    })
+
+    it("should not say delivered on unsent message", async () => {
+        const mock = new MockAdapter(axios);
+        mock.onPost(URLs.server + URLs.getChat).reply(config => {
+            return [400];
+        })
+
+        const store = new RootStore();
+        const StoreProvider = createStoreProvider(store);
+        const getChatLength = jest.fn();
+        render(
+            <StoreProvider value={store}>
+                <ChatMob
+                    latestMessages={[]}
+                    publicProfile={recepientProfile}
+                    returnChatLength={getChatLength}
+                />
+            </StoreProvider>
+        );
+
+        const myMessage = "hi";
+        const myInput = screen.getByPlaceholderText(chatText.inputPlaceholder);
+        await act( () => {
+            fireEvent(myInput, "changeText", myMessage);
+        })
+        await act( () => {
+            fireEvent(myInput, "submitEditing");
+        })
+
+        expect(screen.queryByText(chatText.unsent)).not.toEqual(null);
+        expect(getChatLength).toHaveBeenLastCalledWith(1);
+    })
+
+    it("should resend undelivered message", async () => {
+        const mock = new MockAdapter(axios);
+        mock.onPost(URLs.server + URLs.sendMessage).replyOnce(config => {
+            return [400];
+        })
+        mock.onPost(URLs.server + URLs.sendMessage).replyOnce(config => {
+            const payload = JSON.parse(config.data) as MessageInput;
+            const message : Message = {
+                id: "randomID",
+                message: payload.message,
+                readStatus: false,
+                recepientID: payload.recepientID,
+                timestamp: new Date(),
+                userID: "id"
+            }
+            return [200, message];
+        })
+
+        const store = new RootStore();
+        const StoreProvider = createStoreProvider(store);
+        const getChatLength = jest.fn();
+        const getUnsentLength = jest.fn();
+        render(
+            <StoreProvider value={store}>
+                <ChatMob
+                    latestMessages={[]}
+                    publicProfile={recepientProfile}
+                    returnChatLength={getChatLength}
+                    returnUnsentChatLength={getUnsentLength}
+                />
+            </StoreProvider>
+        );
+
+        const myMessage = "hi";
+        const myInput = screen.getByPlaceholderText(chatText.inputPlaceholder);
+        await act( () => {
+            fireEvent(myInput, "changeText", myMessage);
+        })
+        await act( () => {
+            fireEvent(myInput, "submitEditing");
+        })
+
+        await act( () => {
+            fireEvent(screen.getByTestId(`message-${myMessage}`), "press")
+        });
+
+        expect(getUnsentLength).toHaveBeenLastCalledWith(0);
+        expect(getChatLength).toHaveBeenLastCalledWith(1);
+        expect(screen.queryByText(chatText.unsent)).toEqual(null);
+        expect(screen.queryByText(chatText.delivered)).not.toEqual(null);
     })
 })

@@ -9,7 +9,8 @@ export const chatText = {
     inputPlaceholder: "Type your message here",
     inputError: "Cannot send message",
     read: "read",
-    delivered: "delivered"
+    delivered: "delivered",
+    unsent: "unsent",
 }
 
 export const matchesText = {

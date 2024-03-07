@@ -21,7 +21,7 @@ export function PageHeader(props : Props) {
 
     const imageElement = props.imageSource ? 
         <StyledImage 
-            className="w-[75px] h-[75px] rounded-full"
+            className="w-[50px] h-[50px] rounded-full"
             source={{uri : props.imageSource}}
         /> : 
         <StyledImage 

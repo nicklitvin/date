@@ -6,7 +6,7 @@ import { useStore } from "../store/RootStore";
 import { GetChatInput, Message, MessageInput, PublicProfile, RequestReportInput } from "../interfaces";
 import axios from "axios";
 import { globals } from "../globals";
-import { StyledButton, StyledScroll, StyledText, StyledView } from "../styledElements";
+import { StyledButton, StyledImage, StyledScroll, StyledText, StyledView } from "../styledElements";
 import { testIDS } from "../testIDs";
 import { getChatTimestamp } from "../utils";
 import { PageHeader } from "../components/PageHeader";
@@ -18,6 +18,7 @@ interface Props {
     publicProfile: PublicProfile
     latestMessages: Message[]
     returnChatLength?: (input : number) => number
+    returnUnsentChatLength?: (input : number) => any
 }
 
 export function Chat(props : Props) {
@@ -26,14 +27,24 @@ export function Chat(props : Props) {
     const { globalState } = useStore();
     const scrollRef = useRef<ScrollView>(null);
     const [gettingChat, setGettingChat] = useState<boolean>(false);
+    const [sendingChats, setSendingChats] = useState<Message[]>([]);
+    const [unsentChats, setUnsentChats] = useState<string[]>([]);
+    const [currentID, setCurrentID] = useState<number>(0);
+
+    useEffect( () => {
+        if (props.returnUnsentChatLength) props.returnUnsentChatLength(unsentChats.length);
+    }, [unsentChats])
 
     useEffect( () => {
         if (chat.length == 0) return
 
         if (chat[0].userID == props.publicProfile.id) return
 
-        if (chat[0].recepientID == props.publicProfile.id) {
-            setLastSentChatID(chat[0].id)
+        for (const message of chat) {
+            if (!unsentChats.includes(message.id) && message.recepientID == props.publicProfile.id ) {
+                setLastSentChatID(message.id);
+                break;
+            } 
         }
 
         if (props.returnChatLength) {
@@ -45,15 +56,40 @@ export function Chat(props : Props) {
         scrollRef.current?.scrollToEnd({animated: true});
     }, [])
 
-    const sendMessage = async (sentMessage : string) => {
+    const sendMessage = async (sentMessage : string, removeID?: string) => {
         const messageInput : MessageInput = {
             recepientID: props.publicProfile.id,
             message: sentMessage
         }
+
+        const sendingID = String(currentID);
+        setCurrentID(currentID + 1);
+
+        const sendingChat : Message = {
+            id: sendingID,
+            message: sentMessage,
+            readStatus: false,
+            recepientID: props.publicProfile.id,
+            timestamp: new Date(),
+            userID: ""
+        }
+
+        setChat([sendingChat].concat(chat.filter( val => val.id != removeID)));
+
         try {
             const endpoint = URLs.server + URLs.sendMessage;
             const response = await axios.post(endpoint, messageInput);
-        } catch (err) {}
+            const message = response.data as Message;
+
+            const copy = [...chat];
+            const index = chat.findIndex( val => val.id == sendingID);
+            copy[index] = message;
+
+            setSendingChats(sendingChats.filter( val => val.id != sendingID));
+            setUnsentChats(unsentChats.filter(val => val != removeID));
+        } catch (err) {
+            setUnsentChats(unsentChats.filter(val => val != removeID).concat(sendingID))
+        }
     }
 
     const handleScroll = async (event: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -78,7 +114,6 @@ export function Chat(props : Props) {
 
             setChat(chat.concat(moreChats));
         } catch (err) {
-            console.log(err);
         }
         setGettingChat(false);
     }
@@ -102,6 +137,11 @@ export function Chat(props : Props) {
                 swapTitleAndImage={true}
                 rightContent={
                     <StyledButton onPress={reportUser} testID={testIDS.reportUser}>
+                        <StyledImage
+                            source={require("../../assets/Report.png")}
+                            alt=""
+                            className="w-[35px] h-[35px]"
+                        />
                     </StyledButton>    
                 }
             />
@@ -139,8 +179,13 @@ export function Chat(props : Props) {
                                 }
                                 <StyledView>
                                     <MyMessage
-                                        text={message.message + (message.id == lastSentChatID ? "hi" : "")}
+                                        text={message.message}
                                         invert={message.userID == props.publicProfile.id}
+                                        error={unsentChats.includes(message.id)}
+                                        onPress={unsentChats.includes(message.id) ? 
+                                            () => sendMessage(message.message, message.id) :
+                                            () => {}
+                                        }
                                     />
                                 </StyledView>
                                 {
@@ -149,7 +194,12 @@ export function Chat(props : Props) {
                                         <StyledText 
                                             testID={`readStatus-${message.id}`}
                                         >
-                                            {message.readStatus ? chatText.read : chatText.delivered}
+                                            {
+                                                unsentChats.includes(message.id) ? chatText.unsent :
+                                                (
+                                                    message.readStatus ? chatText.read : chatText.delivered
+                                                )
+                                            }
                                         </StyledText>
                                     </StyledView> : null
                                 }

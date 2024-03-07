@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { StyledButton, StyledImage, StyledInput, StyledText, StyledView } from "../styledElements"
 import classNames from "classnames"
 import { Image } from "expo-image"
+import { globals } from "../globals"
 
 interface Props {
     placeholder: string
@@ -54,7 +55,7 @@ export function MyTextInput(props : Props) {
                     <StyledImage
                         className="w-[20px] h-[20px]"
                         source={require("../../assets/SendTriangle.png")}
-                        style={{tintColor: "#000000"}}
+                        style={{tintColor: globals.dark}}
                     />
                 </StyledButton>
             </StyledView>
