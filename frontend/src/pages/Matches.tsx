@@ -4,11 +4,15 @@ import { matchesText } from "../text";
 import { ChatPreview, NewMatch, NewMatchDataInput } from "../interfaces";
 import { Image } from "expo-image";
 import { ChatPreviewBox } from "../components/ChatPreviewBox";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { testIDS } from "../testIDs";
 import { PageHeader } from "../components/PageHeader";
 import { URLs } from "../urls";
+import { NativeScrollEvent, NativeSyntheticEvent, ScrollView } from "react-native";
+import { globals } from "../globals";
+import { differenceInSeconds } from "date-fns";
+import { createTimeoutSignal } from "../utils";
 
 interface Props {
     newMatches: NewMatch[]
@@ -20,6 +24,10 @@ interface Props {
 export function Matches(props : Props) {
     const [newMatches, setNewMatches] = useState<NewMatch[]>(props.newMatches ?? []);
     const [chatPreviews, setChatPreviews] = useState<ChatPreview[]>(props.chatPreviews ?? []);
+    const newMatchScrollRef = useRef<ScrollView>(null);
+    const chatsScrollRef = useRef<ScrollView>(null);
+    const [matchRequestTime, setMatchRequestTime] = useState<Date>(new Date());
+    const [previewRequestTime, setPreviewRequestTime] = useState<Date>(new Date());
 
     useEffect( () => {
         if (props.returnNewChatPreviewsLength) {
@@ -33,14 +41,23 @@ export function Matches(props : Props) {
         }
     }, [newMatches])
 
-    const loadMoreNewMatches = async () => {
+    const handleMatchScroll = async (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+        const { contentOffset, layoutMeasurement, contentSize } = event.nativeEvent;
+        const scrollWidth = contentSize.width - layoutMeasurement.width;
+        const isAtRight = contentOffset.x >= scrollWidth * globals.scrollAtPercentage;
+        const canSend = differenceInSeconds(new Date(), matchRequestTime) > globals.apiRequestTimeout;
+        
+        if (!(isAtRight && canSend)) return  
+        setMatchRequestTime(new Date());
+
         try {
             let receivedNewMatches : NewMatch[] = [];
             const input : NewMatchDataInput = {
                 timestamp: new Date(newMatches.at(-1)!.timestamp.getTime() - 1)
             }
-
-            const response = await axios.post(URLs.server + URLs.getNewMatches, input); 
+            const response = await axios.post(URLs.server + URLs.getNewMatches, input, {
+                signal: createTimeoutSignal()
+            }); 
             receivedNewMatches = response.data.data;
             receivedNewMatches = receivedNewMatches.map( val => ({
                 ...val,
@@ -53,14 +70,24 @@ export function Matches(props : Props) {
         }
     }
 
-    const loadMoreChatPreviews = async () => {
+    const handleChatsScroll = async (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+        const { contentOffset, layoutMeasurement, contentSize } = event.nativeEvent;
+        const scrollHeight = contentSize.height - layoutMeasurement.height;
+        const isAtBottom = contentOffset.y >= scrollHeight * globals.scrollAtPercentage;
+        const canSend = differenceInSeconds(new Date(), previewRequestTime) > globals.apiRequestTimeout;
+
+        if (!(isAtBottom && canSend)) return
+        setPreviewRequestTime(new Date())
+
         try {
             let newChatPreviews : ChatPreview[] = [];
             const input : NewMatchDataInput = {
                 timestamp: new Date(chatPreviews.at(-1)!.messages[0].timestamp.getTime() - 1)
             }
 
-            const response = await axios.post(URLs.server + URLs.getNewChatPreviews, input);
+            const response = await axios.post(URLs.server + URLs.getNewChatPreviews, input, {
+                signal: createTimeoutSignal()
+            });
             newChatPreviews = response.data.data as ChatPreview[];
             newChatPreviews = newChatPreviews.map( val => ({
                 ...val,
@@ -86,8 +113,9 @@ export function Matches(props : Props) {
             </StyledText>
             <StyledView className="py-3 px-5">
                 <StyledScroll
+                    ref={newMatchScrollRef}
                     horizontal={true}
-                    // onScrollToTop={loadMoreNewMatches}
+                    onScroll={handleMatchScroll}
                     testID={testIDS.newMatchScroll}
                 >
                     {newMatches.map( (match, index) => (
@@ -113,6 +141,8 @@ export function Matches(props : Props) {
             <StyledScroll
                 testID={testIDS.chatPreviewScroll}
                 showsVerticalScrollIndicator={true}
+                onScroll={handleChatsScroll}
+                ref={chatsScrollRef}
             >
                 <StyledView className="pb-2">
                     {chatPreviews.map( (match,index) => (

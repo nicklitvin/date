@@ -1,3 +1,5 @@
+import { globals } from "./globals";
+
 export function getChatTimestamp(date : Date, timezone : string) {
     let timestamp = date.toLocaleString(undefined, {
         month: "short",
@@ -46,4 +48,12 @@ export function getBirthdayStamp(date : Date) {
         timestamp.slice(3, timestamp.length);
 
     return timestamp
+}
+
+export function createTimeoutSignal() {
+    const control = new AbortController();
+    setTimeout( () => {
+        control.abort();
+    }, globals.apiRequestTimeout * 1000);
+    return control.signal;
 }

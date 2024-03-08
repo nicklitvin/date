@@ -16,6 +16,8 @@ export const globals = {
     pictureHeight: 136,
     pictureWidth: 102,
     maxPictureSize: 1024*1024*1,
+    scrollAtPercentage: 0.95,
+    apiRequestTimeout: 2,
 
     attributes: {
         "Sports": [

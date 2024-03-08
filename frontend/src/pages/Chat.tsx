@@ -8,12 +8,13 @@ import axios from "axios";
 import { globals } from "../globals";
 import { StyledButton, StyledImage, StyledScroll, StyledText, StyledView } from "../styledElements";
 import { testIDS } from "../testIDs";
-import { getChatTimestamp } from "../utils";
+import { createTimeoutSignal, getChatTimestamp } from "../utils";
 import { PageHeader } from "../components/PageHeader";
 import { MyMessage } from "../components/Message";
 import { URLs } from "../urls";
 import { NativeScrollEvent, NativeSyntheticEvent, ScrollView } from "react-native";
 import { MyModal } from "../components/Modal";
+import { differenceInSeconds } from "date-fns";
 
 interface Props {
     publicProfile: PublicProfile
@@ -27,7 +28,7 @@ export function Chat(props : Props) {
     const [lastSentChatID, setLastSentChatID] = useState<string>("");
     const { globalState } = useStore();
     const scrollRef = useRef<ScrollView>(null);
-    const [gettingChat, setGettingChat] = useState<boolean>(false);
+    const [chatRequestTime, setChatRequestTime] = useState<Date>(new Date());
     const [sendingChats, setSendingChats] = useState<Message[]>([]);
     const [unsentChats, setUnsentChats] = useState<string[]>([]);
     const [currentID, setCurrentID] = useState<number>(0);
@@ -97,8 +98,13 @@ export function Chat(props : Props) {
     }
 
     const handleScroll = async (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-        if (event.nativeEvent.contentOffset.y > 0 || gettingChat) return  
-        setGettingChat(true);
+        const { contentOffset, layoutMeasurement, contentSize } = event.nativeEvent;
+        const scrollHeight = contentSize.height - layoutMeasurement.height;
+        const isAtTop = contentOffset.y <= scrollHeight * (1-globals.scrollAtPercentage);
+        const canSend = differenceInSeconds(new Date(), chatRequestTime) > globals.apiRequestTimeout;
+
+        if (!(isAtTop && canSend)) return 
+        setChatRequestTime(new Date());
         
         try {
             let moreChats : Message[];
@@ -109,7 +115,9 @@ export function Chat(props : Props) {
                 fromTime: new Date(chat.at(-1)!.timestamp.getTime() - 1)
             }
 
-            const response = await axios.post(URLs.server + URLs.getChat, input);
+            const response = await axios.post(URLs.server + URLs.getChat, input, {
+                signal: createTimeoutSignal()
+            });
             moreChats = response.data.data as Message[];
             moreChats = moreChats.map( message => ({
                 ...message, 
@@ -119,7 +127,6 @@ export function Chat(props : Props) {
             setChat(chat.concat(moreChats));
         } catch (err) {
         }
-        setGettingChat(false);
     }
 
     const reportUser = async () => {
@@ -200,7 +207,7 @@ export function Chat(props : Props) {
                     className="flex-1"
                     ref={scrollRef}
                 >
-                    <StyledView className="flex flex-col-reverse ">
+                    <StyledView className="flex flex-col-reverse">
                         {chat.map( (message, index) => (
                             <StyledView 
                                 className="pb-1"

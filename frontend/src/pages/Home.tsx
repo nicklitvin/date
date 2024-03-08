@@ -12,7 +12,7 @@ import { AccountCreationMob } from "./AccountCreation";
 import { MyName } from "../simplePages/MyName";
 import { Pictures } from "../simplePages/Pictures";
 import { Chat } from "./Chat";
-import { ChatPreview, Message, PublicProfile } from "../interfaces";
+import { ChatPreview, Message, NewMatch, PublicProfile } from "../interfaces";
 import { Attributes } from "./Attributes";
 import { ScrollView } from "react-native";
 import { globals } from "../globals";
@@ -87,6 +87,15 @@ export function Home() {
         } 
     ]
 
+    const latestMessages1 : Message[] = Array.from({length: 20}).map( (val,index) => ({
+        id: String(index),
+        message: "aksjdasd",
+        readStatus: true,
+        recepientID: recepientProfile.id,
+        timestamp: new Date(index),
+        userID: "id"
+    }))
+
     const profiles = [
         makePublicProfile("id1"),
         makePublicProfile("id2"),
@@ -115,8 +124,28 @@ export function Home() {
         messages: messages3,
         profile: profiles[2]
     }
-    let chatPreviews = [chatPreview1, chatPreview2, chatPreview3];
-    let newMatches = [
+    const chatPreview4 : ChatPreview = {
+        messages: messages1,
+        profile: profiles[3]
+    }
+    const chatPreview5 : ChatPreview = {
+        messages: messages1,
+        profile: profiles[4]
+    }
+    let chatPreviews = [chatPreview1, chatPreview2, chatPreview3, chatPreview4, chatPreview5];
+    let newMatches : NewMatch[] = [
+        {
+            profile: profiles[0],
+            timestamp: new Date()
+        },
+        {
+            profile: profiles[1],
+            timestamp: new Date()
+        },
+        {
+            profile: profiles[2],
+            timestamp: new Date()
+        },
         {
             profile: profiles[3],
             timestamp: new Date()
@@ -130,11 +159,6 @@ export function Home() {
             timestamp: new Date()
         }
     ];
-    for (let i = 0; i < 2; i++) {
-        chatPreviews = chatPreviews.concat(chatPreviews);
-        newMatches = newMatches.concat(newMatches);
-    }
-    chatPreviews.at(-1)!.profile.name = "AS";
 
     return (
         <>
@@ -143,7 +167,7 @@ export function Home() {
                 newMatches={newMatches}
             />
             {/* <Chat
-                latestMessages={latestMessages}
+                latestMessages={latestMessages1}
                 publicProfile={recepientProfile}
             /> */}
             {/* <Pictures
