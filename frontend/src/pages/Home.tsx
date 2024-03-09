@@ -164,7 +164,7 @@ export function Home() {
         <>
             <Matches
                 chatPreviews={[]}
-                newMatches={newMatches}
+                newMatches={[]}
             />
             <Chat
                 latestMessages={[]}

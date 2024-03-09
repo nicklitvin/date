@@ -111,32 +111,52 @@ export function Matches(props : Props) {
                 {`${matchesText.newMatches}`}
             </StyledText>
             <StyledView className="py-3 px-5">
-                <StyledScroll
-                    ref={newMatchScrollRef}
-                    horizontal={true}
-                    onScroll={handleMatchScroll}
-                    testID={testIDS.newMatchScroll}
-                >
-                    {newMatches.map( (match, index) => (
-                        <StyledButton
-                            key={`${match.profile.id}-${index}`}    
-                            className="flex items-center pr-3"
-                        >
-                            <StyledImage
-                                source={match.profile.images[0]}
-                                className="w-[75px] h-[75px] rounded-full"
-                            />
-                            {/* <StyledText className="text-base">
-                                {match.profile.name}
-                            </StyledText> */}
-                        </StyledButton>
-                    ))}
-                </StyledScroll>
+                {
+                    newMatches.length == 0 ?
+                    <StyledView className="flex flex-row justify-center items-center">
+                        <StyledImage
+                            source={require("../../assets/brokenHeart.png")}
+                            className="w-[50px] h-[50px]"
+                        />
+                        <StyledText className="font-bold text-base">
+                            {matchesText.noNewMatches}  
+                        </StyledText>
+                    </StyledView> :
+                    <StyledScroll
+                        ref={newMatchScrollRef}
+                        horizontal={true}
+                        onScroll={handleMatchScroll}
+                        testID={testIDS.newMatchScroll}
+                    >
+                        {newMatches.map( (match, index) => (
+                            <StyledButton
+                                key={`${match.profile.id}-${index}`}    
+                                className="flex items-center pr-3"
+                            >
+                                <StyledImage
+                                    source={match.profile.images[0]}
+                                    className="w-[75px] h-[75px] rounded-full"
+                                />
+                            </StyledButton>
+                        ))}
+                    </StyledScroll>
+                }
             </StyledView>
             
             <StyledText className="font-bold text-xl px-5">
                 {`${matchesText.chats}`}
             </StyledText>
+            {
+            chatPreviews.length == 0 ?
+            <StyledView className="flex flex-row justify-center items-center">
+                <StyledImage
+                    source={require("../../assets/brokenHeart.png")}
+                    className="w-[50px] h-[50px]"
+                />
+                <StyledText className="font-bold text-base">
+                    {matchesText.noChats}  
+                </StyledText>
+            </StyledView> :
             <StyledScroll
                 testID={testIDS.chatPreviewScroll}
                 showsVerticalScrollIndicator={true}
@@ -157,6 +177,8 @@ export function Matches(props : Props) {
                     ))}
                 </StyledView>
             </StyledScroll>                          
+            }
+            
         </StyledView>
     )
 } 

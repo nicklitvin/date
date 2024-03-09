@@ -20,7 +20,9 @@ export const chatText = {
 export const matchesText = {
     newMatches: "New Matches",
     chats: "Chats",
-    pageTitle: "Matches"
+    pageTitle: "Matches",
+    noNewMatches: "No new matches",
+    noChats: "No chats",
 }
 
 export const feedText = {
