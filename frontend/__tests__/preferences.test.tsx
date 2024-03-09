@@ -40,4 +40,47 @@ describe("preferences", () => {
         
         expect(sent).toEqual(true);
     })
+
+    it("should show save text if new changes", async () => {
+        render(
+            <Preferences
+                agePreference={[20,30]}
+                genderPreference={[]}
+            />
+        )
+
+        expect(screen.getByText(generalText.saved)).not.toEqual(null);
+
+        await act ( () => {
+            fireEvent(screen.getByText(globals.genders[0]), "press")
+        });
+
+        expect(screen.getByText(generalText.saveChanges)).not.toEqual(null);
+    })
+
+    it("should not save if no gender selected", async () => {
+        let sent = false;
+
+        const mock = new MockAdapter(axios);
+        mock.onPost(URLs.server + URLs.editUser).reply(config => {
+            sent = true;
+            return [200]
+        })
+        render(
+            <Preferences
+                agePreference={[20,30]}
+                genderPreference={[globals.genders[0]]}
+            />
+        )
+
+        await act ( () => {
+            fireEvent(screen.getByText(globals.genders[0]), "press")
+        });
+        await act( () => {
+            fireEvent(screen.getByText(generalText.saveChanges), "press")
+        })
+
+        expect(screen.queryByText(generalText.saved)).toEqual(null);
+        expect(sent).toEqual(false);
+    })
 })

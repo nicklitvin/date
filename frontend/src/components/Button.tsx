@@ -7,6 +7,7 @@ interface Props {
     invertColor?: boolean 
     danger?: boolean
     smallButton?: boolean
+    saveChange?: boolean
 }
 
 export function MyButton(props : Props) {
@@ -29,10 +30,12 @@ export function MyButton(props : Props) {
             }}
         >
             <StyledText className={classNames(
+                "text-center",
                 props.smallButton ? "px-4 py-1 text-base" : "text-center text-lg font-bold",
                 props.danger ? "text-danger" : (
                     props.invertColor ? "text-back" : "text-front"
-                )
+                ),
+                props.saveChange ? "w-[150px]" : ""
             )}>
                 {props.text}
             </StyledText>

@@ -67,7 +67,8 @@ export const birthdayText = {
 export const generalText = {
     continue: "Continue",
     saveChanges: "Save Changes",
-    cancel: "Cancel"
+    cancel: "Cancel",
+    saved: "Saved",
 }
 
 export const genderPreferenceText = {
@@ -128,8 +129,9 @@ export const editProfileText = {
 
 export const preferencesText = {
     pageTitle: "Preferences",
-    headerGender: "Gender",
-    headerAgePreference: "Age Preference"
+    headerGender: "Gender Preference",
+    headerAgePreference: "Age Preference",
+    selectGender: "Select at least 1 gender preference",
 }
 
 export const statsText = {

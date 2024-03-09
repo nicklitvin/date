@@ -11,8 +11,8 @@ import { globals } from "../globals"
 interface Props {
     minAge: number
     maxAge: number
-    onSubmit: (input : [number, number]) => any
-    submitText: string
+    onSubmit?: (input : [number, number]) => any
+    submitText?: string
     embed?: boolean
     setMinAge?: Function
     setMaxAge?: Function
@@ -83,9 +83,9 @@ export function AgePreference(props : Props) {
         content={
             <>
                 <MyButton
-                    text={props.submitText}
+                    text={props.submitText ?? ""}
                     onPressFunction={ () => {
-                        if (minAge <= maxAge) {
+                        if (minAge <= maxAge && props.onSubmit) {
                             props.onSubmit([minAge,maxAge])
                         }
                     }}

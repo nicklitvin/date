@@ -7,15 +7,17 @@ import classNames from "classnames"
 
 interface Props {
     genders: string[]
-    onSubmit: (input : string[]) => any
-    submitText: string
+    selectedGenders?: string[]
+    onSubmit?: (input : string[]) => any
+    submitText?: string
     returnGenderCount?: (input : number) => number
     embed?: boolean
     setGenders?: Function
+    smallButtons?: boolean
 }
 
 export function GenderPreference(props : Props) {
-    const [genderPreference, setGenderPreference] = useState<string[]>([]);
+    const [genderPreference, setGenderPreference] = useState<string[]>(props.selectedGenders ?? []);
 
     useEffect( () => {
         if (props.returnGenderCount) props.returnGenderCount(genderPreference.length);
@@ -27,10 +29,11 @@ export function GenderPreference(props : Props) {
             <StyledView 
                 key={`gender-pref-${val}`} 
                 className={classNames(
-                    props.embed ? "" : "w-full items-center flex mb-3"
+                    props.embed ? "flex flex-row" : "w-full items-center flex mb-3"
                 )}
             >
                 <MyButton
+                    smallButton={props.smallButtons}
                     text={val}
                     invertColor={genderPreference.includes(val)}
                     onPressFunction={() => {
@@ -69,9 +72,9 @@ export function GenderPreference(props : Props) {
         content={
             <>
                 <MyButton
-                    text={props.submitText}
+                    text={props.submitText ?? ""}
                     onPressFunction={() => {
-                        if (genderPreference.length > 0) {
+                        if (genderPreference.length > 0 && props.onSubmit) {
                             props.onSubmit(genderPreference)
                         }
                     }}
