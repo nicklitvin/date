@@ -20,18 +20,19 @@ import { MyModal } from "../components/Modal";
 import { Matches } from "./Matches";
 import { Preferences } from "./Preferences";
 import { Stats } from "./Stats";
+import { Profile } from "./Profile";
 
 // const myUserID = "userID";
 
-// const recepientProfile : PublicProfile = {
-//     name: "Michael",
-//     age: 21,
-//     attributes: [],
-//     description: "",
-//     gender: "Male",
-//     id: "abc",
-//     images: ["https://hips.hearstapps.com/hmg-prod/images/jordan-jamming-1589896458.png?crop=0.564xw:1.00xh;0.0545xw,0&resize=1200:*"],
-// }
+const recepientProfile : PublicProfile = {
+    name: "Michael",
+    age: 21,
+    attributes: [],
+    description: "",
+    gender: "Male",
+    id: "abc",
+    images: ["https://hips.hearstapps.com/hmg-prod/images/jordan-jamming-1589896458.png?crop=0.564xw:1.00xh;0.0545xw,0&resize=1200:*"],
+}
 // const latestMessages : Message[] = [
 //     {
 //         id: "id",
@@ -164,7 +165,16 @@ export function Home() {
 
     return (
         <>
-            <Stats
+            <Profile
+                profile={recepientProfile}
+                subscription={{
+                    subscribed: false,
+                    endDate: new Date(),
+                    ID: "id"
+                }}
+
+            />
+            {/* <Stats
                 stats={{
                     allTime: {
                         dislikedMe: 10,
@@ -181,7 +191,7 @@ export function Home() {
                         }
                     ]
                 }}
-            />
+            /> */}
             {/* <Preferences
                 agePreference={[18,21]}
                 genderPreference={["Male"]}

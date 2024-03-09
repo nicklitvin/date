@@ -150,6 +150,7 @@ export const statsText = {
 export const profileText = {
     pageTitle: "Profile",
     viewProfile: "View Profile",
+    editProfile: "Edit Profile",
     managePayment: "Manage Payment",
     cancelSubscription: "Cancel Subscription",
     subscriptionStatus: "Subscription Status",

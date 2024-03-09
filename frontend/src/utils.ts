@@ -52,8 +52,12 @@ export function getBirthdayStamp(date : Date) {
 
 export function createTimeoutSignal() {
     const control = new AbortController();
-    setTimeout( () => {
+    const timeout = setTimeout( () => {
         control.abort();
-    }, globals.apiRequestTimeout * 1000).unref();
+    }, globals.apiRequestTimeout * 1000);
+    if (process.env.NODE_ENV == "test") {
+        timeout.unref()
+    }
+    
     return control.signal;
 }

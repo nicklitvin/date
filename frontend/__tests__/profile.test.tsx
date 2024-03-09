@@ -5,6 +5,7 @@ import { act, fireEvent, render, screen } from "@testing-library/react-native";
 import { ProfileMob } from "../src/pages/Profile";
 import { profileText } from "../src/text";
 import { PublicProfile, SubscriptionData } from "../src/interfaces";
+import { RootStore, createStoreProvider } from "../src/store/RootStore";
 
 describe("profile", () => {
     const profile : PublicProfile = {
@@ -34,12 +35,18 @@ describe("profile", () => {
         mock.onPost(URLs.server + URLs.getCheckoutPage).reply( config => [200, checkoutURL])
 
         const openLinkFunc = jest.fn( (input : string) => null)
+
+        const store = new RootStore();
+        const Provider = createStoreProvider(store);
         render( 
-            <ProfileMob
-                profile={profile}
-                subscription={notSubscribedData}
-                openLinkFunc={openLinkFunc}
-            />
+            <Provider value={store}>
+                <ProfileMob
+                    profile={profile}
+                    subscription={notSubscribedData}
+                    openLinkFunc={openLinkFunc}
+                />
+            </Provider>
+            
         )
 
         await act( () => {
@@ -52,12 +59,16 @@ describe("profile", () => {
     it("should not see cancel subscription", async () => {
         const mock = new MockAdapter(axios);
         mock.onPost(URLs.server + URLs.cancelSubscription).reply( config => [200])
-
-        render(
-            <ProfileMob
-                profile={profile}
-                subscription={notSubscribedData}
-            />
+        
+        const store = new RootStore();
+        const Provider = createStoreProvider(store);
+        render( 
+            <Provider value={store}>
+                <ProfileMob
+                    profile={profile}
+                    subscription={notSubscribedData}
+                />
+            </Provider>
         );
 
         expect(screen.queryByText(profileText.freeTier)).not.toEqual(null);
@@ -73,11 +84,15 @@ describe("profile", () => {
             return [200]
         })
 
-        render(
-            <ProfileMob
-                profile={profile}
-                subscription={subscriptionData}
-            />
+        const store = new RootStore();
+        const Provider = createStoreProvider(store);
+        render( 
+            <Provider value={store}>
+                <ProfileMob
+                    profile={profile}
+                    subscription={subscriptionData}
+                />
+            </Provider>
         );
 
         await act( () => {
@@ -95,12 +110,16 @@ describe("profile", () => {
         mock.onPost(URLs.server + URLs.manageSubscription).reply( config => [200, manageURL])
 
         const openLinkFunc = jest.fn( (input : string) => null)
-        render(
-            <ProfileMob
-                profile={profile}
-                subscription={subscriptionData}
-                openLinkFunc={openLinkFunc}
-            />
+        const store = new RootStore();
+        const Provider = createStoreProvider(store);
+        render( 
+            <Provider value={store}>
+                <ProfileMob
+                    profile={profile}
+                    subscription={subscriptionData}
+                    openLinkFunc={openLinkFunc}
+                />
+            </Provider>
         );
 
         await act( () => {

@@ -1,7 +1,7 @@
 import { Image } from "expo-image"
 import { StyledImage, StyledText, StyledView } from "../styledElements"
 
-type ImageName = "SendTriangle" | "Matches" | "Preferences" | "Stats";
+type ImageName = "SendTriangle" | "Matches" | "Preferences" | "Stats" | "Profile";
 
 interface Props {
     title: string
@@ -16,6 +16,7 @@ export function PageHeader(props : Props) {
     const MatchesBubble = require(`../../assets/Matches.png`);
     const Preferences = require("../../assets/Preferences.png");
     const Stats = require("../../assets/Stats.png");
+    const Profile = require("../../assets/Profile.png");
 
     let imageData;
     switch (props.imageType) {
@@ -23,6 +24,7 @@ export function PageHeader(props : Props) {
         case ("Matches"): imageData = MatchesBubble; break;
         case ("Preferences"): imageData = Preferences; break;
         case ("Stats"): imageData = Stats; break;
+        case ("Profile"): imageData = Profile; break;
     }
 
     const imageElement = props.imageSource ? 
