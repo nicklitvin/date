@@ -1,4 +1,6 @@
 TODO
+install reactnative svg for charts in next dev build
+
 stackviewer for edit attributes
 add alc/smoke/drugs attributes
 move props to global state

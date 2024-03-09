@@ -19,6 +19,7 @@ import { globals } from "../globals";
 import { MyModal } from "../components/Modal";
 import { Matches } from "./Matches";
 import { Preferences } from "./Preferences";
+import { Stats } from "./Stats";
 
 // const myUserID = "userID";
 
@@ -163,10 +164,28 @@ export function Home() {
 
     return (
         <>
-            <Preferences
+            <Stats
+                stats={{
+                    allTime: {
+                        dislikedMe: 10,
+                        likedMe: 10,
+                        myDislikes: 10,
+                        myLikes: 10
+                    },
+                    weekly: [
+                        {
+                            dislikedMe: 10,
+                            likedMe: 10,
+                            myDislikes: 10,
+                            myLikes: 10
+                        }
+                    ]
+                }}
+            />
+            {/* <Preferences
                 agePreference={[18,21]}
                 genderPreference={["Male"]}
-            />
+            /> */}
             {/* <Matches
                 chatPreviews={[]}
                 newMatches={[]}

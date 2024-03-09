@@ -100,6 +100,9 @@ export function Stats(props : Props) {
             <StyledView>
                 <PieChart
                     data={receivedDataAllTime}
+                    width={100}
+                    height={100}
+                    style={{backgroundColor: "red"}}
                 />
                 <StyledView>
                     <StyledText>{`${props.stats.allTime.likedMe} Likes Received`}</StyledText>
@@ -139,17 +142,17 @@ export function Stats(props : Props) {
         )
 
         content = (
-            <StyledView>
-                <StyledText>
+            <StyledView className="px-5">
+                <StyledText className="font-bold text-xl">
                     {statsText.allTime}
                 </StyledText>
                 {allTimeReceived}
                 {allTimeSent}
-                <StyledText>
+                <StyledText className="font-bold text-xl">
                     {statsText.weeklyReceived}
                 </StyledText>
                 {weeklyReceived}
-                <StyledText>
+                <StyledText className="font-bold text-xl">
                     {statsText.weeklySent}
                 </StyledText>
                 {weeklySent}
@@ -157,12 +160,47 @@ export function Stats(props : Props) {
         )
     }
 
+    // const data = [
+    //     {
+    //         key: 1,
+    //         value: 50,
+    //         svg: { fill: '#600080' },
+    //         arc: { outerRadius: '130%', cornerRadius: 10,  }
+    //     },
+    //     {
+    //         key: 2,
+    //         value: 50,
+    //         svg: { fill: '#9900cc' }
+    //     },
+    //     {
+    //         key: 3,
+    //         value: 40,
+    //         svg: { fill: '#c61aff' }
+    //     },
+    //     {
+    //         key: 4,
+    //         value: 95,
+    //         svg: { fill: '#d966ff' }
+    //     },
+    //     {
+    //         key: 5,
+    //         value: 35,
+    //         svg: { fill: '#ecb3ff' }
+    //     }
+    // ]
+
     return (
         <StyledView>
             <PageHeader
                 title={statsText.pageTitle}
-                imageSource=""
+                imageType="Stats"
             />
+            {/* <PieChart
+                style={{ height: 200 }}
+                outerRadius={'70%'}
+                innerRadius={10}
+                data={data}
+            /> */}
             {content}
         </StyledView>
     )
