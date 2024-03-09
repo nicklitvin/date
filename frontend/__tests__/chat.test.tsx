@@ -8,7 +8,7 @@ import { getChatTimestamp } from "../src/utils";
 import MockAdapter from "axios-mock-adapter";
 import axios from "axios";
 import { URLs } from "../src/urls";
-import { scrollToTopVal } from "../__testUtils__/easySetup";
+import { scrollVertically } from "../__testUtils__/easySetup";
 
 describe("chat", () => {
     const myUserID = "userID";
@@ -133,9 +133,8 @@ describe("chat", () => {
 
         expect(returnChatLength).toHaveLastReturnedWith(2);
 
-        const scroll = screen.getByTestId(testIDS.chatScroll);
         await act( () => {
-            fireEvent(scroll, "scroll", scrollToTopVal)
+            fireEvent(screen.getByTestId(testIDS.chatScroll), "scroll", scrollVertically)
         })
 
         expect(returnChatLength).toHaveLastReturnedWith(3);
@@ -202,9 +201,8 @@ describe("chat", () => {
             moreMessages[0].timestamp, timezone)
         )).toEqual(null);
         
-        const scroll = screen.getByTestId(testIDS.chatScroll);
         await act( () => {
-            fireEvent(scroll, "scroll", scrollToTopVal)
+            fireEvent(screen.getByTestId(testIDS.chatScroll), "scroll", scrollVertically)
         })
 
         expect(screen.queryByText(getChatTimestamp(
@@ -238,9 +236,8 @@ describe("chat", () => {
         expect(screen.queryByText(chatText.delivered)).toEqual(null);
         expect(screen.getByTestId(`readStatus-${latestMessages[0].id}`)).not.toEqual(null);
         
-        const scroll = screen.getByTestId(testIDS.chatScroll);
         await act( () => {
-            fireEvent(scroll, "scroll", scrollToTopVal)
+            fireEvent(screen.getByTestId(testIDS.chatScroll), "scroll", scrollVertically)
         })
 
         expect(screen.queryByText(chatText.read)).not.toEqual(null);

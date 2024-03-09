@@ -28,7 +28,7 @@ export function Chat(props : Props) {
     const [lastSentChatID, setLastSentChatID] = useState<string>("");
     const { globalState } = useStore();
     const scrollRef = useRef<ScrollView>(null);
-    const [chatRequestTime, setChatRequestTime] = useState<Date>(new Date());
+    const [chatRequestTime, setChatRequestTime] = useState<Date>(new Date(0));
     const [sendingChats, setSendingChats] = useState<Message[]>([]);
     const [unsentChats, setUnsentChats] = useState<string[]>([]);
     const [currentID, setCurrentID] = useState<number>(0);

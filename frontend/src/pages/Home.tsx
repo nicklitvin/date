@@ -163,13 +163,13 @@ export function Home() {
     return (
         <>
             <Matches
-                chatPreviews={chatPreviews}
+                chatPreviews={[]}
                 newMatches={newMatches}
             />
-            {/* <Chat
-                latestMessages={latestMessages1}
+            <Chat
+                latestMessages={[]}
                 publicProfile={recepientProfile}
-            /> */}
+            />
             {/* <Pictures
                 onSubmit={() => {}}
                 submitText="submit"

@@ -1,7 +1,7 @@
 import { act, fireEvent, render, screen } from "@testing-library/react-native"
 import { MatchesMob } from "../src/pages/Matches";
 import { ChatPreview, Message, NewMatch, NewMatchDataInput, PublicProfile } from "../src/interfaces";
-import { makePublicProfile, makeSentMessage } from "../__testUtils__/easySetup";
+import { makePublicProfile, makeSentMessage, scrollHorizontally, scrollVertically } from "../__testUtils__/easySetup";
 import { testIDS } from "../src/testIDs";
 import MockAdapter from "axios-mock-adapter";
 import axios from "axios";
@@ -42,9 +42,8 @@ describe("matches", () => {
 
         expect(getNewMatchLength).toHaveLastReturnedWith(2);
         
-        const scroll = screen.getByTestId(testIDS.newMatchScroll);
         await act( () => {
-            fireEvent(scroll, "scrollToTop")
+            fireEvent(screen.getByTestId(testIDS.newMatchScroll), "scroll", scrollHorizontally)
         })
 
         expect(getNewMatchLength).toHaveLastReturnedWith(3);
@@ -92,9 +91,8 @@ describe("matches", () => {
         
         expect(getChatPreviewLength).toHaveLastReturnedWith(2);
 
-        const scroll = screen.getByTestId(testIDS.chatPreviewScroll);
         await act( () => {
-            fireEvent(scroll, "scrollToTop");
+            fireEvent(screen.getByTestId(testIDS.chatPreviewScroll), "scroll", scrollVertically);
         });
 
         expect(getChatPreviewLength).toHaveLastReturnedWith(3);

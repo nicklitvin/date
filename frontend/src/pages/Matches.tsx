@@ -26,8 +26,8 @@ export function Matches(props : Props) {
     const [chatPreviews, setChatPreviews] = useState<ChatPreview[]>(props.chatPreviews ?? []);
     const newMatchScrollRef = useRef<ScrollView>(null);
     const chatsScrollRef = useRef<ScrollView>(null);
-    const [matchRequestTime, setMatchRequestTime] = useState<Date>(new Date());
-    const [previewRequestTime, setPreviewRequestTime] = useState<Date>(new Date());
+    const [matchRequestTime, setMatchRequestTime] = useState<Date>(new Date(0));
+    const [previewRequestTime, setPreviewRequestTime] = useState<Date>(new Date(0));
 
     useEffect( () => {
         if (props.returnNewChatPreviewsLength) {
@@ -75,7 +75,6 @@ export function Matches(props : Props) {
         const scrollHeight = contentSize.height - layoutMeasurement.height;
         const isAtBottom = contentOffset.y >= scrollHeight * globals.scrollAtPercentage;
         const canSend = differenceInSeconds(new Date(), previewRequestTime) > globals.apiRequestTimeout;
-
         if (!(isAtBottom && canSend)) return
         setPreviewRequestTime(new Date())
 
@@ -127,9 +126,9 @@ export function Matches(props : Props) {
                                 source={match.profile.images[0]}
                                 className="w-[75px] h-[75px] rounded-full"
                             />
-                            <StyledText className="text-base">
+                            {/* <StyledText className="text-base">
                                 {match.profile.name}
-                            </StyledText>
+                            </StyledText> */}
                         </StyledButton>
                     ))}
                 </StyledScroll>

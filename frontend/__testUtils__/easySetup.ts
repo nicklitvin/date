@@ -38,4 +38,30 @@ export const makeReceivedMessage = (
     userID: sentID
 })
 
-export const scrollToTopVal = {nativeEvent: {contentOffset: {y: 0}}};
+interface ScrollEvent {
+    contentOffset: {x?: number, y?: number}
+    layoutMeasurement: {width?: number, height?: number}
+    contentSize: {width?: number, height?: number}
+}
+
+export const scrollVertically : {nativeEvent : ScrollEvent} = {
+    nativeEvent: {
+        contentOffset: {y: 0},
+        contentSize: {height: 0},
+        layoutMeasurement: {height: 0}
+    }
+}
+
+export const scrollHorizontally : {nativeEvent : ScrollEvent} = {
+    nativeEvent: {
+        contentOffset: {x: 0},
+        contentSize: {width: 0},
+        layoutMeasurement: {width: 0}
+    }
+}
+
+// export const scrollToTopVal = {nativeEvent: {
+//     contentOffset: {y: 0},
+//     layoutMeasurement: 
+// }};
+// export const scrollToBotVal = {nativeEvent: {contentOffset: {y: 9999}}};

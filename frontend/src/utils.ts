@@ -54,6 +54,6 @@ export function createTimeoutSignal() {
     const control = new AbortController();
     setTimeout( () => {
         control.abort();
-    }, globals.apiRequestTimeout * 1000);
+    }, globals.apiRequestTimeout * 1000).unref();
     return control.signal;
 }
