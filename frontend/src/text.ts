@@ -137,14 +137,19 @@ export const preferencesText = {
 export const statsText = {
     pageTitle: "Stats",
     purchaseButton: "Purchase Premium",
-    purchaseText: `
-        Want to see how many people like/dislike your profile?
-        Want to see your improvement over the last few weeks?
-        Want improved visibility of your profile?
-    `,
-    allTime: "All Time",
+    purchaseText: [
+        "Want to see how many people like/dislike your profile?",
+        "Want to see your improvement over the last few weeks?",
+        "Want improved visibility of your profile?",
+    ],
+    allTimeReceived: "All Time Received",
+    allTimeSent: "All Time Sent",
     weeklyReceived: "Weekly Received",
-    weeklySent: "Weekly Sent"
+    weeklySent: "Weekly Sent",
+    likesReceived: "likes received",
+    dislikesReceived: "dislikes received",
+    likesSent: "likes sent",
+    dislikesSent: "dislikes sent",
 }
 
 export const profileText = {

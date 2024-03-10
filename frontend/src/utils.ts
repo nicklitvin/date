@@ -18,7 +18,7 @@ export function getChatTimestamp(date : Date, timezone : string) {
     return timestamp;
 }
 
-export function getShortDate(date : Date, timezone : string) {
+export function getShortDate(date : Date, timezone? : string) {
     let timestamp = date.toLocaleString(undefined, {
         month: "short",
         day: "numeric",
