@@ -55,4 +55,5 @@ export const globals = {
     green: "#4A991A",
     red: "#B81515",
     dark: "#222222",
+    light: "#F3F0E7"
 }

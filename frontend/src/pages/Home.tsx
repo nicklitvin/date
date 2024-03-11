@@ -2,6 +2,8 @@ import { observer } from "mobx-react-lite";
 import { LineChart, PieChart } from "react-native-gifted-charts";
 import { globals } from "../globals";
 import { Stats } from "./Stats";
+import { Settings } from "./Settings";
+import { MyButton } from "../components/Button";
 
 // const myUserID = "userID";
 
@@ -144,44 +146,58 @@ import { Stats } from "./Stats";
 export function Home() {
     return (
         <>
-            <Stats
-                stats={{
-                    allTime: {
-                        dislikedMe: 10,
-                        likedMe: 20,
-                        myDislikes: 30,
-                        myLikes: 40
-                    },
-                    weekly: [
-                        {
-                            dislikedMe: 10,
-                            likedMe: 20,
-                            myDislikes: 30,
-                            myLikes: 40
-                        },
-                        {
-                            dislikedMe: 40,
-                            likedMe: 30,
-                            myDislikes: 20,
-                            myLikes: 10
-                        },
-                        {
-                            dislikedMe: 30,
-                            likedMe: 40,
-                            myDislikes: 10,
-                            myLikes: 20
-                        },
-                        {
-                            dislikedMe: 20,
-                            likedMe: 10,
-                            myDislikes: 40,
-                            myLikes: 30
-                        },
-                    ]
-                }}
-            />
+            <Settings settings={[
+                {
+                    title: "notification",
+                    value: true
+                }, 
+                {
+                    title: "notification1",
+                    value: false
+                }, 
+            ]}/>
         </>
     )
 }
 
 export const HomeMob = observer(Home);
+
+/*
+
+<Stats
+    stats={{
+        allTime: {
+            dislikedMe: 10,
+            likedMe: 20,
+            myDislikes: 30,
+            myLikes: 40
+        },
+        weekly: [
+            {
+                dislikedMe: 10,
+                likedMe: 20,
+                myDislikes: 30,
+                myLikes: 40
+            },
+            {
+                dislikedMe: 40,
+                likedMe: 30,
+                myDislikes: 20,
+                myLikes: 10
+            },
+            {
+                dislikedMe: 30,
+                likedMe: 40,
+                myDislikes: 10,
+                myLikes: 20
+            },
+            {
+                dislikedMe: 20,
+                likedMe: 10,
+                myDislikes: 40,
+                myLikes: 30
+            },
+        ]
+    }}
+/>
+*/

@@ -167,5 +167,7 @@ export const profileText = {
 export const settingsText = {
     pageTitle: "Settings",
     signOut: "Sign Out",
-    deleteAccount: "Delete Account"
+    deleteAccount: "Delete Account",
+    modalTitle: "Are you sure you want to delete your account?",
+    modalDelete: "Confirm Delete",
 }

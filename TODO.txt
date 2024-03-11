@@ -1,4 +1,6 @@
 TODO
+next apk install: react hot toast
+
 stackviewer for edit attributes
 add alc/smoke/drugs attributes
 move props to global state
