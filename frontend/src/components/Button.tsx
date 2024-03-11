@@ -8,6 +8,7 @@ interface Props {
     danger?: boolean
     smallButton?: boolean
     saveChange?: boolean
+    fullSize?: boolean
 }
 
 export function MyButton(props : Props) {
@@ -16,7 +17,10 @@ export function MyButton(props : Props) {
             onPress={props.onPressFunction}
             className={classNames(
                 "border border-front",
-                props.smallButton ? "m-1 rounded-3xl" : "w-3/5 rounded-[50px] px-10 py-3",
+                props.smallButton ? "m-1 rounded-3xl" : ( props.fullSize ? 
+                    "w-full rounded-xl p-3" :
+                    "w-3/5 rounded-[50px] px-10 py-3"
+                ),
                 props.invertColor ? "bg-front" : "bg-back",
             )}
             style={{
@@ -30,8 +34,11 @@ export function MyButton(props : Props) {
             }}
         >
             <StyledText className={classNames(
-                "text-center",
-                props.smallButton ? "px-4 py-1 text-base" : "text-center text-lg font-bold",
+                props.smallButton ? "px-4 py-1 text-base text-center" : (
+                    props.fullSize ? 
+                    "text-start text-lg" :
+                    "text-center text-lg font-bold"
+                ),
                 props.danger ? "text-danger" : (
                     props.invertColor ? "text-back" : "text-front"
                 ),

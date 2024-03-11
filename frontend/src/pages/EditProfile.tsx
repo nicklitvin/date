@@ -2,21 +2,20 @@ import { observer } from "mobx-react-lite";
 import { PageHeader } from "../components/PageHeader";
 import { editProfileText } from "../text";
 import { useEffect, useState } from "react";
-import { StyledButton, StyledText, StyledView } from "../styledElements";
+import { StyledButton, StyledImage, StyledScroll, StyledText, StyledView } from "../styledElements";
 import { globals } from "../globals";
 import { Picture } from "../components/Picture";
 import axios from "axios";
-import { DeleteImageInput, EditUserInput, FileUploadAndURI, UploadImageInput } from "../interfaces";
+import { DeleteImageInput, EditUserInput, FileUploadAndURI, PublicProfile, UploadImageInput } from "../interfaces";
 import { URLs } from "../urls";
 import { MediaTypeOptions, launchImageLibraryAsync } from "expo-image-picker";
 import { EncodingType, readAsStringAsync } from "expo-file-system";
 import { MyTextInput } from "../components/TextInput";
 import { MyButton } from "../components/Button";
+import { Spacing } from "../components/Spacing";
 
 interface Props {
-    uploadURLs: string[]
-    description: string
-    attributes: string[]
+    profile: PublicProfile
     uploadImageData?: FileUploadAndURI
     returnUploadURLsLength?: (input : number) => number
     returnDescription?: (input : string) => string
@@ -24,10 +23,10 @@ interface Props {
 }
 
 export function EditProfile(props : Props) {
-    const [uploadURLs, setUploadURLs] = useState<string[]>(props.uploadURLs);
+    const [uploadURLs, setUploadURLs] = useState<string[]>(props.profile.images);
     const [switchURL, setSwitchURL] = useState<string|null>(null);
-    const [description, setDescription] = useState<string>(props.description);
-    const [attributes, setAttributes] = useState<string[]>(props.attributes);
+    const [description, setDescription] = useState<string>(props.profile.description);
+    const [attributes, setAttributes] = useState<string[]>(props.profile.attributes);
 
     useEffect( () => {
         if (props.returnUploadURLsLength) props.returnUploadURLsLength(uploadURLs.length);
@@ -133,59 +132,77 @@ export function EditProfile(props : Props) {
     }
 
     return (
-        <>
+        <StyledScroll>
+        <StyledView>
             <PageHeader
                 title={editProfileText.pageTitle}
-                imageSource=""
+                imageType="Edit"
             />
-            <StyledView>
-                <StyledText>
-                    {editProfileText.headerPictures}
-                </StyledText>
-                {Array.from({length: globals.maxUploads}).map( (_,index) => (
-                    index < props.uploadURLs.length ? 
+            <StyledView className="w-full px-5">
+
+            <StyledText className="font-bold text-xl">
+                {editProfileText.headerPictures}
+            </StyledText>
+            <StyledView className="w-full flex flex-wrap flex-row items-center">
+            {Array.from({length: globals.maxUploads}).map( (_,index) => (
+                index < uploadURLs.length ? 
+                <StyledView className="m-2" key={`edit-${uploadURLs[index]}`}>
                     <Picture
-                        key={`edit-${uploadURLs[index]}`}
                         source={uploadURLs[index]}
-                        onPress={() => switchImage(uploadURLs[index])}
-                        onRemove={() => removeImage(uploadURLs[index])}
-                        switching={uploadURLs[index] == switchURL}
-                    /> :
-                    <StyledButton
-                        key={`edit-empty-${index}`}
-                        testID={`edit-empty-${index}`}
-                        onPress={uploadImage}
+                        switching={false}
+                        disable={true}
                     />
-                ))}
+                </StyledView> :    
+                <StyledView 
+                    className="w-[102px] h-[136px] rounded-xl border border-front m-2"
+                    key={`edit-empty-${index}`}
+                />
+            ))}
             </StyledView>
-            <StyledView>
-                <StyledText>
-                    {editProfileText.headerDescription}
-                </StyledText>
-                    <MyTextInput
-                        initialInput={description}
-                        errorMessage={editProfileText.descriptionError}
-                        onSubmit={editDescription}
-                        placeholder={editProfileText.descriptionPlaceholder}
-                    />
-            </StyledView>
-            <StyledView>
-                <StyledText>
-                    {editProfileText.headerAttributes}
-                </StyledText>
-                {attributes.map( val => (
-                    <StyledText
-                        key={`attribute-${val}`}
-                    >
-                        {val}
-                    </StyledText>
-                ))}
+            <Spacing size="md"/>
+            <StyledView className="w-full items-center flex">
                 <MyButton
-                    text={editProfileText.attributeButton}
-                    onPressFunction={editAttributes}
+                    text={editProfileText.editImages}
+                    onPressFunction={() => {}}
                 />
             </StyledView>
-        </>
+            <Spacing size="lg"/>
+            <StyledText className="font-bold text-xl">    
+                {editProfileText.headerDescription}
+            </StyledText>
+            <Spacing size="md"/>
+            <MyButton
+                text={description}
+                onPressFunction={() => {}}
+                fullSize={true}
+            />
+            <Spacing size="lg"/>
+            <StyledText className="font-bold text-xl">
+                {editProfileText.headerAttributes}
+            </StyledText>
+            <Spacing size="md"/>
+            <StyledView className="flex flex-start w-full flex-row flex-wrap">
+                {attributes.map( val => (
+                    <MyButton
+                        key={`attribute-${val}`}
+                        text={val}
+                        onPressFunction={() => {}}
+                        smallButton={true}
+                    />
+                ))}
+            </StyledView>
+            <Spacing size="lg"/>
+            <StyledView className="w-full flex items-center">
+                <MyButton
+                    text={editProfileText.editAttributes}
+                    onPressFunction={() => {}}
+                />
+            </StyledView>
+            <Spacing size="lg"/>
+
+            </StyledView>
+        </StyledView>
+        </StyledScroll>
     )
 }
 

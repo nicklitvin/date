@@ -6,8 +6,9 @@ import { globals } from "../globals";
 interface Props {
     switching: boolean
     source: string
-    onRemove: () => any
-    onPress: () => any
+    onRemove?: () => any
+    onPress?: () => any
+    disable?: boolean
 }
 
 export function Picture(props : Props) {
@@ -17,6 +18,7 @@ export function Picture(props : Props) {
         testID={`picture-${props.source}`}
     >
         <StyledButton
+            disabled={props.disable}
             className={`flex justify-start items-start w-[${globals.pictureWidth}px] 
             h-[${globals.pictureHeight}px]`
             }
@@ -41,6 +43,7 @@ export function Picture(props : Props) {
         testID={`picture-${props.source}`}
     >
         <StyledButton
+            disabled={props.disable}
             onPress={props.onPress}
         >
             <StyledImage
@@ -53,10 +56,12 @@ export function Picture(props : Props) {
             testID={`remove-${props.source}`}
             onPress={props.onRemove}
         >
-            <StyledImage
-                source={require("../../assets/Dislike.png")}
-                className="w-8 h-8"
-            />
+            {props.disable ? null :
+                <StyledImage
+                    source={require("../../assets/Dislike.png")}
+                    className="w-8 h-8"
+                />
+            }
         </StyledButton>
     </StyledView>
 }

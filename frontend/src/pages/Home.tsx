@@ -5,18 +5,20 @@ import { Stats } from "./Stats";
 import { Settings } from "./Settings";
 import { MyButton } from "../components/Button";
 import { Verification } from "./Verification";
+import { EditProfile } from "./EditProfile";
+import { PublicProfile } from "../interfaces";
 
 // const myUserID = "userID";
 
-// const recepientProfile : PublicProfile = {
-//     name: "Michael",
-//     age: 21,
-//     attributes: [],
-//     description: "",
-//     gender: "Male",
-//     id: "abc",
-//     images: ["https://hips.hearstapps.com/hmg-prod/images/jordan-jamming-1589896458.png?crop=0.564xw:1.00xh;0.0545xw,0&resize=1200:*"],
-// }
+const recepientProfile : PublicProfile = {
+    name: "Michael",
+    age: 21,
+    attributes: ["asd","asrqd", "asdnw", "ajshdkasdsa", "ajljshdwgeiqw"],
+    description: "this is a desceiption askdh askdjh aks dhsk ds dkas daksj daks kad jhask dajsh kasdhjasdhask das dhaskd ask dashd ",
+    gender: "Male",
+    id: "abc",
+    images: ["https://hips.hearstapps.com/hmg-prod/images/jordan-jamming-1589896458.png?crop=0.564xw:1.00xh;0.0545xw,0&resize=1200:*"],
+}
 // const latestMessages : Message[] = [
 //     {
 //         id: "id",
@@ -147,8 +149,8 @@ import { Verification } from "./Verification";
 export function Home() {
     return (
         <>
-            <Verification
-                currentPage={1}
+            <EditProfile
+                profile={recepientProfile}
             />
         </>
     )

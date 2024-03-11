@@ -126,7 +126,10 @@ export const editProfileText = {
     headerAttributes: "Attributes",
     descriptionPlaceholder: "Type your description here...",
     descriptionError: "Invalid Description",
-    attributeButton: "Change Attributes"
+    attributeButton: "Change Attributes",
+
+    editImages: "Edit Images",
+    editAttributes: "Edit Attributes",
 }
 
 export const preferencesText = {
