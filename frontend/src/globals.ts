@@ -5,7 +5,6 @@ export const globals = {
     maxUploads: 6,
     maxAttributes: 5,
     timeBeforeChatTimestamp: 1000 * 60 * 60,
-    minutesBeforeResend: 1,
     settingImages: "images",
     settingDescription: "description",
     settingGenderPreference: "gender preference",
@@ -18,6 +17,7 @@ export const globals = {
     maxPictureSize: 1024*1024*1,
     scrollAtPercentage: 0.95,
     apiRequestTimeout: 2,
+    resendVerificationTimeout: 10,
 
     attributes: {
         "Sports": [

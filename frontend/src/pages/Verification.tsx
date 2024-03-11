@@ -8,21 +8,29 @@ import { MySimplePage } from "../components/SimplePage";
 import { eduEmailText, verifyCodeText } from "../text";
 import { MyTextInput } from "../components/TextInput";
 import { MyButton } from "../components/Button";
-import { differenceInMinutes } from "date-fns";
+import { differenceInMinutes, differenceInSeconds } from "date-fns";
 import { globals } from "../globals";
 
 interface Props {
     currentPage?: number
     eduEmail?: string
-    lastSend? : Date
     returnCurrentPage?: (input : number) => number
+    returnSeconds?: (input : number) => any
+    customSeconds?: number
 }
 
 export function Verification(props : Props) {
     const [currentPage, setCurrentPage] = useState<number>(props.currentPage ?? 0);
     const [eduEmail, setEduEmail] = useState<string>(props.eduEmail ?? "");
-    const [lastSend, setLastSend] = useState<Date>(props.lastSend ?? new Date());
     const {globalState} = useStore();
+    const [seconds, setSeconds] = useState<number>(props.customSeconds ?? globals.resendVerificationTimeout);
+
+    useEffect( () => {
+        if (props.returnSeconds) props.returnSeconds(seconds);
+        if (seconds == 0) return
+        const timer = setTimeout( () => setSeconds(seconds - 1), 1000);
+        return () => clearTimeout(timer);
+    }, [seconds])
 
     useEffect( () => {
         if (props.returnCurrentPage) props.returnCurrentPage(currentPage);
@@ -62,14 +70,14 @@ export function Verification(props : Props) {
     }
 
     const resendCode = async () => {
-        if (differenceInMinutes(new Date(), lastSend) < globals.minutesBeforeResend) return 
+        if (seconds > 0) return
 
         try {
             const input : NewCodeInput = {
                 personalEmail: globalState.email!
             }
             await axios.post(URLs.server + URLs.newCode, input);
-            setLastSend(new Date());
+            setSeconds(globals.resendVerificationTimeout)
 
         } catch (err) {
             console.log(err);
@@ -81,6 +89,7 @@ export function Verification(props : Props) {
             return <MySimplePage
                 title={eduEmailText.pageTitle}
                 subtitle={eduEmailText.pageSubtitle}
+                marginTop="Keyboard"
                 content={<MyTextInput
                     placeholder={eduEmailText.inputPlaceholder}
                     errorMessage={eduEmailText.inputError}
@@ -91,6 +100,7 @@ export function Verification(props : Props) {
             return <MySimplePage
                 title={verifyCodeText.pageTitle}
                 subtitle={verifyCodeText.pageSubtitle}
+                marginTop="Keyboard"
                 content={
                 <>
                     <MyTextInput
@@ -100,7 +110,11 @@ export function Verification(props : Props) {
                     />
                     <MyButton
                         onPressFunction={resendCode}
-                        text={verifyCodeText.resendButton}
+                        text={seconds == 0 ? 
+                            verifyCodeText.resendButton :
+                            `${verifyCodeText.resending} ${seconds}s`
+                        }
+                        invertColor={seconds > 0}
                     />
                 </>
                 }

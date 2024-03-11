@@ -114,7 +114,9 @@ export const verifyCodeText = {
     pageSubtitle: "Check your university email account, What is the 4 digit code?",
     inputPlaceholder: "Type the 4-digit code here...",
     inputError: "Invalid Code",
-    resendButton: "Resend Code"
+    resendButton: "Resend Code",
+    resending: "Resend in"
+
 }
 
 export const editProfileText = {

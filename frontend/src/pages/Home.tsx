@@ -4,6 +4,7 @@ import { globals } from "../globals";
 import { Stats } from "./Stats";
 import { Settings } from "./Settings";
 import { MyButton } from "../components/Button";
+import { Verification } from "./Verification";
 
 // const myUserID = "userID";
 
@@ -146,16 +147,9 @@ import { MyButton } from "../components/Button";
 export function Home() {
     return (
         <>
-            <Settings settings={[
-                {
-                    title: "notification",
-                    value: true
-                }, 
-                {
-                    title: "notification1",
-                    value: false
-                }, 
-            ]}/>
+            <Verification
+                currentPage={1}
+            />
         </>
     )
 }
@@ -200,4 +194,15 @@ export const HomeMob = observer(Home);
         ]
     }}
 />
+
+<Settings settings={[
+    {
+        title: "notification",
+        value: true
+    }, 
+    {
+        title: "notification1",
+        value: false
+    }, 
+]}/>
 */

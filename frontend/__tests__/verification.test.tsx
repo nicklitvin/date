@@ -6,6 +6,7 @@ import axios from "axios";
 import { URLs } from "../src/urls";
 import { ConfirmVerificationInput, NewCodeInput, NewVerificationInput } from "../src/interfaces";
 import { RootStore, createStoreProvider } from "../src/store/RootStore";
+import { globals } from "../src/globals";
 
 describe("verification", () => {
     it("should send verification code", async () => {
@@ -105,6 +106,7 @@ describe("verification", () => {
                 <VerificationMob
                     currentPage={1}
                     eduEmail={eduEmail}
+                    customSeconds={0}
                 />
             </StoreProvider>
         );
@@ -136,13 +138,14 @@ describe("verification", () => {
         const store = new RootStore();
         store.globalState.setEmail(personalEmail);
         const StoreProvider = createStoreProvider(store);
-
+        const returnSeconds = jest.fn();
         render(
             <StoreProvider value={store}>
                 <VerificationMob
                     currentPage={1}
                     eduEmail={eduEmail}
-                    lastSend={new Date(0)}
+                    customSeconds={0}
+                    returnSeconds={returnSeconds}
                 />
             </StoreProvider>
         );
@@ -152,17 +155,11 @@ describe("verification", () => {
         })
 
         expect(sent).toEqual(true);
+        expect(returnSeconds).toHaveBeenLastCalledWith(globals.resendVerificationTimeout);
     })
 
     it("should not resend code too quickly", async () => {
         const personalEmail = "a@gmail.com";
-        let sent = false
-
-        const mock = new MockAdapter(axios);
-        mock.onPost(URLs.server + URLs.newCode).reply( config => {
-            sent = true;
-            return [200]
-        })
         
         const store = new RootStore();
         store.globalState.setEmail(personalEmail);
@@ -172,17 +169,11 @@ describe("verification", () => {
             <StoreProvider value={store}>
                 <VerificationMob
                     currentPage={1}
+                    customSeconds={10}
                 />
             </StoreProvider>
         );
 
-        await act( () => {
-            fireEvent(screen.getByText(verifyCodeText.resendButton), "press");
-        })
-        await act( () => {
-            fireEvent(screen.getByText(verifyCodeText.resendButton), "press");
-        })
-
-        expect(sent).toEqual(false);
+        expect(screen.queryByText(verifyCodeText.resendButton)).toEqual(null);
     })
 })
