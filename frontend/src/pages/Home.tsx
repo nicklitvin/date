@@ -7,6 +7,8 @@ import { MyButton } from "../components/Button";
 import { Verification } from "./Verification";
 import { EditProfile } from "./EditProfile";
 import { PublicProfile } from "../interfaces";
+import { ProfileView } from "./ProfileView";
+import { PictureSeries } from "../components/PictureSeries";
 
 // const myUserID = "userID";
 
@@ -17,7 +19,10 @@ const recepientProfile : PublicProfile = {
     description: "this is a desceiption askdh askdjh aks dhsk ds dkas daksj daks kad jhask dajsh kasdhjasdhask das dhaskd ask dashd ",
     gender: "Male",
     id: "abc",
-    images: ["https://hips.hearstapps.com/hmg-prod/images/jordan-jamming-1589896458.png?crop=0.564xw:1.00xh;0.0545xw,0&resize=1200:*"],
+    images: [
+        "https://hips.hearstapps.com/hmg-prod/images/jordan-jamming-1589896458.png?crop=0.564xw:1.00xh;0.0545xw,0&resize=1200:*",
+        "https://pbs.twimg.com/profile_images/1262372966073016321/DH4rOj9S_400x400.jpg"
+    ],
 }
 // const latestMessages : Message[] = [
 //     {
@@ -149,8 +154,9 @@ const recepientProfile : PublicProfile = {
 export function Home() {
     return (
         <>
-            <EditProfile
+            <ProfileView
                 profile={recepientProfile}
+                isInSwipeFeed={false}
             />
         </>
     )
@@ -197,14 +203,5 @@ export const HomeMob = observer(Home);
     }}
 />
 
-<Settings settings={[
-    {
-        title: "notification",
-        value: true
-    }, 
-    {
-        title: "notification1",
-        value: false
-    }, 
-]}/>
+
 */
