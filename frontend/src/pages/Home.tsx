@@ -172,9 +172,9 @@ const profile2 : PublicProfile = {
 export function Home() {
     return (
         <>
-            <AccountCreationMob
+            {/* <AccountCreationMob
                 customPageStart={6}        
-            />
+            /> */}
             {/* <Alcohol
                 onSubmit={(input : string) => console.log(input)}
             /> */}
@@ -184,10 +184,10 @@ export function Home() {
                     profile2
                 ]}
             /> */}
-            {/* <ProfileView
+            <ProfileView
                 profile={recepientProfile}
                 isInSwipeFeed={false}
-            /> */}
+            />
         </>
     )
 }

@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { StyledScroll, StyledText, StyledView } from "../styledElements";
+import { StyledButton, StyledImage, StyledScroll, StyledText, StyledView } from "../styledElements";
 import { PageHeader } from "../components/PageHeader";
 import { profileViewText } from "../text";
 import { PublicProfile, SwipeInput } from "../interfaces";
@@ -10,6 +10,7 @@ import { PictureSeries } from "../components/PictureSeries";
 import { Spacing } from "../components/Spacing";
 import { MyButton } from "../components/Button";
 import { createTimeoutSignal } from "../utils";
+import { Frequency } from "../components/Frequency";
 
 interface Props {
     isInSwipeFeed: boolean
@@ -63,6 +64,12 @@ export function ProfileView(props : Props) {
                 <StyledText className="text-xl">
                     {props.profile.description}
                 </StyledText>
+                <Spacing size="md"/>
+                <StyledView className="flex flex-wrap flex-row w-full">
+                    <Frequency frequency={props.profile.alcohol} habit="Alcohol"/>
+                    <StyledView className="w-3"/>
+                    <Frequency frequency={props.profile.smoking} habit="Smoking"/>
+                </StyledView>
                 <Spacing size="md"/>
                 <StyledView className="flex flex-wrap flex-row w-full">
                     {props.profile.attributes.map( attribute => (
