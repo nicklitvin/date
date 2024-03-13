@@ -18,6 +18,7 @@ export const globals = {
     scrollAtPercentage: 0.95,
     apiRequestTimeout: 2,
     resendVerificationTimeout: 10,
+    fadeDuration: 500,
 
     attributes: {
         "Sports": [

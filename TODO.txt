@@ -1,5 +1,5 @@
 TODO
-next apk install: react hot toast
+next apk install: react hot toast, stack and tab navigators
 
 stackviewer for edit attributes
 add alc/smoke/drugs attributes (icons with cross out if dont do it)

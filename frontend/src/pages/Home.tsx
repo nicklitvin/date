@@ -9,6 +9,7 @@ import { EditProfile } from "./EditProfile";
 import { PublicProfile } from "../interfaces";
 import { ProfileView } from "./ProfileView";
 import { PictureSeries } from "../components/PictureSeries";
+import { FeedMob } from "./Feed";
 
 // const myUserID = "userID";
 
@@ -21,6 +22,17 @@ const recepientProfile : PublicProfile = {
     id: "abc",
     images: [
         "https://hips.hearstapps.com/hmg-prod/images/jordan-jamming-1589896458.png?crop=0.564xw:1.00xh;0.0545xw,0&resize=1200:*",
+        "https://pbs.twimg.com/profile_images/1262372966073016321/DH4rOj9S_400x400.jpg"
+    ],
+}
+const profile2 : PublicProfile = {
+    name: "Nick",
+    age: 19,
+    attributes: ["Music"],
+    description: "this is short",
+    gender: "Female",
+    id: "asd",
+    images: [
         "https://pbs.twimg.com/profile_images/1262372966073016321/DH4rOj9S_400x400.jpg"
     ],
 }
@@ -154,10 +166,16 @@ const recepientProfile : PublicProfile = {
 export function Home() {
     return (
         <>
-            <ProfileView
+            <FeedMob
+                feed={[
+                    recepientProfile,
+                    profile2
+                ]}
+            />
+            {/* <ProfileView
                 profile={recepientProfile}
                 isInSwipeFeed={false}
-            />
+            /> */}
         </>
     )
 }

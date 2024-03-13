@@ -1,6 +1,6 @@
 import { StyledImage, StyledText, StyledView } from "../styledElements"
 
-type ImageName = "SendTriangle" | "Matches" | "Preferences" | "Stats" | "Profile" | "Settings" | "Edit" | "Telescope";
+type ImageName = "SendTriangle" | "Matches" | "Preferences" | "Stats" | "Profile" | "Settings" | "Edit" | "Telescope" | "Feed";
 
 interface Props {
     title: string
@@ -19,6 +19,7 @@ export function PageHeader(props : Props) {
     const Settings = require("../../assets/Setting.png");
     const Edit = require("../../assets/Edit.png");
     const Telesceope = require("../../assets/Telescope.png");
+    const Feed = require("../../assets/Feed.png");
 
     let imageData;
     switch (props.imageType) {
@@ -30,6 +31,7 @@ export function PageHeader(props : Props) {
         case ("Settings"): imageData = Settings; break; 
         case ("Edit"): imageData = Edit; break;
         case ("Telescope"): imageData = Telesceope; break;
+        case ("Feed"): imageData = Feed; break;
     }
 
     const imageElement = props.imageSource ? 

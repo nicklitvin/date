@@ -23,6 +23,7 @@ describe("feed", () => {
             <FeedMob
                 feed={feed}
                 returnFeedIndex={getFeedIndex}
+                disableFade={true}
             />
         )
 
@@ -46,6 +47,7 @@ describe("feed", () => {
         render(
             <FeedMob
                 feed={[]}
+                disableFade={true}
             />
         )
     })
@@ -67,6 +69,7 @@ describe("feed", () => {
             <FeedMob
                 feed={initialFeed}
                 returnFeedLength={getFeedLength}
+                disableFade={true}
             />
         )
 

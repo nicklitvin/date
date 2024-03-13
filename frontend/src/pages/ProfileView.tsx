@@ -14,19 +14,25 @@ import { createTimeoutSignal } from "../utils";
 interface Props {
     isInSwipeFeed: boolean
     profile : PublicProfile
-    afterSwipe? : Function
+    afterSwipe?: Function
+    ignoreRequest?: boolean
+    disableSwiping?: boolean
 }
 
 export function ProfileView(props : Props) {
     const makeSwipe = async (opinion : Action) => {
+        if (props.disableSwiping) return
+
         try {
             const input : SwipeInput = {
                 swipedUserID: props.profile.id,
                 action: opinion
             }
-            await axios.post(URLs.server + URLs.makeSwipe, input, {
-                signal: createTimeoutSignal()
-            });
+            if (!props.ignoreRequest) {
+                await axios.post(URLs.server + URLs.makeSwipe, input, {
+                    signal: createTimeoutSignal()
+                });
+            }
 
             if (props.afterSwipe) props.afterSwipe();
         } catch (err) {
