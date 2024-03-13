@@ -15,6 +15,7 @@ interface Props {
     embed?: boolean
     setGenders?: Function
     smallButtons?: boolean
+    goBack?: () => any
 }
 
 export function GenderPreference(props : Props) {
@@ -65,6 +66,7 @@ export function GenderPreference(props : Props) {
     return <MySimplePage
         title={genderPreferenceText.pageTitle}
         subtitle={genderPreferenceText.pageSubtitle}
+        goBackFunc={props.goBack}
         beforeGapContent={
             <>
                 {makeContent()}

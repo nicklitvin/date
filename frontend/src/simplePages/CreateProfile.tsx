@@ -6,12 +6,14 @@ import { createProfileText } from "../text"
 interface Props {
     onSubmit : () => any
     submitText: string
+    goBack?: () => any
 }
 
 export function CreateProfile(props : Props) {
     return <MySimplePage
         title={createProfileText.pageTitle}
         subtitle={createProfileText.pageSubtitle}
+        goBackFunc={props.goBack}
         content={
             <StyledView className="w-full flex items-center">
                 <MyButton

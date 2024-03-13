@@ -8,15 +8,18 @@ import { Spacing } from "../components/Spacing";
 
 interface Props {
     onSubmit: (input : string) => any
+    goBack?: () => any
+    input?: string
 }
 
 export function Alcohol(props : Props) {    
-    const [frequency, setFrequency] = useState<string>("");
+    const [frequency, setFrequency] = useState<string|undefined>(props.input);
 
     return (
         <MySimplePage
             title={alcoholText.pageTitle}
             subtitle={alcoholText.pageSubtitle}
+            goBackFunc={props.goBack}
             beforeGapContent={
                 <>
                 {globals.frequencies.map( freq => (
@@ -34,7 +37,7 @@ export function Alcohol(props : Props) {
             content={
                 <MyButton
                     onPressFunction={() => {
-                        if (frequency.length > 0) props.onSubmit(frequency)
+                        if (frequency) props.onSubmit(frequency)
                     }}
                     text={generalText.continue}
                 />

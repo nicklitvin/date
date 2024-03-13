@@ -4,6 +4,8 @@ import { descriptionText } from "../text";
 
 interface Props {
     onSubmit: (input : string) => any
+    goBack?: () => any
+    input?: string
 }
 
 export function Description(props : Props) {
@@ -11,12 +13,14 @@ export function Description(props : Props) {
         title={descriptionText.pageTitle}
         subtitle={descriptionText.pageSubtitle}
         marginTop="Keyboard"
+        goBackFunc={props.goBack}
         content={
             <MyTextInput
                 placeholder={descriptionText.inputPlaceholder}
                 errorMessage={descriptionText.errorMessage}
                 onSubmit={props.onSubmit}
                 newLine={true}
+                initialInput={props.input}
             />
         }
     />

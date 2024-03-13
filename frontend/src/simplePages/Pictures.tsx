@@ -18,6 +18,7 @@ interface Props {
     submitText: string
     returnUploadLength?: (input : number) => number
     returnSwitchURI?: (input : string|null) => string|null
+    goBack?: () => any
 }
 
 export function Pictures(props : Props) {
@@ -122,6 +123,7 @@ export function Pictures(props : Props) {
     return <MySimplePage
         title={pictureText.pageTitle}
         subtitle={pictureText.pageSubtitle}
+        goBackFunc={props.goBack}
         marginTop="Pictures"
         beforeGapContent={
             <>

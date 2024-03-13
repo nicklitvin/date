@@ -8,6 +8,7 @@ import { useState } from "react";
 interface Props {
     onSubmit: () => any
     submitText: string
+    goBack?: () => any
 }
 
 export function Final(props : Props) {
@@ -16,6 +17,7 @@ export function Final(props : Props) {
     return <MySimplePage
         title={finalText.pageTitle}
         subtitle={finalText.pageSubtitle}
+        goBackFunc={props.goBack}
         content={
             <>
                 <MyButton

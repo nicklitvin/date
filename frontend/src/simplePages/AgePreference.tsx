@@ -16,6 +16,7 @@ interface Props {
     embed?: boolean
     setMinAge?: Function
     setMaxAge?: Function
+    goBack?: () => any
 }
 
 export function AgePreference(props : Props) {
@@ -75,6 +76,7 @@ export function AgePreference(props : Props) {
     return <MySimplePage
         title={agePreferenceText.pageTitle}
         subtitle={agePreferenceText.pageSubtitle}
+        goBackFunc={props.goBack}
         beforeGapContent={
             <>
                 {makeContent()}

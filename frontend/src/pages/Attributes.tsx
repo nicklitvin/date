@@ -10,16 +10,19 @@ interface Props {
     onSubmit: (input : string[]) => any
     attributes: { [title : string] : {id: string, value: string}[]}
     submitText: string
+    goBack?: () => any
+    selectedAttributes?: string[]
 }
 
 export function Attributes(props : Props) {
-    const [attributes, setAttributes] = useState<string[]>([]);
+    const [attributes, setAttributes] = useState<string[]>(props.selectedAttributes ?? []);
     const [showError, setShowError] = useState<boolean>(false);
 
     return <MySimplePage
         title={attributesText.pageTitle}
         subtitle={attributesText.pageSubtitle}
         marginTop="Attributes"
+        goBackFunc={props.goBack}
         content={
             <StyledView className="w-full flex items-center mt-3">
                 <StyledText className={classNames(

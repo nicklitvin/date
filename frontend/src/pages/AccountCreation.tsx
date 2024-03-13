@@ -37,8 +37,8 @@ export function AccountCreation(props : Props) {
     const { globalState } = useStore();
 
     const [name, setName] = useState<string>("");
-    const [birthday, setBirthday] = useState<Date>(props.customBirthday ?? new Date());
-    const [gender, setGender] = useState<string|null>(null);
+    const [birthday, setBirthday] = useState<Date>(props.customBirthday ?? new Date(2000,0,1));
+    const [gender, setGender] = useState<string|undefined>();
     const [genderPreference, setGenderPreference] = useState<string[]>([]);
     const [description, setDescription] = useState<string>("");
     const [attributes, setAttributes] = useState<string[]>([]);
@@ -51,6 +51,10 @@ export function AccountCreation(props : Props) {
 
     const goToNextPage = () => {
         setCurrentPage(currentPage + 1);
+    }
+
+    const goBack = () => {
+        setCurrentPage(currentPage - 1)
     }
 
     useEffect( () => {
@@ -66,7 +70,7 @@ export function AccountCreation(props : Props) {
             attributes: attributes,
             description: description,
             email: globalState.email as string,
-            gender: gender,
+            gender: gender!,
             genderInterest: genderPreference,
             alcohol: alcohol,
             smoking: smoking,
@@ -90,6 +94,8 @@ export function AccountCreation(props : Props) {
             />
         case "Name":
             return <MyName
+                input={name}
+                goBack={goBack}
                 onSubmit={(input : string) => {
                     setName(input);
                     goToNextPage();
@@ -97,7 +103,8 @@ export function AccountCreation(props : Props) {
             />
         case "Birthday":
             return <Birthday
-                customBirthday={props.customBirthday}
+                goBack={goBack}
+                customBirthday={props.customBirthday ?? birthday}
                 submitText={generalText.continue}
                 onSubmit={(input : Date) => {
                     setBirthday(input);
@@ -106,6 +113,8 @@ export function AccountCreation(props : Props) {
             />
         case "Gender":
             return <Gender
+                input={gender}
+                goBack={goBack}
                 genders={globals.genders}
                 submitText={generalText.continue}
                 onSubmit={(input : string) => {
@@ -115,6 +124,8 @@ export function AccountCreation(props : Props) {
             />
         case "Gender Preference":
             return <GenderPreference
+                selectedGenders={genderPreference}
+                goBack={goBack}
                 genders={globals.genders}
                 onSubmit={(input : string[]) => {
                     setGenderPreference(input);
@@ -124,6 +135,8 @@ export function AccountCreation(props : Props) {
             />
         case "Description":
             return <Description 
+                input={description}
+                goBack={goBack}
                 onSubmit={(input : string) => {
                     setDescription(input);
                     goToNextPage();
@@ -131,6 +144,8 @@ export function AccountCreation(props : Props) {
             />
         case "Attributes":
             return <Attributes
+                selectedAttributes={attributes}
+                goBack={goBack}    
                 attributes={globals.attributes}
                 onSubmit={(input : string[]) => {
                     setAttributes(input);
@@ -140,8 +155,9 @@ export function AccountCreation(props : Props) {
             />
         case "Age Preference":
             return <AgePreference
-                minAge={globals.minAge}
-                maxAge={globals.maxAge}
+                goBack={goBack}
+                minAge={agePreference[0]}
+                maxAge={agePreference[1]}
                 submitText={generalText.continue}
                 onSubmit={(input : [number, number]) => {
                     setAgePreference(input);
@@ -150,11 +166,13 @@ export function AccountCreation(props : Props) {
             />
         case "Final":
             return <Final
+                goBack={goBack}
                 submitText={generalText.continue}
                 onSubmit={createUser}
             />
         case "Pictures":
             return <Pictures
+                goBack={goBack}
                 uploads={uploads}
                 onSubmit={(input : FileUploadAndURI[]) => {
                     setUploads(input);
@@ -164,6 +182,8 @@ export function AccountCreation(props : Props) {
             />
         case "Alcohol":
             return <Alcohol
+                input={alcohol}
+                goBack={goBack}
                 onSubmit={ (input : string) => {
                     setAlcohol(input);
                     goToNextPage();
@@ -171,6 +191,8 @@ export function AccountCreation(props : Props) {
             />
         case "Smoking":
             return <Smoking
+                input={smoking}
+                goBack={goBack}
                 onSubmit={ (input : string) => {
                     setSmoking(input);
                     goToNextPage();

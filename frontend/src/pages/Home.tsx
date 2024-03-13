@@ -12,6 +12,7 @@ import { PictureSeries } from "../components/PictureSeries";
 import { FeedMob } from "./Feed";
 import { Alcohol } from "../simplePages/Alcohol";
 import { AccountCreationMob } from "./AccountCreation";
+import { MySimplePage } from "../components/SimplePage";
 
 // const myUserID = "userID";
 
@@ -172,18 +173,24 @@ const profile2 : PublicProfile = {
 export function Home() {
     return (
         <>
-            {/* <AccountCreationMob
-                customPageStart={6}        
+            {/* <MySimplePage
+                title="asd"
+                subtitle="asd"
+                goBackFunc={( ) => {}}
             /> */}
+            <AccountCreationMob
+                customPageStart={0}        
+            />
             {/* <Alcohol
                 onSubmit={(input : string) => console.log(input)}
+                
             /> */}
-            <FeedMob
+            {/* <FeedMob
                 feed={[
                     recepientProfile,
                     profile2
                 ]}
-            />
+            /> */}
             {/* <ProfileView
                 profile={recepientProfile}
                 isInSwipeFeed={false}

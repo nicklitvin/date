@@ -12,6 +12,7 @@ interface Props {
     submitText: string
     onSubmit: (input : Date) => any
     customBirthday?: Date
+    goBack?: () => any
 }
 
 export function Birthday(props : Props) {
@@ -34,6 +35,7 @@ export function Birthday(props : Props) {
     return <MySimplePage
         title={birthdayText.pageTitle}
         subtitle={birthdayText.pageSubtitle}
+        goBackFunc={props.goBack}
         beforeGapContent={
             <>
                 <DatePicker 

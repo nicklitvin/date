@@ -9,14 +9,17 @@ interface Props {
     submitText: string
     genders: string[]
     onSubmit: (input : string) => any
+    goBack?: () => any
+    input?: string
 }
 
 export function Gender(props : Props) {
-    const [gender, setGender] = useState<string|null>(null);
+    const [gender, setGender] = useState<string|undefined>(props.input);
 
     return <MySimplePage
         title={genderText.pageTitle}
         subtitle={genderText.pageSubtitle}
+        goBackFunc={props.goBack}
         beforeGapContent={
             <>
             {props.genders.map( (val) => 
@@ -24,7 +27,7 @@ export function Gender(props : Props) {
                     <MyButton
                         text={val}
                         onPressFunction={() => {
-                            gender == val ? setGender(null) : setGender(val);
+                            gender == val ? setGender(undefined) : setGender(val);
                         }}
                         invertColor={val == gender}
                     />
