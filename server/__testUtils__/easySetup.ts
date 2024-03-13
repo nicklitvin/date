@@ -37,7 +37,9 @@ export async function validRequestUserInput() : Promise<RequestUserInput> {
             },
         ],
         name: "a".repeat(globals.maxNameLength),
-        description: "a".repeat(globals.maxDescriptionLength)
+        description: "a".repeat(globals.maxDescriptionLength),
+        smoking: "Never",
+        alcohol: "Never",
     }
 }
 
@@ -51,7 +53,9 @@ export function createUserInput(email = "a@berkeley.edu") : UserInput {
         genderInterest: ["Male"],
         attributes: ["Basketball"],
         images: ["imageURL"],
-        description: "description"
+        description: "description",
+        alcohol: "Never",
+        smoking: "Never"
     }
 }
 

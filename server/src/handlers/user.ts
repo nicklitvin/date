@@ -239,6 +239,8 @@ export class UserHandler {
             description: input.description,
             gender: input.gender,
             images: imageIDs,
+            alcohol: input.alcohol,
+            smoking: input.smoking
         }
     }
 }

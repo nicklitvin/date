@@ -1,4 +1,4 @@
-import { AttributeType, Gender, Message, Opinion, Swipe, User } from "@prisma/client"
+import { AttributeType, Gender, Message, Opinion, Swipe, Usage, User } from "@prisma/client"
 
 export interface AnnouncementInput {
     startTime: Date
@@ -26,6 +26,8 @@ interface BasicUserInput {
     genderInterest: Gender[]
     attributes: string[]
     description: string
+    alcohol: Usage
+    smoking: Usage
 }
 
 export interface UserInput extends BasicUserInput {
@@ -96,6 +98,8 @@ export interface PublicProfile {
     attributes: string[]
     images: string[]
     description: string
+    alcohol: Usage
+    smoking: Usage
 }
 
 export interface UserSwipeStats {

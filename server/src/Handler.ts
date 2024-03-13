@@ -87,7 +87,9 @@ export class Handler {
                 ageInterest: input.ageInterest,
                 genderInterest: input.genderInterest,
                 name: input.name,
-                images: imageIDs as string[]
+                images: imageIDs as string[],
+                alcohol: input.alcohol,
+                smoking: input.smoking,
             }
     
             return await this.user.createUser(userInput);

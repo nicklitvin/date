@@ -22,6 +22,12 @@ enum AttributeType {
     Music
 }
 
+enum Usage {
+    Never
+    Sometimes
+    Often
+}
+
 model User {
     id              String          @id
     email           String
@@ -33,6 +39,8 @@ model User {
     attributes      String[]
     images          String[]
     description     String
+    alcohol         Usage
+    smoking         Usage
     notifications   Boolean
     university      String
     subscribeEnd    DateTime

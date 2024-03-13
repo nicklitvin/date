@@ -5,6 +5,9 @@ stackviewer for edit attributes
 add alc/smoke/drugs attributes (icons with cross out if dont do it)
 move props to global state
 
+smoking (no, sometimes, yes)
+alcohol (no, sometimes, yest)
+
 is clerks worth it?
 LOGIN with clerk
 
