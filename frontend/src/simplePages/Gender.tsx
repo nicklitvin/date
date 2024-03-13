@@ -3,6 +3,7 @@ import { MySimplePage } from "../components/SimplePage";
 import { genderText } from "../text";
 import { MyButton } from "../components/Button";
 import { StyledView } from "../styledElements";
+import { Spacing } from "../components/Spacing";
 
 interface Props {
     submitText: string
@@ -17,19 +18,20 @@ export function Gender(props : Props) {
         title={genderText.pageTitle}
         subtitle={genderText.pageSubtitle}
         beforeGapContent={
-            <StyledView className="flex flex-col w-full">
-                {props.genders.map( (val) => 
-                    <StyledView className="flex items-center pb-2" key={`gender-${val}`}>
-                        <MyButton
-                            text={val}
-                            onPressFunction={() => {
-                                gender == val ? setGender(null) : setGender(val);
-                            }}
-                            invertColor={val == gender}
-                        />
-                    </StyledView>
-                )}
-            </StyledView>
+            <>
+            {props.genders.map( (val) => 
+                <StyledView className="flex items-center w-full" key={`gender-${val}`}>
+                    <MyButton
+                        text={val}
+                        onPressFunction={() => {
+                            gender == val ? setGender(null) : setGender(val);
+                        }}
+                        invertColor={val == gender}
+                    />
+                    <Spacing size="md"/>
+                </StyledView>
+            )}
+            </>
         }
         content={
             <>

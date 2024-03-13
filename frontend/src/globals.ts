@@ -19,6 +19,7 @@ export const globals = {
     apiRequestTimeout: 2,
     resendVerificationTimeout: 10,
     fadeDuration: 500,
+    frequencies: ["Never", "Sometimes", "Often"],
 
     attributes: {
         "Sports": [

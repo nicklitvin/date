@@ -20,7 +20,7 @@ describe("verification", () => {
                 10,globals.verificationCodeLength - 1)
             )
             expect(code).toBeLessThan(Math.pow(
-                10, globals.verificationCodeLength) - 1
+                10, globals.verificationCodeLength)
             )
         }
     })

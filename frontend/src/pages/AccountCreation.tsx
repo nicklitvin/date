@@ -17,9 +17,11 @@ import { Attributes } from "./Attributes";
 import { AgePreference } from "../simplePages/AgePreference";
 import { Final } from "../simplePages/Final";
 import { Pictures } from "../simplePages/Pictures";
+import { Alcohol } from "../simplePages/Alcohol";
+import { Smoking } from "../simplePages/Smoking";
 
 export const pageOrder : AccountCreationType[] = [
-    "Create Profile","Name","Birthday", "Gender", "Age Preference", "Gender Preference",
+    "Create Profile","Name","Birthday", "Gender", "Alcohol", "Smoking", "Age Preference", "Gender Preference",
     "Pictures", "Attributes", "Description", "Final"
 ]
 
@@ -44,6 +46,8 @@ export function AccountCreation(props : Props) {
     const [agePreference, setAgePreference] = useState<[number, number]>(
         [globals.minAge, globals.maxAge]
     );
+    const [alcohol, setAlcohol] = useState<string>("");
+    const [smoking, setSmoking] = useState<string>("");
 
     const goToNextPage = () => {
         setCurrentPage(currentPage + 1);
@@ -64,6 +68,8 @@ export function AccountCreation(props : Props) {
             email: globalState.email as string,
             gender: gender,
             genderInterest: genderPreference,
+            alcohol: alcohol,
+            smoking: smoking,
             files: uploads.map( upload => {
                 return {
                     buffer: upload.buffer,
@@ -155,6 +161,20 @@ export function AccountCreation(props : Props) {
                     goToNextPage();
                 }}
                 submitText={generalText.continue}
+            />
+        case "Alcohol":
+            return <Alcohol
+                onSubmit={ (input : string) => {
+                    setAlcohol(input);
+                    goToNextPage();
+                }}
+            />
+        case "Smoking":
+            return <Smoking
+                onSubmit={ (input : string) => {
+                    setSmoking(input);
+                    goToNextPage();
+                }}
             />
     }
 }

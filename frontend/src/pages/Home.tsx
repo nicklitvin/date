@@ -10,6 +10,8 @@ import { PublicProfile } from "../interfaces";
 import { ProfileView } from "./ProfileView";
 import { PictureSeries } from "../components/PictureSeries";
 import { FeedMob } from "./Feed";
+import { Alcohol } from "../simplePages/Alcohol";
+import { AccountCreationMob } from "./AccountCreation";
 
 // const myUserID = "userID";
 
@@ -24,6 +26,8 @@ const recepientProfile : PublicProfile = {
         "https://hips.hearstapps.com/hmg-prod/images/jordan-jamming-1589896458.png?crop=0.564xw:1.00xh;0.0545xw,0&resize=1200:*",
         "https://pbs.twimg.com/profile_images/1262372966073016321/DH4rOj9S_400x400.jpg"
     ],
+    alcohol: "Often",
+    smoking: "Often",
 }
 const profile2 : PublicProfile = {
     name: "Nick",
@@ -35,6 +39,8 @@ const profile2 : PublicProfile = {
     images: [
         "https://pbs.twimg.com/profile_images/1262372966073016321/DH4rOj9S_400x400.jpg"
     ],
+    alcohol: "Often",
+    smoking: "Often",
 }
 // const latestMessages : Message[] = [
 //     {
@@ -166,12 +172,18 @@ const profile2 : PublicProfile = {
 export function Home() {
     return (
         <>
-            <FeedMob
+            <AccountCreationMob
+                customPageStart={6}        
+            />
+            {/* <Alcohol
+                onSubmit={(input : string) => console.log(input)}
+            /> */}
+            {/* <FeedMob
                 feed={[
                     recepientProfile,
                     profile2
                 ]}
-            />
+            /> */}
             {/* <ProfileView
                 profile={recepientProfile}
                 isInSwipeFeed={false}

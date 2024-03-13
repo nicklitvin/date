@@ -1,8 +1,10 @@
 TODO
+add to profile (alc, smoke)
+go back button in account creation
 next apk install: react hot toast, stack and tab navigators
 
 stackviewer for edit attributes
-add alc/smoke/drugs attributes (icons with cross out if dont do it)
+add alc/smoke/drugs attributes (icons with cross out if dont do it) 
 move props to global state
 
 smoking (no, sometimes, yes)

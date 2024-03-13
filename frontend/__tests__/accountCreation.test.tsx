@@ -44,6 +44,8 @@ describe("accountCreation", () => {
             globals.attributes.Music[1].value,
             globals.attributes.Sports[0].value
         ]
+        const alcoholFreq = globals.frequencies[1];
+        const smokingFreq = globals.frequencies[2];
 
         const mock = new MockAdapter(axios);
         mock.onPost(URLs.server + URLs.createUser).reply( config => {
@@ -57,6 +59,8 @@ describe("accountCreation", () => {
             expect(userInput?.files).toHaveLength(1);
             expect(userInput?.attributes).toHaveLength(2);
             expect(userInput?.description).toEqual(myDescription);
+            expect(userInput?.alcohol).toEqual(alcoholFreq);
+            expect(userInput?.smoking).toEqual(smokingFreq);
             
             return [200]
         })
@@ -74,11 +78,13 @@ describe("accountCreation", () => {
             </StoreProvider>
         );
 
+        let pageNumber = 0;
         // create profile
         await act( () => {
             fireEvent(screen.getByText(generalText.continue), "press")
         })
-        expect(returnPageNumber).toHaveLastReturnedWith(1);
+        expect(returnPageNumber).toHaveLastReturnedWith(pageNumber + 1);
+        pageNumber += 1;
 
         //my name
         const nameInput = screen.getByPlaceholderText(myNameText.inputPlaceholder);
@@ -88,13 +94,15 @@ describe("accountCreation", () => {
         await act( () => {
             fireEvent(nameInput, "submitEditing");
         })
-        expect(returnPageNumber).toHaveLastReturnedWith(2);
+        expect(returnPageNumber).toHaveLastReturnedWith(pageNumber + 1);
+        pageNumber += 1;
 
         // birthday
         await act( () => {
             fireEvent(screen.getByText(generalText.continue), "press")
         })
-        expect(returnPageNumber).toHaveLastReturnedWith(3);
+        expect(returnPageNumber).toHaveLastReturnedWith(pageNumber + 1);
+        pageNumber += 1;
 
         // my gender
         await act( () => {
@@ -103,13 +111,35 @@ describe("accountCreation", () => {
         await act( () => {
             fireEvent(screen.getByText(generalText.continue), "press")
         })
-        expect(returnPageNumber).toHaveLastReturnedWith(4);
+        expect(returnPageNumber).toHaveLastReturnedWith(pageNumber + 1);
+        pageNumber += 1;
+
+        // alcohol 
+        await act( () => {
+            fireEvent(screen.getByText(alcoholFreq), "press")
+        })
+        await act( () => {
+            fireEvent(screen.getByText(generalText.continue), "press")
+        })
+        expect(returnPageNumber).toHaveLastReturnedWith(pageNumber + 1);
+        pageNumber += 1;
+
+        // smoking
+        await act( () => {
+            fireEvent(screen.getByText(smokingFreq), "press")
+        })
+        await act( () => {
+            fireEvent(screen.getByText(generalText.continue), "press")
+        })
+        expect(returnPageNumber).toHaveLastReturnedWith(pageNumber + 1);
+        pageNumber += 1;
 
         // age preference
         await act( () => {
             fireEvent(screen.getByText(generalText.continue), "press")
         })
-        expect(returnPageNumber).toHaveLastReturnedWith(5);
+        expect(returnPageNumber).toHaveLastReturnedWith(pageNumber + 1);
+        pageNumber += 1;
 
         // gender preference
         for (const genderPrefer of myGenderPreference) {
@@ -120,13 +150,15 @@ describe("accountCreation", () => {
         await act( () => {
             fireEvent(screen.getByText(generalText.continue), "press")
         })
-        expect(returnPageNumber).toHaveLastReturnedWith(6);
+        expect(returnPageNumber).toHaveLastReturnedWith(pageNumber + 1);
+        pageNumber += 1;
 
         // pictures
         await act( () => {
             fireEvent(screen.getByText(generalText.continue), "press")
         })
-        expect(returnPageNumber).toHaveLastReturnedWith(7);
+        expect(returnPageNumber).toHaveLastReturnedWith(pageNumber + 1);
+        pageNumber += 1;
 
         // attributes
         for (const attribute of myAttributes) {
@@ -137,7 +169,8 @@ describe("accountCreation", () => {
         await act( () => {
             fireEvent(screen.getByText(generalText.continue), "press")
         })
-        expect(returnPageNumber).toHaveLastReturnedWith(8);
+        expect(returnPageNumber).toHaveLastReturnedWith(pageNumber + 1);
+        pageNumber += 1;
 
         // description
         const descriptionInput = screen.getByPlaceholderText(
@@ -149,7 +182,8 @@ describe("accountCreation", () => {
         await act( () => {
             fireEvent(descriptionInput, "submitEditing");
         })
-        expect(returnPageNumber).toHaveLastReturnedWith(9);
+        expect(returnPageNumber).toHaveLastReturnedWith(pageNumber + 1);
+        pageNumber += 1;
 
         //final
         await act( () => {

@@ -4,6 +4,7 @@ import { MySimplePage } from "../components/SimplePage"
 import { genderPreferenceText } from "../text"
 import { StyledView } from "../styledElements"
 import classNames from "classnames"
+import { Spacing } from "../components/Spacing"
 
 interface Props {
     genders: string[]
@@ -29,7 +30,7 @@ export function GenderPreference(props : Props) {
             <StyledView 
                 key={`gender-pref-${val}`} 
                 className={classNames(
-                    props.embed ? "flex flex-row" : "w-full items-center flex mb-3"
+                    props.embed ? "flex flex-row" : "w-full items-center flex"
                 )}
             >
                 <MyButton
@@ -51,8 +52,8 @@ export function GenderPreference(props : Props) {
                         setGenderPreference(copy);
                     }}
                 />
+                <Spacing size="md"/>
             </StyledView>
-            
         )}
         </>
     )

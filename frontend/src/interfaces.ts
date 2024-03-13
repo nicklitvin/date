@@ -10,6 +10,8 @@ export interface UserInput {
     attributes: string[]
     description: string
     files: FileUpload[]
+    alcohol: string
+    smoking: string
 }
 
 export interface FileUpload {
@@ -43,6 +45,8 @@ export interface PublicProfile {
     attributes: string[]
     images: string[]
     description: string
+    alcohol: string
+    smoking: string
 }
 
 export interface GetChatInput {

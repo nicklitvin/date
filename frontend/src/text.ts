@@ -176,3 +176,13 @@ export const settingsText = {
     modalTitle: "Are you sure you want to delete your account?",
     modalDelete: "Confirm Delete",
 }
+
+export const alcoholText = {
+    pageTitle: "Alcohol",
+    pageSubtitle: "How often do you drink?"
+}
+
+export const smokingText = {
+    pageTitle: "Smoking",
+    pageSubtitle: "How often do you smoke?"
+}

@@ -138,7 +138,7 @@ export function Pictures(props : Props) {
                         </StyledView> :
                         <StyledView
                             key={`empty-button-${index}`}
-                            className={`w-[102px] h-[${globals.pictureHeight}px] m-2 rounded-xl border border-front`}
+                            className={`w-[102px] h-[136px] m-2 rounded-xl border border-front`}
                         />
                     )}
                 </StyledView>
