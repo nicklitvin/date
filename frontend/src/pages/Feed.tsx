@@ -3,12 +3,12 @@ import { PageHeader } from "../components/PageHeader";
 import { StyledButton, StyledImage, StyledScroll, StyledText, StyledView } from "../styledElements";
 import { feedText } from "../text";
 import { PublicProfile } from "../interfaces";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ProfileViewMob } from "./ProfileView";
 import axios from "axios";
 import { URLs } from "../urls";
 import { createTimeoutSignal } from "../utils";
-import { Animated } from "react-native";
+import { Animated, ScrollView } from "react-native";
 import { globals } from "../globals";
 
 interface Props {
@@ -23,6 +23,13 @@ export function Feed(props : Props) {
     const [feedIndex, setFeedIndex] = useState<number>(0);
     const [lastSwipedIndex, setLastSwipedIndex] = useState<number>(-1);
     const opacity = useState(new Animated.Value(1))[0];
+    const scrollViewRef = useRef<ScrollView>(null);
+
+    const scrollToTop = () => {
+        if (scrollViewRef.current) {
+            scrollViewRef.current.scrollTo({ y: 0, animated: true });
+        }
+    };
 
     useEffect( () => {
         if (props.returnFeedLength) {
@@ -36,7 +43,8 @@ export function Feed(props : Props) {
         }
         if (feedIndex == feed.length) {
             loadMoreFeed();
-        }
+        } 
+        scrollToTop()
     }, [feedIndex])
 
     const loadMoreFeed = async () => {
@@ -77,7 +85,7 @@ export function Feed(props : Props) {
     }
 
     return (
-        <StyledScroll showsVerticalScrollIndicator={false}>
+        <StyledScroll showsVerticalScrollIndicator={false} ref={scrollViewRef}>
         <StyledView>
             <PageHeader
                 title={feedText.pageTitle}
@@ -112,6 +120,7 @@ export function Feed(props : Props) {
                         afterSwipe={afterSwipe}
                         disableSwiping={lastSwipedIndex == feedIndex}
                         ignoreRequest={true}
+                        reportable={true}
                     />
                 }
             </Animated.View>

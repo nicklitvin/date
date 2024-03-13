@@ -135,7 +135,9 @@ export function Chat(props : Props) {
             const myReport : RequestReportInput = {
                 reportedID: props.publicProfile.id
             }
-            await axios.post(URLs.server + URLs.reportUser, myReport)
+            await axios.post(URLs.server + URLs.reportUser, myReport, {
+                signal: createTimeoutSignal()
+            })
         } catch (err) {
             console.log(err);
         }

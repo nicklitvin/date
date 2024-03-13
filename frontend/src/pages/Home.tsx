@@ -178,16 +178,16 @@ export function Home() {
             {/* <Alcohol
                 onSubmit={(input : string) => console.log(input)}
             /> */}
-            {/* <FeedMob
+            <FeedMob
                 feed={[
                     recepientProfile,
                     profile2
                 ]}
-            /> */}
-            <ProfileView
+            />
+            {/* <ProfileView
                 profile={recepientProfile}
                 isInSwipeFeed={false}
-            />
+            /> */}
         </>
     )
 }

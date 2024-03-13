@@ -1,8 +1,8 @@
 import { observer } from "mobx-react-lite";
 import { StyledButton, StyledImage, StyledScroll, StyledText, StyledView } from "../styledElements";
 import { PageHeader } from "../components/PageHeader";
-import { profileViewText } from "../text";
-import { PublicProfile, SwipeInput } from "../interfaces";
+import { profileText, profileViewText } from "../text";
+import { PublicProfile, RequestReportInput, SwipeInput } from "../interfaces";
 import axios from "axios";
 import { Action } from "../types";
 import { URLs } from "../urls";
@@ -18,6 +18,7 @@ interface Props {
     afterSwipe?: Function
     ignoreRequest?: boolean
     disableSwiping?: boolean
+    reportable?: boolean
 }
 
 export function ProfileView(props : Props) {
@@ -36,6 +37,22 @@ export function ProfileView(props : Props) {
             }
 
             if (props.afterSwipe) props.afterSwipe();
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+    const reportUser = async () => {
+        try {
+            const myReport : RequestReportInput = {
+                reportedID: props.profile.id
+            }
+            if (!props.ignoreRequest) {
+                await axios.post(URLs.server + URLs.reportUser, myReport, {
+                    signal: createTimeoutSignal()
+                })
+            }
+            if (props.afterSwipe) props.afterSwipe()
         } catch (err) {
             console.log(err);
         }
@@ -81,6 +98,18 @@ export function ProfileView(props : Props) {
                         />
                     ))}
                 </StyledView>
+                { props.reportable ?
+                    <StyledView className="w-full items-center flex">
+                        <Spacing size="lg"/>
+
+                        <MyButton
+                            text={profileViewText.reportUser}
+                            onPressFunction={reportUser}
+                            danger={true}
+                        />
+                    </StyledView> : null
+                }
+                
                 <Spacing size="lg"/>
             </StyledView>
         </StyledView> 
