@@ -2,7 +2,6 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { RootStore, createStoreProvider} from '../src/store/RootStore';
 import { StyledView } from '../src/styledElements';
 import { Stack } from "expo-router";
-import { NavigationContainer } from "@react-navigation/native";
 
 export default function App() {
     const rootStore = new RootStore();
@@ -15,10 +14,10 @@ export default function App() {
                     <StoreProvider value={rootStore}>
                         <StyledView className="w-full h-full flex items-center justify-center">
                             <StyledView className="w-full h-full">
-                                <Stack initialRouteName="index" screenOptions={{
+                                <Stack screenOptions={{
                                     headerShown: false
                                 }}>
-                                    <Stack.Screen name="index"/>
+                                    <Stack.Screen name="(tabs)"/>
                                 </Stack>
                             </StyledView>
                         </StyledView>
