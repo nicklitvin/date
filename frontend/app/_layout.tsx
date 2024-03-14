@@ -22,6 +22,9 @@ export default function App() {
                                     <Stack.Screen name="Settings"/>
                                     <Stack.Screen name="ProfileView"/>
                                     <Stack.Screen name="EditProfile"/>
+                                    <Stack.Screen name="EditPictures"/>
+                                    <Stack.Screen name="EditDescription"/>
+                                    <Stack.Screen name="EditAttributes"/>
                                 </Stack>
                             </StyledView>
                         </StyledView>

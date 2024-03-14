@@ -13,6 +13,7 @@ import { EncodingType, readAsStringAsync } from "expo-file-system";
 import { MyTextInput } from "../src/components/TextInput";
 import { MyButton } from "../src/components/Button";
 import { Spacing } from "../src/components/Spacing";
+import { router } from "expo-router";
 
 interface Props {
     profile: PublicProfile
@@ -180,7 +181,7 @@ export function EditProfile() {
             <StyledView className="w-full items-center flex">
                 <MyButton
                     text={editProfileText.editImages}
-                    onPressFunction={() => {}}
+                    onPressFunction={() => {router.push("/EditPictures")}}
                 />
             </StyledView>
             <Spacing size="lg"/>
@@ -190,7 +191,7 @@ export function EditProfile() {
             <Spacing size="md"/>
             <MyButton
                 text={description}
-                onPressFunction={() => {}}
+                onPressFunction={() => {router.push("/EditDescription")}}
                 fullSize={true}
             />
             <Spacing size="lg"/>
@@ -212,7 +213,7 @@ export function EditProfile() {
             <StyledView className="w-full flex items-center">
                 <MyButton
                     text={editProfileText.editAttributes}
-                    onPressFunction={() => {}}
+                    onPressFunction={() => {router.push("/EditAttributes")}}
                 />
             </StyledView>
             <Spacing size="lg"/>

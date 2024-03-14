@@ -15,7 +15,7 @@ interface Props {
 
 export function MySimplePage(props : Props) {
     return (
-        <StyledView className="flex-grow">
+        <StyledView className="flex-grow bg-back">
             {props.goBackFunc ? 
                 <StyledButton 
                     className="absolute left-5 top-0"
