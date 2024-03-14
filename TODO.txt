@@ -1,9 +1,7 @@
 TODO
-go back button in account creation
 next apk install: react hot toast, stack and tab navigators
 
 stackviewer for edit attributes
-add alc/smoke/drugs attributes (icons with cross out if dont do it) 
 move props to global state
 
 is clerks worth it?

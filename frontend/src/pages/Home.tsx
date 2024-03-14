@@ -178,9 +178,9 @@ export function Home() {
                 subtitle="asd"
                 goBackFunc={( ) => {}}
             /> */}
-            <AccountCreationMob
+            {/* <AccountCreationMob
                 customPageStart={0}        
-            />
+            /> */}
             {/* <Alcohol
                 onSubmit={(input : string) => console.log(input)}
                 

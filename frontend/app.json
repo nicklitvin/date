@@ -2,6 +2,7 @@
   "expo": {
     "name": "frontend",
     "slug": "date",
+    "scheme": "your-app-scheme",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -32,6 +33,9 @@
         "projectId": "4667bd12-0567-4d4e-8936-4dc42d931ad4"
       }
     },
-    "owner": "nicklitvin"
+    "owner": "nicklitvin",
+    "plugins": [
+      "expo-router"
+    ]
   }
 }
