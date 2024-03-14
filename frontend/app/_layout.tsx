@@ -19,6 +19,9 @@ export default function App() {
                                 }}>
                                     <Stack.Screen name="(tabs)"/>
                                     <Stack.Screen name="Preferences"/>
+                                    <Stack.Screen name="Settings"/>
+                                    <Stack.Screen name="ProfileView"/>
+                                    <Stack.Screen name="EditProfile"/>
                                 </Stack>
                             </StyledView>
                         </StyledView>

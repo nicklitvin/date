@@ -9,6 +9,7 @@ import { Linking } from "react-native";
 import { PublicProfile, SubscriptionData } from "../../src/interfaces";
 import { createTimeoutSignal, getShortDate } from "../../src/utils";
 import { useStore } from "../../src/store/RootStore";
+import { Link, router } from "expo-router";
 
 interface Props {
     openLinkFunc?: (input : string) => any
@@ -16,7 +17,23 @@ interface Props {
     subscription?: SubscriptionData
 }
 
-export function Profile(props : Props) {
+export function Profile() {
+    const props : Props = {
+        profile: {
+            name: "Michael",
+            age: 21,
+            attributes: ["asd","asrqd", "asdnw", "ajshdkasdsa", "ajljshdwgeiqw"],
+            description: "this is a desceiption askdh askdjh aks dhsk ds dkas daksj daks kad jhask dajsh kasdhjasdhask das dhaskd ask dashd ",
+            gender: "Male",
+            id: "abc",
+            images: [
+                "https://hips.hearstapps.com/hmg-prod/images/jordan-jamming-1589896458.png?crop=0.564xw:1.00xh;0.0545xw,0&resize=1200:*",
+                "https://pbs.twimg.com/profile_images/1262372966073016321/DH4rOj9S_400x400.jpg"
+            ],
+            alcohol: "Often",
+            smoking: "Often",
+        }
+    }
     const { globalState } = useStore();
 
     const managePayment = async () => {
@@ -68,12 +85,12 @@ export function Profile(props : Props) {
                 title={profileText.pageTitle}
                 imageType="Profile"
                 rightContent={
-                    <StyledButton onPress={() => {}}>
+                    <Link href="/Settings">
                         <StyledImage
                             source={require("../../assets/Setting.png")}
                             className="w-[35px] h-[35px]"
                         />
-                    </StyledButton>
+                    </Link>
                 }
             />
             <StyledView className="flex items-center pt-[100px]">
@@ -90,13 +107,13 @@ export function Profile(props : Props) {
                 <StyledView className="w-full pt-3 flex items-center">
                     <MyButton
                         text={profileText.viewProfile}
-                        onPressFunction={() => {}}
+                        onPressFunction={() => router.navigate("/ProfileView")}
                     />
                 </StyledView>
                 <StyledView className="w-full pt-3 flex items-center">
                     <MyButton
                         text={profileText.editProfile}
-                        onPressFunction={() => {}}
+                        onPressFunction={() => router.navigate("/EditProfile")}
                     />
                 </StyledView>
                 {
