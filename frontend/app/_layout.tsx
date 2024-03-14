@@ -17,6 +17,7 @@ export default function App() {
                                 <Stack screenOptions={{
                                     headerShown: false
                                 }}>
+                                    <Stack.Screen name="index"/>
                                     <Stack.Screen name="(tabs)"/>
                                     <Stack.Screen name="Preferences"/>
                                     <Stack.Screen name="Settings"/>
@@ -25,6 +26,7 @@ export default function App() {
                                     <Stack.Screen name="EditPictures"/>
                                     <Stack.Screen name="EditDescription"/>
                                     <Stack.Screen name="EditAttributes"/>
+                                    <Stack.Screen name="AccountCreation"/>
                                 </Stack>
                             </StyledView>
                         </StyledView>
