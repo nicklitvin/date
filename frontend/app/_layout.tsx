@@ -18,6 +18,7 @@ export default function App() {
                                     headerShown: false
                                 }}>
                                     <Stack.Screen name="(tabs)"/>
+                                    <Stack.Screen name="Preferences"/>
                                 </Stack>
                             </StyledView>
                         </StyledView>

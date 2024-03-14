@@ -2,7 +2,6 @@ import { observer } from "mobx-react-lite";
 import { StyledButton, StyledImage, StyledScroll, StyledText, StyledView } from "../../src/styledElements";
 import { matchesText } from "../../src/text";
 import { ChatPreview, NewMatch, NewMatchDataInput } from "../../src/interfaces";
-import { Image } from "expo-image";
 import { ChatPreviewBox } from "../../src/components/ChatPreviewBox";
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
@@ -183,6 +182,6 @@ export function Matches(props : Props) {
     )
 } 
 
-const MatchesMob = observer(Matches);
+export const MatchesMob = observer(Matches);
 export default MatchesMob;
 

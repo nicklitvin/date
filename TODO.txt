@@ -1,6 +1,4 @@
 TODO
-next apk install: react hot toast, stack and tab navigators
-
 stackviewer for edit attributes
 move props to global state
 

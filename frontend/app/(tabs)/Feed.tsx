@@ -10,6 +10,7 @@ import { URLs } from "../../src/urls";
 import { createTimeoutSignal } from "../../src/utils";
 import { Animated, ScrollView } from "react-native";
 import { globals } from "../../src/globals";
+import { Link } from "expo-router";
 
 interface Props {
     feed: PublicProfile[]
@@ -88,18 +89,17 @@ export function Feed(props : Props) {
         <StyledView className="w-full h-full bg-back">
         <StyledScroll showsVerticalScrollIndicator={false} ref={scrollViewRef}>
         <StyledView className="w-full h-full">
+
             <PageHeader
                 title={feedText.pageTitle}
                 imageType="Feed"
                 rightContent={
-                    <StyledButton
-                        onPress={ () => {}}
-                    >
+                    <Link href="/Preferences">
                         <StyledImage
                             className="w-[35px] h-[35px]"
                             source={require("../../assets/Preferences.png")}
                         />
-                    </StyledButton>
+                    </Link>
                 }
             />
             <Animated.View style={{ opacity: opacity}}
@@ -107,10 +107,10 @@ export function Feed(props : Props) {
                 {
                     feedIndex == feed.length ? 
                     <StyledView className="flex items-center mt-[250px] flex-col">
-                        <StyledImage
+                        {/* <StyledImage
                             className="w-[100px] h-[100px]"
-                            source={require("../../assets/Sad.png")}
-                        />
+                            source={require("../../../assets/Sad.png")}
+                        /> */}
                         <StyledText className="font-bold text-xl">
                             {feedText.noMoreFeed}
                         </StyledText>

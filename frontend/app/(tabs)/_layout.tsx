@@ -3,13 +3,15 @@ import { globals } from "../../src/globals";
 import { StyledImage } from "../../src/styledElements";
 
 export default function TabLayout() {
-    type IconType = "Feed" | "Matches";
+    type IconType = "Feed" | "Matches" | "Profile" | "Stats";
     const getIcon = (icon: IconType, focused : boolean) => {
         let image;
 
         switch (icon) {
             case ("Feed"): image = require("../../assets/Feed.png"); break;
             case ("Matches"): image = require("../../assets/Matches.png"); break;
+            case ("Profile"): image = require("../../assets/Profile.png"); break;
+            case ("Stats"): image = require("../../assets/Stats.png"); break;
         }
 
         return (
@@ -37,6 +39,16 @@ export default function TabLayout() {
             <Tabs.Screen name="Matches" 
                 options={{
                     tabBarIcon: ({ focused }) => getIcon("Matches", focused)
+                }}
+            />
+            <Tabs.Screen name="Profile" 
+                options={{
+                    tabBarIcon: ({ focused }) => getIcon("Profile", focused)
+                }}
+            />
+            <Tabs.Screen name="Stats" 
+                options={{
+                    tabBarIcon: ({ focused }) => getIcon("Stats", focused)
                 }}
             />
         </Tabs>

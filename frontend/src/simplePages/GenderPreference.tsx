@@ -27,7 +27,7 @@ export function GenderPreference(props : Props) {
 
     const makeContent = () => (
         <>
-        {props.genders.map( (val) => 
+        {props.genders.map( val => 
             <StyledView 
                 key={`gender-pref-${val}`} 
                 className={classNames(

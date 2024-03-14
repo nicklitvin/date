@@ -2,7 +2,7 @@ import axios from "axios"
 import MockAdapter from "axios-mock-adapter"
 import { URLs } from "../src/urls";
 import { act, fireEvent, render, screen } from "@testing-library/react-native";
-import { ProfileMob } from "../src/pages/Profile";
+import { ProfileMob } from "../app/(tabs)/Profile";
 import { profileText } from "../src/text";
 import { PublicProfile, SubscriptionData } from "../src/interfaces";
 import { RootStore, createStoreProvider } from "../src/store/RootStore";

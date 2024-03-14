@@ -63,7 +63,7 @@ export function Profile(props : Props) {
     }
 
     return (
-        <>
+        <StyledView className="bg-back w-full h-full">
             <PageHeader
                 title={profileText.pageTitle}
                 imageType="Profile"
@@ -132,7 +132,7 @@ export function Profile(props : Props) {
                     </StyledView>
                 }
             </StyledView>
-        </>
+        </StyledView>
     )
 }
 
