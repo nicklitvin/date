@@ -1,33 +1,49 @@
+import { observer } from "mobx-react-lite";
 import { MySimplePage } from "../src/components/SimplePage";
 import { MyTextInput } from "../src/components/TextInput";
 import { descriptionText } from "../src/text";
-
-interface Props {
-    onSubmit: (input : string) => any
-    goBack?: () => any
-    input?: string
-}
+import { useStore } from "../src/store/RootStore";
+import { router } from "expo-router";
+import { EditUserInput } from "../src/interfaces";
+import { globals } from "../src/globals";
+import axios from "axios";
+import { URLs } from "../src/urls";
+import { createTimeoutSignal } from "../src/utils";
 
 export function EditDescription() {
-    const props : Props = {
-        onSubmit: () => {}
+    const { receivedData } = useStore();
+
+    const editDescription = async (description: string) => {
+        try {
+            const input : EditUserInput = {
+                setting: globals.settingDescription,
+                value: description
+            }
+            const response = await axios.post(URLs.server + URLs.editUser, input, {
+                signal: createTimeoutSignal()
+            })
+            receivedData.setProfile(response.data);
+            router.back();
+        } catch (err) {
+            console.log()
+        }
     }
 
     return <MySimplePage
         title={descriptionText.pageTitle}
         subtitle={descriptionText.pageSubtitle}
         marginTop="Keyboard"
-        goBackFunc={props.goBack}
         content={
             <MyTextInput
                 placeholder={descriptionText.inputPlaceholder}
                 errorMessage={descriptionText.errorMessage}
-                onSubmit={props.onSubmit}
+                onSubmit={editDescription}
                 newLine={true}
-                initialInput={props.input}
+                initialInput={receivedData.profile?.description}
             />
         }
     />
 }
-export default EditDescription;
+const EditDescriptionMob = observer(EditDescription);
+export default EditDescriptionMob;
 

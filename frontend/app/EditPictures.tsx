@@ -17,14 +17,6 @@ import axios from "axios";
 import { URLs } from "../src/urls";
 import { createTimeoutSignal } from "../src/utils";
 
-interface Props {
-    uploads: FileUploadAndURI[]
-    onSubmit: (input : FileUploadAndURI[]) => any
-    submitText: string
-    returnUploadLength?: (input : number) => number
-    returnSwitchURI?: (input : string|null) => string|null
-    goBack?: () => any
-}
 
 export function EditPictures() {
     const { receivedData } = useStore();
