@@ -11,24 +11,21 @@ import { createTimeoutSignal } from "../../src/utils";
 import { MyDonut } from "../../src/components/Donut";
 import { Weekly } from "../../src/components/Weekly";
 import { Spacing } from "../../src/components/Spacing";
+import { useStore } from "../../src/store/RootStore";
 
-interface Props {
-    stats?: UserSwipeStats
-    openLinkFunc?: (url : string) => any
-}
+export function Stats() {
+    const { receivedData } = useStore();    
+    const stats = receivedData.stats;
 
-export function Stats(props : Props) {
+    console.log(stats);
+
     const getCheckoutPage = async () => {
         try {
             const response = await axios.post(URLs.server + URLs.getCheckoutPage, null, {
                 signal: createTimeoutSignal()
             });
             const url = response.data;
-            if (props.openLinkFunc) {
-                props.openLinkFunc(url);
-            } else {
-                await Linking.openURL(url);
-            }
+            await Linking.openURL(url);
         } catch (err) {
             console.log(err)
         }
@@ -36,7 +33,7 @@ export function Stats(props : Props) {
     
     let content;
 
-    if (!props.stats) {
+    if (!stats) {
         content = (
             <StyledView className="flex flex-col items-center w-full pt-[200px]">
                 {statsText.purchaseText.map( val => (
@@ -64,8 +61,8 @@ export function Stats(props : Props) {
                     </StyledText>
                     <Spacing size="lg"/>
                     <MyDonut
-                        likes={props.stats.allTime.likedMe}
-                        dislikes={props.stats.allTime.dislikedMe}
+                        likes={stats.allTime.likedMe}
+                        dislikes={stats.allTime.dislikedMe}
                         likeText={statsText.likesReceived}
                         dislikeText={statsText.dislikesReceived}
                     />
@@ -75,8 +72,8 @@ export function Stats(props : Props) {
                     </StyledText>
                     <Spacing size="lg"/>
                     <MyDonut
-                        likes={props.stats.allTime.myLikes}
-                        dislikes={props.stats.allTime.myDislikes}
+                        likes={stats.allTime.myLikes}
+                        dislikes={stats.allTime.myDislikes}
                         likeText={statsText.likesSent}
                         dislikeText={statsText.dislikesSent}
                     />
@@ -85,8 +82,8 @@ export function Stats(props : Props) {
                         {statsText.weeklyReceived}
                     </StyledText>
                     <Weekly
-                        likes={props.stats.weekly.map( val => val.likedMe)}
-                        dislikes={props.stats.weekly.map( val => val.dislikedMe)}
+                        likes={stats.weekly.map( val => val.likedMe)}
+                        dislikes={stats.weekly.map( val => val.dislikedMe)}
                         likeText={statsText.likesReceived}
                         dislikeText={statsText.dislikesReceived}
                     />
@@ -95,8 +92,8 @@ export function Stats(props : Props) {
                         {statsText.weeklySent}
                     </StyledText>
                     <Weekly
-                        likes={props.stats.weekly.map( val => val.myLikes)}
-                        dislikes={props.stats.weekly.map( val => val.myDislikes)}
+                        likes={stats.weekly.map( val => val.myLikes)}
+                        dislikes={stats.weekly.map( val => val.myDislikes)}
                         likeText={statsText.likesSent}
                         dislikeText={statsText.dislikesSent}
                     />

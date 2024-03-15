@@ -30,6 +30,40 @@ export function Index() {
                 subscribed: true,
                 endDate: new Date(2025,0,1)
             })
+            // receivedData.setStats({
+            //     allTime: {
+            //         likedMe: 10,
+            //         dislikedMe: 20,
+            //         myDislikes: 30,
+            //         myLikes: 40
+            //     },
+            //     weekly: [
+            //         {
+            //             dislikedMe: 10,
+            //             likedMe: 20,
+            //             myDislikes: 30,
+            //             myLikes: 40
+            //         },
+            //         {
+            //             dislikedMe: 40,
+            //             likedMe: 30,
+            //             myDislikes: 20,
+            //             myLikes: 10
+            //         },
+            //         {
+            //             dislikedMe: 30,
+            //             likedMe: 40,
+            //             myDislikes: 10,
+            //             myLikes: 20
+            //         },
+            //         {
+            //             dislikedMe: 20,
+            //             likedMe: 10,
+            //             myDislikes: 40,
+            //             myLikes: 30
+            //         },
+            //     ]
+            // })
             setLoading(false);
         } catch (err) {}
     })
