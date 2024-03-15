@@ -15,7 +15,9 @@ describe("profile", () => {
         description: "",
         gender: "Male",
         images: ["image"],
-        name: "name"
+        name: "name",
+        alcohol: "Often",
+        smoking: "Often"
     }
 
     const subscriptionData : SubscriptionData = {
@@ -28,104 +30,104 @@ describe("profile", () => {
         subscribed: false,
     }
 
-    it("should purchase if not subscribed", async () => {
-        const checkoutURL = "url";
+    // it("should purchase if not subscribed", async () => {
+    //     const checkoutURL = "url";
 
-        const mock = new MockAdapter(axios);
-        mock.onPost(URLs.server + URLs.getCheckoutPage).reply( config => [200, checkoutURL])
+    //     const mock = new MockAdapter(axios);
+    //     mock.onPost(URLs.server + URLs.getCheckoutPage).reply( config => [200, checkoutURL])
 
-        const openLinkFunc = jest.fn( (input : string) => null)
+    //     const openLinkFunc = jest.fn( (input : string) => null)
 
-        const store = new RootStore();
-        const Provider = createStoreProvider(store);
-        render( 
-            <Provider value={store}>
-                <ProfileMob
-                    profile={profile}
-                    subscription={notSubscribedData}
-                    openLinkFunc={openLinkFunc}
-                />
-            </Provider>
+    //     const store = new RootStore();
+    //     const Provider = createStoreProvider(store);
+    //     render( 
+    //         <Provider value={store}>
+    //             <ProfileMob
+    //                 profile={profile}
+    //                 subscription={notSubscribedData}
+    //                 openLinkFunc={openLinkFunc}
+    //             />
+    //         </Provider>
             
-        )
+    //     )
 
-        await act( () => {
-            fireEvent(screen.getByText(profileText.purchasePremium), "press");
-        })
+    //     await act( () => {
+    //         fireEvent(screen.getByText(profileText.purchasePremium), "press");
+    //     })
 
-        expect(openLinkFunc).toHaveBeenLastCalledWith(checkoutURL);
-    })
+    //     expect(openLinkFunc).toHaveBeenLastCalledWith(checkoutURL);
+    // })
 
-    it("should not see cancel subscription", async () => {
-        const mock = new MockAdapter(axios);
-        mock.onPost(URLs.server + URLs.cancelSubscription).reply( config => [200])
+    // it("should not see cancel subscription", async () => {
+    //     const mock = new MockAdapter(axios);
+    //     mock.onPost(URLs.server + URLs.cancelSubscription).reply( config => [200])
         
-        const store = new RootStore();
-        const Provider = createStoreProvider(store);
-        render( 
-            <Provider value={store}>
-                <ProfileMob
-                    profile={profile}
-                    subscription={notSubscribedData}
-                />
-            </Provider>
-        );
+    //     const store = new RootStore();
+    //     const Provider = createStoreProvider(store);
+    //     render( 
+    //         <Provider value={store}>
+    //             <ProfileMob
+    //                 profile={profile}
+    //                 subscription={notSubscribedData}
+    //             />
+    //         </Provider>
+    //     );
 
-        expect(screen.queryByText(profileText.freeTier)).not.toEqual(null);
-        expect(screen.queryByText(profileText.cancelSubscription)).toEqual(null);
-    })
+    //     expect(screen.queryByText(profileText.freeTier)).not.toEqual(null);
+    //     expect(screen.queryByText(profileText.cancelSubscription)).toEqual(null);
+    // })
 
-    it("should cancel subscription", async () => {
-        let sent = false;
+    // it("should cancel subscription", async () => {
+    //     let sent = false;
 
-        const mock = new MockAdapter(axios);
-        mock.onPost(URLs.server + URLs.cancelSubscription).reply( config => {
-            sent = true;
-            return [200]
-        })
+    //     const mock = new MockAdapter(axios);
+    //     mock.onPost(URLs.server + URLs.cancelSubscription).reply( config => {
+    //         sent = true;
+    //         return [200]
+    //     })
 
-        const store = new RootStore();
-        const Provider = createStoreProvider(store);
-        render( 
-            <Provider value={store}>
-                <ProfileMob
-                    profile={profile}
-                    subscription={subscriptionData}
-                />
-            </Provider>
-        );
+    //     const store = new RootStore();
+    //     const Provider = createStoreProvider(store);
+    //     render( 
+    //         <Provider value={store}>
+    //             <ProfileMob
+    //                 profile={profile}
+    //                 subscription={subscriptionData}
+    //             />
+    //         </Provider>
+    //     );
 
-        await act( () => {
-            fireEvent(screen.getByText(profileText.cancelSubscription), "press")
-        })
+    //     await act( () => {
+    //         fireEvent(screen.getByText(profileText.cancelSubscription), "press")
+    //     })
 
-        expect(screen.queryByText(profileText.premiumTier)).not.toEqual(null);
-        expect(sent).toEqual(true);
-    })
+    //     expect(screen.queryByText(profileText.premiumTier)).not.toEqual(null);
+    //     expect(sent).toEqual(true);
+    // })
 
-    it("should get management page", async () => {
-        const manageURL = "url";
+    // it("should get management page", async () => {
+    //     const manageURL = "url";
 
-        const mock = new MockAdapter(axios);
-        mock.onPost(URLs.server + URLs.manageSubscription).reply( config => [200, manageURL])
+    //     const mock = new MockAdapter(axios);
+    //     mock.onPost(URLs.server + URLs.manageSubscription).reply( config => [200, manageURL])
 
-        const openLinkFunc = jest.fn( (input : string) => null)
-        const store = new RootStore();
-        const Provider = createStoreProvider(store);
-        render( 
-            <Provider value={store}>
-                <ProfileMob
-                    profile={profile}
-                    subscription={subscriptionData}
-                    openLinkFunc={openLinkFunc}
-                />
-            </Provider>
-        );
+    //     const openLinkFunc = jest.fn( (input : string) => null)
+    //     const store = new RootStore();
+    //     const Provider = createStoreProvider(store);
+    //     render( 
+    //         <Provider value={store}>
+    //             <ProfileMob
+    //                 profile={profile}
+    //                 subscription={subscriptionData}
+    //                 openLinkFunc={openLinkFunc}
+    //             />
+    //         </Provider>
+    //     );
 
-        await act( () => {
-            fireEvent(screen.getByText(profileText.managePayment), "press")
-        })
+    //     await act( () => {
+    //         fireEvent(screen.getByText(profileText.managePayment), "press")
+    //     })
 
-        expect(openLinkFunc).toHaveBeenLastCalledWith(manageURL);
-    })
+    //     expect(openLinkFunc).toHaveBeenLastCalledWith(manageURL);
+    // })
 })

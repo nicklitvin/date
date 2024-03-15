@@ -7,6 +7,7 @@ import { MySimplePage } from "../src/components/SimplePage";
 
 export function Index() {
     const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<boolean>(false);
     const { globalState, receivedData } = useStore();
 
     useEffect( () => {
@@ -150,12 +151,13 @@ export function Index() {
                 subtitle="Should not take too long"
             />
         )
+    } else if (error) {
+        return <Redirect href="Error" />
     } else {
         return (
             <Redirect href="Verification"/>
         )
     }
-    
 }
 
 export const IndexMob = observer(Index);

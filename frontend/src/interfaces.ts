@@ -131,3 +131,7 @@ export interface SettingData {
 export interface UnlikeInput {
     withID: string
 }
+
+export interface GetProfileInput {
+    userID: string
+}

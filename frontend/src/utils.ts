@@ -1,4 +1,6 @@
+import axios from "axios";
 import { globals } from "./globals";
+import { URLs } from "./urls";
 
 export function getChatTimestamp(date : Date, timezone : string) {
     let timestamp = date.toLocaleString(undefined, {
@@ -60,4 +62,10 @@ export function createTimeoutSignal() {
     }
     
     return control.signal;
+}
+
+export async function sendRequest(subURL : string, data : any) {
+    return await axios.post(URLs.server + subURL, data, {
+        signal: createTimeoutSignal()
+    })
 }

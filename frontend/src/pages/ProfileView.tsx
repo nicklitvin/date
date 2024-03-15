@@ -19,6 +19,7 @@ interface Props {
     ignoreRequest?: boolean
     disableSwiping?: boolean
     reportable?: boolean
+    likedMe?: boolean
 }
 
 export function ProfileView(props : Props) {
@@ -74,9 +75,20 @@ export function ProfileView(props : Props) {
             />
             <Spacing size="lg"/>
             <StyledView className="px-5">
-                <StyledText className="font-bold text-3xl">
-                    {`${props.profile.name}, ${props.profile.age}`}
-                </StyledText>
+                <StyledView>
+                    <StyledText className="font-bold text-3xl">
+                        {`${props.profile.name}, ${props.profile.age}`}
+                    </StyledText>
+                    {
+                        props.likedMe ? 
+                        <MyButton
+                            text={profileViewText.likedMe}
+                            onPressFunction={() => {}}
+                            smallButton={true}
+                            invertColor={true}
+                        /> : null
+                    }
+                </StyledView>
                 <Spacing size="md"/>
                 <StyledText className="text-xl">
                     {props.profile.description}

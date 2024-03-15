@@ -3,12 +3,12 @@ import { MyTextInput } from "../src/components/TextInput";
 import { chatText, generalText } from "../src/text";
 import { useEffect, useRef, useState } from "react";
 import { useStore } from "../src/store/RootStore";
-import { GetChatInput, Message, MessageInput, PublicProfile, RequestReportInput, SwipeInput, UnlikeInput } from "../src/interfaces";
+import { GetChatInput, GetProfileInput, Message, MessageInput, PublicProfile, RequestReportInput, SwipeInput, UnlikeInput } from "../src/interfaces";
 import axios from "axios";
 import { globals } from "../src/globals";
 import { StyledButton, StyledImage, StyledScroll, StyledText, StyledView } from "../src/styledElements";
 import { testIDS } from "../src/testIDs";
-import { createTimeoutSignal, getChatTimestamp } from "../src/utils";
+import { createTimeoutSignal, getChatTimestamp, sendRequest } from "../src/utils";
 import { PageHeader } from "../src/components/PageHeader";
 import { MyMessage } from "../src/components/Message";
 import { URLs } from "../src/urls";
@@ -17,29 +17,21 @@ import { MyModal } from "../src/components/Modal";
 import { differenceInSeconds } from "date-fns";
 import { Redirect, router, useLocalSearchParams } from "expo-router";
 
-export function Chat() {
-    const { userID } = useLocalSearchParams();
-    const { globalState, receivedData } = useStore();
+interface Props {
+    userID?: string
+    getChatLength?: (input : number) => void
+    noAutoLoad?: boolean
+    getUnsentLength?: (input : number) => void
+}
 
-    if (!userID) router.back();
+export function Chat(props : Props) {
+    const { userID } = props || useLocalSearchParams();
+    const { globalState } = useStore();
 
-    let profile : PublicProfile;
-    let chat : Message[];
+    if (!userID) router.back(); 
 
-    const newMatch = receivedData.newMatches.find( val => val.profile.id == userID);
-    const existingMatch = receivedData.chatPreviews.find(val => val.profile.id == userID);
-
-    if (newMatch) {
-        profile = newMatch.profile;
-        chat = [];
-    } else if (existingMatch) {
-        profile = existingMatch.profile;
-        chat = existingMatch.messages;
-    } else {
-        return <Redirect href="Error"/>
-    }
-
-    const [allMessages, setAllMessages] = useState<Message[]>(chat);
+    const [profile, setProfile] = useState<PublicProfile>();
+    const [chat, setChat] = useState<Message[]>([]);
     const [lastSentChatID, setLastSentChatID] = useState<string>("");
     const scrollRef = useRef<ScrollView>(null);
     const [chatRequestTime, setChatRequestTime] = useState<Date>(new Date(0));
@@ -50,23 +42,56 @@ export function Chat() {
     const [showModal, setShowModal] = useState<boolean>(false);
 
     useEffect( () => {
-        if (chat.length == 0) return
+        if (props.getChatLength) props.getChatLength(chat.length);
 
         for (const message of chat) {
-            if (!unsentChats.includes(message.id) && message.recepientID == profile.id ) {
+            if (!unsentChats.includes(message.id) && message.recepientID == profile?.id ) {
                 setLastSentChatID(message.id);
                 break;
             } 
         }
-    }, [chat])
+
+    }, [chat,profile])
 
     useEffect( () => {
+        if (props.getUnsentLength) props.getUnsentLength(unsentChats.length)
+    }, [unsentChats])
+
+    useEffect( () => {
+        if (props.noAutoLoad) return
+        load();
         scrollRef.current?.scrollToEnd({animated: true});
-    }, [])
+    })
+
+    const load = async () => {
+        try {
+            const chatInput : GetChatInput = {
+                fromTime: new Date(),
+                withID: userID!
+            }
+            const profileInput : GetProfileInput = {
+                userID: userID!
+            }
+            const [chatResponse, profileResponse] = await Promise.all([
+                sendRequest(URLs.getChat, chatInput),
+                sendRequest(URLs.getProfile, profileInput)
+            ])
+            const chatData = chatResponse.data.data as Message[];
+            const processedChatData = chatData.map( val => ({
+                ...val,
+                timestamp: new Date(val.timestamp)
+            }));
+            setChat(processedChatData);
+
+            setProfile(profileResponse.data.data);
+        } catch (err) {
+            console.log(err);
+        }
+    }
 
     const sendMessage = async (sentMessage : string, removeID?: string) => {
         const messageInput : MessageInput = {
-            recepientID: profile.id,
+            recepientID: profile!.id,
             message: sentMessage
         }
 
@@ -77,17 +102,17 @@ export function Chat() {
             id: sendingID,
             message: sentMessage,
             readStatus: false,
-            recepientID: profile.id,
+            recepientID: profile!.id,
             timestamp: new Date(),
             userID: ""
         }
         setLoadingIDs(loadingIDs.concat(sendingID));
-        setAllMessages([sendingChat].concat(chat.filter( val => val.id != removeID)));
+        setChat([sendingChat].concat(chat.filter( val => val.id != removeID)));
 
         try {
             const endpoint = URLs.server + URLs.sendMessage;
             const response = await axios.post(endpoint, messageInput);
-            const message = response.data as Message;
+            const message = response.data.data as Message;
 
             const copy = [...chat];
             const index = chat.findIndex( val => val.id == sendingID);
@@ -95,6 +120,7 @@ export function Chat() {
 
             setSendingChats(sendingChats.filter( val => val.id != sendingID));
             setUnsentChats(unsentChats.filter(val => val != removeID));
+
         } catch (err) {
             setUnsentChats(unsentChats.filter(val => val != removeID).concat(sendingID))
         }
@@ -115,7 +141,7 @@ export function Chat() {
             if (chat.length == 0) return
 
             const input : GetChatInput = {
-                withID: profile.id,
+                withID: profile!.id,
                 fromTime: new Date(chat.at(-1)!.timestamp.getTime() - 1)
             }
 
@@ -128,7 +154,7 @@ export function Chat() {
                 timestamp: new Date(message.timestamp)
             }))
 
-            setAllMessages(chat.concat(moreChats));
+            setChat(chat.concat(moreChats));
         } catch (err) {
         }
     }
@@ -137,7 +163,7 @@ export function Chat() {
         try {
             setShowModal(false);
             const myReport : RequestReportInput = {
-                reportedID: profile.id
+                reportedID: profile!.id
             }
             await axios.post(URLs.server + URLs.reportUser, myReport, {
                 signal: createTimeoutSignal()
@@ -151,7 +177,7 @@ export function Chat() {
         try {
             setShowModal(false);
             const unlike : UnlikeInput = {
-                withID: profile.id
+                withID: profile!.id
             }
             await axios.post(URLs.server + URLs.unlikeUser, unlike);
         } catch (err) {
@@ -184,9 +210,10 @@ export function Chat() {
             cancelButtonIndex={2}
         />
         <StyledView className="w-full h-full">
+            <StyledButton testID={testIDS.load} onPress={load}/>
             <PageHeader
-                imageSource={profile.images[0]}
-                title={profile.name}
+                imageSource={profile?.images[0]}
+                title={profile?.name ?? ""}
                 swapTitleAndImage={true}
                 rightContent={
                     <StyledButton onPress={() => setShowModal(true)} testID={testIDS.reportUser}>
@@ -197,7 +224,7 @@ export function Chat() {
                         /> */}
                     </StyledButton>    
                 }
-                imageLink={`/ProfileView?userID=${profile.id}`}
+                imageLink={`/ProfileView?userID=${profile?.id}`}
             />
             <StyledView className="flex flex-grow flex-col-reverse pb-3 px-2">
                 <StyledView className="pt-2">
@@ -234,7 +261,7 @@ export function Chat() {
                                 <StyledView>
                                     <MyMessage
                                         text={message.message}
-                                        invert={message.userID == profile.id}
+                                        invert={message.userID == profile?.id}
                                         error={unsentChats.includes(message.id)}
                                         onPress={unsentChats.includes(message.id) ? 
                                             () => sendMessage(message.message, message.id) :

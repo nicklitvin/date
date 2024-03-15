@@ -33,6 +33,7 @@ export const feedText = {
 export const profileViewText = {
     pageTitle: "Public View",
     reportUser: "Report User",
+    likedMe: "Likes you",
 }
 
 export const descriptionText = {

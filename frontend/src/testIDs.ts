@@ -9,5 +9,7 @@ export const testIDS = {
     swipeDislike: "Dislike",
 
     agePreferenceMin: "ageprefmin",
-    agePreferenceMax: "ageprefmax"
+    agePreferenceMax: "ageprefmax",
+
+    load: "Load"
 }

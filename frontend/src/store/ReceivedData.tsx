@@ -16,7 +16,7 @@ export class ReceivedData {
     setSubscription(input : SubscriptionData) {this.subscription = input; }
 
     @action
-    setChatPreviews(input : ChatPreview[]) { this.chatPreviews = this.chatPreviews; }
+    setChatPreviews(input : ChatPreview[]) { this.chatPreviews = input; }
 
     @action
     setSwipeFeed(input : PublicProfile[]) { this.swipeFeed = input; }
@@ -24,5 +24,6 @@ export class ReceivedData {
     @action 
     setStats(input : UserSwipeStats|null) { this.stats = input; }
 
-    @action setNewMatches(input : NewMatch[]) { this.newMatches = input; }
+    @action 
+    setNewMatches(input : NewMatch[]) { this.newMatches = input; }
 }

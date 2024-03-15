@@ -19,5 +19,6 @@ export const URLs = {
     cancelSubscription: "/cancelSubscription",
     manageSubscription: "/manageSubscription",
     deleteAccount: "/deleteAccount",
-    unlikeUser: "/unlikeUser"
+    unlikeUser: "/unlikeUser",
+    getProfile: "/getProfile"
 }
