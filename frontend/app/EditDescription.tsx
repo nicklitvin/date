@@ -25,7 +25,7 @@ export function EditDescription() {
             receivedData.setProfile(response.data);
             router.back();
         } catch (err) {
-            console.log()
+            console.log(err)
         }
     }
 

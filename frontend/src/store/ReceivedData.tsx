@@ -5,7 +5,7 @@ export class ReceivedData {
     @observable public profile : PublicProfile|null = null;
     @observable public subscription : SubscriptionData|null = null;
     @observable public chatPreviews : ChatPreview[] = [];
-    @observable public swipeFeed : PublicProfile[]|null = null;
+    @observable public swipeFeed : PublicProfile[] = [];
     @observable public stats : UserSwipeStats|null = null;
     @observable public newMatches : NewMatch[] = [];
 

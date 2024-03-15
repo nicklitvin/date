@@ -5,6 +5,7 @@ export class GlobalState {
     @observable public email : string|null = null;
     @observable public timeZone : string = "America/Los_Angeles";
     @observable public ignoreRequest : boolean = true;
+    @observable public disableFade : boolean = false;
 
     constructor() {
         makeAutoObservable(this);
@@ -21,4 +22,7 @@ export class GlobalState {
 
     @action 
     setIgnoreRequest(value : boolean) { this.ignoreRequest = value; }
+
+    @action
+    setDisableFade(value : boolean) { this.disableFade = value; }
 }

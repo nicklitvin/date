@@ -11,16 +11,12 @@ import { createTimeoutSignal } from "../../src/utils";
 import { Animated, ScrollView } from "react-native";
 import { globals } from "../../src/globals";
 import { Link } from "expo-router";
+import { useStore } from "../../src/store/RootStore";
 
-interface Props {
-    feed: PublicProfile[]
-    returnFeedLength? (input : number) : number
-    returnFeedIndex? (input : number) : number
-    disableFade?: boolean
-}
+export function Feed() {
+    const { globalState, receivedData } = useStore();
 
-export function Feed(props : Props) {
-    const [feed, setFeed] = useState<PublicProfile[]>(props.feed ?? []);
+    const [feed, setFeed] = useState<PublicProfile[]>(receivedData.swipeFeed);
     const [feedIndex, setFeedIndex] = useState<number>(0);
     const [lastSwipedIndex, setLastSwipedIndex] = useState<number>(-1);
     const opacity = useState(new Animated.Value(1))[0];
@@ -33,15 +29,6 @@ export function Feed(props : Props) {
     };
 
     useEffect( () => {
-        if (props.returnFeedLength) {
-            props.returnFeedLength(feed.length);
-        }
-    }, [feed])
-
-    useEffect( () => {
-        if (props.returnFeedIndex) {
-            props.returnFeedIndex(feedIndex);
-        }
         if (feedIndex == feed.length) {
             loadMoreFeed();
         } 
@@ -66,7 +53,7 @@ export function Feed(props : Props) {
     const afterSwipe = () => {
         setLastSwipedIndex(lastSwipedIndex + 1);
 
-        if (props.disableFade) {
+        if (globalState.disableFade) {
             setFeedIndex(feedIndex + 1); 
             return;
         }
@@ -107,10 +94,10 @@ export function Feed(props : Props) {
                 {
                     feedIndex == feed.length ? 
                     <StyledView className="flex items-center mt-[250px] flex-col">
-                        {/* <StyledImage
+                        <StyledImage
                             className="w-[100px] h-[100px]"
-                            source={require("../../../assets/Sad.png")}
-                        /> */}
+                            source={require("../../assets/Sad.png")}
+                        />
                         <StyledText className="font-bold text-xl">
                             {feedText.noMoreFeed}
                         </StyledText>

@@ -110,6 +110,35 @@ export function Index() {
                     }]
                 }
             ])
+            receivedData.setSwipeFeed([
+                {
+                    name: "Not Michael 2",
+                    age: 25,
+                    attributes: ["basketball"],
+                    description: "this is not michael",
+                    gender: "Female",
+                    id: "goat",
+                    images: [
+                        "https://hips.hearstapps.com/hmg-prod/images/jordan-jamming-1589896458.png?crop=0.564xw:1.00xh;0.0545xw,0&resize=1200:*",
+                        "https://pbs.twimg.com/profile_images/1262372966073016321/DH4rOj9S_400x400.jpg"
+                    ],
+                    alcohol: "Never",
+                    smoking: "Never",
+                },
+                {
+                    name: "Not Michael 3",
+                    age: 35,
+                    attributes: ["basketball"],
+                    description: "this is not michael again",
+                    gender: "Female",
+                    id: "asdqwe",
+                    images: [
+                        "https://pbs.twimg.com/profile_images/1262372966073016321/DH4rOj9S_400x400.jpg"
+                    ],
+                    alcohol: "Often",
+                    smoking: "Often",
+                }
+            ])
             setLoading(false);
         } catch (err) {}
     })

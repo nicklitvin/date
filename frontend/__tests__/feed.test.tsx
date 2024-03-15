@@ -40,7 +40,6 @@ describe("feed", () => {
     it("should show not load more users if none", async () => {
         const mock = new MockAdapter(axios);
         mock.onPost(URLs.server + URLs.getFeed).reply( config => {
-            console.log("no");
             return [200, {data: feed}]
         })
         
