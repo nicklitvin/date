@@ -20,9 +20,9 @@ import { createTimeoutSignal } from "../src/utils";
 
 export function EditPictures() {
     const { receivedData } = useStore();
-    if (!receivedData.profile) return <Redirect href="Error"/>
+    const profile = receivedData.profile;
+    if (!profile) return <Redirect href="Error"/>
 
-    const [uploads, setUploads] = useState<string[]>(receivedData.profile.images);
     const [switchURI, setSwitchURI] = useState<string|null>(null);
     const [showError, setShowError] = useState<boolean>(false);
 
@@ -119,7 +119,7 @@ export function EditPictures() {
         if (switchURI == uri) {
             setSwitchURI(null);
         } else if (switchURI) {
-            const copy = [...uploads];
+            const copy = [...profile.images];
             const index1 = copy.findIndex( val => val == switchURI);
             const index2 = copy.findIndex( val => val == uri);
             const saved = copy[index1];
@@ -151,13 +151,13 @@ export function EditPictures() {
             <>
                 <StyledView className="flex flex-row flex-wrap justify-center">
                     {Array.from({length : globals.maxUploads}).map( (_,index) => 
-                        index < uploads.length ?
-                        <StyledView key={`picture-${uploads[index]}`} className="m-2">
+                        index < profile.images.length ?
+                        <StyledView key={`picture-${profile.images[index]}`} className="m-2">
                             <Picture
-                                source={uploads[index]}
-                                switching={uploads[index] == switchURI}
-                                onPress={() => performSwitch(uploads[index])}
-                                onRemove={() => removeImage(uploads[index])}
+                                source={profile.images[index]}
+                                switching={profile.images[index] == switchURI}
+                                onPress={() => performSwitch(profile.images[index])}
+                                onRemove={() => removeImage(profile.images[index])}
                             />
                         </StyledView> :
                         <StyledView

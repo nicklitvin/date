@@ -5,30 +5,53 @@ import { StyledScroll, StyledText, StyledView } from "../src/styledElements"
 import { attributesText, generalText } from "../src/text"
 import { globals } from "../src/globals"
 import classNames from "classnames"
+import { observer } from "mobx-react-lite"
+import { useStore } from "../src/store/RootStore"
+import { EditUserInput } from "../src/interfaces"
+import axios from "axios"
+import { URLs } from "../src/urls"
+import { createTimeoutSignal } from "../src/utils"
+import { router } from "expo-router"
 
-interface Props {
-    onSubmit: (input : string[]) => any
-    attributes: { [title : string] : {id: string, value: string}[]}
-    submitText: string
-    goBack?: () => any
-    selectedAttributes?: string[]
-}
+// interface Props {
+//     onSubmit: (input : string[]) => any
+//     attributes: { [title : string] : {id: string, value: string}[]}
+//     submitText: string
+//     goBack?: () => any
+//     selectedAttributes?: string[]
+// }
 
 export function EditAttributes() {
-    const props : Props = {
-        attributes: globals.attributes,
-        onSubmit: () => {},
-        submitText: "Submit"
-    }
+    const { receivedData } = useStore();
 
-    const [attributes, setAttributes] = useState<string[]>(props.selectedAttributes ?? []);
+    const [attributes, setAttributes] = useState<string[]>(receivedData.profile?.attributes ?? []);
     const [showError, setShowError] = useState<boolean>(false);
+
+    const submitChanges = async () => {
+        if (attributes.length == 0 || attributes.length > globals.maxAttributes) {
+            setShowError(true)
+            return
+        } 
+
+        try {
+            const input : EditUserInput = {
+                setting: globals.settingAttributes,
+                value: attributes
+            }
+            const response = await axios.post(URLs.server + URLs.editUser, input, {
+                signal: createTimeoutSignal()
+            })
+            receivedData.setProfile(response.data);
+            router.back()
+        } catch (err) { 
+            console.log(err);
+        }
+    }
 
     return <MySimplePage
         title={attributesText.pageTitle}
         subtitle={attributesText.pageSubtitle}
         marginTop="Attributes"
-        goBackFunc={props.goBack}
         content={
             <StyledView className="w-full flex items-center mt-3">
                 <StyledText className={classNames(
@@ -38,14 +61,8 @@ export function EditAttributes() {
                     {attributesText.error}
                 </StyledText>
                 <MyButton
-                    text={props.submitText}
-                    onPressFunction={ () => {
-                        if (attributes.length > 0 && attributes.length < globals.maxAttributes) {
-                            props.onSubmit(attributes)
-                        } else {
-                            setShowError(true)
-                        }
-                    }}
+                    text={generalText.saveChanges}
+                    onPressFunction={submitChanges}
                 />
             </StyledView>
         }
@@ -97,4 +114,5 @@ export function EditAttributes() {
         }
     />
 }
-export default EditAttributes;
+export const EditAttributesMob = observer(EditAttributes);
+export default EditAttributesMob;

@@ -14,7 +14,7 @@ export function Index() {
             receivedData.setProfile({
                 name: "Michael",
                 age: 21,
-                attributes: ["asd","asrqd", "asdnw", "ajshdkasdsa", "ajljshdwgeiqw"],
+                attributes: ["soccer", "basketball"],
                 description: "this is a desceiption askdh askdjh aks dhsk ds dkas daksj daks kad jhask dajsh kasdhjasdhask das dhaskd ask dashd ",
                 gender: "Male",
                 id: "abc",

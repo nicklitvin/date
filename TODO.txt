@@ -1,14 +1,6 @@
 TODO
-receivedData
-    myProfile
-    feed
-    chatpreviews
-    stats
-    settings
-
-formOutput
-    
-
+add tests for edit pages
+attirubte verification on backend (prevent random attributes)
 
 BACKEND TODO
 change elo constants with api?
