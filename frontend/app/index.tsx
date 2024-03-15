@@ -152,7 +152,7 @@ export function Index() {
         )
     } else {
         return (
-            <Redirect href={"/(tabs)"}/>
+            <Redirect href="Verification"/>
         )
     }
     

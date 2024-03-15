@@ -29,6 +29,7 @@ export default function App() {
                                     <Stack.Screen name="AccountCreation"/>
                                     <Stack.Screen name="Error"/>
                                     <Stack.Screen name="Chat"/>
+                                    <Stack.Screen name="Verification"/>
                                 </Stack>
                             </StyledView>
                         </StyledView>
