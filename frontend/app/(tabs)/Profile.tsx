@@ -13,28 +13,10 @@ import { Link, router } from "expo-router";
 
 interface Props {
     openLinkFunc?: (input : string) => any
-    profile?: PublicProfile
-    subscription?: SubscriptionData
 }
 
-export function Profile() {
-    const props : Props = {
-        profile: {
-            name: "Michael",
-            age: 21,
-            attributes: ["asd","asrqd", "asdnw", "ajshdkasdsa", "ajljshdwgeiqw"],
-            description: "this is a desceiption askdh askdjh aks dhsk ds dkas daksj daks kad jhask dajsh kasdhjasdhask das dhaskd ask dashd ",
-            gender: "Male",
-            id: "abc",
-            images: [
-                "https://hips.hearstapps.com/hmg-prod/images/jordan-jamming-1589896458.png?crop=0.564xw:1.00xh;0.0545xw,0&resize=1200:*",
-                "https://pbs.twimg.com/profile_images/1262372966073016321/DH4rOj9S_400x400.jpg"
-            ],
-            alcohol: "Often",
-            smoking: "Often",
-        }
-    }
-    const { globalState } = useStore();
+export function Profile(props : Props) {
+    const { globalState, receivedData } = useStore();
 
     const managePayment = async () => {
         try {
@@ -95,19 +77,19 @@ export function Profile() {
             />
             <StyledView className="flex items-center pt-[100px]">
                 <StyledImage
-                    source={props.profile?.images[0]}
+                    source={receivedData.profile?.images[0]}
                     className="w-[150px] h-[150px] rounded-full"
                 />
                 <StyledText className="font-bold text-xl">
-                    {`${props.profile?.name}, ${props.profile?.age}`}
+                    {`${receivedData.profile?.name}, ${receivedData.profile?.age}`}
                 </StyledText>
                 <StyledText className="text-xl">
-                    {props.subscription?.subscribed ? profileText.premiumTier : profileText.freeTier}
+                    {receivedData.subscription?.subscribed ? profileText.premiumTier : profileText.freeTier}
                 </StyledText>
                 <StyledView className="w-full pt-3 flex items-center">
                     <MyButton
                         text={profileText.viewProfile}
-                        onPressFunction={() => router.navigate("/ProfileView")}
+                        onPressFunction={() => router.navigate(`/ProfileView?userID=${receivedData.profile?.id}`)}
                     />
                 </StyledView>
                 <StyledView className="w-full pt-3 flex items-center">
@@ -117,14 +99,14 @@ export function Profile() {
                     />
                 </StyledView>
                 {
-                    props.subscription?.subscribed ? 
+                    receivedData.subscription?.subscribed ? 
                     <StyledView className="flex flex-col w-full pt-5 items-center">
                         <StyledText className="font-bold text-xl">
                             {profileText.subscriptionStatus}
                         </StyledText>
                         <StyledText className="text-xl">
                             {`Next payment of $6.99 on ${getShortDate(
-                                props.subscription.endDate!, globalState.timeZone
+                                receivedData.subscription.endDate!, globalState.timeZone
                             )}`}
                         </StyledText>
                         <StyledView className="w-full flex items-center pt-3">

@@ -4,6 +4,7 @@ export class GlobalState {
     @observable public useHttp : boolean = true;
     @observable public email : string|null = null;
     @observable public timeZone : string = "America/Los_Angeles";
+    @observable public ignoreRequest : boolean = true;
 
     constructor() {
         makeAutoObservable(this);
@@ -16,5 +17,8 @@ export class GlobalState {
     setEmail(value : string|null) { this.email = value; }
 
     @action
-    setTimezone(value : string) { this.timeZone= value; }
+    setTimezone(value : string) { this.timeZone = value; }
+
+    @action 
+    setIgnoreRequest(value : boolean) { this.ignoreRequest = value; }
 }

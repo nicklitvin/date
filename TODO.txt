@@ -1,14 +1,5 @@
 TODO
-stackviewer for edit attributes
-move props to global state
 
-is clerks worth it?
-LOGIN with clerk
-
-if user -> redirect to main pages
-if not user -> redirect to verify page
-
-sign out button on verify page
 
 BACKEND TODO
 change elo constants with api?
