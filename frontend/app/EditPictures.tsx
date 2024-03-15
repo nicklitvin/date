@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { MySimplePage } from "../src/components/SimplePage"
-import { FileUploadAndURI } from "../src/interfaces";
+import { DeleteImageInput, EditUserInput, FileUploadAndURI, UploadImageInput } from "../src/interfaces";
 import { pictureText } from "../src/text"
 import { StyledButton, StyledText, StyledView } from "../src/styledElements";
 import { globals } from "../src/globals";
@@ -11,6 +11,11 @@ import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
 import { Buffer } from "buffer"
 import classNames from "classnames";
+import { useStore } from "../src/store/RootStore";
+import { Redirect, router } from "expo-router";
+import axios from "axios";
+import { URLs } from "../src/urls";
+import { createTimeoutSignal } from "../src/utils";
 
 interface Props {
     uploads: FileUploadAndURI[]
@@ -22,31 +27,20 @@ interface Props {
 }
 
 export function EditPictures() {
-    const props : Props = {
-        uploads: [],
-        onSubmit: () => {},
-        submitText: "Submit"
-    }
+    const { receivedData } = useStore();
+    if (!receivedData.profile) return <Redirect href="Error"/>
 
-    const [uploads, setUploads] = useState<FileUploadAndURI[]>(props.uploads);
+    const [uploads, setUploads] = useState<string[]>(receivedData.profile.images);
     const [switchURI, setSwitchURI] = useState<string|null>(null);
     const [showError, setShowError] = useState<boolean>(false);
 
-    useEffect( () => {
-        if (props.returnSwitchURI) props.returnSwitchURI(switchURI);
-    }, [switchURI])
-
-    useEffect( () => {
-        if (props.returnUploadLength) props.returnUploadLength(uploads.length);
-    }, [uploads])
-
     const uploadImage = async (fromFileSys : boolean) => {
-        let assets : {uri: string, mime: string}[] = [];
+        let asset : {uri: string, mime: string};
         try {
             if (fromFileSys) {
                 const result = await DocumentPicker.getDocumentAsync({
                     copyToCacheDirectory: true,
-                    multiple: true,
+                    multiple: false,
                     type: globals.acceptableFileTypes
                 })
 
@@ -54,18 +48,14 @@ export function EditPictures() {
                 setShowError(result.assets.filter(val => val.size && val.size > globals.maxPictureSize).
                     length > 0
                 );
-                assets = result.assets.
-                    filter(val => val.size && val.size <= globals.maxPictureSize && val.mimeType).
-                    slice(0,globals.maxUploads - uploads.length).
-                    map( val => ({
-                        uri: val.uri,
-                        mime: val.mimeType!
-                    })
-                );    
+                asset = {
+                    mime: result.assets[0].mimeType!,
+                    uri: result.assets[0].uri
+                }
             } else {
                 const result = await ImagePicker.launchImageLibraryAsync({
                     mediaTypes: ImagePicker.MediaTypeOptions.Images,
-                    selectionLimit: globals.maxUploads - uploads.length,
+                    selectionLimit: 1,
                     allowsEditing: true,
                 });
                 if (result.canceled) return
@@ -76,7 +66,7 @@ export function EditPictures() {
                     return
                 }
                 setShowError(false);
-                assets = [{uri: file.uri, mime: file.mimeType}]
+                asset = {uri: file.uri, mime: file.mimeType}
             }
         } catch (err) {
             setShowError(true);
@@ -84,29 +74,53 @@ export function EditPictures() {
             return
         }
 
-        const newUploads : FileUploadAndURI[] = [];
-        for (const asset of assets) {
-            try {
-                const assetString = await FileSystem.readAsStringAsync(asset.uri, {
-                    encoding: FileSystem.EncodingType.Base64
-                })
-                const buffer = Buffer.from(assetString);
-                newUploads.push({
-                    buffer: buffer,
-                    mimetype: asset.mime as string,
-                    uri: asset.uri
-                })
-            } catch (err) {
-                console.log(err);
+        let newUpload : FileUploadAndURI;
+        try {
+            const assetString = await FileSystem.readAsStringAsync(asset.uri, {
+                encoding: FileSystem.EncodingType.Base64
+            })
+            const buffer = Buffer.from(assetString);
+            newUpload = {
+                buffer: buffer,
+                mimetype: asset.mime as string,
+                uri: asset.uri
             }
+        } catch (err) {
+            setShowError(true);
+            console.log(err)
+            return
         }
 
-        setUploads(uploads.concat(newUploads));
+        try {
+            const input : UploadImageInput = {
+                image: {
+                    buffer: newUpload.buffer,
+                    mimetype: newUpload.mimetype
+                }
+            }
+            const response = await axios.post(URLs.server + URLs.uploadImage, input, {
+                signal: createTimeoutSignal()
+            })
+            receivedData.setProfile(response.data);
+        } catch (err) {
+            console.log(err);
+            return
+        }
     }
 
-    const removeImage = (uri : string) => {
-        setUploads(uploads.filter( upload => upload.uri != uri));
-        if (switchURI == uri) setSwitchURI(null);
+    const removeImage = async (uri : string) => {
+        try {
+            const input : DeleteImageInput = {
+                imageID: uri
+            };
+            const response = await axios.post(URLs.server + URLs.deleteImage, input, {
+                signal: createTimeoutSignal()
+            })
+            if (switchURI == uri) setSwitchURI(null);
+            receivedData.setProfile(response.data);
+        } catch (err) {
+            console.log(err);
+        }
     }
 
     const performSwitch = async (uri : string) => {
@@ -114,13 +128,24 @@ export function EditPictures() {
             setSwitchURI(null);
         } else if (switchURI) {
             const copy = [...uploads];
-            const index1 = copy.findIndex( val => val.uri == switchURI);
-            const index2 = copy.findIndex( val => val.uri == uri);
+            const index1 = copy.findIndex( val => val == switchURI);
+            const index2 = copy.findIndex( val => val == uri);
             const saved = copy[index1];
             copy[index1] = copy[index2];
             copy[index2] = saved;
-            setUploads(copy);
-            setSwitchURI(null);
+            try {
+                const input : EditUserInput = {
+                    setting: globals.settingImages,
+                    value: copy
+                }
+                const response = await axios.post(URLs.server + URLs.editUser, input, {
+                    signal: createTimeoutSignal()
+                })
+                receivedData.setProfile(response.data);
+                setSwitchURI(null);
+            } catch (err) {
+                console.log(err);
+            }
         } else {
             setSwitchURI(uri);
         }
@@ -129,19 +154,18 @@ export function EditPictures() {
     return <MySimplePage
         title={pictureText.pageTitle}
         subtitle={pictureText.pageSubtitle}
-        goBackFunc={props.goBack}
         marginTop="Pictures"
         beforeGapContent={
             <>
                 <StyledView className="flex flex-row flex-wrap justify-center">
                     {Array.from({length : globals.maxUploads}).map( (_,index) => 
                         index < uploads.length ?
-                        <StyledView key={`picture-${uploads[index].uri}`} className="m-2">
+                        <StyledView key={`picture-${uploads[index]}`} className="m-2">
                             <Picture
-                                source={uploads[index].uri}
-                                switching={uploads[index].uri == switchURI}
-                                onPress={() => performSwitch(uploads[index].uri)}
-                                onRemove={() => removeImage(uploads[index].uri)}
+                                source={uploads[index]}
+                                switching={uploads[index] == switchURI}
+                                onPress={() => performSwitch(uploads[index])}
+                                onRemove={() => removeImage(uploads[index])}
                             />
                         </StyledView> :
                         <StyledView
@@ -172,15 +196,6 @@ export function EditPictures() {
                 )}>
                     {pictureText.uploadError}
                 </StyledText>
-                <StyledView className="mt-3 w-full items-center">
-                    <MyButton
-                        text={props.submitText}
-                        onPressFunction={() => {
-                            if (uploads.length > 0)
-                                props.onSubmit(uploads);
-                        }}
-                    />
-                </StyledView>
             </>
         }
     />

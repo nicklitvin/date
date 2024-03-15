@@ -1,4 +1,13 @@
 TODO
+receivedData
+    myProfile
+    feed
+    chatpreviews
+    stats
+    settings
+
+formOutput
+    
 
 
 BACKEND TODO
