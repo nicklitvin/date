@@ -1,12 +1,13 @@
 import { action, observable } from "mobx";
-import { ChatPreview, PublicProfile, SubscriptionData, UserSwipeStats } from "../interfaces";
+import { ChatPreview, NewMatch, PublicProfile, SubscriptionData, UserSwipeStats } from "../interfaces";
 
 export class ReceivedData {
     @observable public profile : PublicProfile|null = null;
     @observable public subscription : SubscriptionData|null = null;
-    @observable public chatPreviews : ChatPreview[]|null = null;
+    @observable public chatPreviews : ChatPreview[] = [];
     @observable public swipeFeed : PublicProfile[]|null = null;
     @observable public stats : UserSwipeStats|null = null;
+    @observable public newMatches : NewMatch[] = [];
 
     @action
     setProfile(input : PublicProfile) {this.profile = input; }
@@ -22,4 +23,6 @@ export class ReceivedData {
 
     @action 
     setStats(input : UserSwipeStats|null) { this.stats = input; }
+
+    @action setNewMatches(input : NewMatch[]) { this.newMatches = input; }
 }

@@ -23,6 +23,9 @@ npx prisma db push
 double quotes for table names
 select * from "<table>"
 
+build android development
+eas build --profile development --platform android
+
 premium 
     better filters?
     more likes/day?

@@ -28,6 +28,7 @@ export default function App() {
                                     <Stack.Screen name="EditAttributes"/>
                                     <Stack.Screen name="AccountCreation"/>
                                     <Stack.Screen name="Error"/>
+                                    <Stack.Screen name="Chat"/>
                                 </Stack>
                             </StyledView>
                         </StyledView>

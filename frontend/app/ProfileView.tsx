@@ -2,13 +2,13 @@ import { observer } from "mobx-react-lite";
 import { StyledScroll, StyledText, StyledView } from "../src/styledElements";
 import { PageHeader } from "../src/components/PageHeader";
 import { profileViewText } from "../src/text";
-import { PublicProfile, RequestReportInput, SwipeInput } from "../src/interfaces";
+import { PublicProfile } from "../src/interfaces";
 import { PictureSeries } from "../src/components/PictureSeries";
 import { Spacing } from "../src/components/Spacing";
 import { MyButton } from "../src/components/Button";
 import { Frequency } from "../src/components/Frequency";
 import { useStore } from "../src/store/RootStore";
-import { Redirect, router, useLocalSearchParams } from "expo-router";
+import { Redirect, useLocalSearchParams } from "expo-router";
 
 export function ProfileView() {
     const { receivedData } = useStore();
@@ -16,14 +16,11 @@ export function ProfileView() {
 
     let profile : PublicProfile|undefined;
 
-    if (receivedData.profile && receivedData.profile.id == userID) {
-        profile = receivedData.profile;
-    } else {
-        const index = receivedData.chatPreviews?.findIndex(val =>
-            val.profile.id == userID
-        );
-        if (index) profile = receivedData.chatPreviews![index].profile;
-    }
+    const myProfile = receivedData.profile?.id == userID ? receivedData.profile : undefined;
+    const newMatch = receivedData.newMatches.find(val => val.profile.id == userID)?.profile;
+    const chatPreview = receivedData.chatPreviews.find(val => val.profile.id == userID)?.profile;
+
+    profile = myProfile || newMatch || chatPreview;
 
     if (!profile) return <Redirect href="Error"/>
 

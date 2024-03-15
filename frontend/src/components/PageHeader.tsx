@@ -1,3 +1,4 @@
+import { Link } from "expo-router";
 import { StyledImage, StyledText, StyledView } from "../styledElements"
 
 type ImageName = "SendTriangle" | "Matches" | "Preferences" | "Stats" | "Profile" | "Settings" | "Edit" | "Telescope" | "Feed";
@@ -8,6 +9,7 @@ interface Props {
     rightContent?: React.JSX.Element
     swapTitleAndImage? : boolean
     imageType?: ImageName
+    imageLink?: string
 }
 
 export function PageHeader(props : Props) {
@@ -34,7 +36,7 @@ export function PageHeader(props : Props) {
         case ("Feed"): imageData = Feed; break;
     }
 
-    const imageElement = props.imageSource ? 
+    let imageElement = props.imageSource ? 
         <StyledImage 
             className="w-[50px] h-[50px] rounded-full"
             source={{uri : props.imageSource}}
@@ -43,6 +45,14 @@ export function PageHeader(props : Props) {
             className="w-[25px] h-[25px]"
             source={imageData}
         />
+    
+    if (props.imageLink) {
+        imageElement = (
+            <Link href={props.imageLink}>
+                {imageElement}
+            </Link>
+        )
+    }
         
     const textElement = <StyledText className="text-3xl font-bold">
         {props.title}

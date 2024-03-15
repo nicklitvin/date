@@ -17,8 +17,6 @@ export function Stats() {
     const { receivedData } = useStore();    
     const stats = receivedData.stats;
 
-    console.log(stats);
-
     const getCheckoutPage = async () => {
         try {
             const response = await axios.post(URLs.server + URLs.getCheckoutPage, null, {

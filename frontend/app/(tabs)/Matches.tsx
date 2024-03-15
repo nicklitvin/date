@@ -12,33 +12,19 @@ import { NativeScrollEvent, NativeSyntheticEvent, ScrollView } from "react-nativ
 import { globals } from "../../src/globals";
 import { differenceInSeconds } from "date-fns";
 import { createTimeoutSignal } from "../../src/utils";
+import { useStore } from "../../src/store/RootStore";
+import { Link } from "expo-router";
 
-interface Props {
-    newMatches: NewMatch[]
-    chatPreviews: ChatPreview[]
-    returnNewMatchesLength?: (input : number) => number
-    returnNewChatPreviewsLength?: (input : number) => number
-}
+export function Matches() {
+    const { receivedData } = useStore();
 
-export function Matches(props : Props) {
-    const [newMatches, setNewMatches] = useState<NewMatch[]>(props.newMatches ?? []);
-    const [chatPreviews, setChatPreviews] = useState<ChatPreview[]>(props.chatPreviews ?? []);
+    const newMatches = receivedData.newMatches;
+    const chatPreviews = receivedData.chatPreviews;
+
     const newMatchScrollRef = useRef<ScrollView>(null);
     const chatsScrollRef = useRef<ScrollView>(null);
     const [matchRequestTime, setMatchRequestTime] = useState<Date>(new Date(0));
     const [previewRequestTime, setPreviewRequestTime] = useState<Date>(new Date(0));
-
-    useEffect( () => {
-        if (props.returnNewChatPreviewsLength) {
-            props.returnNewChatPreviewsLength(chatPreviews.length)
-        }
-    }, [chatPreviews])
-
-    useEffect( () => {
-        if (props.returnNewMatchesLength) {
-            props.returnNewMatchesLength(newMatches.length);
-        }
-    }, [newMatches])
 
     const handleMatchScroll = async (event: NativeSyntheticEvent<NativeScrollEvent>) => {
         const { contentOffset, layoutMeasurement, contentSize } = event.nativeEvent;
@@ -62,8 +48,7 @@ export function Matches(props : Props) {
                 ...val,
                 timestamp: new Date(val.timestamp)
             }))
-
-            setNewMatches(newMatches.concat(receivedNewMatches));
+            receivedData.setNewMatches(newMatches.concat(receivedNewMatches));
         } catch (err) {
             console.log(err);
         }
@@ -94,7 +79,7 @@ export function Matches(props : Props) {
                     timestamp: new Date(message.timestamp)
                 }))
             }))
-            setChatPreviews(chatPreviews.concat(newChatPreviews));
+            receivedData.setChatPreviews(chatPreviews.concat(newChatPreviews));
         } catch (err) {
             console.log(err)
         }
@@ -128,15 +113,17 @@ export function Matches(props : Props) {
                         testID={testIDS.newMatchScroll}
                     >
                         {newMatches.map( (match, index) => (
-                            <StyledButton
-                                key={`${match.profile.id}-${index}`}    
-                                className="flex items-center pr-3"
+                            <Link 
+                                key={`${match.profile.id}-${index}`}  
+                                href={`Chat?userID=${match.profile.id}`}
                             >
-                                <StyledImage
-                                    source={match.profile.images[0]}
-                                    className="w-[75px] h-[75px] rounded-full"
-                                />
-                            </StyledButton>
+                                <StyledView className="flex items-center pr-3">
+                                    <StyledImage
+                                            source={match.profile.images[0]}
+                                            className="w-[75px] h-[75px] rounded-full"
+                                    />
+                                </StyledView>
+                            </Link>
                         ))}
                     </StyledScroll>
                 }
