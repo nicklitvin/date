@@ -126,7 +126,7 @@ export interface GetChatPreviewsInput {
 
 export interface ChatPreview {
     profile: PublicProfile
-    messages: Message[]
+    message: Message
 }
 
 export interface ImageHandler {

@@ -122,7 +122,7 @@ describe("message suite", () => {
             funcs.sendMessage(makeMessageInputWithRandoms(), new Date(13))
         ])
 
-        const data = await funcs.getLatestMessagesFromDistinctUsers({
+        const data = await funcs.getLatestMessageFromDistinctUsers({
             userID: userID,
             timestamp: new Date()
         })
@@ -133,7 +133,7 @@ describe("message suite", () => {
         expect(data.messagesToUserID.length).toEqual(1);
         expect(data.messagesToUserID[0].id).toEqual(m3.id);
         
-        const data_2 = await funcs.getLatestMessagesFromDistinctUsers({
+        const data_2 = await funcs.getLatestMessageFromDistinctUsers({
             userID: userID,
             timestamp: new Date(5)
         })

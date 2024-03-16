@@ -185,10 +185,9 @@ describe("handler", () => {
         }) as ChatPreview[];
         expect(previews.length).toEqual(2);
         expect(previews[0].profile.id).toEqual(user_3.id);
-        expect(previews[0].messages[0].id).toEqual(m3.id);
+        expect(previews[0].message.id).toEqual(m3.id);
         expect(previews[1].profile.id).toEqual(user_2.id);
-        expect(previews[1].messages[0].id).toEqual(m2.id);
-        expect(previews[1].messages[1].id).toEqual(m1.id);
+        expect(previews[1].message.id).toEqual(m2.id);
     })
 
     it("should not get chat preview if no messages", async () => {

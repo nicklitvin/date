@@ -127,7 +127,7 @@ export class MessageHandler {
         return deleted.count;
     }
 
-    public async getLatestMessagesFromDistinctUsers(input : GetChatPreviewsInput) {
+    public async getLatestMessageFromDistinctUsers(input : GetChatPreviewsInput) {
         const [messagesFromUserID, messagesToUserID] = await Promise.all([
             this.prisma.message.findMany({
                 where: {

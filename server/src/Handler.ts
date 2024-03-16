@@ -176,24 +176,19 @@ export class Handler {
         const user = await this.user.getUserByID(input.userID);
         if (!user) return null;
 
-        const messages = await this.message.getLatestMessagesFromDistinctUsers(input);
+        const messages = await this.message.getLatestMessageFromDistinctUsers(input);
         const combined = messages.messagesFromUserID.concat(messages.messagesToUserID).
             sort( (a,b) => b.timestamp.getTime() - a.timestamp.getTime())
 
         const getChatPreview = async (message : Message) : 
             Promise<ChatPreview|null> => 
         {
-            const [profile, messages] = await Promise.all([
+            const profile = await (
                 message.userID == input.userID ?
                     this.user.getPublicProfile(message.recepientID) :
-                    this.user.getPublicProfile(message.userID),
-                this.message.getChat({
-                    userID: message.userID,
-                    withID: message.recepientID,
-                    fromTime: input.timestamp
-                })
-            ])
-            if (profile && messages) return {profile, messages}
+                    this.user.getPublicProfile(message.userID)
+            )
+            if (profile) return {profile, message}
             return null;
         }
         
