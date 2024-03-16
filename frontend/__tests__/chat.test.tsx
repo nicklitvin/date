@@ -53,7 +53,7 @@ describe("chat", () => {
         } 
     ]
 
-    const loadChat = async () => {
+    const loadChat = async (useSave = false) => {
         const mock = new MockAdapter(axios);
         mock.onPost(URLs.server + URLs.getProfile).reply( config =>
             [200, {
@@ -70,6 +70,11 @@ describe("chat", () => {
 
         const store = new RootStore();
         store.globalState.setTimezone(timezone);
+        if (useSave) {
+            store.receivedData.addSavedChat(
+                recepientProfile.id, latestMessages.concat(moreMessages)
+            )
+        }
         const StoreProvider = createStoreProvider(store);
         const getChatLength = jest.fn();
         const getUnsentLength = jest.fn();
@@ -88,7 +93,7 @@ describe("chat", () => {
             fireEvent(screen.getByTestId(testIDS.load), "press");
         })
 
-        return { mock, getChatLength, getUnsentLength }
+        return { store, mock, getChatLength, getUnsentLength }
     }
 
     const loadMore = async (mock : MockAdapter) => {
@@ -239,5 +244,19 @@ describe("chat", () => {
 
         expect(getUnsentLength).toHaveBeenLastCalledWith(0);
         expect(screen.queryByText(chatText.unsent)).toEqual(null);
+    })
+
+    it("should save loaded chat", async () => {
+        const { store } = await loadChat();
+
+        expect(store.receivedData.savedChats[recepientProfile.id]).toHaveLength(latestMessages.length);
+    })
+
+    it("should load saved chat", async () => {
+        const { getChatLength } = await loadChat(true);
+        
+        expect(getChatLength).toHaveBeenLastCalledWith(
+            moreMessages.length + latestMessages.length
+        );
     })
 })

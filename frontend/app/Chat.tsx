@@ -6,7 +6,7 @@ import { useStore } from "../src/store/RootStore";
 import { GetChatInput, GetProfileInput, Message, MessageInput, PublicProfile, RequestReportInput, SwipeInput, UnlikeInput } from "../src/interfaces";
 import axios from "axios";
 import { globals } from "../src/globals";
-import { StyledButton, StyledImage, StyledScroll, StyledText, StyledView } from "../src/styledElements";
+import { StyledButton, StyledScroll, StyledText, StyledView } from "../src/styledElements";
 import { testIDS } from "../src/testIDs";
 import { createTimeoutSignal, getChatTimestamp, sendRequest } from "../src/utils";
 import { PageHeader } from "../src/components/PageHeader";
@@ -15,7 +15,7 @@ import { URLs } from "../src/urls";
 import { NativeScrollEvent, NativeSyntheticEvent, ScrollView } from "react-native";
 import { MyModal } from "../src/components/Modal";
 import { differenceInSeconds } from "date-fns";
-import { Redirect, router, useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 
 interface Props {
     userID?: string
@@ -26,7 +26,7 @@ interface Props {
 
 export function Chat(props : Props) {
     const { userID } = props || useLocalSearchParams();
-    const { globalState } = useStore();
+    const { globalState, receivedData } = useStore();
 
     if (!userID) router.back(); 
 
@@ -49,6 +49,11 @@ export function Chat(props : Props) {
                 setLastSentChatID(message.id);
                 break;
             } 
+        }
+
+        const savedChat = receivedData.savedChats[userID!];
+        if (!savedChat && chat.length > 0 || (savedChat && chat.length > savedChat.length)) {
+            receivedData.addSavedChat(userID!,chat)
         }
 
     }, [chat,profile])
@@ -76,12 +81,17 @@ export function Chat(props : Props) {
                 sendRequest(URLs.getChat, chatInput),
                 sendRequest(URLs.getProfile, profileInput)
             ])
-            const chatData = chatResponse.data.data as Message[];
-            const processedChatData = chatData.map( val => ({
-                ...val,
-                timestamp: new Date(val.timestamp)
-            }));
-            setChat(processedChatData);
+
+            if ( receivedData.savedChats[userID!]  ) {
+                setChat(receivedData.savedChats[userID!])
+            } else {
+                const chatData = chatResponse.data.data as Message[];
+                const processedChatData = chatData.map( val => ({
+                    ...val,
+                    timestamp: new Date(val.timestamp)
+                }));
+                setChat(processedChatData);
+            }
 
             setProfile(profileResponse.data.data);
         } catch (err) {
