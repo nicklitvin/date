@@ -79,7 +79,7 @@ describe("components", () => {
 
         const chatPreview : ChatPreview = {
             profile: otherProfile,
-            messages: [sentMessage, receivedMessage]
+            message: sentMessage
         }
         render(
             <ChatPreviewBox
@@ -98,7 +98,7 @@ describe("components", () => {
 
         const chatPreview : ChatPreview = {
             profile: otherProfile,
-            messages: [receivedMessage]
+            message: receivedMessage
         }
 
         render(
@@ -117,7 +117,7 @@ describe("components", () => {
 
         const chatPreview : ChatPreview = {
             profile: otherProfile,
-            messages: [receivedMessage]
+            message: receivedMessage
         }
 
         render(
@@ -136,7 +136,7 @@ describe("components", () => {
 
         const chatPreview : ChatPreview = {
             profile: otherProfile,
-            messages: [sentMessage]
+            message: sentMessage
         }
 
         render(

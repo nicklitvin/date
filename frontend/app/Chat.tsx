@@ -31,7 +31,7 @@ export function Chat(props : Props) {
     if (!userID) router.back(); 
 
     const [profile, setProfile] = useState<PublicProfile>();
-    const [chat, setChat] = useState<Message[]>([]);
+    const [chat, setChat] = useState<Message[]>(receivedData.savedChats[userID ?? ""] ?? []);
     const [lastSentChatID, setLastSentChatID] = useState<string>("");
     const scrollRef = useRef<ScrollView>(null);
     const [chatRequestTime, setChatRequestTime] = useState<Date>(new Date(0));
@@ -70,30 +70,25 @@ export function Chat(props : Props) {
 
     const load = async () => {
         try {
+            // profile
+            const profileInput : GetProfileInput = {
+                userID: userID!
+            }
+            const profileResponse = await sendRequest(URLs.getProfile, profileInput);
+            setProfile(profileResponse.data.data);
+
+            // chat
             const chatInput : GetChatInput = {
                 fromTime: new Date(),
                 withID: userID!
             }
-            const profileInput : GetProfileInput = {
-                userID: userID!
-            }
-            const [chatResponse, profileResponse] = await Promise.all([
-                sendRequest(URLs.getChat, chatInput),
-                sendRequest(URLs.getProfile, profileInput)
-            ])
-
-            if ( receivedData.savedChats[userID!]  ) {
-                setChat(receivedData.savedChats[userID!])
-            } else {
-                const chatData = chatResponse.data.data as Message[];
-                const processedChatData = chatData.map( val => ({
-                    ...val,
-                    timestamp: new Date(val.timestamp)
-                }));
-                setChat(processedChatData);
-            }
-
-            setProfile(profileResponse.data.data);
+            const chatResponse = await sendRequest(URLs.getChat, chatInput);
+            const chatData = chatResponse.data.data as Message[];
+            const processedChatData = chatData.map( val => ({
+                ...val,
+                timestamp: new Date(val.timestamp)
+            }));
+            setChat(processedChatData);
         } catch (err) {
             console.log(err);
         }

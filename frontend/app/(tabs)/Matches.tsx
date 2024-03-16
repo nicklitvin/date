@@ -11,20 +11,90 @@ import { URLs } from "../../src/urls";
 import { NativeScrollEvent, NativeSyntheticEvent, ScrollView } from "react-native";
 import { globals } from "../../src/globals";
 import { differenceInSeconds } from "date-fns";
-import { createTimeoutSignal } from "../../src/utils";
+import { createTimeoutSignal, sendRequest } from "../../src/utils";
 import { useStore } from "../../src/store/RootStore";
 import { Link } from "expo-router";
 
-export function Matches() {
+interface Props {
+    noAutoLoad?: boolean
+    getNewMatchLength?: (input : number) => void
+    getChatPreviewLength?: (input : number) => void
+}
+
+export function Matches(props : Props) {
     const { receivedData } = useStore();
 
-    const newMatches = receivedData.newMatches;
-    const chatPreviews = receivedData.chatPreviews;
+    const [newMatches, setNewMatches] = useState<NewMatch[]>(receivedData.newMatches);
+    const [chatPreviews, setChatPreviews] = useState<ChatPreview[]>(receivedData.chatPreviews);
 
     const newMatchScrollRef = useRef<ScrollView>(null);
     const chatsScrollRef = useRef<ScrollView>(null);
     const [matchRequestTime, setMatchRequestTime] = useState<Date>(new Date(0));
     const [previewRequestTime, setPreviewRequestTime] = useState<Date>(new Date(0));
+
+    useEffect( () => {
+        if (props.noAutoLoad) return
+        load()
+    })
+
+    useEffect( () => {
+        if (props.getChatPreviewLength) props.getChatPreviewLength(chatPreviews.length)
+
+        const savedPreviews = receivedData.chatPreviews;
+        if (
+            !savedPreviews && chatPreviews.length > 0 || 
+            (savedPreviews && chatPreviews.length > savedPreviews.length)
+        ) {
+            receivedData.setChatPreviews(chatPreviews)
+        }
+    }, [chatPreviews])
+
+    useEffect( () => {
+        if (props.getNewMatchLength) props.getNewMatchLength(newMatches.length)
+
+        const savedMatches = receivedData.newMatches;
+        if (
+            !savedMatches && newMatches.length > 0 ||
+            (savedMatches && newMatches.length > savedMatches.length)
+        ) {
+            receivedData.setNewMatches(newMatches);
+        }
+    }, [newMatches])
+
+    const load = async () => {
+        try {
+            const newMatchDataInput : NewMatchDataInput = {
+                timestamp: new Date()
+            }
+
+            // newMatches
+            if (newMatches.length == 0) {
+                const newMatchResponse = await sendRequest(URLs.getNewMatches, newMatchDataInput);
+                const data = newMatchResponse.data.data as NewMatch[];
+                const processed : NewMatch[] = data.map( val => ({
+                    profile: val.profile,
+                    timestamp: new Date(val.timestamp)
+                })) 
+                setNewMatches(processed);
+            }
+
+            // chatPreview
+            if (chatPreviews.length == 0) {
+                const chatPreviewResponse = await sendRequest(URLs.getNewChatPreviews, newMatchDataInput);
+                const data = chatPreviewResponse.data.data as ChatPreview[];
+                const processed : ChatPreview[] = data.map( val => ({
+                    profile: val.profile,
+                    message: {
+                        ...val.message,
+                        timestamp: new Date(val.message.timestamp)
+                    }
+                }))
+                setChatPreviews(processed);
+            }
+        } catch (err) {
+            console.log(err);
+        }
+    }
 
     const handleMatchScroll = async (event: NativeSyntheticEvent<NativeScrollEvent>) => {
         const { contentOffset, layoutMeasurement, contentSize } = event.nativeEvent;
@@ -48,7 +118,8 @@ export function Matches() {
                 ...val,
                 timestamp: new Date(val.timestamp)
             }))
-            receivedData.setNewMatches(newMatches.concat(receivedNewMatches));
+            
+            setNewMatches(newMatches.concat(receivedNewMatches));
         } catch (err) {
             console.log(err);
         }
@@ -65,7 +136,7 @@ export function Matches() {
         try {
             let newChatPreviews : ChatPreview[] = [];
             const input : NewMatchDataInput = {
-                timestamp: new Date(chatPreviews.at(-1)!.messages[0].timestamp.getTime() - 1)
+                timestamp: new Date(chatPreviews.at(-1)!.message.timestamp.getTime() - 1)
             }
 
             const response = await axios.post(URLs.server + URLs.getNewChatPreviews, input, {
@@ -73,13 +144,13 @@ export function Matches() {
             });
             newChatPreviews = response.data.data as ChatPreview[];
             newChatPreviews = newChatPreviews.map( val => ({
-                ...val,
-                messages: val.messages.map( message => ({
-                    ...message,
-                    timestamp: new Date(message.timestamp)
-                }))
+                profile: val.profile,
+                message: {
+                    ...val.message,
+                    timestamp: new Date(val.message.timestamp)
+                }
             }))
-            receivedData.setChatPreviews(chatPreviews.concat(newChatPreviews));
+            setChatPreviews(chatPreviews.concat(newChatPreviews));
         } catch (err) {
             console.log(err)
         }
@@ -87,6 +158,7 @@ export function Matches() {
 
     return (
         <StyledView className="w-full h-full flex flex-col bg-back">
+            <StyledButton testID={testIDS.load} onPress={load} />
             <PageHeader
                 title={matchesText.pageTitle}
                 imageType="Matches"

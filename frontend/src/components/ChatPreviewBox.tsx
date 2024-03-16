@@ -1,7 +1,6 @@
 import { globals } from "../globals";
 import { ChatPreview } from "../interfaces";
 import { StyledButton, StyledImage, StyledText, StyledView } from "../styledElements";
-import { Image } from "expo-image";
 
 interface Props {
     chatPreview: ChatPreview
@@ -9,8 +8,7 @@ interface Props {
 
 export function ChatPreviewBox(props : Props) {
     const getBriefSummaryText = () => {
-        const lastMessage = props.chatPreview.messages[0];
-
+        const lastMessage = props.chatPreview.message;
         let returnedMessage : string;
         if (lastMessage?.recepientID == props.chatPreview.profile.id) {
             returnedMessage = `You: ${lastMessage.message}`
@@ -26,7 +24,7 @@ export function ChatPreviewBox(props : Props) {
     }
 
     const isNewUnread = () => {
-        const lastMessage = props.chatPreview.messages[0];
+        const lastMessage = props.chatPreview.message;
 
         return (lastMessage?.userID == props.chatPreview.profile.id 
             && lastMessage.readStatus == false) 

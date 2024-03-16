@@ -55,12 +55,12 @@ describe("chat", () => {
 
     const loadChat = async (useSave = false) => {
         const mock = new MockAdapter(axios);
-        mock.onPost(URLs.server + URLs.getProfile).reply( config =>
+        mock.onPost(URLs.server + URLs.getProfile).replyOnce( config =>
             [200, {
                 data: recepientProfile
             }]
         )
-        mock.onPost(URLs.server + URLs.getChat).reply(config => {
+        mock.onPost(URLs.server + URLs.getChat).replyOnce(config => {
             const payload = JSON.parse(config.data) as GetChatInput;
             expect(payload.withID).toEqual(recepientProfile.id);
             return [200, {
@@ -97,7 +97,7 @@ describe("chat", () => {
     }
 
     const loadMore = async (mock : MockAdapter) => {
-        mock.onPost(URLs.server + URLs.getChat).reply( config => {
+        mock.onPost(URLs.server + URLs.getChat).replyOnce( config => {
             const payload = JSON.parse(config.data) as GetChatInput;
 
             expect(new Date(payload.fromTime).getTime()).toEqual(
@@ -256,7 +256,7 @@ describe("chat", () => {
         const { getChatLength } = await loadChat(true);
         
         expect(getChatLength).toHaveBeenLastCalledWith(
-            moreMessages.length + latestMessages.length
+            latestMessages.length
         );
     })
 })

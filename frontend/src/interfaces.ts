@@ -60,7 +60,7 @@ export interface RequestReportInput {
 
 export interface ChatPreview {
     profile: PublicProfile
-    messages: Message[]
+    message: Message
 }
 
 export interface SwipeInput {
