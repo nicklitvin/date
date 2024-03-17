@@ -89,9 +89,11 @@ describe("chat", () => {
             </StoreProvider>
         )
 
-        await act( () => {
-            fireEvent(screen.getByTestId(testIDS.load), "press");
-        })
+        if (!useSave) {
+            await act( () => {
+                fireEvent(screen.getByTestId(testIDS.load), "press");
+            })
+        }
 
         return { store, mock, getChatLength, getUnsentLength }
     }
@@ -256,7 +258,7 @@ describe("chat", () => {
         const { getChatLength } = await loadChat(true);
         
         expect(getChatLength).toHaveBeenLastCalledWith(
-            latestMessages.length
+            latestMessages.length + moreMessages.length
         );
     })
 })

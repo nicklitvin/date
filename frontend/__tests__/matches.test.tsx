@@ -68,8 +68,8 @@ describe("matches", () => {
 
         const store = new RootStore();
         if (useSave) {
-            store.receivedData.setChatPreviews(chatPreviews);
-            store.receivedData.setNewMatches(newMatches);
+            store.receivedData.setChatPreviews(chatPreviews.concat(moreChatPreviews));
+            store.receivedData.setNewMatches(newMatches.concat(moreNewMatches));
         }
         const StoreProvider = createStoreProvider(store);
         const getNewMatchLength = jest.fn();
@@ -84,9 +84,11 @@ describe("matches", () => {
             </StoreProvider>
         )
 
-        await act( () => {
-            fireEvent(screen.getByTestId(testIDS.load), "press");
-        })
+        if (!useSave) {
+            await act( () => {
+                fireEvent(screen.getByTestId(testIDS.load), "press");
+            })
+        }
 
         return { store, mock, getChatPreviewLength, getNewMatchLength }
     }
@@ -137,5 +139,16 @@ describe("matches", () => {
         const newLength = newMatches.length + moreNewMatches.length;
         expect(getNewMatchLength).toHaveBeenLastCalledWith(newLength);
         expect(store.receivedData.newMatches).toHaveLength(newLength);
+    })
+
+    it("should load saved", async () => {
+        const { getChatPreviewLength, getNewMatchLength } = await load(true);
+
+        expect(getChatPreviewLength).toHaveBeenLastCalledWith(
+            chatPreviews.length + moreChatPreviews.length
+        )
+        expect(getNewMatchLength).toHaveBeenLastCalledWith(
+            newMatches.length + moreNewMatches.length
+        )
     })
 })

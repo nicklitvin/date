@@ -73,10 +73,12 @@ describe("profile", () => {
             </StoreProvider>
         )
 
-        await act( () => {
-            fireEvent(screen.getByTestId(testIDS.load), "press")
-        });
-
+        if (!useSave) {
+            await act( () => {
+                fireEvent(screen.getByTestId(testIDS.load), "press")
+            });
+        }
+        
         return { store, mock, openLinkFunc }
     }
 
@@ -104,8 +106,8 @@ describe("profile", () => {
     })
 
     it("should load saved data", async () => {
-        const { store } = await load(true, true);
-        expect(store.receivedData.profile).not.toEqual(null);
-        expect(store.receivedData.subscription).not.toEqual(null);
+        await load(true, true);
+
+        expect(screen.queryByText(profileText.cancelSubscription)).not.toEqual(null);
     })
 })

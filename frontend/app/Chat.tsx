@@ -71,24 +71,28 @@ export function Chat(props : Props) {
     const load = async () => {
         try {
             // profile
-            const profileInput : GetProfileInput = {
-                userID: userID!
+            if (!profile) {
+                const profileInput : GetProfileInput = {
+                    userID: userID!
+                }
+                const profileResponse = await sendRequest(URLs.getProfile, profileInput);
+                setProfile(profileResponse.data.data);    
             }
-            const profileResponse = await sendRequest(URLs.getProfile, profileInput);
-            setProfile(profileResponse.data.data);
 
             // chat
-            const chatInput : GetChatInput = {
-                fromTime: new Date(),
-                withID: userID!
+            if (chat.length == 0) {
+                const chatInput : GetChatInput = {
+                    fromTime: new Date(),
+                    withID: userID!
+                }
+                const chatResponse = await sendRequest(URLs.getChat, chatInput);
+                const chatData = chatResponse.data.data as Message[];
+                const processedChatData = chatData.map( val => ({
+                    ...val,
+                    timestamp: new Date(val.timestamp)
+                }));
+                setChat(processedChatData);
             }
-            const chatResponse = await sendRequest(URLs.getChat, chatInput);
-            const chatData = chatResponse.data.data as Message[];
-            const processedChatData = chatData.map( val => ({
-                ...val,
-                timestamp: new Date(val.timestamp)
-            }));
-            setChat(processedChatData);
         } catch (err) {
             console.log(err);
         }

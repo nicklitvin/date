@@ -44,11 +44,15 @@ export function Profile(props : Props) {
 
     const load = async () => {
         try {
-            const profile = await sendRequest(URLs.getProfile, null);
-            setProfile(profile.data.data);
+            if (!profile) {
+                const profileResponse = await sendRequest(URLs.getProfile, null);
+                setProfile(profileResponse.data.data);
+            }
 
-            const subscription = await sendRequest(URLs.getSubscription, null);
-            setSubscription(subscription.data.data);
+            if (!subscription) {
+                const subscriptionResponse = await sendRequest(URLs.getSubscription, null);
+                setSubscription(subscriptionResponse.data.data);
+            }
         } catch (err) {}
     }
 

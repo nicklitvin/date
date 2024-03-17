@@ -52,9 +52,11 @@ describe("stats", () => {
             </StoreProvider>
         )
 
-        await act( () => {
-            fireEvent(screen.getByTestId(testIDS.load), "press")
-        })
+        if (!useSave) {
+            await act( () => {
+                fireEvent(screen.getByTestId(testIDS.load), "press")
+            })
+        }
 
         return { mock, store, openLinkFunc, url }
     }
@@ -81,5 +83,11 @@ describe("stats", () => {
         const { store } = await load(false);
 
         expect(store.receivedData.stats).not.toEqual(null);
+    })
+
+    it("should load saved", async () => {
+        await load(false,true);
+
+        expect(screen.queryByText(statsText.purchaseButton)).toEqual(null);
     })
 })

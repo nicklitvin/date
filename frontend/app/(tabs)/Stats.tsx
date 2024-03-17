@@ -4,17 +4,13 @@ import { statsText } from "../../src/text";
 import { StyledButton, StyledScroll, StyledText, StyledView } from "../../src/styledElements";
 import { PageHeader } from "../../src/components/PageHeader";
 import { MyButton } from "../../src/components/Button";
-import axios from "axios";
 import { URLs } from "../../src/urls";
 import { Linking } from "react-native";
-import { createTimeoutSignal, sendRequest } from "../../src/utils";
+import { sendRequest } from "../../src/utils";
 import { Spacing } from "../../src/components/Spacing";
 import { useStore } from "../../src/store/RootStore";
 import { testIDS } from "../../src/testIDs";
 import { useEffect, useState } from "react";
-
-// import { MyDonut } from "../../src/components/Donut";
-// import { Weekly } from "../../src/components/Weekly";
 
 interface Props {
     noAutoLoad?: boolean

@@ -5,15 +5,19 @@ import { feedText } from "../../src/text";
 import { PublicProfile } from "../../src/interfaces";
 import { useEffect, useRef, useState } from "react";
 import { ProfileViewMob } from "../../src/pages/ProfileView";
-import axios from "axios";
 import { URLs } from "../../src/urls";
-import { createTimeoutSignal } from "../../src/utils";
+import { sendRequest } from "../../src/utils";
 import { Animated, ScrollView } from "react-native";
 import { globals } from "../../src/globals";
 import { Link } from "expo-router";
 import { useStore } from "../../src/store/RootStore";
+import { testIDS } from "../../src/testIDs";
 
-export function Feed() {
+interface Props {
+    dontAutoLoad?: boolean
+}
+
+export function Feed(props : Props) {
     const { globalState, receivedData } = useStore();
 
     const [feed, setFeed] = useState<PublicProfile[]>(receivedData.swipeFeed);
@@ -22,11 +26,16 @@ export function Feed() {
     const opacity = useState(new Animated.Value(1))[0];
     const scrollViewRef = useRef<ScrollView>(null);
 
-    const scrollToTop = () => {
-        if (scrollViewRef.current) {
-            scrollViewRef.current.scrollTo({ y: 0, animated: true });
+    useEffect( () => {
+        if (props.dontAutoLoad) return
+        load();
+    })
+
+    useEffect( () => {
+        if (feed && !receivedData.swipeFeed) {
+            receivedData.setSwipeFeed(feed)
         }
-    };
+    }, [feed])
 
     useEffect( () => {
         if (feedIndex == feed.length) {
@@ -35,14 +44,26 @@ export function Feed() {
         scrollToTop()
     }, [feedIndex])
 
+    const load = async () => {
+        try {
+            if (!feed) {
+                const response = await sendRequest(URLs.getFeed, null);
+                setFeed(response.data.data);
+            }
+        } catch (err) {}
+    }
+
+    const scrollToTop = () => {
+        if (scrollViewRef.current) {
+            scrollViewRef.current.scrollTo({ y: 0, animated: true });
+        }
+    };
+
     const loadMoreFeed = async () => {
         if (feed.length == 0) return 
         try {
             let moreFeed : PublicProfile[] = [];
-
-            const response = await axios.post(URLs.server + URLs.getFeed, null, {
-                signal: createTimeoutSignal()
-            });
+            const response = await sendRequest(URLs.getFeed, null);
             moreFeed = response.data.data as PublicProfile[];
             setFeed(feed.concat(moreFeed));
         } catch (err) {
@@ -74,6 +95,7 @@ export function Feed() {
 
     return (
         <StyledView className="w-full h-full bg-back">
+        <StyledButton testID={testIDS.load} onPress={load}/>
         <StyledScroll showsVerticalScrollIndicator={false} ref={scrollViewRef}>
         <StyledView className="w-full h-full">
 

@@ -1,4 +1,7 @@
 TODO
+feed save swipe index currently on
+test loading from saved data
+
 add tests for edit pages
 attirubte verification on backend (prevent random attributes)
 sample data for backend and frontend system testing
