@@ -22,4 +22,5 @@ export const URLs = {
     unlikeUser: "/unlikeUser",
     getProfile: "/getProfile",
     getStats: "/getStats",
+    getSubscription: "/getSubscription",
 }

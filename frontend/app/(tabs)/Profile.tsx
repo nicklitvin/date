@@ -7,23 +7,55 @@ import axios from "axios";
 import { URLs } from "../../src/urls";
 import { Linking } from "react-native";
 import { PublicProfile, SubscriptionData } from "../../src/interfaces";
-import { createTimeoutSignal, getShortDate } from "../../src/utils";
+import { createTimeoutSignal, getShortDate, sendRequest } from "../../src/utils";
 import { useStore } from "../../src/store/RootStore";
 import { Link, router } from "expo-router";
+import { testIDS } from "../../src/testIDs";
+import { useEffect, useState } from "react";
 
 interface Props {
     openLinkFunc?: (input : string) => any
+    dontAutoLoad?: boolean
 }
 
 export function Profile(props : Props) {
     const { globalState, receivedData } = useStore();
+    const [profile, setProfile] = useState<PublicProfile|null>(receivedData.profile);
+    const [subscription, setSubscription] = useState<SubscriptionData|null>(
+        receivedData.subscription
+    )
+
+    useEffect( () => {
+        if (props.dontAutoLoad) return
+        load();   
+    })
+
+    useEffect( () => {
+        if (profile && !receivedData.profile) {
+            receivedData.setProfile(profile)
+        }
+    }, [profile])
+
+    useEffect( () => {
+        if (subscription && !receivedData.subscription) {
+            receivedData.setSubscription(subscription);
+        }
+    }, [subscription])
+
+    const load = async () => {
+        try {
+            const profile = await sendRequest(URLs.getProfile, null);
+            setProfile(profile.data.data);
+
+            const subscription = await sendRequest(URLs.getSubscription, null);
+            setSubscription(subscription.data.data);
+        } catch (err) {}
+    }
 
     const managePayment = async () => {
         try {
-            const response = await axios.post(URLs.server + URLs.manageSubscription, null, {
-                signal: createTimeoutSignal()
-            });
-            const url = response.data;
+            const response = await sendRequest(URLs.manageSubscription, null);
+            const url = response.data.data;
             if (props.openLinkFunc) {
                 props.openLinkFunc(url)
             } else {
@@ -37,9 +69,7 @@ export function Profile(props : Props) {
 
     const cancelSubscription = async () => {
         try {
-            await axios.post(URLs.server + URLs.cancelSubscription, null, {
-                signal: createTimeoutSignal()
-            });
+            await sendRequest(URLs.cancelSubscription, null);
         } catch (err) {
             console.log(err)
         }
@@ -47,10 +77,8 @@ export function Profile(props : Props) {
 
     const getCheckoutPage = async () => {
         try {
-            const response = await axios.post(URLs.server + URLs.getCheckoutPage, null, {
-                signal: createTimeoutSignal()
-            });
-            const url = response.data;
+            const response = await sendRequest(URLs.getCheckoutPage,null);
+            const url = response.data.data;
             if (props.openLinkFunc) {
                 props.openLinkFunc(url);
             } else {
@@ -63,6 +91,7 @@ export function Profile(props : Props) {
 
     return (
         <StyledView className="bg-back w-full h-full">
+            <StyledButton testID={testIDS.load} onPress={load}/>
             <PageHeader
                 title={profileText.pageTitle}
                 imageType="Profile"
@@ -77,14 +106,14 @@ export function Profile(props : Props) {
             />
             <StyledView className="flex items-center pt-[100px]">
                 <StyledImage
-                    source={receivedData.profile?.images[0]}
+                    source={profile?.images[0]}
                     className="w-[150px] h-[150px] rounded-full"
                 />
                 <StyledText className="font-bold text-xl">
-                    {`${receivedData.profile?.name}, ${receivedData.profile?.age}`}
+                    {`${profile?.name}, ${profile?.age}`}
                 </StyledText>
                 <StyledText className="text-xl">
-                    {receivedData.subscription?.subscribed ? profileText.premiumTier : profileText.freeTier}
+                    {subscription?.subscribed ? profileText.premiumTier : profileText.freeTier}
                 </StyledText>
                 <StyledView className="w-full pt-3 flex items-center">
                     <MyButton
@@ -99,14 +128,14 @@ export function Profile(props : Props) {
                     />
                 </StyledView>
                 {
-                    receivedData.subscription?.subscribed ? 
+                    subscription?.subscribed ? 
                     <StyledView className="flex flex-col w-full pt-5 items-center">
                         <StyledText className="font-bold text-xl">
                             {profileText.subscriptionStatus}
                         </StyledText>
                         <StyledText className="text-xl">
                             {`Next payment of $6.99 on ${getShortDate(
-                                receivedData.subscription.endDate!, globalState.timeZone
+                                subscription.endDate!, globalState.timeZone
                             )}`}
                         </StyledText>
                         <StyledView className="w-full flex items-center pt-3">

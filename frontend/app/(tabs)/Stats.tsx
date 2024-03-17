@@ -56,10 +56,8 @@ export function Stats(props : Props) {
 
     const getCheckoutPage = async () => {
         try {
-            const response = await axios.post(URLs.server + URLs.getCheckoutPage, null, {
-                signal: createTimeoutSignal()
-            });
-            const url = response.data;
+            const response = await sendRequest(URLs.getCheckoutPage, null);
+            const url = response.data.data;
             if (props.openLinkFunc) {
                 props.openLinkFunc(url);
             } else {

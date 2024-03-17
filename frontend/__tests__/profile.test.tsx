@@ -6,6 +6,7 @@ import { ProfileMob } from "../app/(tabs)/Profile";
 import { profileText } from "../src/text";
 import { PublicProfile, SubscriptionData } from "../src/interfaces";
 import { RootStore, createStoreProvider } from "../src/store/RootStore";
+import { testIDS } from "../src/testIDs";
 
 describe("profile", () => {
     const profile : PublicProfile = {
@@ -30,104 +31,81 @@ describe("profile", () => {
         subscribed: false,
     }
 
-    // it("should purchase if not subscribed", async () => {
-    //     const checkoutURL = "url";
+    const cancelURL = "cancelURL";
+    const manageURL = "manageURL";
+    const checkoutURL = "checkoutURL";
 
-    //     const mock = new MockAdapter(axios);
-    //     mock.onPost(URLs.server + URLs.getCheckoutPage).reply( config => [200, checkoutURL])
+    const load = async (subscribed : boolean, useSave = false) => {
+        const mock = new MockAdapter(axios);
+        mock.onPost(URLs.server + URLs.getProfile).reply( config => 
+            [200, {data: profile}]    
+        )
+        mock.onPost(URLs.server + URLs.getSubscription).reply( config => 
+            [200, {data: subscribed ? subscriptionData : notSubscribedData} ]
+        )
+        mock.onPost(URLs.server + URLs.cancelSubscription).reply(config => 
+            [200, {data: cancelURL}]
+        )
+        mock.onPost(URLs.server + URLs.manageSubscription).reply(config => 
+            [200, {data: manageURL}]
+        )
+        mock.onPost(URLs.server + URLs.getCheckoutPage).reply(config => 
+            [200, {data: checkoutURL}]
+        )
 
-    //     const openLinkFunc = jest.fn( (input : string) => null)
+        const store = new RootStore();
+        const StoreProvider = createStoreProvider(store);
+        const openLinkFunc = jest.fn();
 
-    //     const store = new RootStore();
-    //     const Provider = createStoreProvider(store);
-    //     render( 
-    //         <Provider value={store}>
-    //             <ProfileMob
-    //                 profile={profile}
-    //                 subscription={notSubscribedData}
-    //                 openLinkFunc={openLinkFunc}
-    //             />
-    //         </Provider>
-            
-    //     )
+        if (useSave) {
+            store.receivedData.setProfile(profile);
+            store.receivedData.setSubscription(
+                subscribed ? subscriptionData : notSubscribedData
+            )
+        }
 
-    //     await act( () => {
-    //         fireEvent(screen.getByText(profileText.purchasePremium), "press");
-    //     })
+        render(
+            <StoreProvider value={store}>
+                <ProfileMob
+                    dontAutoLoad={true}
+                    openLinkFunc={openLinkFunc}
+                />
+            </StoreProvider>
+        )
 
-    //     expect(openLinkFunc).toHaveBeenLastCalledWith(checkoutURL);
-    // })
+        await act( () => {
+            fireEvent(screen.getByTestId(testIDS.load), "press")
+        });
 
-    // it("should not see cancel subscription", async () => {
-    //     const mock = new MockAdapter(axios);
-    //     mock.onPost(URLs.server + URLs.cancelSubscription).reply( config => [200])
-        
-    //     const store = new RootStore();
-    //     const Provider = createStoreProvider(store);
-    //     render( 
-    //         <Provider value={store}>
-    //             <ProfileMob
-    //                 profile={profile}
-    //                 subscription={notSubscribedData}
-    //             />
-    //         </Provider>
-    //     );
+        return { store, mock, openLinkFunc }
+    }
 
-    //     expect(screen.queryByText(profileText.freeTier)).not.toEqual(null);
-    //     expect(screen.queryByText(profileText.cancelSubscription)).toEqual(null);
-    // })
+    it("should render subscribed view", async () => {
+        const { store, openLinkFunc } = await load(true);
 
-    // it("should cancel subscription", async () => {
-    //     let sent = false;
+        expect(store.receivedData.subscription?.subscribed).toEqual(true);
 
-    //     const mock = new MockAdapter(axios);
-    //     mock.onPost(URLs.server + URLs.cancelSubscription).reply( config => {
-    //         sent = true;
-    //         return [200]
-    //     })
+        await act( () => {
+            fireEvent(screen.getByText(profileText.managePayment), "press")
+        });
 
-    //     const store = new RootStore();
-    //     const Provider = createStoreProvider(store);
-    //     render( 
-    //         <Provider value={store}>
-    //             <ProfileMob
-    //                 profile={profile}
-    //                 subscription={subscriptionData}
-    //             />
-    //         </Provider>
-    //     );
+        expect(openLinkFunc).toHaveBeenLastCalledWith(manageURL);
+        expect(screen.queryByText(profileText.cancelSubscription)).not.toEqual(null);
+    })
 
-    //     await act( () => {
-    //         fireEvent(screen.getByText(profileText.cancelSubscription), "press")
-    //     })
+    it("should show not subscribed view", async () => {
+        const { openLinkFunc } = await load(false);
 
-    //     expect(screen.queryByText(profileText.premiumTier)).not.toEqual(null);
-    //     expect(sent).toEqual(true);
-    // })
+        await act( () => {
+            fireEvent(screen.getByText(profileText.purchasePremium), "press")
+        });
 
-    // it("should get management page", async () => {
-    //     const manageURL = "url";
+        expect(openLinkFunc).toHaveBeenLastCalledWith(checkoutURL);
+    })
 
-    //     const mock = new MockAdapter(axios);
-    //     mock.onPost(URLs.server + URLs.manageSubscription).reply( config => [200, manageURL])
-
-    //     const openLinkFunc = jest.fn( (input : string) => null)
-    //     const store = new RootStore();
-    //     const Provider = createStoreProvider(store);
-    //     render( 
-    //         <Provider value={store}>
-    //             <ProfileMob
-    //                 profile={profile}
-    //                 subscription={subscriptionData}
-    //                 openLinkFunc={openLinkFunc}
-    //             />
-    //         </Provider>
-    //     );
-
-    //     await act( () => {
-    //         fireEvent(screen.getByText(profileText.managePayment), "press")
-    //     })
-
-    //     expect(openLinkFunc).toHaveBeenLastCalledWith(manageURL);
-    // })
+    it("should load saved data", async () => {
+        const { store } = await load(true, true);
+        expect(store.receivedData.profile).not.toEqual(null);
+        expect(store.receivedData.subscription).not.toEqual(null);
+    })
 })

@@ -1,5 +1,4 @@
 import { act, fireEvent, render, screen } from "@testing-library/react-native"
-import { Stats } from "../src/pages/Stats"
 import { statsText } from "../src/text"
 import MockAdapter from "axios-mock-adapter"
 import axios from "axios"
