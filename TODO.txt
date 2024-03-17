@@ -3,7 +3,6 @@ add tests for edit pages
 attirubte verification on backend (prevent random attributes)
 sample data for backend and frontend system testing
 on notification, delete receivedData
-server change chatpreview to return only latest message
 
 BACKEND TODO
 change elo constants with api?

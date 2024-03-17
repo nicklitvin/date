@@ -1,21 +1,58 @@
 import { observer } from "mobx-react-lite";
 import { UserSwipeStats } from "../../src/interfaces";
 import { statsText } from "../../src/text";
-import { StyledScroll, StyledText, StyledView } from "../../src/styledElements";
+import { StyledButton, StyledScroll, StyledText, StyledView } from "../../src/styledElements";
 import { PageHeader } from "../../src/components/PageHeader";
 import { MyButton } from "../../src/components/Button";
 import axios from "axios";
 import { URLs } from "../../src/urls";
 import { Linking } from "react-native";
-import { createTimeoutSignal } from "../../src/utils";
-import { MyDonut } from "../../src/components/Donut";
-import { Weekly } from "../../src/components/Weekly";
+import { createTimeoutSignal, sendRequest } from "../../src/utils";
 import { Spacing } from "../../src/components/Spacing";
 import { useStore } from "../../src/store/RootStore";
+import { testIDS } from "../../src/testIDs";
+import { useEffect, useState } from "react";
 
-export function Stats() {
+// import { MyDonut } from "../../src/components/Donut";
+// import { Weekly } from "../../src/components/Weekly";
+
+interface Props {
+    noAutoLoad?: boolean
+    openLinkFunc?: (input : string) => any
+    dontLoadCharts?: boolean
+}
+
+export function Stats(props : Props) {
     const { receivedData } = useStore();    
-    const stats = receivedData.stats;
+    const [stats, setStats] = useState<UserSwipeStats|null>(receivedData.stats);
+
+    let MyDonut;
+    let Weekly;
+    if (!props.dontLoadCharts) {
+        MyDonut = require("../../src/components/Donut");
+        Weekly = require("../../src/components/Weekly");
+    }
+
+    useEffect( () => {
+        if (props.noAutoLoad) return
+        load();
+    })
+
+    useEffect( () => {
+        if (stats && !receivedData.stats) {
+            receivedData.setStats(stats);
+        }
+    }, [stats])
+
+    const load = async () => {
+        try {
+            const response = await sendRequest(URLs.getStats, null);
+            const data = response.data.data;
+            setStats(data);
+        } catch (err) {
+
+        }
+    }
 
     const getCheckoutPage = async () => {
         try {
@@ -23,7 +60,11 @@ export function Stats() {
                 signal: createTimeoutSignal()
             });
             const url = response.data;
-            await Linking.openURL(url);
+            if (props.openLinkFunc) {
+                props.openLinkFunc(url);
+            } else {
+                await Linking.openURL(url);
+            }
         } catch (err) {
             console.log(err)
         }
@@ -50,6 +91,8 @@ export function Stats() {
                 </StyledView>
             </StyledView>
         ) 
+    } else if (props.dontLoadCharts) {
+        content = <></>
     } else {
         content = (
             <>
@@ -103,6 +146,7 @@ export function Stats() {
 
     return (
         <StyledView className="w-full h-full bg-back">
+            <StyledButton testID={testIDS.load} onPress={load}/>
             <StyledScroll>
                 <PageHeader
                     title={statsText.pageTitle}
