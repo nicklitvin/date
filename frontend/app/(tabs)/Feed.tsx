@@ -2,7 +2,7 @@ import { observer } from "mobx-react-lite";
 import { PageHeader } from "../../src/components/PageHeader";
 import { StyledButton, StyledImage, StyledScroll, StyledText, StyledView } from "../../src/styledElements";
 import { feedText } from "../../src/text";
-import { PublicProfile } from "../../src/interfaces";
+import { PublicProfile, SwipeFeed, SwipeStatus } from "../../src/interfaces";
 import { useEffect, useRef, useState } from "react";
 import { ProfileViewMob } from "../../src/pages/ProfileView";
 import { URLs } from "../../src/urls";
@@ -15,14 +15,15 @@ import { testIDS } from "../../src/testIDs";
 
 interface Props {
     dontAutoLoad?: boolean
+    getFeedIndex?: (input : number) => void
+    getFeedLength?: (input : number) => void
 }
 
 export function Feed(props : Props) {
     const { globalState, receivedData } = useStore();
 
-    const [feed, setFeed] = useState<PublicProfile[]>(receivedData.swipeFeed);
-    const [feedIndex, setFeedIndex] = useState<number>(0);
-    const [lastSwipedIndex, setLastSwipedIndex] = useState<number>(-1);
+    const [feed, setFeed] = useState<SwipeFeed|null>(receivedData.swipeFeed);
+    const [swipeStatus, setSwipeStatus] = useState<SwipeStatus|null>(receivedData.swipeStatus);
     const opacity = useState(new Animated.Value(1))[0];
     const scrollViewRef = useRef<ScrollView>(null);
 
@@ -32,23 +33,34 @@ export function Feed(props : Props) {
     })
 
     useEffect( () => {
-        if (feed && !receivedData.swipeFeed) {
+        if (feed) {
+            if (props.getFeedLength) props.getFeedLength(feed.profiles.length)
             receivedData.setSwipeFeed(feed)
         }
     }, [feed])
 
     useEffect( () => {
-        if (feedIndex == feed.length) {
-            loadMoreFeed();
-        } 
-        scrollToTop()
-    }, [feedIndex])
+        if (swipeStatus) {
+            if (props.getFeedIndex) props.getFeedIndex(swipeStatus.feedIndex);
+
+            receivedData.setSwipeStatus(swipeStatus);
+
+            if (feed && swipeStatus.feedIndex == feed.profiles.length) {
+                loadMoreFeed();
+            }
+            scrollToTop();
+        }
+    }, [swipeStatus])
 
     const load = async () => {
         try {
             if (!feed) {
                 const response = await sendRequest(URLs.getFeed, null);
                 setFeed(response.data.data);
+                setSwipeStatus({
+                    feedIndex: 0,
+                    lastSwipedIndex: -1
+                })
             }
         } catch (err) {}
     }
@@ -60,22 +72,31 @@ export function Feed(props : Props) {
     };
 
     const loadMoreFeed = async () => {
-        if (feed.length == 0) return 
+        if (!feed || feed.profiles.length == 0) return 
         try {
-            let moreFeed : PublicProfile[] = [];
+            let moreFeed : SwipeFeed;
             const response = await sendRequest(URLs.getFeed, null);
-            moreFeed = response.data.data as PublicProfile[];
-            setFeed(feed.concat(moreFeed));
+            moreFeed = response.data.data as SwipeFeed;
+            setFeed({
+                profiles: feed.profiles.concat(moreFeed.profiles),
+                likedMeIDs: feed.likedMeIDs.concat(moreFeed.likedMeIDs)
+            })
         } catch (err) {
-            console.log(err);
+            // console.log(err);
         }
     }
 
     const afterSwipe = () => {
-        setLastSwipedIndex(lastSwipedIndex + 1);
+        setSwipeStatus({
+            feedIndex: swipeStatus!.feedIndex,
+            lastSwipedIndex: swipeStatus!.lastSwipedIndex + 1
+        })
 
         if (globalState.disableFade) {
-            setFeedIndex(feedIndex + 1); 
+            setSwipeStatus({
+                feedIndex: swipeStatus!.feedIndex + 1,
+                lastSwipedIndex: swipeStatus!.lastSwipedIndex
+            })
             return;
         }
 
@@ -84,7 +105,10 @@ export function Feed(props : Props) {
             duration: globals.fadeDuration,
             useNativeDriver: true
         }).start(() => {
-            setFeedIndex(feedIndex + 1);
+            setSwipeStatus({
+                feedIndex: swipeStatus!.feedIndex + 1,
+                lastSwipedIndex: swipeStatus!.lastSwipedIndex
+            })
             Animated.timing(opacity, {
                 toValue: 1,
                 duration: globals.fadeDuration,
@@ -114,7 +138,7 @@ export function Feed(props : Props) {
             <Animated.View style={{ opacity: opacity}}
             >
                 {
-                    feedIndex == feed.length ? 
+                    (!swipeStatus || !feed || swipeStatus.feedIndex == feed.profiles.length) ? 
                     <StyledView className="flex items-center mt-[250px] flex-col">
                         <StyledImage
                             className="w-[100px] h-[100px]"
@@ -126,11 +150,12 @@ export function Feed(props : Props) {
                     </StyledView> :
                     <ProfileViewMob
                         isInSwipeFeed={true}
-                        profile={feed[feedIndex]}
+                        profile={feed.profiles[swipeStatus.feedIndex]}
                         afterSwipe={afterSwipe}
-                        disableSwiping={lastSwipedIndex == feedIndex}
+                        disableSwiping={swipeStatus.lastSwipedIndex == swipeStatus.feedIndex}
                         ignoreRequest={true}
                         reportable={true}
+                        likedMe={feed.likedMeIDs.includes(feed.profiles[swipeStatus.feedIndex].id)}
                     />
                 }
             </Animated.View>

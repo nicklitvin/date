@@ -1,11 +1,12 @@
 import { action, observable } from "mobx";
-import { ChatPreview, Message, NewMatch, PublicProfile, SubscriptionData, UserSwipeStats } from "../interfaces";
+import { ChatPreview, Message, NewMatch, PublicProfile, SubscriptionData, SwipeFeed, SwipeStatus, UserSwipeStats } from "../interfaces";
 
 export class ReceivedData {
     @observable public profile : PublicProfile|null = null;
     @observable public subscription : SubscriptionData|null = null;
     @observable public chatPreviews : ChatPreview[] = [];
-    @observable public swipeFeed : PublicProfile[] = [];
+    @observable public swipeFeed : SwipeFeed|null = null;
+    @observable public swipeStatus : SwipeStatus|null = null;
     @observable public stats : UserSwipeStats|null = null;
     @observable public newMatches : NewMatch[] = [];
     @observable public savedChats : {[userID: string] : Message[]} = {}
@@ -20,7 +21,7 @@ export class ReceivedData {
     setChatPreviews(input : ChatPreview[]) { this.chatPreviews = input; }
 
     @action
-    setSwipeFeed(input : PublicProfile[]) { this.swipeFeed = input; }
+    setSwipeFeed(input : SwipeFeed) { this.swipeFeed = input; }
 
     @action 
     setStats(input : UserSwipeStats|null) { this.stats = input; }
@@ -32,4 +33,7 @@ export class ReceivedData {
     addSavedChat(userID : string, chat : Message[]) { 
         this.savedChats[userID] = chat
     }
+
+    @action
+    setSwipeStatus(input : SwipeStatus) { this.swipeStatus = input; }
 }

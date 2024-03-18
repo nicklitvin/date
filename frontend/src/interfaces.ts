@@ -135,3 +135,13 @@ export interface UnlikeInput {
 export interface GetProfileInput {
     userID: string
 }
+
+export interface SwipeFeed {
+    profiles: PublicProfile[]
+    likedMeIDs: string[]
+}
+
+export interface SwipeStatus {
+    feedIndex : number
+    lastSwipedIndex : number
+}
