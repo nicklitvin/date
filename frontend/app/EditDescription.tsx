@@ -3,15 +3,24 @@ import { MySimplePage } from "../src/components/SimplePage";
 import { MyTextInput } from "../src/components/TextInput";
 import { descriptionText } from "../src/text";
 import { useStore } from "../src/store/RootStore";
-import { router } from "expo-router";
-import { EditUserInput } from "../src/interfaces";
+import { Redirect, router } from "expo-router";
+import { EditUserInput, PublicProfile } from "../src/interfaces";
 import { globals } from "../src/globals";
 import axios from "axios";
 import { URLs } from "../src/urls";
-import { createTimeoutSignal } from "../src/utils";
+import { createTimeoutSignal, sendRequest } from "../src/utils";
+import { useEffect, useState } from "react";
 
 export function EditDescription() {
     const { receivedData } = useStore();
+    const [profile, setProfile] = useState<PublicProfile|null>(receivedData.profile);
+    if (!profile) return <Redirect href="Error"/>
+
+    useEffect( () => {
+        if (profile) {
+            receivedData.setProfile(profile);
+        }
+    }, [profile])
 
     const editDescription = async (description: string) => {
         try {
@@ -19,10 +28,8 @@ export function EditDescription() {
                 setting: globals.settingDescription,
                 value: description
             }
-            const response = await axios.post(URLs.server + URLs.editUser, input, {
-                signal: createTimeoutSignal()
-            })
-            receivedData.setProfile(response.data);
+            const response = await sendRequest(URLs.editUser, input);
+            setProfile(response.data.data);
             router.back();
         } catch (err) {
             console.log(err)
@@ -39,7 +46,7 @@ export function EditDescription() {
                 errorMessage={descriptionText.errorMessage}
                 onSubmit={editDescription}
                 newLine={true}
-                initialInput={receivedData.profile?.description}
+                initialInput={profile.description}
             />
         }
     />

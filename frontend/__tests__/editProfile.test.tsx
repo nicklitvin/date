@@ -6,23 +6,58 @@ import { URLs } from "../src/urls";
 import { DeleteImageInput, EditUserInput, PublicProfile, UploadImageInput } from "../src/interfaces";
 import { globals } from "../src/globals";
 import { editProfileText } from "../src/text";
+import { RootStore, createStoreProvider } from "../src/store/RootStore";
+import EditProfileMob from "../app/EditProfile";
+import EditPicturesMob from "../app/EditPictures";
 
 describe("editProfile", () => {
     const description = "description";
     const uploadURLs = ["url_1", "url_2"];
     const attributes = ["attribute_1", "attribute_2"];
 
-    const createProfile = () : PublicProfile => ({
+    const original = () : PublicProfile => ({
         id: "asd",
         age: 21,
-        attributes: [],
-        description: "",
         gender: "Male",
-        images: [],
-        name: "Michael"
+
+        description: description,
+        images: uploadURLs,
+        attributes: attributes,
+        name: "Michael",
+        alcohol: "Often",
+        smoking: "Often"
     })
 
-    it("placeholder", () => {})
+    // const load = async () => {
+    //     const store = new RootStore();
+    //     store.receivedData.setProfile(original())
+    //     const StoreProvider = createStoreProvider(store);
+    //     render(     
+    //         <StoreProvider value={store}>
+    //             <EditProfileMob
+    //             />
+    //         </StoreProvider>
+    //     )
+
+    //     return { store }
+    // }
+
+    const loadEditPictures = async () => {
+        const store = new RootStore();
+        store.receivedData.setProfile(original())
+        const StoreProvider = createStoreProvider(store);
+
+        render(
+            <StoreProvider value={store}>
+                <EditPicturesMob/>
+            </StoreProvider>
+        )
+    }
+
+    it("should remove image", async () => {
+        await loadEditPictures()
+    })
+
 
     // it("should remove image", async () => {
     //     const mock = new MockAdapter(axios);

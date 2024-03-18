@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { MyButton } from "../src/components/Button"
 import { MySimplePage } from "../src/components/SimplePage"
 import { StyledScroll, StyledText, StyledView } from "../src/styledElements"
@@ -7,11 +7,11 @@ import { globals } from "../src/globals"
 import classNames from "classnames"
 import { observer } from "mobx-react-lite"
 import { useStore } from "../src/store/RootStore"
-import { EditUserInput } from "../src/interfaces"
+import { EditUserInput, PublicProfile } from "../src/interfaces"
 import axios from "axios"
 import { URLs } from "../src/urls"
-import { createTimeoutSignal } from "../src/utils"
-import { router } from "expo-router"
+import { createTimeoutSignal, sendRequest } from "../src/utils"
+import { Redirect, router } from "expo-router"
 
 // interface Props {
 //     onSubmit: (input : string[]) => any
@@ -23,9 +23,17 @@ import { router } from "expo-router"
 
 export function EditAttributes() {
     const { receivedData } = useStore();
-
-    const [attributes, setAttributes] = useState<string[]>(receivedData.profile?.attributes ?? []);
+    const [profile, setProfile] = useState<PublicProfile|null>(receivedData.profile);
     const [showError, setShowError] = useState<boolean>(false);
+    if (!profile) return <Redirect href="Error"/>
+
+    const [attributes, setAttributes] = useState<string[]>(profile.attributes);
+
+    useEffect( () => {
+        if (profile) {
+            receivedData.setProfile(profile);
+        }
+    }, [profile])
 
     const submitChanges = async () => {
         if (attributes.length == 0 || attributes.length > globals.maxAttributes) {
@@ -38,10 +46,8 @@ export function EditAttributes() {
                 setting: globals.settingAttributes,
                 value: attributes
             }
-            const response = await axios.post(URLs.server + URLs.editUser, input, {
-                signal: createTimeoutSignal()
-            })
-            receivedData.setProfile(response.data);
+            const response = await sendRequest(URLs.editUser, input);
+            setProfile(response.data.data);
             router.back()
         } catch (err) { 
             console.log(err);

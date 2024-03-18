@@ -19,6 +19,7 @@ import { Pictures } from "../src/simplePages/Pictures";
 import { Alcohol } from "../src/simplePages/Alcohol";
 import { Smoking } from "../src/simplePages/Smoking";
 import { Attributes } from "../src/pages/Attributes";
+import { sendRequest } from "../src/utils";
 
 export const pageOrder : AccountCreationType[] = [
     "Create Profile","Name","Birthday", "Gender", "Alcohol", "Smoking", "Age Preference", "Gender Preference",
@@ -32,17 +33,17 @@ interface Props {
     returnPageNumber?: (input : number) => number
 }
 
-export function AccountCreation() {
-    const [currentPage, setCurrentPage] = useState<number>(0);
+export function AccountCreation(props : Props) {
+    const [currentPage, setCurrentPage] = useState<number>(props.customPageStart ?? 0);
     const { globalState } = useStore();
 
     const [name, setName] = useState<string>("");
-    const [birthday, setBirthday] = useState<Date>(new Date(2000,0,1));
+    const [birthday, setBirthday] = useState<Date>(props.customBirthday ?? new Date(2000,0,1));
     const [gender, setGender] = useState<string|undefined>();
     const [genderPreference, setGenderPreference] = useState<string[]>([]);
     const [description, setDescription] = useState<string>("");
     const [attributes, setAttributes] = useState<string[]>([]);
-    const [uploads, setUploads] = useState<FileUploadAndURI[]>([]);
+    const [uploads, setUploads] = useState<FileUploadAndURI[]>(props.customUploads ?? []);
     const [agePreference, setAgePreference] = useState<[number, number]>(
         [globals.minAge, globals.maxAge]
     );
@@ -57,9 +58,9 @@ export function AccountCreation() {
         setCurrentPage(currentPage - 1)
     }
 
-    // useEffect( () => {
-    //     if (props.returnPageNumber) props.returnPageNumber(currentPage)
-    // }, [currentPage])
+    useEffect( () => {
+        if (props.returnPageNumber) props.returnPageNumber(currentPage)
+    }, [currentPage])
 
     const createUser = async () => {
         const userInput : UserInput = {
@@ -81,8 +82,9 @@ export function AccountCreation() {
             })
         };
      
-        const endpoint = URLs.server + URLs.createUser;
-        await axios.post(endpoint, userInput);
+        try {
+            await sendRequest(URLs.createUser, userInput);
+        } catch (err) {}
     }
 
     switch (pageOrder[currentPage]) {

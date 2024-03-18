@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { MySimplePage } from "../src/components/SimplePage"
-import { DeleteImageInput, EditUserInput, FileUploadAndURI, UploadImageInput } from "../src/interfaces";
+import { DeleteImageInput, EditUserInput, FileUploadAndURI, PublicProfile, UploadImageInput } from "../src/interfaces";
 import { pictureText } from "../src/text"
 import { StyledButton, StyledText, StyledView } from "../src/styledElements";
 import { globals } from "../src/globals";
@@ -15,16 +15,23 @@ import { useStore } from "../src/store/RootStore";
 import { Redirect, router } from "expo-router";
 import axios from "axios";
 import { URLs } from "../src/urls";
-import { createTimeoutSignal } from "../src/utils";
+import { createTimeoutSignal, sendRequest } from "../src/utils";
+import { observer } from "mobx-react-lite";
 
 
 export function EditPictures() {
     const { receivedData } = useStore();
-    const profile = receivedData.profile;
+    const [profile, setProfile] = useState<PublicProfile|null>(receivedData.profile);
     if (!profile) return <Redirect href="Error"/>
 
     const [switchURI, setSwitchURI] = useState<string|null>(null);
     const [showError, setShowError] = useState<boolean>(false);
+
+    useEffect( () => {
+        if (profile) {
+            receivedData.setProfile(profile);
+        }
+    }, [profile])
 
     const uploadImage = async (fromFileSys : boolean) => {
         let asset : {uri: string, mime: string};
@@ -90,10 +97,8 @@ export function EditPictures() {
                     mimetype: newUpload.mimetype
                 }
             }
-            const response = await axios.post(URLs.server + URLs.uploadImage, input, {
-                signal: createTimeoutSignal()
-            })
-            receivedData.setProfile(response.data);
+            const response = await sendRequest(URLs.uploadImage, input);
+            setProfile(response.data.data);
         } catch (err) {
             console.log(err);
             return
@@ -105,11 +110,9 @@ export function EditPictures() {
             const input : DeleteImageInput = {
                 imageID: uri
             };
-            const response = await axios.post(URLs.server + URLs.deleteImage, input, {
-                signal: createTimeoutSignal()
-            })
+            const response = await sendRequest(URLs.deleteImage, input);
             if (switchURI == uri) setSwitchURI(null);
-            receivedData.setProfile(response.data);
+            setProfile(response.data.data);
         } catch (err) {
             console.log(err);
         }
@@ -130,11 +133,9 @@ export function EditPictures() {
                     setting: globals.settingImages,
                     value: copy
                 }
-                const response = await axios.post(URLs.server + URLs.editUser, input, {
-                    signal: createTimeoutSignal()
-                })
-                receivedData.setProfile(response.data);
+                const response = await sendRequest(URLs.editUser, input);
                 setSwitchURI(null);
+                setProfile(response.data.data);
             } catch (err) {
                 console.log(err);
             }
@@ -192,4 +193,5 @@ export function EditPictures() {
         }
     />
 }
-export default EditPictures;
+export const EditPicturesMob = observer(EditPictures);
+export default EditPicturesMob;
