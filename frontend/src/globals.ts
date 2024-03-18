@@ -10,6 +10,8 @@ export const globals = {
     settingGenderPreference: "gender preference",
     settingAgePreference: "age preference",
     settingAttributes: "attributes",
+    settingAlcohol: "alcohol",
+    settingSmoking: "smoking",
     maxPreviewMessageLength: 20,
     maxNameLength: 16,
     acceptableFileTypes: ["image/jpeg", "image/png"],
