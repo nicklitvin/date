@@ -4,6 +4,7 @@ import { StyledButton, StyledImage, StyledText, StyledView } from "../styledElem
 
 interface Props {
     chatPreview: ChatPreview
+    onPress?: () => any
 }
 
 export function ChatPreviewBox(props : Props) {
@@ -33,6 +34,7 @@ export function ChatPreviewBox(props : Props) {
     return (
         <StyledButton
             className="rounded-3xl border border-front px-5 py-5 flex flex-row w-full items-center"
+            onPress={props.onPress}
             // style={{
             //     // IOS
             //     shadowColor: 'rgba(0,0,0, .4)', 

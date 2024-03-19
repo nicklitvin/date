@@ -13,7 +13,7 @@ import { globals } from "../../src/globals";
 import { differenceInSeconds } from "date-fns";
 import { createTimeoutSignal, sendRequest } from "../../src/utils";
 import { useStore } from "../../src/store/RootStore";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 
 interface Props {
     noAutoLoad?: boolean
@@ -191,8 +191,8 @@ export function Matches(props : Props) {
                             >
                                 <StyledView className="flex items-center pr-3">
                                     <StyledImage
-                                            source={match.profile.images[0]}
-                                            className="w-[75px] h-[75px] rounded-full"
+                                        source={match.profile.images[0]}
+                                        className="w-[75px] h-[75px] rounded-full"
                                     />
                                 </StyledView>
                             </Link>
@@ -229,6 +229,7 @@ export function Matches(props : Props) {
                         >
                             <ChatPreviewBox
                                 chatPreview={match}
+                                onPress={() => router.push(`/Chat?userID=${match.profile.id}`)}
                             />
                         </StyledView>
                         

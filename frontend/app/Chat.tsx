@@ -25,7 +25,7 @@ interface Props {
 }
 
 export function Chat(props : Props) {
-    const { userID } = props || useLocalSearchParams();
+    const userID : string|undefined = props.userID ?? String(useLocalSearchParams().userID);
     const { globalState, receivedData } = useStore();
 
     if (!userID) router.back(); 
