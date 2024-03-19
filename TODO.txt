@@ -1,6 +1,5 @@
 TODO
-feed save swipe index currently on
-test loading from saved data
+frequency dont show back button on edit page
 
 add tests for edit pages
 attirubte verification on backend (prevent random attributes)

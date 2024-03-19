@@ -8,6 +8,7 @@ import { MyButton } from "../src/components/Button";
 import { Spacing } from "../src/components/Spacing";
 import { Redirect, router } from "expo-router";
 import { useStore } from "../src/store/RootStore";
+import { Frequency } from "../src/components/Frequency";
 
 export function EditProfile() {
     const { receivedData } = useStore();
@@ -71,6 +72,7 @@ export function EditProfile() {
                         text={val}
                         onPressFunction={() => {}}
                         smallButton={true}
+                        disable={true}
                     />
                 ))}
             </StyledView>
@@ -80,6 +82,22 @@ export function EditProfile() {
                     text={editProfileText.editAttributes}
                     onPressFunction={() => {router.push("/EditAttributes")}}
                 />
+            </StyledView>
+            <Spacing size="lg"/>
+            <StyledText className="font-bold text-xl">
+                {editProfileText.editOther}
+            </StyledText>
+            <Spacing size="md"/>
+            <StyledView className="flex flex-wrap flex-row w-full">
+                <Frequency frequency={profile.alcohol} habit="Alcohol" 
+                    onPress={() => router.push("/EditAlcohol")}
+                />
+                <StyledView className="w-3"/>
+                <Frequency frequency={profile.smoking} habit="Smoking"
+                    onPress={() => router.push("/EditSmoking")}
+                />
+            </StyledView>
+            <StyledView>
             </StyledView>
             <Spacing size="lg"/>
 

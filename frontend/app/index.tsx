@@ -143,6 +143,10 @@ export function Index() {
                 ],
                 likedMeIDs: []
             })
+            receivedData.setSwipeStatus({
+                feedIndex: 0,
+                lastSwipedIndex: -1
+            })
             setLoading(false);
         } catch (err) {}
     })

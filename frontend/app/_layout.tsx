@@ -26,6 +26,8 @@ export default function App() {
                                     <Stack.Screen name="EditPictures"/>
                                     <Stack.Screen name="EditDescription"/>
                                     <Stack.Screen name="EditAttributes"/>
+                                    <Stack.Screen name="EditAlcohol"/>
+                                    <Stack.Screen name="EditSmoking"/>
                                     <Stack.Screen name="AccountCreation"/>
                                     <Stack.Screen name="Error"/>
                                     <Stack.Screen name="Chat"/>

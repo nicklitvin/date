@@ -8,18 +8,9 @@ import classNames from "classnames"
 import { observer } from "mobx-react-lite"
 import { useStore } from "../src/store/RootStore"
 import { EditUserInput, PublicProfile } from "../src/interfaces"
-import axios from "axios"
 import { URLs } from "../src/urls"
-import { createTimeoutSignal, sendRequest } from "../src/utils"
+import { sendRequest } from "../src/utils"
 import { Redirect, router } from "expo-router"
-
-// interface Props {
-//     onSubmit: (input : string[]) => any
-//     attributes: { [title : string] : {id: string, value: string}[]}
-//     submitText: string
-//     goBack?: () => any
-//     selectedAttributes?: string[]
-// }
 
 export function EditAttributes() {
     const { receivedData } = useStore();

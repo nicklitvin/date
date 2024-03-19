@@ -57,6 +57,7 @@ export function ProfileView() {
                             onPressFunction={() => {}}
                             text={attribute}
                             smallButton={true}
+                            disable={true}
                         />
                     ))}
                 </StyledView>

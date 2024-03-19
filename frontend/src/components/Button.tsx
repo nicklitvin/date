@@ -9,11 +9,13 @@ interface Props {
     smallButton?: boolean
     saveChange?: boolean
     fullSize?: boolean
+    disable?: boolean
 }
 
 export function MyButton(props : Props) {
     return (
         <StyledButton
+            disabled={props.disable}
             onPress={props.onPressFunction}
             className={classNames(
                 "border border-front",

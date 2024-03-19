@@ -1,10 +1,11 @@
-import { StyledImage, StyledText, StyledView } from "../styledElements";
+import { StyledButton, StyledImage, StyledText, StyledView } from "../styledElements";
 
 type Habit = "Alcohol" | "Smoking";
 
 interface Props {
     habit: Habit
     frequency: string
+    onPress?: () => any
 }
 
 export function Frequency(props : Props) {
@@ -14,8 +15,14 @@ export function Frequency(props : Props) {
         case ("Smoking"): image = require("../../assets/Smoke.png"); break;
     }
 
+    const doNothing = () => {}
+
     return (
-        <StyledView className="border border-front rounded-3xl py-2 px-3 flex flex-row">
+        <StyledButton 
+            className="border border-front rounded-3xl py-2 px-3 flex flex-row"
+            onPress={props.onPress ?? doNothing}
+            disabled={!Boolean(props.onPress)}
+        >
             <StyledImage
                 source={image}
                 className="w-[25px] h-[25px]"
@@ -23,6 +30,6 @@ export function Frequency(props : Props) {
             <StyledText className="text-base pl-1">
                 {props.frequency}
             </StyledText>
-        </StyledView>
+        </StyledButton>
     )
 }

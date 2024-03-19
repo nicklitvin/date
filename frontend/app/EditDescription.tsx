@@ -6,9 +6,8 @@ import { useStore } from "../src/store/RootStore";
 import { Redirect, router } from "expo-router";
 import { EditUserInput, PublicProfile } from "../src/interfaces";
 import { globals } from "../src/globals";
-import axios from "axios";
 import { URLs } from "../src/urls";
-import { createTimeoutSignal, sendRequest } from "../src/utils";
+import { sendRequest } from "../src/utils";
 import { useEffect, useState } from "react";
 
 export function EditDescription() {

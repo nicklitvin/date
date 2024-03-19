@@ -107,6 +107,7 @@ export function ProfileView(props : Props) {
                             onPressFunction={() => {}}
                             text={attribute}
                             smallButton={true}
+                            disable={true}
                         />
                     ))}
                 </StyledView>

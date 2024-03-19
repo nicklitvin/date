@@ -132,6 +132,7 @@ export const editProfileText = {
 
     editImages: "Edit Images",
     editAttributes: "Edit Attributes",
+    editOther: "Other",
 }
 
 export const preferencesText = {
