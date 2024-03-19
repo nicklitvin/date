@@ -11,6 +11,7 @@ import { AgePreference } from "../src/simplePages/AgePreference";
 import { GenderPreference } from "../src/simplePages/GenderPreference";
 import { StyledText, StyledView } from "../src/styledElements";
 import classNames from "classnames";
+import { sendRequest } from "../src/utils";
 
 export function Preferences() {
     const props : {genderPreference: string[], agePreference: [number,number]}= {
@@ -47,8 +48,8 @@ export function Preferences() {
             }
 
             const response = await Promise.all([
-                axios.post(URLs.server + URLs.editUser, genderEdit),
-                axios.post(URLs.server + URLs.editUser, ageEdit)
+                sendRequest(URLs.editUser, genderEdit),
+                sendRequest(URLs.editUser, ageEdit)
             ])
             setInitialGenders(genders);
             setInitialAge([minAge, maxAge]);

@@ -4,7 +4,6 @@ import { MySimplePage } from "../components/SimplePage"
 import { genderPreferenceText } from "../text"
 import { StyledView } from "../styledElements"
 import classNames from "classnames"
-import { Spacing } from "../components/Spacing"
 
 interface Props {
     genders: string[]
@@ -26,15 +25,14 @@ export function GenderPreference(props : Props) {
     }, [genderPreference])
 
     const makeContent = () => (
-        <>
-        {props.genders.map( val => 
-            <StyledView 
-                key={`gender-pref-${val}`} 
-                className={classNames(
-                    props.embed ? "flex flex-row" : "w-full items-center flex"
-                )}
-            >
+        <StyledView 
+            className={classNames(
+                props.embed ? "flex flex-row" : "w-full items-center flex"
+            )}
+        >
+            {props.genders.map( val => 
                 <MyButton
+                    key={`gender-pref-${val}`}
                     smallButton={props.smallButtons}
                     text={val}
                     invertColor={genderPreference.includes(val)}
@@ -53,10 +51,9 @@ export function GenderPreference(props : Props) {
                         setGenderPreference(copy);
                     }}
                 />
-                <Spacing size="md"/>
-            </StyledView>
-        )}
-        </>
+            )}
+
+        </StyledView>
     )
 
     if (props.embed) {
