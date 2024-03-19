@@ -4,11 +4,10 @@ import { chatText, generalText } from "../src/text";
 import { useEffect, useRef, useState } from "react";
 import { useStore } from "../src/store/RootStore";
 import { GetChatInput, GetProfileInput, Message, MessageInput, PublicProfile, RequestReportInput, SwipeInput, UnlikeInput } from "../src/interfaces";
-import axios from "axios";
 import { globals } from "../src/globals";
-import { StyledButton, StyledScroll, StyledText, StyledView } from "../src/styledElements";
+import { StyledButton, StyledImage, StyledScroll, StyledText, StyledView } from "../src/styledElements";
 import { testIDS } from "../src/testIDs";
-import { createTimeoutSignal, getChatTimestamp, sendRequest } from "../src/utils";
+import { getChatTimestamp, sendRequest } from "../src/utils";
 import { PageHeader } from "../src/components/PageHeader";
 import { MyMessage } from "../src/components/Message";
 import { URLs } from "../src/urls";
@@ -72,11 +71,18 @@ export function Chat(props : Props) {
         try {
             // profile
             if (!profile) {
-                const profileInput : GetProfileInput = {
-                    userID: userID!
+                const newMatch = receivedData.newMatches.find(val => val.profile.id == userID)?.profile;
+                const existMatch = receivedData.chatPreviews.find(val => val.profile.id == userID)?.profile;
+
+                if (newMatch || existMatch) {
+                    setProfile(newMatch || existMatch);
+                } else {
+                    const profileInput : GetProfileInput = {
+                        userID: userID!
+                    }
+                    const profileResponse = await sendRequest(URLs.getProfile, profileInput);
+                    setProfile(profileResponse.data.data);    
                 }
-                const profileResponse = await sendRequest(URLs.getProfile, profileInput);
-                setProfile(profileResponse.data.data);    
             }
 
             // chat
@@ -119,8 +125,7 @@ export function Chat(props : Props) {
         setChat([sendingChat].concat(chat.filter( val => val.id != removeID)));
 
         try {
-            const endpoint = URLs.server + URLs.sendMessage;
-            const response = await axios.post(endpoint, messageInput);
+            const response = await sendRequest(URLs.sendMessage, messageInput);
             const message = response.data.data as Message;
 
             const copy = [...chat];
@@ -154,9 +159,7 @@ export function Chat(props : Props) {
                 fromTime: new Date(chat.at(-1)!.timestamp.getTime() - 1)
             }
 
-            const response = await axios.post(URLs.server + URLs.getChat, input, {
-                signal: createTimeoutSignal()
-            });
+            const response = await sendRequest(URLs.getChat, input);
             moreChats = response.data.data as Message[];
             moreChats = moreChats.map( message => ({
                 ...message, 
@@ -174,9 +177,9 @@ export function Chat(props : Props) {
             const myReport : RequestReportInput = {
                 reportedID: profile!.id
             }
-            await axios.post(URLs.server + URLs.reportUser, myReport, {
-                signal: createTimeoutSignal()
-            })
+            await sendRequest(URLs.reportUser, myReport);
+            // delete user
+            router.back();
         } catch (err) {
             console.log(err);
         }
@@ -188,7 +191,9 @@ export function Chat(props : Props) {
             const unlike : UnlikeInput = {
                 withID: profile!.id
             }
-            await axios.post(URLs.server + URLs.unlikeUser, unlike);
+            await sendRequest(URLs.unlikeUser, unlike);
+            // delete user
+            router.back();
         } catch (err) {
             console.log(err);
         }
@@ -226,11 +231,11 @@ export function Chat(props : Props) {
                 swapTitleAndImage={true}
                 rightContent={
                     <StyledButton onPress={() => setShowModal(true)} testID={testIDS.reportUser}>
-                        {/* <StyledImage
-                            source={require("../../assets/Report.png")}
+                        <StyledImage
+                            source={require("../assets/Report.png")}
                             alt=""
                             className="w-[35px] h-[35px]"
-                        /> */}
+                        />
                     </StyledButton>    
                 }
                 imageLink={`/ProfileView?userID=${profile?.id}`}
@@ -243,6 +248,12 @@ export function Chat(props : Props) {
                         newLine={true}
                     />  
                 </StyledView>
+                {
+                    chat.length == 0 ?
+                    <StyledText className="pb-[400px] items-center font-bold text-center text-xl">
+                        {chatText.sendFirst}
+                    </StyledText> : null
+                }
                 <StyledScroll 
                     onScroll={handleScroll}
                     testID={testIDS.chatScroll}

@@ -39,17 +39,22 @@ export function PageHeader(props : Props) {
     let imageElement = props.imageSource ? 
         <StyledImage 
             className="w-[50px] h-[50px] rounded-full"
+            alt=""
             source={{uri : props.imageSource}}
         /> : 
         <StyledImage 
             className="w-[25px] h-[25px]"
             source={imageData}
-        />
-    
+        />;
+
     if (props.imageLink) {
         imageElement = (
-            <Link href={props.imageLink}>
-                {imageElement}
+            <Link 
+                href={props.imageLink} 
+            >
+                <StyledView className="w-[50px] h-[50px] flex items-center justify-center">
+                    {imageElement}
+                </StyledView>
             </Link>
         )
     }

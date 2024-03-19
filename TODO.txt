@@ -1,5 +1,6 @@
 TODO
-frequency dont show back button on edit page
+delete profile after reporting user
+loading text
 
 add tests for edit pages
 attirubte verification on backend (prevent random attributes)

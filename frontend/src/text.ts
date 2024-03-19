@@ -15,6 +15,7 @@ export const chatText = {
     modalTitle: "What would you like to do?",
     modalReport: "Report User",
     modalUnlike: "Unmatch User",
+    sendFirst: "Send the first message :)",
 }
 
 export const matchesText = {
