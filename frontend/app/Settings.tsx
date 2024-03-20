@@ -1,42 +1,49 @@
 import { observer } from "mobx-react-lite";
 import { PageHeader } from "../src/components/PageHeader";
 import { generalText, settingsText } from "../src/text";
-import { StyledButton, StyledScroll, StyledText, StyledView } from "../src/styledElements";
+import { StyledButton, StyledText, StyledView } from "../src/styledElements";
 import { EditUserInput, SettingData } from "../src/interfaces";
-import axios from "axios";
 import { URLs } from "../src/urls";
 import { MyButton } from "../src/components/Button";
 import { useStore } from "../src/store/RootStore";
 import Toggle from "react-native-toggle-element"
 import { useEffect, useState } from "react";
-import { createTimeoutSignal } from "../src/utils";
+import { sendRequest } from "../src/utils";
 import { globals } from "../src/globals";
 import { Spacing } from "../src/components/Spacing";
 import { MyModal } from "../src/components/Modal";
+import { testIDS } from "../src/testIDs";
 
 interface Props {
-    settings: SettingData[]
     disableToggle?: boolean
+    noAutoLoad?: boolean
 }
 
-type Settings = {[title: string] : boolean}
 
-export function Settings() {
-    const props : Props = {
-        settings: [{title: "title", value: true}]
-    }
-
-    const {globalState} = useStore();
+export function Settings(props : Props) {
+    const {globalState, receivedData} = useStore();
     const [showModal, setShowModal] = useState<boolean>(false);
-    const [settings, setSettings] = useState<Settings>({});
+    const [settings, setSettings] = useState<SettingData[]>(receivedData.settings);
 
     useEffect( () => {
-        const newSettings : Settings = {};
-        for (const setting of props.settings) {
-            newSettings[setting.title] = setting.value
+        if (props.noAutoLoad) return
+        load();   
+    })
+
+    useEffect( () => {
+        if (settings) {
+            receivedData.setSettings(settings);
         }
-        setSettings(newSettings);
-    }, [])
+    }, [settings])
+
+    const load = async () => {
+        try {   
+            const response = await sendRequest(URLs.getSettings, null);
+            setSettings(response.data.data);
+        } catch (err) {
+            console.log(err);
+        }
+    }
 
     const changeSettingValue = async (title : string, value : boolean) => {
         try {
@@ -44,19 +51,15 @@ export function Settings() {
                 setting: title,
                 value: value
             }
-            setSettings({
-                ...settings,
-                [title]: value
-            })
-            await axios.post(URLs.server + URLs.editUser, input, {
-                signal: createTimeoutSignal()
-            });
+            const copy = [...settings];
+            copy[copy.findIndex(val => val.title == title)] = { title, value };
+            setSettings(copy);
+            await sendRequest(URLs.editUser, input);
 
         } catch (err) {
-            setSettings({
-                ...settings,
-                [title]: !value
-            })
+            const copy = [...settings];
+            copy[copy.findIndex(val => val.title == title)] = { title, value: !value };
+            setSettings(copy);
         }
     }
 
@@ -66,13 +69,14 @@ export function Settings() {
 
     const deleteAccount = async () => {
         try {
-            await axios.post(URLs.server + URLs.deleteAccount);
-            globalState.setEmail(null);
+            await sendRequest(URLs.deleteAccount, null);
+            signOut();
         } catch (err) {}
     }
 
     return (
         <StyledView className="w-full h-full bg-back">
+        <StyledButton testID={testIDS.load} onPress={load}/> 
         <MyModal
             show={showModal}
             buttons={[
@@ -96,27 +100,27 @@ export function Settings() {
                 imageType="Settings"
             />
             <Spacing size="lg"/>
-            {Object.entries(settings).map( setting => (
-                <StyledView key={`setting-${setting[0]}`}>
+            {settings.map( setting => (
+                <StyledView key={`setting-${setting.title}`}>
                     <StyledView
                         className="flex flex-row w-full items-center px-5 pb-2"
                     >
                         <StyledText className="text-bold text-xl font-bold">
-                             {setting[0]}
+                             {setting.title}
                          </StyledText>
                          <StyledView className="flex-grow"/>
                          <StyledButton
-                            testID={`toggle-${setting[0]}`}
+                            testID={`toggle-${setting.title}`}
                             onPress={props.disableToggle ? 
-                                () => changeSettingValue(setting[0], !setting[1]) : 
+                                () => changeSettingValue(setting.title, !setting.value) : 
                                 () => {}
                             }
                             className="border border-front rounded-full"
                         >
                             { props.disableToggle ? null : 
                                 <Toggle
-                                    value={setting[1]}
-                                    onPress={ () => changeSettingValue(setting[0], !setting[1])}
+                                    value={setting.value}
+                                    onPress={ () => changeSettingValue(setting.title, !setting.value)}
                                     thumbStyle={{backgroundColor: globals.light}}
                                     thumbButton={{radius: 1000, height: 25, width: 25}}
                                     trackBar={{width: 50, height: 25, activeBackgroundColor: globals.green, inActiveBackgroundColor: globals.red}}

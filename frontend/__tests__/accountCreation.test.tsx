@@ -1,5 +1,4 @@
 import { act, fireEvent, render, screen } from "@testing-library/react-native"
-import { AccountCreation } from "../src/pages/AccountCreation"
 import { createProfileText, descriptionText, generalText, myNameText } from "../src/text";
 import { globals } from "../src/globals";
 import { RootStore, createStoreProvider } from "../src/store/RootStore";
@@ -7,6 +6,7 @@ import { FileUploadAndURI, UserInput } from "../src/interfaces";
 import MockAdapter from "axios-mock-adapter";
 import axios from "axios";
 import { URLs } from "../src/urls";
+import AccountCreationMob from "../app/AccountCreation";
 
 describe("accountCreation", () => {
     it("should continue to next page", async () => {
@@ -14,7 +14,7 @@ describe("accountCreation", () => {
         const StoreProvider = createStoreProvider(store);
         render(
             <StoreProvider value={store}>
-                <AccountCreation/>
+                <AccountCreationMob/>
             </StoreProvider>
         );
 
@@ -70,7 +70,7 @@ describe("accountCreation", () => {
         const StoreProvider = createStoreProvider(store);
         render(
             <StoreProvider value={store}>
-                <AccountCreation 
+                <AccountCreationMob 
                     customBirthday={myBirthday}
                     customUploads={customUploads}
                     returnPageNumber={returnPageNumber}

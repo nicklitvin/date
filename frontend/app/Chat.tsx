@@ -179,7 +179,7 @@ export function Chat(props : Props) {
             }
             await sendRequest(URLs.reportUser, myReport);
             // delete user
-            router.back();
+            // router.back();
         } catch (err) {
             console.log(err);
         }
@@ -193,7 +193,7 @@ export function Chat(props : Props) {
             }
             await sendRequest(URLs.unlikeUser, unlike);
             // delete user
-            router.back();
+            // router.back();
         } catch (err) {
             console.log(err);
         }

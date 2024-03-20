@@ -1,11 +1,12 @@
 import { act, fireEvent, render, screen } from "@testing-library/react-native"
 import { EditUserInput, SettingData } from "../src/interfaces"
-import { Settings, SettingsMob } from "../src/pages/Settings"
 import { RootStore, createStoreProvider } from "../src/store/RootStore"
 import MockAdapter from "axios-mock-adapter"
 import axios from "axios"
 import { URLs } from "../src/urls"
 import { settingsText } from "../src/text"
+import SettingsMob from "../app/Settings"
+import { testIDS } from "../src/testIDs"
 
 describe("settings", () => {
     const settingData : SettingData[] = [
@@ -19,68 +20,64 @@ describe("settings", () => {
         }
     ]
 
-    it("temporary", async () => {})
-    
-    it("should show all settings", async () => {
+    const load = async (useSave = false) => {
+        const mock = new MockAdapter(axios);
+        mock.onPost(URLs.server + URLs.getSettings).reply( config => 
+            [200, {data: settingData}]
+        )
+
+
         const store = new RootStore();
-        store.globalState.setEmail("a");
+        if (useSave) {
+            store.globalState.setEmail("a");
+            store.receivedData.setSettings(settingData);
+        }
         const StoreProvider = createStoreProvider(store);
 
         render(
             <StoreProvider value={store}>
-                <SettingsMob
-                    disableToggle={true}
-                    settings={settingData}
+                <SettingsMob 
+                    disableToggle={true}    
+                    noAutoLoad={true}
                 />
             </StoreProvider>
-        );
+        )
+
+        if (!useSave) {
+            await act( () => {
+                fireEvent(screen.getByTestId(testIDS.load), "press");
+            })
+        }
+
+        return { store, mock }
+    }
+
+    it("should load settings", async () => {
+        const { store } = await load();
 
         for (const setting of settingData) {
             expect(screen.queryByText(setting.title)).not.toEqual(null);
         }
-    });
 
-    it("should sign out", async () => {
-        const store = new RootStore();
-        store.globalState.setEmail("a");
-        const StoreProvider = createStoreProvider(store);
+        expect(store.receivedData.settings).toHaveLength(settingData.length);
+    })
 
-        render(
-            <StoreProvider value={store}>
-                <SettingsMob
-                    disableToggle={true}
-                    settings={settingData}
-                />
-            </StoreProvider>
-        );
+    it("should load saved settings", async () => {
+        await load(true);
 
-        await act( () => {
-            fireEvent(screen.getByText(settingsText.signOut), "press")
-        });
-
-        expect(store.globalState.email).toEqual(null);
+        for (const setting of settingData) {
+            expect(screen.queryByText(setting.title)).not.toEqual(null);
+        }
     })
 
     it("should delete account", async () => {
-        let sent = false;
+        const { store, mock } = await load();
+        let sentDelete = false;
 
-        const mock = new MockAdapter(axios);
         mock.onPost(URLs.server + URLs.deleteAccount).reply(config => {
-            sent = true;
+            sentDelete = true;
             return [200]
         })
-  
-        const store = new RootStore();
-        store.globalState.setEmail("a");
-        const StoreProvider = createStoreProvider(store);
-        render(
-            <StoreProvider value={store}>
-                <SettingsMob
-                    disableToggle={true}
-                    settings={settingData}
-                />
-            </StoreProvider>
-        );
 
         await act( () => {
             fireEvent(screen.getByText(settingsText.deleteAccount), "press")
@@ -89,35 +86,36 @@ describe("settings", () => {
             fireEvent(screen.getByText(settingsText.modalDelete), "press");
         })
 
-        expect(store.globalState.email).toEqual(null);
-        expect(sent).toEqual(true);
+        expect(store.receivedData.profile).toEqual(null);
+        expect(sentDelete).toEqual(true);
+    })
+
+    it("should sign out", async () => {
+        const { store } = await load();
+
+        await act( () => {
+            fireEvent(screen.getByText(settingsText.signOut), "press")
+        });
+
+        expect(store.receivedData.profile).toEqual(null);
     })
 
     it("should edit user", async () => {
-        let sent = false;
+        const { store, mock } = await load();
+        let sentEdit = false;
 
-        const mock = new MockAdapter(axios);
-        mock.onPost(URLs.server + URLs.editUser).reply(config => {
+        mock.onPost(URLs.server + URLs.editUser).reply( config => {
+            sentEdit = true;
             const payload = JSON.parse(config.data) as EditUserInput;
             expect(payload.setting).toEqual(settingData[0].title);
             expect(payload.value).toEqual(!settingData[0].value);
-            sent = true;
             return [200]
         })
-
-        const store = new RootStore();
-        store.globalState.setEmail("a");
-        const StoreProvider = createStoreProvider(store);
-        render(
-            <StoreProvider value={store}>
-                <SettingsMob disableToggle={true} settings={settingData}/>
-            </StoreProvider>
-        );
 
         await act( () => {
             fireEvent(screen.getByTestId(`toggle-${settingData[0].title}`), "press")
         })
 
-        expect(sent).toEqual(true);
+        expect(sentEdit).toEqual(true);
     })
 })

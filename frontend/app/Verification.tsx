@@ -9,6 +9,7 @@ import { eduEmailText, verifyCodeText } from "../src/text";
 import { MyTextInput } from "../src/components/TextInput";
 import { MyButton } from "../src/components/Button";
 import { globals } from "../src/globals";
+import { sendRequest } from "../src/utils";
 
 interface Props {
     currentPage?: number
@@ -46,7 +47,7 @@ export function Verification(props : Props) {
                 schoolEmail: eduEmail
             }
 
-            await axios.post(URLs.server + URLs.newVerification, input);
+            await sendRequest(URLs.newVerification, input);
 
             setEduEmail(eduEmail);
             goToNextPage();
@@ -62,7 +63,7 @@ export function Verification(props : Props) {
                 schoolEmail: eduEmail,
                 code: Number(code)
             }
-            const response = await axios.post(URLs.server + URLs.verifyUser, input);
+            await sendRequest(URLs.verifyUser, input);
         } catch (err) {
             console.log(err);
         }
@@ -75,7 +76,7 @@ export function Verification(props : Props) {
             const input : NewCodeInput = {
                 personalEmail: globalState.email!
             }
-            await axios.post(URLs.server + URLs.newCode, input);
+            await sendRequest(URLs.newCode, input);
             setSeconds(globals.resendVerificationTimeout)
 
         } catch (err) {

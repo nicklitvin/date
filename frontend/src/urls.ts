@@ -23,4 +23,5 @@ export const URLs = {
     getProfile: "/getProfile",
     getStats: "/getStats",
     getSubscription: "/getSubscription",
+    getSettings: "/getSettings",
 }
