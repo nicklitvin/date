@@ -1,5 +1,5 @@
 import { act, fireEvent, render, screen } from "@testing-library/react-native"
-import { VerificationMob } from "../src/pages/Verification"
+import VerificationMob from "../app/Verification";
 import { eduEmailText, verifyCodeText } from "../src/text";
 import MockAdapter from "axios-mock-adapter";
 import axios from "axios";
@@ -9,12 +9,38 @@ import { RootStore, createStoreProvider } from "../src/store/RootStore";
 import { globals } from "../src/globals";
 
 describe("verification", () => {
-    it("should send verification code", async () => {
-        const eduEmail = "a@berkeley.edu";
-        const personalEmail = "a@gmail.com";
+    const eduEmail = "a@berkeley.edu";
+    const personalEmail = "a@gmail.com";
+
+    const load = async (currentPage? : number, customSeconds? : number, eduEmail? : string) => {
+        const mock = new MockAdapter(axios);
+
+        const store = new RootStore();
+        store.globalState.setEmail(personalEmail);
+        const StoreProvider = createStoreProvider(store);
+
+        const getCurrentPage = jest.fn();
+        const getSeconds = jest.fn();
+
+        render(
+            <StoreProvider value={store}>
+                <VerificationMob
+                    returnSeconds={getSeconds}
+                    returnCurrentPage={getCurrentPage}
+                    currentPage={currentPage}
+                    customSeconds={customSeconds}
+                    eduEmail={eduEmail}
+                />
+            </StoreProvider>
+        )
+
+        return { mock, store, getCurrentPage, getSeconds }
+    }
+
+    it("should send verification", async () => {
+        const { mock, getCurrentPage } = await load();
         let sent = false;
 
-        const mock = new MockAdapter(axios);
         mock.onPost(URLs.server + URLs.newVerification).reply( config => {
             const payload = JSON.parse(config.data) as NewVerificationInput;
             expect(payload.personalEmail).toEqual(personalEmail);
@@ -23,19 +49,6 @@ describe("verification", () => {
             return [200]
         })
 
-        const returnCurrentPage = jest.fn( (input : number) => input);
-        const store = new RootStore();
-        store.globalState.setEmail(personalEmail);
-        const StoreProvider = createStoreProvider(store);
-
-        render(
-            <StoreProvider value={store}>
-                <VerificationMob
-                    returnCurrentPage={returnCurrentPage}
-                />
-            </StoreProvider>
-        );
-
         const input = screen.getByPlaceholderText(eduEmailText.inputPlaceholder);
         await act( () => {
             fireEvent(input, "changeText", eduEmail);
@@ -44,31 +57,14 @@ describe("verification", () => {
             fireEvent(input, "submitEditing");
         })
 
-        expect(returnCurrentPage).toHaveLastReturnedWith(1);
+        expect(getCurrentPage).toHaveBeenLastCalledWith(1);
         expect(sent).toEqual(true);
     })
 
     it("should stay on page if bad email", async () => {
-        const eduEmail = "a@berkeley.edu";
-        const personalEmail = "a@gmail.com";
+        const { mock, getCurrentPage } = await load();
 
-        const mock = new MockAdapter(axios);
-        mock.onPost(URLs.server + URLs.newVerification).reply( config => {
-            return [400]
-        })
-
-        const returnCurrentPage = jest.fn( (input : number) => input);
-        const store = new RootStore();
-        store.globalState.setEmail(personalEmail);
-        const StoreProvider = createStoreProvider(store);
-
-        render(
-            <StoreProvider value={store}>
-                <VerificationMob
-                    returnCurrentPage={returnCurrentPage}
-                />
-            </StoreProvider>
-        );
+        mock.onPost(URLs.server + URLs.newVerification).reply( config => [400])
 
         const input = screen.getByPlaceholderText(eduEmailText.inputPlaceholder);
         await act( () => {
@@ -78,38 +74,22 @@ describe("verification", () => {
             fireEvent(input, "submitEditing");
         })
 
-        expect(returnCurrentPage).toHaveLastReturnedWith(0);
+        expect(getCurrentPage).toHaveBeenLastCalledWith(0);
     })
 
     it("should verify code", async () => {
-        const eduEmail = "a@berkeley.edu";
-        const personalEmail = "a@gmail.com";
+        const { mock } = await load(1,0,eduEmail);
         const code = "1234";
         let sent = false;
 
-        const mock = new MockAdapter(axios);
         mock.onPost(URLs.server + URLs.verifyUser).reply( config => {
             const payload = JSON.parse(config.data) as ConfirmVerificationInput;
             expect(payload.code).toEqual(Number(code));
             expect(payload.personalEmail).toEqual(personalEmail);
             expect(payload.schoolEmail).toEqual(eduEmail);
             sent = true;
-            return [200]
+            return [200]            
         })
-
-        const store = new RootStore();
-        store.globalState.setEmail(personalEmail);
-        const StoreProvider = createStoreProvider(store);
-
-        render(
-            <StoreProvider value={store}>
-                <VerificationMob
-                    currentPage={1}
-                    eduEmail={eduEmail}
-                    customSeconds={0}
-                />
-            </StoreProvider>
-        );
 
         const inputCode = screen.getByPlaceholderText(verifyCodeText.inputPlaceholder);
         await act( () => {
@@ -123,57 +103,34 @@ describe("verification", () => {
     })
 
     it("should resend code", async () => {
-        const eduEmail = "a@berkeley.edu";
-        const personalEmail = "a@gmail.com";
-        let sent = false;
+        const { mock, getSeconds} = await load(1,0,eduEmail);
 
-        const mock = new MockAdapter(axios);
-        mock.onPost(URLs.server + URLs.newCode).reply( config => {
-            const payload = JSON.parse(config.data) as NewCodeInput;
-            expect(payload.personalEmail).toEqual(personalEmail);
-            sent = true;
-            return [200]
-        })
-
-        const store = new RootStore();
-        store.globalState.setEmail(personalEmail);
-        const StoreProvider = createStoreProvider(store);
-        const returnSeconds = jest.fn();
-        render(
-            <StoreProvider value={store}>
-                <VerificationMob
-                    currentPage={1}
-                    eduEmail={eduEmail}
-                    customSeconds={0}
-                    returnSeconds={returnSeconds}
-                />
-            </StoreProvider>
-        );
+        mock.onPost(URLs.server + URLs.newCode).reply( config => [200] )
 
         await act( () => {
             fireEvent(screen.getByText(verifyCodeText.resendButton), "press");
         })
 
-        expect(sent).toEqual(true);
-        expect(returnSeconds).toHaveBeenLastCalledWith(globals.resendVerificationTimeout);
+        expect(getSeconds).toHaveBeenLastCalledWith(globals.resendVerificationTimeout);
     })
 
     it("should not resend code too quickly", async () => {
-        const personalEmail = "a@gmail.com";
-        
-        const store = new RootStore();
-        store.globalState.setEmail(personalEmail);
-        const StoreProvider = createStoreProvider(store);
+        const { mock } = await load(1,10,eduEmail);
+        let sent = false;
 
-        render(
-            <StoreProvider value={store}>
-                <VerificationMob
-                    currentPage={1}
-                    customSeconds={10}
-                />
-            </StoreProvider>
-        );
+        mock.onPost(URLs.server + URLs.newCode).reply( config => {
+            sent = true;
+            return [200]
+        })
 
         expect(screen.queryByText(verifyCodeText.resendButton)).toEqual(null);
+
+        await act( () => {
+            fireEvent(screen.getByText(
+                `${verifyCodeText.resending} ${globals.resendVerificationTimeout}s`
+            ), "press")
+        })
+
+        expect(sent).toEqual(false);
     })
 })

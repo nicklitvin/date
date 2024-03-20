@@ -14,7 +14,7 @@ import { sendRequest } from "../src/utils";
 interface Props {
     currentPage?: number
     eduEmail?: string
-    returnCurrentPage?: (input : number) => number
+    returnCurrentPage?: (input : number) => any
     returnSeconds?: (input : number) => any
     customSeconds?: number
 }
