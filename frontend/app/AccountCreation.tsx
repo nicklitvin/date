@@ -125,13 +125,11 @@ export function AccountCreation(props : Props) {
             />
         case "Gender Preference":
             return <GenderPreference
-                selectedGenders={genderPreference}
-                goBack={goBack}
+                genderState={genderPreference}
+                setGenders={setGenderPreference}
                 genders={globals.genders}
-                onSubmit={(input : string[]) => {
-                    setGenderPreference(input);
-                    goToNextPage();
-                }}
+                goBack={goBack}
+                onSubmit={goToNextPage}
                 submitText={generalText.continue}
             />
         case "Description":
@@ -157,13 +155,10 @@ export function AccountCreation(props : Props) {
         case "Age Preference":
             return <AgePreference
                 goBack={goBack}
-                minAge={agePreference[0]}
-                maxAge={agePreference[1]}
+                ages={agePreference}
+                setAges={setAgePreference}
                 submitText={generalText.continue}
-                onSubmit={(input : [number, number]) => {
-                    setAgePreference(input);
-                    goToNextPage();
-                }}
+                onSubmit={goToNextPage}
             />
         case "Final":
             return <Final

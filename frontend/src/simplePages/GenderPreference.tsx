@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react"
 import { MyButton } from "../components/Button"
 import { MySimplePage } from "../components/SimplePage"
 import { genderPreferenceText } from "../text"
@@ -7,22 +6,33 @@ import classNames from "classnames"
 
 interface Props {
     genders: string[]
-    selectedGenders?: string[]
+    genderState: string[]
+    setGenders: Function
+
     onSubmit?: (input : string[]) => any
     submitText?: string
-    returnGenderCount?: (input : number) => number
     embed?: boolean
-    setGenders?: Function
     smallButtons?: boolean
     goBack?: () => any
 }
 
 export function GenderPreference(props : Props) {
-    const [genderPreference, setGenderPreference] = useState<string[]>(props.selectedGenders ?? []);
+    const genderPreference = props.genderState;
+    const setGenderPreference = props.setGenders;
 
-    useEffect( () => {
-        if (props.returnGenderCount) props.returnGenderCount(genderPreference.length);
-    }, [genderPreference])
+    const pressGender = (val : string) => {
+        const index = genderPreference.findIndex( 
+            selected => selected == val
+        )
+        let copy = [...genderPreference];
+        if (index > -1) {
+            copy.splice(index,1);
+        } else {
+            copy.push(val);
+        }
+
+        setGenderPreference(copy);
+    }
 
     const makeContent = () => (
         <StyledView 
@@ -36,20 +46,7 @@ export function GenderPreference(props : Props) {
                     smallButton={props.smallButtons}
                     text={val}
                     invertColor={genderPreference.includes(val)}
-                    onPressFunction={() => {
-                        const index = genderPreference.findIndex( 
-                            selected => selected == val
-                        )
-                        let copy = [...genderPreference];
-                        if (index > -1) {
-                            copy.splice(index,1);
-                        } else {
-                            copy.push(val);
-                        }
-
-                        if (props.setGenders) props.setGenders(copy);
-                        setGenderPreference(copy);
-                    }}
+                    onPressFunction={() => pressGender(val)}
                 />
             )}
 

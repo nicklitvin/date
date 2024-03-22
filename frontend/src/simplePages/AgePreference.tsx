@@ -9,41 +9,39 @@ import { testIDS } from "../testIDs"
 import { globals } from "../globals"
 
 interface Props {
-    minAge: number
-    maxAge: number
+    ages: [number, number]
+    setAges: Function
+
     onSubmit?: (input : [number, number]) => any
     submitText?: string
     embed?: boolean
-    setMinAge?: Function
-    setMaxAge?: Function
     goBack?: () => any
 }
 
 export function AgePreference(props : Props) {
-    const [minAge, setMinAge] = useState<number>(props.minAge);
-    const [maxAge, setMaxAge] = useState<number>(props.maxAge);
+    const updateAges = (min : number, max : number) => {
+        props.setAges([min,max])
+    }
 
     const makeContent = () => (
         <StyledView className="flex w-full items-center">
             <StyledText className="text-lg mb-3">
-                {`Min Age: ${minAge}`}
+                {`Min Age: ${props.ages[0]}`}
             </StyledText>
             <StyledSlider
                 minimumTrackTintColor={globals.dark}
                 thumbTintColor={globals.dark}
-                upperLimit={maxAge}
+                upperLimit={props.ages[1]}
                 className="w-full h-10 mb-3"
                 minimumValue={globals.minAge}
                 maximumValue={globals.maxAge}
                 step={1}
-                value={minAge}
-                onValueChange={(value) => {
-                    setMinAge(value);
-                    if (props.setMinAge) props.setMinAge(value)
-                }}
+                value={props.ages[0]}
+                onValueChange={(value) => updateAges(value,props.ages[1])
+            }
             />
             <StyledText className="text-lg mb-3">
-                {`Max Age: ${maxAge}`}
+                {`Max Age: ${props.ages[1]}`}
             </StyledText>
             <StyledSlider
                 className="w-full mb-3"
@@ -51,21 +49,11 @@ export function AgePreference(props : Props) {
                 thumbTintColor={globals.dark}
                 minimumValue={globals.minAge}
                 maximumValue={globals.maxAge}
-                lowerLimit={minAge}
+                lowerLimit={props.ages[0]}
                 step={1}
-                value={maxAge}
-                onValueChange={(value) => {
-                    setMaxAge(value);
-                    if (props.setMaxAge) props.setMaxAge(value);
-                }}
+                value={props.ages[1]}
+                onValueChange={(value) => updateAges(props.ages[0],value)}
             />
-            <StyledText className={classNames(
-                "mb-3",
-                minAge > maxAge ? "opacity-1" : "opacity-0"
-            )}
-            >
-                {agePreferenceText.inputError}
-            </StyledText>
         </StyledView>
     )
 
@@ -87,10 +75,10 @@ export function AgePreference(props : Props) {
                 <MyButton
                     text={props.submitText ?? ""}
                     onPressFunction={ () => {
-                        if (minAge <= maxAge && props.onSubmit) {
-                            props.onSubmit([minAge,maxAge])
+                        if (props.onSubmit)
+                            props.onSubmit([props.ages[0],props.ages[1]])
                         }
-                    }}
+                    }
                 />
             </>
         }

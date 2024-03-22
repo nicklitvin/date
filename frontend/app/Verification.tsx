@@ -2,7 +2,6 @@ import { observer } from "mobx-react-lite";
 import { useEffect, useState } from "react";
 import { useStore } from "../src/store/RootStore";
 import { ConfirmVerificationInput, NewCodeInput, NewVerificationInput } from "../src/interfaces";
-import axios from "axios";
 import { URLs } from "../src/urls";
 import { MySimplePage } from "../src/components/SimplePage";
 import { eduEmailText, verifyCodeText } from "../src/text";

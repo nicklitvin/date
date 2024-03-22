@@ -145,3 +145,8 @@ export interface SwipeStatus {
     feedIndex : number
     lastSwipedIndex : number
 }
+
+export interface Preferences {
+    genderPreference: string[]
+    agePreference: [number, number]
+}

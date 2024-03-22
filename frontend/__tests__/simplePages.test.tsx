@@ -230,29 +230,4 @@ describe("test pages", () => {
     
         expect(onSubmit).toHaveBeenCalledTimes(0);
     })
-
-    it("should select multiple gender preferences", async () => {
-        const returnGenderCount = jest.fn( (input : number) => input);
-        
-        render(
-            <GenderPreference
-                genders={globals.genders}
-                onSubmit={jest.fn()}
-                submitText={generalText.continue}
-                returnGenderCount={returnGenderCount}
-            />
-        );
-
-        await act( () => {
-            fireEvent(screen.getByText(globals.genders[0]), "press");
-        })
-        await act( () => {
-            fireEvent(screen.getByText(globals.genders[1]), "press");
-        })
-        await act( () => {
-            fireEvent(screen.getByText(generalText.continue), "press");
-        })
-
-        expect(returnGenderCount).toHaveLastReturnedWith(2);
-    })
 })
