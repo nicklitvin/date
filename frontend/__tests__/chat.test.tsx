@@ -147,7 +147,16 @@ describe("chat", () => {
 
     it("should report user", async () => {
         let sent = false;
-        const { mock } = await loadChat();
+        const { mock, store } = await loadChat();
+
+        store.receivedData.setChatPreviews([{
+            message: latestMessages[0],
+            profile: recepientProfile
+        }])
+        store.receivedData.setNewMatches([{
+            profile: recepientProfile,
+            timestamp: new Date()
+        }])
 
         mock.onPost(URLs.server + URLs.reportUser).reply( config => {
             const payload = JSON.parse(config.data) as RequestReportInput;
@@ -155,6 +164,9 @@ describe("chat", () => {
             sent = true;
             return [200]
         })
+
+        expect(store.receivedData.chatPreviews).toHaveLength(1);
+        expect(store.receivedData.newMatches).toHaveLength(1);
 
         await act( () => {
             fireEvent(screen.getByTestId(testIDS.reportUser), "press");
@@ -164,6 +176,8 @@ describe("chat", () => {
         })
 
         expect(sent).toEqual(true);
+        expect(store.receivedData.chatPreviews).toHaveLength(0);
+        expect(store.receivedData.newMatches).toHaveLength(0);
     })
 
     it("should show timestamps", async () => {

@@ -1,7 +1,4 @@
 TODO
-gender preference on press replaces value instead of adding?
-
-migrate away from src folder
 delete profile after reporting user
 loading text
 pull down to refresh

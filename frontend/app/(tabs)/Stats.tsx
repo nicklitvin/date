@@ -11,6 +11,8 @@ import { Spacing } from "../../src/components/Spacing";
 import { useStore } from "../../src/store/RootStore";
 import { testIDS } from "../../src/testIDs";
 import { useEffect, useState } from "react";
+import { MyDonut } from "../../src/components/Donut";
+import { Weekly } from "../../src/components/Weekly";
 
 interface Props {
     noAutoLoad?: boolean
@@ -22,12 +24,12 @@ export function Stats(props : Props) {
     const { receivedData } = useStore();    
     const [stats, setStats] = useState<UserSwipeStats|null>(receivedData.stats);
 
-    let MyDonut;
-    let Weekly;
-    if (!props.dontLoadCharts) {
-        MyDonut = require("../../src/components/Donut");
-        Weekly = require("../../src/components/Weekly");
-    }
+    // let MyDonut;
+    // let Weekly;
+    // if (!props.dontLoadCharts) {
+    //     MyDonut = require("../../src/components/Donut");
+    //     Weekly = require("../../src/components/Weekly");
+    // }
 
     useEffect( () => {
         if (props.noAutoLoad) return

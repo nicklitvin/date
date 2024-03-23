@@ -67,6 +67,16 @@ export function Chat(props : Props) {
         scrollRef.current?.scrollToEnd({animated: true});
     })
 
+    const deleteUser = () => {
+        receivedData.deleteSavedChat(userID);
+        receivedData.setChatPreviews(
+            receivedData.chatPreviews.filter( val => val.profile.id != userID)
+        );
+        receivedData.setNewMatches(
+            receivedData.newMatches.filter( val => val.profile.id != userID)
+        )
+    }
+
     const load = async () => {
         try {
             // profile
@@ -178,8 +188,9 @@ export function Chat(props : Props) {
                 reportedID: profile!.id
             }
             await sendRequest(URLs.reportUser, myReport);
-            // delete user
-            // router.back();
+            deleteUser();
+            if (props.noAutoLoad) return
+            router.push("Matches");
         } catch (err) {
             console.log(err);
         }
@@ -192,8 +203,10 @@ export function Chat(props : Props) {
                 withID: profile!.id
             }
             await sendRequest(URLs.unlikeUser, unlike);
-            // delete user
-            // router.back();
+            deleteUser();
+            if (props.noAutoLoad) return
+            router.push("Matches");
+            // router.push("Matches");
         } catch (err) {
             console.log(err);
         }

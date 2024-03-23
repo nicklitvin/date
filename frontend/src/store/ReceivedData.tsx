@@ -37,6 +37,11 @@ export class ReceivedData {
     }
 
     @action
+    deleteSavedChat(userID : string) {
+        delete this.savedChats[userID]
+    }
+
+    @action
     setSwipeStatus(input : SwipeStatus) { this.swipeStatus = input; }
 
     @action
