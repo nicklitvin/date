@@ -1,7 +1,5 @@
 TODO
-delete profile after reporting user
 loading text
-pull down to refresh
 index load profile => send to account creation or tabs
 
 add tests for edit pages

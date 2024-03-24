@@ -23,7 +23,7 @@ interface Props {
 export function Settings(props : Props) {
     const {globalState, receivedData} = useStore();
     const [showModal, setShowModal] = useState<boolean>(false);
-    const [settings, setSettings] = useState<SettingData[]>(receivedData.settings);
+    const [settings, setSettings] = useState<SettingData[]>(receivedData.settings ?? []);
 
     useEffect( () => {
         if (props.noAutoLoad) return

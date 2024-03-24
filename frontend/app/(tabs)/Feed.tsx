@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import { ProfileViewMob } from "../../src/pages/ProfileView";
 import { URLs } from "../../src/urls";
 import { sendRequest } from "../../src/utils";
-import { Animated, ScrollView } from "react-native";
+import { Animated, RefreshControl, ScrollView } from "react-native";
 import { globals } from "../../src/globals";
 import { Link } from "expo-router";
 import { useStore } from "../../src/store/RootStore";
@@ -27,9 +27,15 @@ export function Feed(props : Props) {
     const opacity = useState(new Animated.Value(1))[0];
     const scrollViewRef = useRef<ScrollView>(null);
 
+    const [refreshing, setRefreshing] = useState<boolean>(false);
+    const [firstLoad, setFirstLoad] = useState<boolean>(true);
+
     useEffect( () => {
-        if (props.dontAutoLoad) return
-        load();
+        if (firstLoad) {
+            if (props.dontAutoLoad) return
+            load();
+        }
+        setFirstLoad(false);
     })
 
     useEffect( () => {
@@ -53,16 +59,22 @@ export function Feed(props : Props) {
     }, [swipeStatus])
 
     const load = async () => {
+        if (!receivedData.swipeFeed) {
+            await getFeed();
+        }
+    }
+
+    const getFeed = async () => {
         try {
-            if (!feed) {
-                const response = await sendRequest(URLs.getFeed, null);
-                setFeed(response.data.data);
-                setSwipeStatus({
-                    feedIndex: 0,
-                    lastSwipedIndex: -1
-                })
-            }
-        } catch (err) {}
+            const response = await sendRequest(URLs.getFeed, null);
+            setFeed(response.data.data);
+            setSwipeStatus({
+                feedIndex: 0,
+                lastSwipedIndex: -1
+            })
+        } catch (err) {
+            console.log(err);
+        }
     }
 
     const scrollToTop = () => {
@@ -117,10 +129,25 @@ export function Feed(props : Props) {
         })
     }
 
+    const refresh = () => {
+        receivedData.setSwipeFeed(null);
+        setFeed(null);
+        setRefreshing(false);
+    }
+
     return (
         <StyledView className="w-full h-full bg-back">
         <StyledButton testID={testIDS.load} onPress={load}/>
-        <StyledScroll showsVerticalScrollIndicator={false} ref={scrollViewRef}>
+        <StyledScroll 
+            showsVerticalScrollIndicator={false} 
+            ref={scrollViewRef}
+            refreshControl={
+                <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={refresh}    
+                />
+            }
+        >
         <StyledView className="w-full h-full">
 
             <PageHeader

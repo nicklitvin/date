@@ -8,7 +8,7 @@ import axios from "axios";
 import { testIDS } from "../../src/testIDs";
 import { PageHeader } from "../../src/components/PageHeader";
 import { URLs } from "../../src/urls";
-import { NativeScrollEvent, NativeSyntheticEvent, ScrollView } from "react-native";
+import { NativeScrollEvent, NativeSyntheticEvent, RefreshControl, ScrollView } from "react-native";
 import { globals } from "../../src/globals";
 import { differenceInSeconds } from "date-fns";
 import { createTimeoutSignal, sendRequest } from "../../src/utils";
@@ -24,18 +24,33 @@ interface Props {
 export function Matches(props : Props) {
     const { receivedData } = useStore();
 
-    const [newMatches, setNewMatches] = useState<NewMatch[]>(receivedData.newMatches);
-    const [chatPreviews, setChatPreviews] = useState<ChatPreview[]>(receivedData.chatPreviews);
+    const [newMatches, setNewMatches] = useState<NewMatch[]>(receivedData.newMatches ?? []);
+    const [chatPreviews, setChatPreviews] = useState<ChatPreview[]>(receivedData.chatPreviews ?? []);
 
     const newMatchScrollRef = useRef<ScrollView>(null);
     const chatsScrollRef = useRef<ScrollView>(null);
     const [matchRequestTime, setMatchRequestTime] = useState<Date>(new Date(0));
     const [previewRequestTime, setPreviewRequestTime] = useState<Date>(new Date(0));
+    
+    const [refreshing, setRefreshing] = useState<boolean>(false);
+    const [firstLoad, setFirstLoad] = useState<boolean>(true);
 
     useEffect( () => {
-        if (props.noAutoLoad) return
-        load()
+        if (firstLoad) {
+            if (props.noAutoLoad) return
+            load()
+        }
+        setFirstLoad(false);
     })
+
+    const load = async () => {
+        if (!receivedData.newMatches) {
+            await getNewMatches()
+        }
+        if (!receivedData.chatPreviews) {
+            await getChatPreviews();
+        }
+    }
 
     useEffect( () => {
         if (props.getChatPreviewLength) props.getChatPreviewLength(chatPreviews.length)
@@ -61,36 +76,39 @@ export function Matches(props : Props) {
         }
     }, [newMatches])
 
-    const load = async () => {
+    const getNewMatches = async () => {
         try {
             const newMatchDataInput : NewMatchDataInput = {
                 timestamp: new Date()
             }
+    
+            const newMatchResponse = await sendRequest(URLs.getNewMatches, newMatchDataInput);
+            const data = newMatchResponse.data.data as NewMatch[];
+            const processed : NewMatch[] = data.map( val => ({
+                profile: val.profile,
+                timestamp: new Date(val.timestamp)
+            })) 
+            setNewMatches(processed);
+        } catch (err) {
+            console.log(err);
+        }
+    }
 
-            // newMatches
-            if (newMatches.length == 0) {
-                const newMatchResponse = await sendRequest(URLs.getNewMatches, newMatchDataInput);
-                const data = newMatchResponse.data.data as NewMatch[];
-                const processed : NewMatch[] = data.map( val => ({
-                    profile: val.profile,
-                    timestamp: new Date(val.timestamp)
-                })) 
-                setNewMatches(processed);
+    const getChatPreviews = async () => {
+        try {
+            const newMatchDataInput : NewMatchDataInput = {
+                timestamp: new Date()
             }
-
-            // chatPreview
-            if (chatPreviews.length == 0) {
-                const chatPreviewResponse = await sendRequest(URLs.getNewChatPreviews, newMatchDataInput);
-                const data = chatPreviewResponse.data.data as ChatPreview[];
-                const processed : ChatPreview[] = data.map( val => ({
-                    profile: val.profile,
-                    message: {
-                        ...val.message,
-                        timestamp: new Date(val.message.timestamp)
-                    }
-                }))
-                setChatPreviews(processed);
-            }
+            const chatPreviewResponse = await sendRequest(URLs.getNewChatPreviews, newMatchDataInput);
+            const data = chatPreviewResponse.data.data as ChatPreview[];
+            const processed : ChatPreview[] = data.map( val => ({
+                profile: val.profile,
+                message: {
+                    ...val.message,
+                    timestamp: new Date(val.message.timestamp)
+                }
+            }))
+            setChatPreviews(processed);
         } catch (err) {
             console.log(err);
         }
@@ -156,8 +174,26 @@ export function Matches(props : Props) {
         }
     }
 
+    const refresh = () => {
+        receivedData.setNewMatches(null);
+        receivedData.setChatPreviews(null);
+        setNewMatches([]);
+        setChatPreviews([]);
+        getChatPreviews();
+        getNewMatches();
+        setRefreshing(false);
+    }
+
     return (
         <StyledView className="w-full h-full flex flex-col bg-back">
+        <StyledScroll
+            refreshControl={
+                <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={refresh}    
+                />
+            }
+        >
             <StyledButton testID={testIDS.load} onPress={load} />
             <PageHeader
                 title={matchesText.pageTitle}
@@ -237,7 +273,7 @@ export function Matches(props : Props) {
                 </StyledView>
             </StyledScroll>                          
             }
-            
+        </StyledScroll>
         </StyledView>
     )
 } 

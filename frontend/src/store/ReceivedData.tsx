@@ -4,13 +4,13 @@ import { ChatPreview, Message, NewMatch, Preferences, PublicProfile, SettingData
 export class ReceivedData {
     @observable public profile : PublicProfile|null = null;
     @observable public subscription : SubscriptionData|null = null;
-    @observable public chatPreviews : ChatPreview[] = [];
+    @observable public chatPreviews : ChatPreview[]|null = null;
+    @observable public newMatches : NewMatch[]|null = null;
     @observable public swipeFeed : SwipeFeed|null = null;
     @observable public swipeStatus : SwipeStatus|null = null;
     @observable public stats : UserSwipeStats|null = null;
-    @observable public newMatches : NewMatch[] = [];
     @observable public savedChats : {[userID: string] : Message[]} = {}
-    @observable public settings : SettingData[] = [];
+    @observable public settings : SettingData[]|null = null;
     @observable public preferences : Preferences|null = null;
 
     @action
@@ -20,16 +20,16 @@ export class ReceivedData {
     setSubscription(input : SubscriptionData) {this.subscription = input; }
 
     @action
-    setChatPreviews(input : ChatPreview[]) { this.chatPreviews = input; }
+    setChatPreviews(input : ChatPreview[]|null) { this.chatPreviews = input; }
 
     @action
-    setSwipeFeed(input : SwipeFeed) { this.swipeFeed = input; }
+    setSwipeFeed(input : SwipeFeed|null) { this.swipeFeed = input; }
 
     @action 
     setStats(input : UserSwipeStats|null) { this.stats = input; }
 
     @action 
-    setNewMatches(input : NewMatch[]) { this.newMatches = input; }
+    setNewMatches(input : NewMatch[]|null) { this.newMatches = input; }
 
     @action
     addSavedChat(userID : string, chat : Message[]) { 

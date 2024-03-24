@@ -39,6 +39,7 @@ export function Chat(props : Props) {
     const [currentID, setCurrentID] = useState<number>(0);
     const [loadingIDs, setLoadingIDs] = useState<string[]>([]);
     const [showModal, setShowModal] = useState<boolean>(false);
+    const [firstLoad, setFirstLoad] = useState<boolean>(true);
 
     useEffect( () => {
         if (props.getChatLength) props.getChatLength(chat.length);
@@ -62,53 +63,68 @@ export function Chat(props : Props) {
     }, [unsentChats])
 
     useEffect( () => {
-        if (props.noAutoLoad) return
-        load();
-        scrollRef.current?.scrollToEnd({animated: true});
+        if (firstLoad) {
+            if (props.noAutoLoad) return
+            load();
+            scrollRef.current?.scrollToEnd({animated: true});
+        }
+        setFirstLoad(false);
     })
 
     const deleteUser = () => {
         receivedData.deleteSavedChat(userID);
-        receivedData.setChatPreviews(
-            receivedData.chatPreviews.filter( val => val.profile.id != userID)
-        );
-        receivedData.setNewMatches(
-            receivedData.newMatches.filter( val => val.profile.id != userID)
-        )
+        if (receivedData.newMatches) {
+            receivedData.setNewMatches(
+                receivedData.newMatches.filter( val => val.profile.id != userID)
+            )
+        }
+        if (receivedData.chatPreviews) {
+            receivedData.setChatPreviews(
+                receivedData.chatPreviews.filter( val => val.profile.id != userID)
+            );
+        }
     }
 
     const load = async () => {
+        const newMatch = receivedData.newMatches && receivedData.newMatches.find(val => val.profile.id == userID)?.profile;
+        const existMatch = receivedData.chatPreviews && receivedData.chatPreviews.find(val => val.profile.id == userID)?.profile;
+
+        if (newMatch || existMatch) {
+            setProfile(newMatch || existMatch || undefined)
+        } else {
+            await getProfile();
+        }
+
+        if (!receivedData.savedChats[userID]) {
+            await getChat();
+        }
+    }
+
+    const getProfile = async () => {
         try {
-            // profile
-            if (!profile) {
-                const newMatch = receivedData.newMatches.find(val => val.profile.id == userID)?.profile;
-                const existMatch = receivedData.chatPreviews.find(val => val.profile.id == userID)?.profile;
-
-                if (newMatch || existMatch) {
-                    setProfile(newMatch || existMatch);
-                } else {
-                    const profileInput : GetProfileInput = {
-                        userID: userID!
-                    }
-                    const profileResponse = await sendRequest(URLs.getProfile, profileInput);
-                    setProfile(profileResponse.data.data);    
-                }
+            const profileInput : GetProfileInput = {
+                userID: userID!
             }
+            const profileResponse = await sendRequest(URLs.getProfile, profileInput);
+            setProfile(profileResponse.data.data);    
+        } catch (err) {
+            console.log(err);
+        }
+    }
 
-            // chat
-            if (chat.length == 0) {
-                const chatInput : GetChatInput = {
-                    fromTime: new Date(),
-                    withID: userID!
-                }
-                const chatResponse = await sendRequest(URLs.getChat, chatInput);
-                const chatData = chatResponse.data.data as Message[];
-                const processedChatData = chatData.map( val => ({
-                    ...val,
-                    timestamp: new Date(val.timestamp)
-                }));
-                setChat(processedChatData);
+    const getChat = async () => {
+        try {
+            const chatInput : GetChatInput = {
+                fromTime: new Date(),
+                withID: userID!
             }
+            const chatResponse = await sendRequest(URLs.getChat, chatInput);
+            const chatData = chatResponse.data.data as Message[];
+            const processedChatData = chatData.map( val => ({
+                ...val,
+                timestamp: new Date(val.timestamp)
+            }));
+            setChat(processedChatData);
         } catch (err) {
             console.log(err);
         }
