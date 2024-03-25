@@ -1,5 +1,4 @@
 TODO
-loading text
 index load profile => send to account creation or tabs
 
 add tests for edit pages

@@ -150,3 +150,14 @@ export interface Preferences {
     genderPreference: string[]
     agePreference: [number, number]
 }
+
+export interface clientIDs {
+    android?: string
+    ios?: string
+    expo?: string
+}
+
+export interface LoginInput {
+    googleToken?: string
+    appleToken?: string
+}

@@ -119,7 +119,6 @@ export const verifyCodeText = {
     inputError: "Invalid Code",
     resendButton: "Resend Code",
     resending: "Resend in"
-
 }
 
 export const editProfileText = {
@@ -189,4 +188,10 @@ export const alcoholText = {
 export const smokingText = {
     pageTitle: "Smoking",
     pageSubtitle: "How often do you smoke?"
+}
+
+export const homeText = {
+    pageTitle: "Lovedu",
+    pageSubtitle: "",
+
 }

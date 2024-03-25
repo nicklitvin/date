@@ -1,5 +1,5 @@
 import { action, observable } from "mobx";
-import { ChatPreview, Message, NewMatch, Preferences, PublicProfile, SettingData, SubscriptionData, SwipeFeed, SwipeStatus, UserSwipeStats } from "../interfaces";
+import { ChatPreview, clientIDs, LoginInput, Message, NewMatch, Preferences, PublicProfile, SettingData, SubscriptionData, SwipeFeed, SwipeStatus, UserSwipeStats } from "../interfaces";
 
 export class ReceivedData {
     @observable public profile : PublicProfile|null = null;
@@ -12,6 +12,8 @@ export class ReceivedData {
     @observable public savedChats : {[userID: string] : Message[]} = {}
     @observable public settings : SettingData[]|null = null;
     @observable public preferences : Preferences|null = null;
+    @observable public clientIDs : clientIDs|null = null;
+    @observable public loginToken : LoginInput|null = null;
 
     @action
     setProfile(input : PublicProfile) {this.profile = input; }
@@ -49,4 +51,10 @@ export class ReceivedData {
 
     @action
     setPreferences(input : Preferences) { this.preferences = input; }
+
+    @action
+    setClientIDs(input : clientIDs ) { this.clientIDs = input; }
+
+    @action
+    setLoginToken(input : LoginInput) { this.loginToken = input; }
 }
