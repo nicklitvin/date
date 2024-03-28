@@ -1,16 +1,24 @@
 import { Redirect } from "expo-router";
 import { useEffect, useState } from "react";
-import { StyledText } from "../src/styledElements";
 import { observer } from "mobx-react-lite";
 import { useStore } from "../src/store/RootStore";
 import { MySimplePage } from "../src/components/SimplePage";
+import { globals } from "../src/globals";
 
 export function Index() {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<boolean>(false);
-    const { globalState, receivedData } = useStore();
+    const { receivedData } = useStore();
 
     useEffect( () => {
+        const func = async () => {
+            if (globals.useStorage) {
+                const AsyncStorage = require("@react-native-async-storage/async-storage");
+                receivedData.setLoginKey(await AsyncStorage.getItem(globals.storageloginKey) ?? "");
+            }
+        }
+        func();
+        
         try {
             receivedData.setProfile({
                 name: "Michael",
@@ -147,6 +155,7 @@ export function Index() {
                 feedIndex: 0,
                 lastSwipedIndex: -1
             })
+
             setLoading(false);
         } catch (err) {}
     })

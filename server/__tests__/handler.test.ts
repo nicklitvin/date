@@ -830,7 +830,7 @@ describe("handler", () => {
         expect(await handler.autoLogin("bad")).toEqual(null);
     })
 
-    it("should update key if auto login and existing", async () => {
+    it("should not update key if auto login and existing", async () => {
         const email = "a";
         const create = await handler.login.createUser(email);
         expect(await handler.autoLogin(create.key)).toEqual(create.key);

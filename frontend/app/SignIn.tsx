@@ -11,10 +11,6 @@ import { LoginInput } from "../src/interfaces";
 import { sendRequest } from "../src/utils";
 import { URLs } from "../src/urls";
 
-interface Props {
-
-}
-
 export function Home() {
     const { receivedData } = useStore();
     const [firstLoad, setFirstLoad] = useState<boolean>(true);
@@ -48,7 +44,7 @@ export function Home() {
             }
             try {
                 const response = await sendRequest(URLs.login, input);
-                receivedData.setLoginToken(response.data.data)
+                receivedData.setLoginKey(response.data.data)
             } catch (err) { 
                 console.log(err);
             }
@@ -75,7 +71,7 @@ export function Home() {
             }
 
             const response = await sendRequest(URLs.login, input);
-            receivedData.setLoginToken(response.data.data);
+            receivedData.setLoginKey(response.data.data);
         } catch (err) {
             console.log(err);
         }

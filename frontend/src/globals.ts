@@ -1,4 +1,6 @@
 export const globals = {
+    useStorage: false,
+
     genders: ["Male", "Female"],
     minAge: 18,
     maxAge: 30,
@@ -23,6 +25,7 @@ export const globals = {
     resendVerificationTimeout: 10,
     fadeDuration: 500,
     frequencies: ["Never", "Sometimes", "Often"],
+    storageloginKey: "LoginKey",
 
     attributes: {
         "Sports": [

@@ -1,5 +1,6 @@
 import { action, observable } from "mobx";
-import { ChatPreview, clientIDs, LoginInput, Message, NewMatch, Preferences, PublicProfile, SettingData, SubscriptionData, SwipeFeed, SwipeStatus, UserSwipeStats } from "../interfaces";
+import { ChatPreview, clientIDs, Message, NewMatch, Preferences, PublicProfile, SettingData, SubscriptionData, SwipeFeed, SwipeStatus, UserSwipeStats } from "../interfaces";
+import { globals } from "../globals";
 
 export class ReceivedData {
     @observable public profile : PublicProfile|null = null;
@@ -13,7 +14,7 @@ export class ReceivedData {
     @observable public settings : SettingData[]|null = null;
     @observable public preferences : Preferences|null = null;
     @observable public clientIDs : clientIDs|null = null;
-    @observable public loginToken : LoginInput|null = null;
+    @observable public loginKey : string|null = null;
 
     @action
     setProfile(input : PublicProfile) {this.profile = input; }
@@ -56,5 +57,11 @@ export class ReceivedData {
     setClientIDs(input : clientIDs ) { this.clientIDs = input; }
 
     @action
-    setLoginToken(input : LoginInput) { this.loginToken = input; }
+    setLoginKey(input : string|null) { 
+        this.loginKey = input; 
+        if (globals.useStorage) {
+            const AsyncStorage = require("@react-native-async-storage/async-storage");
+            AsyncStorage.setItem(globals.storageloginKey, input ?? "");
+        }
+    }
 }
