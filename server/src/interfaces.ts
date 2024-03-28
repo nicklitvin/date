@@ -236,3 +236,8 @@ export interface SubscriptionData{
     ID?: string
     endDate?: Date
 }
+
+export interface LoginInput {
+    googleToken?: string
+    appleToken?: string
+}

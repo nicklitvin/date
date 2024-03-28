@@ -106,3 +106,9 @@ model Verification {
     expires         DateTime
     verified        Boolean         
 }
+
+model Login {
+    email           String          @id
+    key             String
+    expire          DateTime
+}

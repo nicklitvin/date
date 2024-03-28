@@ -1,5 +1,21 @@
 TODO
+user signs up
+    create user entry with expiration date
+    return account key
+
+user logs in
+    check if token = existing email
+    if existing, update key and expiration date
+
+
+
+
+email
+token
+expire
+
 index load profile => send to account creation or tabs
+notification deletes 
 
 add tests for edit pages
 attirubte verification on backend (prevent random attributes)

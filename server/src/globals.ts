@@ -25,5 +25,9 @@ export const globals = {
     freeTrialDays: 7,
     usersInSwipeFeed: 10,
     verificationCodeLength: 4,
-    verificationExpireMinutes: 5
+    verificationExpireMinutes: 5,
+    keyExpirationWeeks: 10,
+
+    //URLS
+    googleOAuth: "https://www.googleapis.com/userinfo/v2/me",
 }

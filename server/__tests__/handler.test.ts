@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it } from "@jest/globals";
 import { handler } from "../jest.setup";
 import { globals } from "../src/globals";
 import { User } from "@prisma/client";
-import { ChatPreview, PublicProfile } from "../src/interfaces";
+import { ChatPreview } from "../src/interfaces";
 import { randomUUID } from "crypto";
 import { createUserInput, createUsersForSwipeFeed, getImageDetails, makeMessageInputWithOneRandom, makeMessageInputWithRandoms, makeTwoUsers, makeTwoUsersAndMatch, makeVerificationInput, matchUsers, validRequestUserInput } from "../__testUtils__/easySetup";
 import { addMinutes, addYears } from "date-fns";
@@ -801,5 +801,44 @@ describe("handler", () => {
         expect(await handler.verification.getVerificationBySchoolEmail(
             eduEmail
         )).toEqual(null);
+    })
+
+    it("should not login bad token", async () => {
+        expect(await handler.loginWithToken({
+            appleToken: "bad"
+        })).toEqual(null);
+    })
+
+
+    it("should create login entry if new", async () => {
+        const email = "a";
+
+        expect(await handler.login.getUserByEmail(email)).toEqual(null);
+        const loginKey = await handler.loginWithToken({appleToken: "a"}, email);
+        expect(await handler.login.getUserByKey(loginKey as string)).not.toEqual(null);
+    })
+
+    it("should update key if existing entry", async () => {
+        const email = "a";
+
+        const create = await handler.login.createUser(email);
+        const after = await handler.loginWithToken({appleToken: "a"}, email);
+        expect(create.key).not.toEqual(after);
+    })
+
+    it("should not login with bad key", async () => {
+        expect(await handler.autoLogin("bad")).toEqual(null);
+    })
+
+    it("should update key if auto login and existing", async () => {
+        const email = "a";
+        const create = await handler.login.createUser(email);
+        expect(await handler.autoLogin(create.key)).toEqual(create.key);
+    })
+
+    it("should not auto login with expired key", async () => {
+        const email = "a";
+        const create = await handler.login.createUser(email, new Date(0));
+        expect(await handler.autoLogin(create.key)).toEqual(null);
     })
 })

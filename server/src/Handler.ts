@@ -8,12 +8,13 @@ import { SwipeHandler } from "./handlers/swipe";
 import { MessageHandler } from "./handlers/message";
 import { ReportHandler } from "./handlers/report";
 import { StripePaymentHandler } from "./handlers/pay";
-import { ChatPreview, ConfirmVerificationInput, DeleteImageInput, EditUserInput, EloAction, GetChatPreviewsInput, ImageHandler, MessageInput, NewMatchData, NewMatchInput, NewVerificationInput, PaymentHandler, PublicProfile, RequestReportInput, RequestUserInput, SubscribeInput, SwipeFeed, SwipeInput, UnlikeInput, UnlikeOutput, UploadImageInput, UserInput } from "./interfaces";
+import { ChatPreview, ConfirmVerificationInput, DeleteImageInput, EditUserInput, EloAction, GetChatPreviewsInput, ImageHandler, LoginInput, MessageInput, NewMatchData, NewMatchInput, NewVerificationInput, PaymentHandler, PublicProfile, RequestReportInput, RequestUserInput, SubscribeInput, SwipeFeed, SwipeInput, UnlikeInput, UnlikeOutput, UploadImageInput, UserInput } from "./interfaces";
 import { globals } from "./globals";
 import { FreeTrialHandler } from "./handlers/freetrial";
 import { VerificationHandler } from "./handlers/verification";
 import { addYears } from "date-fns";
 import { allowedAttributeEdits } from "./others";
+import { LoginHandler } from "./handlers/login";
 
 export class Handler {
     public announcement : AnnouncementHandler;
@@ -27,6 +28,7 @@ export class Handler {
     public pay : PaymentHandler;
     public freeTrial : FreeTrialHandler;
     public verification : VerificationHandler;
+    public login : LoginHandler;
 
     private ignoreVerification : boolean;
 
@@ -47,6 +49,7 @@ export class Handler {
         this.report = new ReportHandler(prisma);
         this.freeTrial = new FreeTrialHandler(prisma);
         this.verification = new VerificationHandler(prisma);
+        this.login = new LoginHandler(prisma);
     }
 
     public async deleteEverything() {
@@ -60,7 +63,8 @@ export class Handler {
             this.message.deleteAllMessages(),
             this.report.deleteAllReports(),
             this.freeTrial.deleteAllFreeTrialUsedUsers(),
-            this.verification.deleteAllVerifications()
+            this.verification.deleteAllVerifications(),
+            this.login.deleteAllLogin(),
         ])
     }
 
@@ -468,5 +472,41 @@ export class Handler {
             email, newCode
         );
         return newVerification.code;
+    }
+
+    public async loginWithToken(input : LoginInput, customEmail? : string) : Promise<string|null> {
+        await this.login.deleteExpiredEntries();
+
+        let email = customEmail ?? 
+        (
+            input.appleToken ? 
+            await this.login.getEmailFromAppleToken(input.appleToken) : 
+            (
+                input.googleToken ? 
+                await this.login.getEmailFromGoogleToken(input.googleToken) : 
+                null
+            )
+        );
+        
+        if (!email) return null;
+
+        if (await this.login.getUserByEmail(email)) {
+            const userLogin = await this.login.updateKey(email);
+            return userLogin.key;
+        } else {
+            const userLogin = await this.login.createUser(email);
+            return userLogin.key;
+        }
+    }
+
+    public async autoLogin(key : string) : Promise<string|null> {
+        const userLogin = await this.login.getUserByKey(key);
+        
+        if (userLogin &&  userLogin.expire.getTime() > new Date().getTime()) {
+            await this.login.updateExpiration(userLogin.email);
+            return key;
+        } else {
+            return null;
+        }
     }
 }
