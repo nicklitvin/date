@@ -111,4 +111,5 @@ model Login {
     email           String          @id
     key             String
     expire          DateTime
+    expoPushToken   String?
 }

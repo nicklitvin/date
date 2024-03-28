@@ -821,7 +821,7 @@ describe("handler", () => {
     it("should update key if existing entry", async () => {
         const email = "a";
 
-        const create = await handler.login.createUser(email);
+        const create = await handler.login.createUser({email});
         const after = await handler.loginWithToken({appleToken: "a"}, email);
         expect(create.key).not.toEqual(after);
     })
@@ -832,13 +832,16 @@ describe("handler", () => {
 
     it("should not update key if auto login and existing", async () => {
         const email = "a";
-        const create = await handler.login.createUser(email);
+        const create = await handler.login.createUser({email});
         expect(await handler.autoLogin(create.key)).toEqual(create.key);
     })
 
     it("should not auto login with expired key", async () => {
         const email = "a";
-        const create = await handler.login.createUser(email, new Date(0));
+        const create = await handler.login.createUser({
+            email: email, 
+            customDate: new Date(0)
+        });
         expect(await handler.autoLogin(create.key)).toEqual(null);
     })
 })

@@ -1,14 +1,10 @@
 TODO
-user signs up
-    create user entry with expiration date
-    return account key
+notifications 
+if on start
+    create user, checks if push token exists, sets enable to true
 
-user logs in
-    check if token = existing email
-    if existing, update key and expiration date
-
-
-
+if in app
+    before sending edit user, ask for push token, send push token /updateNotification
 
 email
 token

@@ -231,7 +231,7 @@ export interface NewMatchData {
     timestamp: Date
 }
 
-export interface SubscriptionData{
+export interface SubscriptionData {
     subscribed: boolean
     ID?: string
     endDate?: Date
@@ -240,4 +240,11 @@ export interface SubscriptionData{
 export interface LoginInput {
     googleToken?: string
     appleToken?: string
+    expoPushToken?: string
+}
+
+export interface LoginEntryInput {
+    email: string
+    expoPushToken?: string
+    customDate?: Date
 }

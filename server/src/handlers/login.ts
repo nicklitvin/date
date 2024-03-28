@@ -4,6 +4,7 @@ import { addWeeks } from "date-fns";
 import { randomUUID } from "crypto";
 import axios from "axios";
 import verifyAppleToken from "verify-apple-id-token";
+import { LoginEntryInput } from "../interfaces";
 
 export class LoginHandler {
     private prisma : PrismaClient;
@@ -12,12 +13,13 @@ export class LoginHandler {
         this.prisma = prisma;
     }
 
-    async createUser(email : string, customDate? : Date) {
+    async createUser(input : LoginEntryInput) {
         return await this.prisma.login.create({
             data: {
-                email: email,
-                expire: customDate ?? addWeeks(new Date(), globals.keyExpirationWeeks),
-                key: randomUUID()
+                email: input.email,
+                expire: input.customDate ?? addWeeks(new Date(), globals.keyExpirationWeeks),
+                key: randomUUID(),
+                expoPushToken: input.expoPushToken 
             }
         })
     }
@@ -98,5 +100,16 @@ export class LoginHandler {
         } catch (err) {
             return null;
         }
+    }
+
+    async updateExpoToken(email: string, token: string) {
+        return await this.prisma.login.update({
+            where: {
+                email: email
+            },
+            data: {
+                expoPushToken: token
+            }
+        })
     }
 }
