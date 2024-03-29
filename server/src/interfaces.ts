@@ -18,6 +18,7 @@ export interface ErrorLogInput {
 }
 
 interface BasicUserInput {
+    id: string
     email: string   
     name: string
     birthday: Date
@@ -253,3 +254,9 @@ export interface LoginOutput {
     key: string
     newAccount: boolean
 }
+
+export interface Email {
+    email : string
+}
+
+export type APIRequest<T> = Omit<T,"userID"|"id"> & {key : string};

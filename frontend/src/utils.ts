@@ -66,6 +66,6 @@ export function createTimeoutSignal() {
 
 export async function sendRequest(subURL : string, data : any) {
     return await axios.post(URLs.server + subURL, data, {
-        signal: createTimeoutSignal()
+        signal: createTimeoutSignal(),
     })
 }

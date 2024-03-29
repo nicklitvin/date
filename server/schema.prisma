@@ -30,7 +30,7 @@ enum Usage {
 
 model User {
     id              String          @id
-    email           String
+    email           String          
     name            String
     birthday        DateTime
     ageInterest     Int[]
@@ -109,6 +109,7 @@ model Verification {
 
 model Login {
     email           String          @id
+    userID          String          @unique
     key             String
     expire          DateTime
     expoPushToken   String?

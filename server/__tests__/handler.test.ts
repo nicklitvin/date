@@ -814,8 +814,8 @@ describe("handler", () => {
         const email = "a";
 
         expect(await handler.login.getUserByEmail(email)).toEqual(null);
-        const loginKey = await handler.loginWithToken({appleToken: "a"}, email);
-        expect(await handler.login.getUserByKey(loginKey as string)).not.toEqual(null);
+        const output = await handler.loginWithToken({appleToken: "a"}, email);
+        expect(await handler.login.getUserByKey(output?.key as string)).not.toEqual(null);
     })
 
     it("should update key if existing entry", async () => {

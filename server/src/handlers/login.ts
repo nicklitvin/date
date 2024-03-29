@@ -19,7 +19,8 @@ export class LoginHandler {
                 email: input.email,
                 expire: input.customDate ?? addWeeks(new Date(), globals.keyExpirationWeeks),
                 key: randomUUID(),
-                expoPushToken: input.expoPushToken 
+                expoPushToken: input.expoPushToken,
+                userID: randomUUID()
             }
         })
     }
@@ -30,6 +31,15 @@ export class LoginHandler {
                 key: key
             }
         })
+    }
+
+    async getUserIDByKey(key : string) {
+        const user = await this.prisma.login.findFirst({
+            where: {
+                key: key
+            },
+        })
+        return user?.userID;
     }
 
     async getUserByEmail(email : string) {
@@ -67,17 +77,6 @@ export class LoginHandler {
         const deleted = await this.prisma.login.deleteMany();
         return deleted.count;
     }
-
-    async deleteExpiredEntries() {
-        const deleted = await this.prisma.login.deleteMany({
-            where: {
-                expire: {
-                    lt: new Date()
-                }
-            }
-        })
-        return deleted.count;
-    }   
 
     async getEmailFromGoogleToken(token : string) : Promise<string|null> {
         try {

@@ -58,16 +58,6 @@ describe("login", () => {
         expect(await funcs.deleteAllLogin()).toEqual(3);
     })
 
-    it("should delete expired entries", async () => {
-        await Promise.all([
-            funcs.createUser(createInput("a", addWeeks(new Date(),-10))),
-            funcs.createUser(createInput("b")),
-            funcs.createUser(createInput("c")),
-        ])
-
-        expect(await funcs.deleteExpiredEntries()).toEqual(1);
-    })
-
     it("should update push token", async () => {
         const token = "a";
         const before = await funcs.createUser(createInput(email));

@@ -20,6 +20,7 @@ export async function getImageDetails(good : boolean) : Promise<ImageInput> {
 export async function validRequestUserInput() : Promise<RequestUserInput> { 
     const upload = await getImageDetails(true);
     return {
+        id: randomUUID(),
         birthday: addYears(new Date(), -globals.minAge),
         ageInterest: [18,25],
         attributes: Array.from({length: globals.maxAttributes}, (_,index) => `${index}`),
@@ -45,6 +46,7 @@ export async function validRequestUserInput() : Promise<RequestUserInput> {
 
 export function createUserInput(email = "a@berkeley.edu") : UserInput {
     return {
+        id: randomUUID(),
         email: email,
         name: "a",
         birthday: addYears(new Date(), -21),

@@ -1,6 +1,5 @@
 import { PrismaClient, User } from "@prisma/client";
 import { EditUserInput, EloAction, EloUpdateInput, GetProfileListInput, ImageHandler, PublicProfile, RequestUserInput, UserInput } from "../interfaces";
-import { randomUUID } from "crypto";
 import { addMonths, differenceInYears } from "date-fns";
 import { globals } from "../globals";
 
@@ -25,7 +24,6 @@ export class UserHandler {
         return this.prisma.user.create({
             data: {
                 ...input,
-                id: randomUUID(),
                 notifications: true,
                 university: this.getUniversityFromEmail(input.email),
                 subscribeEnd: new Date(),

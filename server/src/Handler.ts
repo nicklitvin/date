@@ -83,6 +83,7 @@ export class Handler {
             );
     
             const userInput : UserInput = {
+                id: input.id,
                 birthday: input.birthday,
                 attributes: input.attributes,
                 description: input.description,
@@ -475,8 +476,6 @@ export class Handler {
     }
 
     public async loginWithToken(input : LoginInput, customEmail? : string) : Promise<LoginOutput|null> {
-        await this.login.deleteExpiredEntries();
-
         let email = customEmail ?? 
         (
             input.appleToken ? 

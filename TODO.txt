@@ -1,4 +1,7 @@
 TODO
+how to send key with every request
+    delete key type and then add userID type?
+
 index load profile => send to account creation or tabs
 notification deletes 
 
