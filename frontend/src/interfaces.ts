@@ -160,4 +160,5 @@ export interface clientIDs {
 export interface LoginInput {
     googleToken?: string
     appleToken?: string
+    expoPushToken?: string
 }

@@ -4,17 +4,44 @@ import { observer } from "mobx-react-lite";
 import { useStore } from "../src/store/RootStore";
 import { MySimplePage } from "../src/components/SimplePage";
 import { globals } from "../src/globals";
+import * as Device from "expo-device";
+import * as Notifications from "expo-notifications";
+import Constants from "expo-constants";
+import { Platform } from "react-native";
 
 export function Index() {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<boolean>(false);
-    const { receivedData } = useStore();
+    const { globalState, receivedData } = useStore();
 
     useEffect( () => {
         const func = async () => {
             if (globals.useStorage) {
                 const AsyncStorage = require("@react-native-async-storage/async-storage");
                 receivedData.setLoginKey(await AsyncStorage.getItem(globals.storageloginKey) ?? "");
+            }
+
+            if (Platform.OS == "android") {
+                Notifications.setNotificationChannelAsync("default", {
+                    name: "default",
+                    importance: Notifications.AndroidImportance.DEFAULT,
+                })
+            }
+
+            if (Device.isDevice) {
+                const { status: existingStatus } = await Notifications.getPermissionsAsync();
+                let finalStatus = existingStatus;
+                if (existingStatus !== 'granted') {
+                    const { status } = await Notifications.requestPermissionsAsync();
+                    finalStatus = status;
+                }
+                if (finalStatus !== 'granted') {
+                    return;
+                }
+                const token = await Notifications.getExpoPushTokenAsync({
+                    projectId: Constants.expoConfig?.extra?.eas.projectId,
+                });
+                globalState.setExpoPushToken(token.data);
             }
         }
         func();

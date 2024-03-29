@@ -6,6 +6,7 @@ export class GlobalState {
     @observable public timeZone : string = "America/Los_Angeles";
     @observable public ignoreRequest : boolean = true;
     @observable public disableFade : boolean = false;
+    @observable public expoPushToken : string|null = null;
 
     constructor() {
         makeAutoObservable(this);
@@ -25,4 +26,7 @@ export class GlobalState {
 
     @action
     setDisableFade(value : boolean) { this.disableFade = value; }
+
+    @action
+    setExpoPushToken(value : string) { this.expoPushToken = value; }
 }

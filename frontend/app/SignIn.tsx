@@ -12,7 +12,7 @@ import { sendRequest } from "../src/utils";
 import { URLs } from "../src/urls";
 
 export function Home() {
-    const { receivedData } = useStore();
+    const { globalState, receivedData } = useStore();
     const [firstLoad, setFirstLoad] = useState<boolean>(true);
     const [allowApple, setAllowApple] = useState<boolean>(false);
     const [_, googleResponse, googlePrompt] = Google.useAuthRequest({
@@ -40,11 +40,12 @@ export function Home() {
     const completeGoogleLogin = async () => {
         if (googleResponse && googleResponse.type == "success") {
             const input : LoginInput = {
-                googleToken: googleResponse.authentication!.accessToken
+                googleToken: googleResponse.authentication!.accessToken,
+                expoPushToken: globalState.expoPushToken ?? undefined
             }
             try {
                 const response = await sendRequest(URLs.login, input);
-                receivedData.setLoginKey(response.data.data)
+                receivedData.setLoginKey(response.data.data);
             } catch (err) { 
                 console.log(err);
             }
@@ -67,7 +68,8 @@ export function Home() {
                 ]
             })
             const input : LoginInput = {
-                appleToken: iosData.identityToken || undefined
+                appleToken: iosData.identityToken ?? undefined,
+                expoPushToken: globalState.expoPushToken ?? undefined
             }
 
             const response = await sendRequest(URLs.login, input);

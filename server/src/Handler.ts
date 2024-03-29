@@ -491,11 +491,14 @@ export class Handler {
         if (!email) return null;
 
         if (await this.login.getUserByEmail(email)) {
+            if (input.expoPushToken) {
+                await this.login.updateExpoToken(email, input.expoPushToken);
+            }
             const userLogin = await this.login.updateKey(email);
             return userLogin.key;
         } else {
             const userLogin = await this.login.createUser({
-                email: email, 
+                email: email,
                 expoPushToken: input.expoPushToken
             });
             return userLogin.key;

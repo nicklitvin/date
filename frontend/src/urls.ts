@@ -25,5 +25,6 @@ export const URLs = {
     getSubscription: "/getSubscription",
     getSettings: "/getSettings",
     getPreferences: "/getPreferences",
-    login: "/login"
+    login: "/login",
+    updatePushToken: "/updatePushToken",
 }

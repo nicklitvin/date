@@ -39,7 +39,7 @@ export class LoginHandler {
             }
         })
     }
-
+    
     async updateKey(email : string) {
         return await this.prisma.login.update({
             where: {

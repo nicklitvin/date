@@ -13,12 +13,15 @@ import { globals } from "../src/globals";
 import { Spacing } from "../src/components/Spacing";
 import { MyModal } from "../src/components/Modal";
 import { testIDS } from "../src/testIDs";
+import { Platform } from "react-native";
+import * as Device from "expo-device";
+import * as Notifications from "expo-notifications";
+import Constants from "expo-constants";
 
 interface Props {
     disableToggle?: boolean
     noAutoLoad?: boolean
 }
-
 
 export function Settings(props : Props) {
     const {globalState, receivedData} = useStore();
@@ -36,6 +39,34 @@ export function Settings(props : Props) {
         }
     }, [settings])
 
+    const updatePushToken = async () => {
+        if (Platform.OS == "android") {
+            Notifications.setNotificationChannelAsync("default", {
+                name: "default",
+                importance: Notifications.AndroidImportance.DEFAULT,
+            })
+        }
+
+
+        if (Device.isDevice) {
+            const { status: existingStatus } = await Notifications.getPermissionsAsync();
+            let finalStatus = existingStatus;
+            if (existingStatus !== 'granted') {
+                const { status } = await Notifications.requestPermissionsAsync();
+                finalStatus = status;
+            }
+            if (finalStatus !== 'granted') {
+                return;
+            }
+            const token = await Notifications.getExpoPushTokenAsync({
+                projectId: Constants.expoConfig?.extra?.eas.projectId,
+            });
+            await sendRequest(URLs.updatePushToken, token)
+
+            globalState.setExpoPushToken(token.data);
+        }
+    }
+
     const load = async () => {
         try {   
             const response = await sendRequest(URLs.getSettings, null);
@@ -47,6 +78,15 @@ export function Settings(props : Props) {
 
     const changeSettingValue = async (title : string, value : boolean) => {
         try {
+            if (!globalState.expoPushToken && title.includes("notification")) {
+                try {
+                    await updatePushToken();
+                } catch (err) {
+                    console.log(err);
+                    return
+                }
+            }
+
             const input : EditUserInput = {
                 setting: title,
                 value: value
