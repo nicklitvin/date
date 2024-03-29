@@ -332,5 +332,15 @@ describe("user", () => {
         expect(output).toHaveLength(1);
         expect(output![0].title).toEqual(globals.notificationSetting);
     })
+
+    it("should get subscription data", async () => {
+        const input = createUserInput();
+        await funcs.createUser(input);
+
+        const output = await funcs.getSubscriptionData(input.id);
+        expect(output?.ID).toEqual(undefined);
+        expect(output?.subscribed).toEqual(false);
+        expect(output?.endDate?.getTime()).toBeLessThanOrEqual(new Date().getTime())
+    })
 })
 

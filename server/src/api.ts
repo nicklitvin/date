@@ -154,7 +154,7 @@ export class APIHandler {
                 const body = req.body as APIRequest<void>;
                 const userID = await handler.login.getUserIDByKey(body.key);
     
-                if (!userID) return res.status(401).send();
+                if (!userID) return res.status(401).json();
     
                 const output = await handler.getSwipeFeed(userID);
                 return output ? res.status(200).json({
@@ -162,7 +162,7 @@ export class APIHandler {
                 }) : res.status(400).json()
             } catch (err) {
                 console.log(err);
-                res.status(500).send();
+                res.status(500).json();
             }
         })
 
@@ -171,7 +171,7 @@ export class APIHandler {
                 const body = req.body as APIRequest<NewVerificationInput>;
                 const userID = await handler.login.getUserIDByKey(body.key);
     
-                if (!userID) return res.status(401).send();
+                if (!userID) return res.status(401).json();
     
                 const input : NewVerificationInput = {
                     ...body,
@@ -180,7 +180,7 @@ export class APIHandler {
                 return output ? res.status(200).json() : res.status(400).json()
             } catch (err) {
                 console.log(err);
-                res.status(500).send();
+                res.status(500).json();
             }
         })
 
@@ -189,7 +189,7 @@ export class APIHandler {
                 const body = req.body as APIRequest<ConfirmVerificationInput>;
                 const userID = await handler.login.getUserIDByKey(body.key);
     
-                if (!userID) return res.status(401).send();
+                if (!userID) return res.status(401).json();
     
                 const input : ConfirmVerificationInput = {
                     ...body,
@@ -200,7 +200,7 @@ export class APIHandler {
                 }) : res.status(400).json()
             } catch (err) {
                 console.log(err);
-                res.status(500).send();
+                res.status(500).json();
             }
         })
 
@@ -209,13 +209,13 @@ export class APIHandler {
                 const body = req.body as APIRequest<Email>;
                 const userID = await handler.login.getUserIDByKey(body.key);
     
-                if (!userID) return res.status(401).send();
+                if (!userID) return res.status(401).json();
     
                 const output = await handler.regenerateVerificationCode(body.email);
                 return output ? res.status(200).json() : res.status(400).json()
             } catch (err) {
                 console.log(err);
-                res.status(500).send();
+                res.status(500).json();
             }
         })
 
@@ -224,7 +224,7 @@ export class APIHandler {
                 const body = req.body as APIRequest<UploadImageInput>;
                 const userID = await handler.login.getUserIDByKey(body.key);
     
-                if (!userID) return res.status(401).send();
+                if (!userID) return res.status(401).json();
     
                 const input : UploadImageInput = {
                     ...body,
@@ -234,7 +234,7 @@ export class APIHandler {
                 return output ? res.status(200).json() : res.status(400).json()
             } catch (err) {
                 console.log(err);
-                res.status(500).send();
+                res.status(500).json();
             }
         })
 
@@ -243,7 +243,7 @@ export class APIHandler {
                 const body = req.body as APIRequest<DeleteImageInput>;
                 const userID = await handler.login.getUserIDByKey(body.key);
     
-                if (!userID) return res.status(401).send();
+                if (!userID) return res.status(401).json();
     
                 const input : DeleteImageInput = {
                     ...body,
@@ -253,7 +253,7 @@ export class APIHandler {
                 return output ? res.status(200).json() : res.status(400).json()
             } catch (err) {
                 console.log(err);
-                res.status(500).send();
+                res.status(500).json();
             }
         })
 
@@ -262,7 +262,7 @@ export class APIHandler {
                 const body = req.body as APIRequest<EditUserInput>;
                 const userID = await handler.login.getUserIDByKey(body.key);
     
-                if (!userID) return res.status(401).send();
+                if (!userID) return res.status(401).json();
     
                 const input : EditUserInput = {
                     ...body,
@@ -272,7 +272,7 @@ export class APIHandler {
                 return output ? res.status(200).json() : res.status(400).json()
             } catch (err) {
                 console.log(err);
-                res.status(500).send();
+                res.status(500).json();
             }
         })
 
@@ -281,7 +281,7 @@ export class APIHandler {
                 const body = req.body as APIRequest<EditUserInput>;
                 const userID = await handler.login.getUserIDByKey(body.key);
     
-                if (!userID) return res.status(401).send();
+                if (!userID) return res.status(401).json();
     
                 const input : EditUserInput = {
                     ...body,
@@ -291,7 +291,7 @@ export class APIHandler {
                 return output ? res.status(200).json() : res.status(400).json()
             } catch (err) {
                 console.log(err);
-                res.status(500).send();
+                res.status(500).json();
             }
         })
 
@@ -300,7 +300,7 @@ export class APIHandler {
                 const body = req.body as APIRequest<void>;
                 const userID = await handler.login.getUserIDByKey(body.key);
     
-                if (!userID) return res.status(401).send();
+                if (!userID) return res.status(401).json();
     
                 const output = await handler.getSubscriptionCheckoutPage(userID);
                 return output ? res.status(200).json({
@@ -308,7 +308,7 @@ export class APIHandler {
                 }) : res.status(400).json()
             } catch (err) {
                 console.log(err);
-                res.status(500).send();
+                res.status(500).json();
             }
         })
 
@@ -322,7 +322,7 @@ export class APIHandler {
                 return output ? res.status(200).json() : res.status(400).json()
             } catch (err) {
                 console.log(err);
-                res.status(500).send();
+                res.status(500).json();
             }
         })
 
@@ -331,31 +331,24 @@ export class APIHandler {
                 const body = req.body as APIRequest<void>;
                 const userID = await handler.login.getUserIDByKey(body.key);
     
-                if (!userID) return res.status(401).send();
+                if (!userID) return res.status(401).json();
     
                 const output = await handler.cancelSubscription(userID);
                 return output ? res.status(200).json() : res.status(400).json()
             } catch (err) {
                 console.log(err);
-                res.status(500).send();
+                res.status(500).json();
             }
         })
 
         app.post(URLs.manageSubscription, async (req,res) => {
             try {
-                const body = req.body as APIRequest<void>;
-                const userID = await handler.login.getUserIDByKey(body.key);
-    
-                if (!userID) return res.status(401).send();
-    
-                // TODO
-                const output = null;
-                return output ? res.status(200).json({
-                    data: output
-                }) : res.status(400).json()
+                return res.status(200).json({
+                    data: process.env.STRIPE_PAY_PORTAL
+                })
             } catch (err) {
                 console.log(err);
-                res.status(500).send();
+                res.status(500).json();
             }
         })
 
@@ -364,13 +357,13 @@ export class APIHandler {
                 const body = req.body as APIRequest<void>;
                 const userID = await handler.login.getUserIDByKey(body.key);
     
-                if (!userID) return res.status(401).send();
+                if (!userID) return res.status(401).json();
     
                 const output = await handler.deleteUser(userID);
                 return output ? res.status(200).json() : res.status(400).json()
             } catch (err) {
                 console.log(err);
-                res.status(500).send();
+                res.status(500).json();
             }
         }) 
 
@@ -379,7 +372,7 @@ export class APIHandler {
                 const body = req.body as APIRequest<UnlikeInput>;
                 const userID = await handler.login.getUserIDByKey(body.key);
     
-                if (!userID) return res.status(401).send();
+                if (!userID) return res.status(401).json();
 
                 const input : UnlikeInput = {
                     ...body,
@@ -392,7 +385,7 @@ export class APIHandler {
                 }) : res.status(400).json()
             } catch (err) {
                 console.log(err);
-                res.status(500).send();
+                res.status(500).json();
             }
         })
 
@@ -406,7 +399,7 @@ export class APIHandler {
                 }) : res.status(400).json()
             } catch (err) {
                 console.log(err);
-                res.status(500).send();
+                res.status(500).json();
             }
         })
 
@@ -415,7 +408,7 @@ export class APIHandler {
                 const body = req.body as APIRequest<void>;
                 const userID = await handler.login.getUserIDByKey(body.key);
     
-                if (!userID) return res.status(401).send();
+                if (!userID) return res.status(401).json();
 
                 const output = await handler.swipe.getUserSwipeStats(userID);
                 return output ? res.status(200).json({
@@ -423,7 +416,7 @@ export class APIHandler {
                 }) : res.status(400).json()
             } catch (err) {
                 console.log(err);
-                res.status(500).send();
+                res.status(500).json();
             }
         })
 
@@ -432,16 +425,15 @@ export class APIHandler {
                 const body = req.body as APIRequest<void>;
                 const userID = await handler.login.getUserIDByKey(body.key);
     
-                if (!userID) return res.status(401).send();
-
-                // TODO
-                const output = null;
+                if (!userID) return res.status(401).json();
+    
+                const output = await handler.user.getSubscriptionData(userID);
                 return output ? res.status(200).json({
                     data: output
                 }) : res.status(400).json()
             } catch (err) {
                 console.log(err);
-                res.status(500).send();
+                res.status(500).json();
             }
         })
 
@@ -450,7 +442,7 @@ export class APIHandler {
                 const body = req.body as APIRequest<void>;
                 const userID = await handler.login.getUserIDByKey(body.key);
     
-                if (!userID) return res.status(401).send();
+                if (!userID) return res.status(401).json();
 
                 const output = await handler.user.getSettings(userID);
                 return output ? res.status(200).json({
@@ -458,7 +450,7 @@ export class APIHandler {
                 }) : res.status(400).json()
             } catch (err) {
                 console.log(err);
-                res.status(500).send();
+                res.status(500).json();
             }
         })
 
@@ -467,7 +459,7 @@ export class APIHandler {
                 const body = req.body as APIRequest<void>;
                 const userID = await handler.login.getUserIDByKey(body.key);
     
-                if (!userID) return res.status(401).send();
+                if (!userID) return res.status(401).json();
     
                 const output = await handler.user.getPreferences(userID);
                 return output ? res.status(200).json({
@@ -475,7 +467,7 @@ export class APIHandler {
                 }) : res.status(400).json()
             } catch (err) {
                 console.log(err);
-                res.status(500).send();
+                res.status(500).json();
             }
         })
 
@@ -489,7 +481,7 @@ export class APIHandler {
                 }) : res.status(400).json()
             } catch (err) {
                 console.log(err);
-                res.status(500).send();
+                res.status(500).json();
             }
         })
 
@@ -498,13 +490,22 @@ export class APIHandler {
                 const body = req.body as APIRequest<UpdatePushTokenInput>;
                 const userID = await handler.login.getUserIDByKey(body.key);
     
-                if (!userID) return res.status(401).send();
+                if (!userID) return res.status(401).json();
     
                 const output = await handler.login.updateExpoToken(userID,body.expoPushToken);
                 return output ? res.status(200).json() : res.status(400).json()
             } catch (err) {
                 console.log(err);
-                res.status(500).send();
+                res.status(500).json();
+            }
+        })
+
+        app.post(URLs.getAttributes, async (req,res) => {
+            try {
+                return res.status(200).json(await handler.attribute.getAttributes());
+            } catch (err) {
+                console.log(err);
+                res.status(500).json();
             }
         })
     }

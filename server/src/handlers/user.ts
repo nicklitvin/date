@@ -1,5 +1,5 @@
 import { PrismaClient, User } from "@prisma/client";
-import { EditUserInput, EloAction, EloUpdateInput, GetProfileListInput, ImageHandler, Preferences, PublicProfile, RequestUserInput, SettingData, UserInput } from "../interfaces";
+import { EditUserInput, EloAction, EloUpdateInput, GetProfileListInput, ImageHandler, Preferences, PublicProfile, RequestUserInput, SettingData, SubscriptionData, UserInput } from "../interfaces";
 import { addMonths, differenceInYears } from "date-fns";
 import { globals } from "../globals";
 
@@ -271,5 +271,19 @@ export class UserHandler {
                 value: data.notifications
             }
         ]
+    }
+
+    public async getSubscriptionData(userID: string) : Promise<SubscriptionData|null> {
+        const data = await this.prisma.user.findUnique({
+            where: {
+                id: userID
+            }
+        })
+        if (!data) return null;
+        return {
+            subscribed: data.isSubscribed,
+            endDate: data.subscribeEnd,
+            ID: data.subscriptionID ?? undefined
+        }
     }
 }
