@@ -26,4 +26,5 @@ export const URLs = {
     getPreferences: "/getPreferences",
     login: "/login",
     updatePushToken: "/updatePushToken",
+    webhook: "/webhook"
 }

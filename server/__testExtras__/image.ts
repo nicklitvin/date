@@ -1,11 +1,10 @@
 import { ImageHandler, ImageInput } from "../src/interfaces";
-import { randomUUID } from "crypto";
 
 export class MockImageHandler implements ImageHandler {
     uploadedIDs : string [] = [];
 
     uploadImage(input : ImageInput) : Promise<string|null> {
-        const id = String(randomUUID());
+        const id = String(Math.random());
         this.uploadedIDs.push(id);
         return Promise.resolve(id);
     }

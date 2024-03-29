@@ -161,7 +161,7 @@ export interface PaymentExtractOutput {
 export interface PaymentHandler {
     createSubscriptionSessionURL(userID : string, freeTrial: boolean) : 
         Promise<string>
-    extractDataFromPayment(request : Request) : Promise<PaymentExtractOutput|null> 
+    extractDataFromPayment(signature : string, body : any) : Promise<PaymentExtractOutput|null> 
     cancelSubscription(subscriptionID: string) : Promise<boolean>
 }
 
@@ -260,3 +260,12 @@ export interface Email {
 }
 
 export type APIRequest<T> = Omit<T,"userID"|"id"> & {key : string};
+
+export interface GetProfileInput {
+    userID: string
+}
+
+export interface UpdatePushTokenInput {
+    userID: string
+    expoPushToken: string
+}

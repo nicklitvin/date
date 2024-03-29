@@ -63,7 +63,7 @@ describe("login", () => {
         const before = await funcs.createUser(createInput(email));
         expect(before.expoPushToken).toEqual(null);
 
-        const after = await funcs.updateExpoToken(email, token);
+        const after = await funcs.updateExpoToken(before.userID, token);
         expect(after.expoPushToken).toEqual(token);
     })
 })

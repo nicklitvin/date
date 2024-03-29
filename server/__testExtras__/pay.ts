@@ -13,7 +13,7 @@ export class MockPaymentHandler implements PaymentHandler {
         return Promise.resolve("url")
     }
 
-    extractDataFromPayment(request: Request): Promise<PaymentExtractOutput | null> {
+    extractDataFromPayment(signature: string, body: any): Promise<PaymentExtractOutput | null> {
         return Promise.resolve({
             userID: "userID",
             subscriptionID: "subscriptionID"

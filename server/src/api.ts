@@ -1,6 +1,6 @@
 import express from "express";
 import { URLs } from "./urls";
-import { APIRequest, ConfirmVerificationInput, DeleteImageInput, Email, GetChatInput, GetChatPreviewsInput, MessageInput, NewMatchInput, NewVerificationInput, RequestReportInput, RequestUserInput, SwipeInput, UploadImageInput } from "./interfaces";
+import { APIRequest, ConfirmVerificationInput, DeleteImageInput, EditUserInput, Email, GetChatInput, GetChatPreviewsInput, GetProfileInput, LoginInput, MessageInput, NewMatchInput, NewVerificationInput, RequestReportInput, RequestUserInput, SubscribeInput, SwipeInput, UnlikeInput, UpdatePushTokenInput, UploadImageInput } from "./interfaces";
 import { Handler } from "./handler";
 
 export class APIHandler {
@@ -250,6 +250,259 @@ export class APIHandler {
                     userID: userID
                 }
                 const output = await handler.deleteImage(input);
+                return output ? res.status(200).json() : res.status(400).json()
+            } catch (err) {
+                console.log(err);
+                res.status(500).send();
+            }
+        })
+
+        app.post(URLs.newOrder, async (req,res) => {
+            try {
+                const body = req.body as APIRequest<EditUserInput>;
+                const userID = await handler.login.getUserIDByKey(body.key);
+    
+                if (!userID) return res.status(401).send();
+    
+                const input : EditUserInput = {
+                    ...body,
+                    userID: userID
+                }
+                const output = await handler.changeImageOrder(input);
+                return output ? res.status(200).json() : res.status(400).json()
+            } catch (err) {
+                console.log(err);
+                res.status(500).send();
+            }
+        })
+
+        app.post(URLs.editUser, async (req,res) => {
+            try {
+                const body = req.body as APIRequest<EditUserInput>;
+                const userID = await handler.login.getUserIDByKey(body.key);
+    
+                if (!userID) return res.status(401).send();
+    
+                const input : EditUserInput = {
+                    ...body,
+                    userID: userID
+                }
+                const output = await handler.editUser(input);
+                return output ? res.status(200).json() : res.status(400).json()
+            } catch (err) {
+                console.log(err);
+                res.status(500).send();
+            }
+        })
+
+        app.post(URLs.getCheckoutPage, async (req,res) => {
+            try {
+                const body = req.body as APIRequest<void>;
+                const userID = await handler.login.getUserIDByKey(body.key);
+    
+                if (!userID) return res.status(401).send();
+    
+                const output = await handler.getSubscriptionCheckoutPage(userID);
+                return output ? res.status(200).json({
+                    data: output
+                }) : res.status(400).json()
+            } catch (err) {
+                console.log(err);
+                res.status(500).send();
+            }
+        })
+
+        app.post(URLs.webhook, async (req,res) => {
+            try {
+                const input = await handler.pay.extractDataFromPayment(
+                    req.headers["Stripe-Signature"] as string,
+                    req.body
+                ) as SubscribeInput;
+                const output = await handler.processSubscriptionPay(input);
+                return output ? res.status(200).json() : res.status(400).json()
+            } catch (err) {
+                console.log(err);
+                res.status(500).send();
+            }
+        })
+
+        app.post(URLs.cancelSubscription, async (req,res) => {
+            try {
+                const body = req.body as APIRequest<void>;
+                const userID = await handler.login.getUserIDByKey(body.key);
+    
+                if (!userID) return res.status(401).send();
+    
+                const output = await handler.cancelSubscription(userID);
+                return output ? res.status(200).json() : res.status(400).json()
+            } catch (err) {
+                console.log(err);
+                res.status(500).send();
+            }
+        })
+
+        app.post(URLs.manageSubscription, async (req,res) => {
+            try {
+                const body = req.body as APIRequest<void>;
+                const userID = await handler.login.getUserIDByKey(body.key);
+    
+                if (!userID) return res.status(401).send();
+    
+                // TODO
+                const output = null;
+                return output ? res.status(200).json({
+                    data: output
+                }) : res.status(400).json()
+            } catch (err) {
+                console.log(err);
+                res.status(500).send();
+            }
+        })
+
+        app.post(URLs.deleteAccount, async (req,res) => {
+            try {
+                const body = req.body as APIRequest<void>;
+                const userID = await handler.login.getUserIDByKey(body.key);
+    
+                if (!userID) return res.status(401).send();
+    
+                const output = await handler.deleteUser(userID);
+                return output ? res.status(200).json() : res.status(400).json()
+            } catch (err) {
+                console.log(err);
+                res.status(500).send();
+            }
+        }) 
+
+        app.post(URLs.unlikeUser, async (req,res) => {
+            try {
+                const body = req.body as APIRequest<UnlikeInput>;
+                const userID = await handler.login.getUserIDByKey(body.key);
+    
+                if (!userID) return res.status(401).send();
+
+                const input : UnlikeInput = {
+                    ...body,
+                    userID: userID
+                }
+    
+                const output = await handler.unlike(input);
+                return output ? res.status(200).json({
+                    data: output
+                }) : res.status(400).json()
+            } catch (err) {
+                console.log(err);
+                res.status(500).send();
+            }
+        })
+
+        app.post(URLs.getProfile, async (req,res) => {
+            try {
+                const body = req.body as GetProfileInput;
+    
+                const output = await handler.user.getPublicProfile(body.userID);
+                return output ? res.status(200).json({
+                    data: output
+                }) : res.status(400).json()
+            } catch (err) {
+                console.log(err);
+                res.status(500).send();
+            }
+        })
+
+        app.post(URLs.getStats, async (req,res) => {
+            try {
+                const body = req.body as APIRequest<void>;
+                const userID = await handler.login.getUserIDByKey(body.key);
+    
+                if (!userID) return res.status(401).send();
+
+                const output = await handler.swipe.getUserSwipeStats(userID);
+                return output ? res.status(200).json({
+                    data: output
+                }) : res.status(400).json()
+            } catch (err) {
+                console.log(err);
+                res.status(500).send();
+            }
+        })
+
+        app.post(URLs.getSubscription, async (req,res) => {
+            try {
+                const body = req.body as APIRequest<void>;
+                const userID = await handler.login.getUserIDByKey(body.key);
+    
+                if (!userID) return res.status(401).send();
+
+                // TODO
+                const output = null;
+                return output ? res.status(200).json({
+                    data: output
+                }) : res.status(400).json()
+            } catch (err) {
+                console.log(err);
+                res.status(500).send();
+            }
+        })
+
+        app.post(URLs.getSettings, async (req,res) => {
+            try {
+                const body = req.body as APIRequest<void>;
+                const userID = await handler.login.getUserIDByKey(body.key);
+    
+                if (!userID) return res.status(401).send();
+
+                // TODO
+                const output = null;
+                return output ? res.status(200).json({
+                    data: output
+                }) : res.status(400).json()
+            } catch (err) {
+                console.log(err);
+                res.status(500).send();
+            }
+        })
+
+        app.post(URLs.getPreferences, async (req,res) => {
+            try {
+                const body = req.body as APIRequest<void>;
+                const userID = await handler.login.getUserIDByKey(body.key);
+    
+                if (!userID) return res.status(401).send();
+    
+                // TODO
+                const output = null;
+                return output ? res.status(200).json({
+                    data: output
+                }) : res.status(400).json()
+            } catch (err) {
+                console.log(err);
+                res.status(500).send();
+            }
+        })
+
+        app.post(URLs.login, async (req,res) => {
+            try {
+                const body = req.body as LoginInput;
+
+                const output = await handler.loginWithToken(body);
+                return output ? res.status(200).json({
+                    data: output
+                }) : res.status(400).json()
+            } catch (err) {
+                console.log(err);
+                res.status(500).send();
+            }
+        })
+
+        app.post(URLs.updatePushToken, async (req,res) => {
+            try {
+                const body = req.body as APIRequest<UpdatePushTokenInput>;
+                const userID = await handler.login.getUserIDByKey(body.key);
+    
+                if (!userID) return res.status(401).send();
+    
+                const output = await handler.login.updateExpoToken(userID,body.expoPushToken);
                 return output ? res.status(200).json() : res.status(400).json()
             } catch (err) {
                 console.log(err);

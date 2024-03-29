@@ -36,12 +36,12 @@ export class StripePaymentHandler implements PaymentHandler {
         return session.url as string;
     }
 
-    public async extractDataFromPayment(request : Request) : 
+    public async extractDataFromPayment(signature : string, body : any) : 
         Promise<PaymentExtractOutput|null> 
     {
         try {
-            const body = await request.text();
-            const signature = request.headers.get("Stripe-Signature") as string;
+            // const body = await request.text();
+            // const signature = request.headers.get("Stripe-Signature") as string;
             const event = this.stripe.webhooks.constructEvent(body,signature,
                 process.env.STRIPE_WEBHOOK!    
             );

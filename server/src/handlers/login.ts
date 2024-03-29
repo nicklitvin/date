@@ -101,10 +101,10 @@ export class LoginHandler {
         }
     }
 
-    async updateExpoToken(email: string, token: string) {
+    async updateExpoToken(userID: string, token: string) {
         return await this.prisma.login.update({
             where: {
-                email: email
+                userID: userID
             },
             data: {
                 expoPushToken: token
