@@ -313,5 +313,24 @@ describe("user", () => {
         expect(profiles4).toHaveLength(1);
         expect(profiles4[0].id).toEqual(user3.id);
     })
+
+    it("should get preferences", async () => {
+        const input = createUserInput();
+        await funcs.createUser(input);
+
+        const output = await funcs.getPreferences(input.id);
+        expect(output?.genderPreference).toHaveLength(input.genderInterest.length);
+        expect(output?.agePreference[0]).toEqual(input.ageInterest[0]);
+        expect(output?.agePreference[1]).toEqual(input.ageInterest[1]);
+    })
+
+    it("should get settings", async () => {
+        const input = createUserInput();
+        await funcs.createUser(input);
+
+        const output = await funcs.getSettings(input.id);
+        expect(output).toHaveLength(1);
+        expect(output![0].title).toEqual(globals.notificationSetting);
+    })
 })
 

@@ -1,5 +1,5 @@
 import { PrismaClient, User } from "@prisma/client";
-import { EditUserInput, EloAction, EloUpdateInput, GetProfileListInput, ImageHandler, PublicProfile, RequestUserInput, UserInput } from "../interfaces";
+import { EditUserInput, EloAction, EloUpdateInput, GetProfileListInput, ImageHandler, Preferences, PublicProfile, RequestUserInput, SettingData, UserInput } from "../interfaces";
 import { addMonths, differenceInYears } from "date-fns";
 import { globals } from "../globals";
 
@@ -240,5 +240,36 @@ export class UserHandler {
             alcohol: input.alcohol,
             smoking: input.smoking
         }
+    }
+
+    public async getPreferences(userID: string) : Promise<Preferences|null> {
+        const data = await this.prisma.user.findUnique({
+            where: {
+                id: userID
+            }
+        })
+        if (!data) return null;
+
+        return {
+            agePreference: data.ageInterest as [number,number],
+            genderPreference: data.genderInterest
+        }
+    }
+
+    public async getSettings(userID : string) : Promise<SettingData[]|null> {
+        const data = await this.prisma.user.findUnique({
+            where: {
+                id: userID
+            }
+        })
+
+        if (!data) return null;
+
+        return [
+            {
+                title: globals.notificationSetting,
+                value: data.notifications
+            }
+        ]
     }
 }

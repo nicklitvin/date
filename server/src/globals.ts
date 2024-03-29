@@ -27,6 +27,7 @@ export const globals = {
     verificationCodeLength: 4,
     verificationExpireMinutes: 5,
     keyExpirationWeeks: 10,
+    notificationSetting: "Notifications",
 
     //URLS
     googleOAuth: "https://www.googleapis.com/userinfo/v2/me",

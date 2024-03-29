@@ -452,8 +452,7 @@ export class APIHandler {
     
                 if (!userID) return res.status(401).send();
 
-                // TODO
-                const output = null;
+                const output = await handler.user.getSettings(userID);
                 return output ? res.status(200).json({
                     data: output
                 }) : res.status(400).json()
@@ -470,8 +469,7 @@ export class APIHandler {
     
                 if (!userID) return res.status(401).send();
     
-                // TODO
-                const output = null;
+                const output = await handler.user.getPreferences(userID);
                 return output ? res.status(200).json({
                     data: output
                 }) : res.status(400).json()

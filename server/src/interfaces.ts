@@ -269,3 +269,13 @@ export interface UpdatePushTokenInput {
     userID: string
     expoPushToken: string
 }
+
+export interface Preferences {
+    genderPreference: string[]
+    agePreference: [number, number]
+}
+
+export interface SettingData {
+    title: string
+    value: boolean
+}
