@@ -17,6 +17,7 @@ import { Platform } from "react-native";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import Constants from "expo-constants";
+import { Redirect } from "expo-router";
 
 interface Props {
     disableToggle?: boolean
@@ -27,6 +28,7 @@ export function Settings(props : Props) {
     const {globalState, receivedData} = useStore();
     const [showModal, setShowModal] = useState<boolean>(false);
     const [settings, setSettings] = useState<SettingData[]>(receivedData.settings ?? []);
+    const [redirect, setRedirect] = useState<boolean>(false);
 
     useEffect( () => {
         if (props.noAutoLoad) return
@@ -105,6 +107,7 @@ export function Settings(props : Props) {
 
     const signOut = () => {
         globalState.setEmail(null);
+        setRedirect(true);
     }
 
     const deleteAccount = async () => {
@@ -114,6 +117,7 @@ export function Settings(props : Props) {
         } catch (err) {}
     }
 
+    if (redirect) return <Redirect href="SignIn"/>
     return (
         <StyledView className="w-full h-full bg-back">
         <StyledButton testID={testIDS.load} onPress={load}/> 

@@ -8,7 +8,7 @@ import { SwipeHandler } from "./handlers/swipe";
 import { MessageHandler } from "./handlers/message";
 import { ReportHandler } from "./handlers/report";
 import { StripePaymentHandler } from "./handlers/pay";
-import { ChatPreview, ConfirmVerificationInput, DeleteImageInput, EditUserInput, EloAction, GetChatPreviewsInput, ImageHandler, LoginInput, MessageInput, NewMatchData, NewMatchInput, NewVerificationInput, PaymentHandler, PublicProfile, RequestReportInput, RequestUserInput, SubscribeInput, SwipeFeed, SwipeInput, UnlikeInput, UnlikeOutput, UploadImageInput, UserInput } from "./interfaces";
+import { ChatPreview, ConfirmVerificationInput, DeleteImageInput, EditUserInput, EloAction, GetChatPreviewsInput, ImageHandler, LoginInput, LoginOutput, MessageInput, NewMatchData, NewMatchInput, NewVerificationInput, PaymentHandler, PublicProfile, RequestReportInput, RequestUserInput, SubscribeInput, SwipeFeed, SwipeInput, UnlikeInput, UnlikeOutput, UploadImageInput, UserInput } from "./interfaces";
 import { globals } from "./globals";
 import { FreeTrialHandler } from "./handlers/freetrial";
 import { VerificationHandler } from "./handlers/verification";
@@ -474,7 +474,7 @@ export class Handler {
         return newVerification.code;
     }
 
-    public async loginWithToken(input : LoginInput, customEmail? : string) : Promise<string|null> {
+    public async loginWithToken(input : LoginInput, customEmail? : string) : Promise<LoginOutput|null> {
         await this.login.deleteExpiredEntries();
 
         let email = customEmail ?? 
@@ -495,13 +495,19 @@ export class Handler {
                 await this.login.updateExpoToken(email, input.expoPushToken);
             }
             const userLogin = await this.login.updateKey(email);
-            return userLogin.key;
+            return {
+                key: userLogin.key,
+                newAccount: false
+            };
         } else {
             const userLogin = await this.login.createUser({
                 email: email,
                 expoPushToken: input.expoPushToken
             });
-            return userLogin.key;
+            return {
+                key: userLogin.key,
+                newAccount: true
+            };
         }
     }
 

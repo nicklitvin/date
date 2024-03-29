@@ -1,15 +1,4 @@
 TODO
-notifications 
-if on start
-    create user, checks if push token exists, sets enable to true
-
-if in app
-    before sending edit user, ask for push token, send push token /updateNotification
-
-email
-token
-expire
-
 index load profile => send to account creation or tabs
 notification deletes 
 

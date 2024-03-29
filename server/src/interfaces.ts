@@ -248,3 +248,8 @@ export interface LoginEntryInput {
     expoPushToken?: string
     customDate?: Date
 }
+
+export interface LoginOutput {
+    key: string
+    newAccount: boolean
+}

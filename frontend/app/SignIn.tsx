@@ -7,9 +7,10 @@ import { homeText } from "../src/text";
 import { StyledButton } from "../src/styledElements";
 import { useStore } from "../src/store/RootStore";
 import * as Apple from "expo-apple-authentication";
-import { LoginInput } from "../src/interfaces";
+import { LoginInput, LoginOutput } from "../src/interfaces";
 import { sendRequest } from "../src/utils";
 import { URLs } from "../src/urls";
+import { Redirect } from "expo-router";
 
 export function Home() {
     const { globalState, receivedData } = useStore();
@@ -21,6 +22,8 @@ export function Home() {
         iosClientId: receivedData.clientIDs?.ios,
         redirectUri: Linking.createURL("")
     });
+    const [newAccount, setNewAccount] = useState<boolean>(false);
+    const [oldAccount, setOldAccount] = useState<boolean>(false);
 
     useEffect( () => {
         if (firstLoad) {
@@ -32,6 +35,15 @@ export function Home() {
     useEffect( () => {
         completeGoogleLogin()
     }, [googleResponse])
+
+    const processLoginOutput = async (output : LoginOutput) => {
+        receivedData.setLoginKey(output.key);
+        if (output.newAccount) {
+            setNewAccount(true);
+        } else {
+            setOldAccount(true);
+        }
+    }
 
     const updateAppleAllow = async () => {
         setAllowApple(await Apple.isAvailableAsync());
@@ -73,12 +85,15 @@ export function Home() {
             }
 
             const response = await sendRequest(URLs.login, input);
-            receivedData.setLoginKey(response.data.data);
+            await processLoginOutput(response.data);
         } catch (err) {
             console.log(err);
         }
     }
 
+    if (oldAccount) return <Redirect href="(tabs)"/>
+    if (newAccount) return <Redirect href="AccountCreation"/>
+    
     return (
         <MySimplePage
             title={homeText.pageTitle}

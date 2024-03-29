@@ -9,10 +9,18 @@ import * as Notifications from "expo-notifications";
 import Constants from "expo-constants";
 import { Platform } from "react-native";
 
+Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: false,
+      shouldSetBadge: false,
+    }),
+});
+
 export function Index() {
     const [loading, setLoading] = useState<boolean>(true);
-    const [error, setError] = useState<boolean>(false);
     const { globalState, receivedData } = useStore();
+    const [error, setError] = useState<boolean>(false);
 
     useEffect( () => {
         const func = async () => {
@@ -184,7 +192,9 @@ export function Index() {
             })
 
             setLoading(false);
-        } catch (err) {}
+        } catch (err) {
+            setError(true);
+        }
     })
     
     if (loading) {
@@ -195,11 +205,11 @@ export function Index() {
             />
         )
     } else if (error) {
-        return <Redirect href="Error" />
+        return <Redirect href="Error"/>
+    } else if (receivedData.profile) {
+        return <Redirect href="(tabs)"/>
     } else {
-        return (
-            <Redirect href="(tabs)"/>
-        )
+        return <Redirect href="SignIn"/>
     }
 }
 

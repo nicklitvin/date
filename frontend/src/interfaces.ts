@@ -162,3 +162,8 @@ export interface LoginInput {
     appleToken?: string
     expoPushToken?: string
 }
+
+export interface LoginOutput {
+    key: string
+    newAccount: boolean
+}
