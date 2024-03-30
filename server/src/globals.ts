@@ -28,6 +28,9 @@ export const globals = {
     verificationExpireMinutes: 5,
     keyExpirationWeeks: 10,
     notificationSetting: "Notifications",
+    notificationChannel: "default",
+    newMatchNotifTitle: "New Match!",
+    newMatchMessage: "Check out who it is",
 
     //URLS
     googleOAuth: "https://www.googleapis.com/userinfo/v2/me",

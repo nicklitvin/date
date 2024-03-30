@@ -1,4 +1,4 @@
-import { Message, PrismaClient, Swipe, User, UserReport, Verification } from "@prisma/client";
+import { Message, Prisma, PrismaClient, Swipe, User, UserReport, Verification } from "@prisma/client";
 import { AnnouncementHandler } from "./handlers/announcement";
 import { AttributeHandler } from "./handlers/attribute";
 import { ErrorLogHandler } from "./handlers/errorlog";
@@ -15,6 +15,15 @@ import { VerificationHandler } from "./handlers/verification";
 import { addYears } from "date-fns";
 import { allowedAttributeEdits } from "./others";
 import { LoginHandler } from "./handlers/login";
+import { NotificationHandler } from "./handlers/notification";
+
+interface Props {
+    prisma: PrismaClient
+    ignoreVerificaton?: boolean
+    disableNotifications?: boolean
+    imageHandler? : ImageHandler
+    paymentHandler? : PaymentHandler
+} 
 
 export class Handler {
     public announcement : AnnouncementHandler;
@@ -29,27 +38,28 @@ export class Handler {
     public freeTrial : FreeTrialHandler;
     public verification : VerificationHandler;
     public login : LoginHandler;
+    public notification : NotificationHandler;
 
     private ignoreVerification : boolean;
+    private disableNotifications : boolean;
 
-    constructor(prisma : PrismaClient, ignoreVerification : boolean,
-        customImageHandler : ImageHandler = new S3ImageHandler(),
-        customPaymentHandler : PaymentHandler = new StripePaymentHandler(),
-    ) {
-        this.image = customImageHandler,
-        this.pay = customPaymentHandler;
-        this.ignoreVerification = ignoreVerification;
+    constructor(props : Props) {
+        this.image = props.imageHandler ?? new S3ImageHandler()
+        this.pay = props.paymentHandler ?? new StripePaymentHandler()
+        this.ignoreVerification = props.ignoreVerificaton ?? false
+        this.disableNotifications = props.disableNotifications ?? false
 
-        this.announcement = new AnnouncementHandler(prisma);
-        this.attribute = new AttributeHandler(prisma);
-        this.errorLog = new ErrorLogHandler(prisma);
-        this.user = new UserHandler(prisma, customImageHandler);
-        this.swipe = new SwipeHandler(prisma);
-        this.message = new MessageHandler(prisma);
-        this.report = new ReportHandler(prisma);
-        this.freeTrial = new FreeTrialHandler(prisma);
-        this.verification = new VerificationHandler(prisma);
-        this.login = new LoginHandler(prisma);
+        this.announcement = new AnnouncementHandler(props.prisma);
+        this.attribute = new AttributeHandler(props.prisma);
+        this.errorLog = new ErrorLogHandler(props.prisma);
+        this.user = new UserHandler(props.prisma, this.image);
+        this.swipe = new SwipeHandler(props.prisma);
+        this.message = new MessageHandler(props.prisma);
+        this.report = new ReportHandler(props.prisma);
+        this.freeTrial = new FreeTrialHandler(props.prisma);
+        this.verification = new VerificationHandler(props.prisma);
+        this.login = new LoginHandler(props.prisma);
+        this.notification = new NotificationHandler()
     }
 
     public async deleteEverything() {
@@ -148,6 +158,7 @@ export class Handler {
             }))
         ])
 
+
         return swipe;
     }
 
@@ -170,6 +181,16 @@ export class Handler {
                     eloDiff: user.elo - recepient.elo
                 }))
             ])
+            if (!this.disableNotifications) {
+                const recepientLogin = await this.login.getUserByEmail(recepient.email);
+                if (recepientLogin?.expoPushToken) {
+                    await this.notification.newMessage({
+                        fromName: user.name,
+                        message: message,
+                        recepientPushToken: recepientLogin?.expoPushToken
+                    })
+                }
+            }
             return message
         }
         return null;

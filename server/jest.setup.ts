@@ -5,13 +5,13 @@ import { Handler } from "./src/handler";
 import { MockPaymentHandler } from "./__testExtras__/pay";
 
 export const usingMocks = process.argv.includes('--use-mocks=true');
-const client = new PrismaClient();
-export const handler = new Handler(
-    client,
-    true,
-    usingMocks ? new MockImageHandler() : undefined,
-    usingMocks ? new MockPaymentHandler() : undefined,
-);
+export const handler = new Handler({
+    prisma: new PrismaClient(),
+    disableNotifications: true,
+    ignoreVerificaton: true,
+    imageHandler: usingMocks ? new MockImageHandler() : undefined,
+    paymentHandler: usingMocks ? new MockPaymentHandler() : undefined,
+})
 
 beforeAll( async () => {
     await Promise.all([

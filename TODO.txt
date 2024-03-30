@@ -1,14 +1,10 @@
 TODO
-how to send key with every request
-    delete key type and then add userID type?
-
-index load profile => send to account creation or tabs
-notification deletes 
-
-add tests for edit pages
-attirubte verification on backend (prevent random attributes)
+send notification
+add key to every send request
+notification receive, delete receiveDate when new
 sample data for backend and frontend system testing
-on notification, delete receivedData
+announcement/errorlog implement
+reported page
 
 BACKEND TODO
 change elo constants with api?
