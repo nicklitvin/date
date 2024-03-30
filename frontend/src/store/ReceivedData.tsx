@@ -14,7 +14,7 @@ export class ReceivedData {
     @observable public settings : SettingData[]|null = null;
     @observable public preferences : Preferences|null = null;
     @observable public clientIDs : clientIDs|null = null;
-    @observable public loginKey : string|null = null;
+    @observable public loginKey : string|undefined = undefined;
 
     @action
     setProfile(input : PublicProfile) {this.profile = input; }
@@ -57,7 +57,7 @@ export class ReceivedData {
     setClientIDs(input : clientIDs ) { this.clientIDs = input; }
 
     @action
-    setLoginKey(input : string|null) { 
+    setLoginKey(input : string|undefined) { 
         this.loginKey = input; 
         if (globals.useStorage) {
             const AsyncStorage = require("@react-native-async-storage/async-storage");

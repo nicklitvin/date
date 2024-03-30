@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { generalText } from "../src/text";
 import { globals } from "../src/globals";
-import { FileUploadAndURI, UserInput } from "../src/interfaces";
-import axios from "axios";
+import { FileUploadAndURI, UserInput, WithKey } from "../src/interfaces";
 import { observer } from "mobx-react-lite";
 import { useStore } from "../src/store/RootStore";
 import { AccountCreationType } from "../src/types";
@@ -35,7 +34,7 @@ interface Props {
 
 export function AccountCreation(props : Props) {
     const [currentPage, setCurrentPage] = useState<number>(props.customPageStart ?? 0);
-    const { globalState } = useStore();
+    const { globalState, receivedData } = useStore();
 
     const [name, setName] = useState<string>("");
     const [birthday, setBirthday] = useState<Date>(props.customBirthday ?? new Date(2000,0,1));
@@ -63,7 +62,8 @@ export function AccountCreation(props : Props) {
     }, [currentPage])
 
     const createUser = async () => {
-        const userInput : UserInput = {
+        const userInput : WithKey<UserInput> = {
+            key: receivedData.loginKey,
             name: name,
             birthday: birthday,
             ageInterest: agePreference,

@@ -6,7 +6,7 @@ import { MyButton } from "../src/components/Button";
 import { StyledView } from "../src/styledElements";
 import { Spacing } from "../src/components/Spacing";
 import { useStore } from "../src/store/RootStore";
-import { EditUserInput, PublicProfile } from "../src/interfaces";
+import { EditUserInput, PublicProfile, WithKey } from "../src/interfaces";
 import { Redirect, router } from "expo-router";
 import { sendRequest } from "../src/utils";
 import { URLs } from "../src/urls";
@@ -21,7 +21,8 @@ export function EditSmoking() {
 
     const changeAlcohol = async () => {
         try {
-            const input : EditUserInput = {
+            const input : WithKey<EditUserInput> = {
+                key: receivedData.loginKey,
                 setting: globals.settingSmoking,   
                 value: frequency
             }

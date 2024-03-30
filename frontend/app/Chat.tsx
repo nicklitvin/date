@@ -3,7 +3,7 @@ import { MyTextInput } from "../src/components/TextInput";
 import { chatText, generalText } from "../src/text";
 import { useEffect, useRef, useState } from "react";
 import { useStore } from "../src/store/RootStore";
-import { GetChatInput, GetProfileInput, Message, MessageInput, PublicProfile, RequestReportInput, SwipeInput, UnlikeInput } from "../src/interfaces";
+import { GetChatInput, GetProfileInput, Message, MessageInput, PublicProfile, RequestReportInput, SwipeInput, UnlikeInput, WithKey } from "../src/interfaces";
 import { globals } from "../src/globals";
 import { StyledButton, StyledImage, StyledScroll, StyledText, StyledView } from "../src/styledElements";
 import { testIDS } from "../src/testIDs";
@@ -114,7 +114,8 @@ export function Chat(props : Props) {
 
     const getChat = async () => {
         try {
-            const chatInput : GetChatInput = {
+            const chatInput : WithKey<GetChatInput> = {
+                key: receivedData.loginKey,
                 fromTime: new Date(),
                 withID: userID!
             }
@@ -151,7 +152,11 @@ export function Chat(props : Props) {
         setChat([sendingChat].concat(chat.filter( val => val.id != removeID)));
 
         try {
-            const response = await sendRequest(URLs.sendMessage, messageInput);
+            const withKeyMessage : WithKey<Message> = {
+                ...sendingChat,
+                key: receivedData.loginKey
+            }
+            const response = await sendRequest(URLs.sendMessage, withKeyMessage);
             const message = response.data.data as Message;
 
             const copy = [...chat];
@@ -180,7 +185,8 @@ export function Chat(props : Props) {
             let moreChats : Message[];
             if (chat.length == 0) return
 
-            const input : GetChatInput = {
+            const input : WithKey<GetChatInput> = {
+                key: receivedData.loginKey,
                 withID: profile!.id,
                 fromTime: new Date(chat.at(-1)!.timestamp.getTime() - 1)
             }
@@ -200,7 +206,8 @@ export function Chat(props : Props) {
     const reportUser = async () => {
         try {
             setShowModal(false);
-            const myReport : RequestReportInput = {
+            const myReport : WithKey<RequestReportInput> = {
+                key: receivedData.loginKey,
                 reportedID: profile!.id
             }
             await sendRequest(URLs.reportUser, myReport);
@@ -215,14 +222,14 @@ export function Chat(props : Props) {
     const unlikeUser = async () => {
         try {
             setShowModal(false);
-            const unlike : UnlikeInput = {
+            const unlike : WithKey<UnlikeInput> = {
+                key: receivedData.loginKey,
                 withID: profile!.id
             }
             await sendRequest(URLs.unlikeUser, unlike);
             deleteUser();
             if (props.noAutoLoad) return
             router.push("Matches");
-            // router.push("Matches");
         } catch (err) {
             console.log(err);
         }

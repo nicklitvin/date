@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { UserSwipeStats } from "../../src/interfaces";
+import { UserSwipeStats, WithKey } from "../../src/interfaces";
 import { statsText } from "../../src/text";
 import { StyledButton, StyledScroll, StyledText, StyledView } from "../../src/styledElements";
 import { PageHeader } from "../../src/components/PageHeader";
@@ -44,7 +44,10 @@ export function Stats(props : Props) {
 
     const load = async () => {
         try {
-            const response = await sendRequest(URLs.getStats, null);
+            const input : WithKey<{}> = {
+                key: receivedData.loginKey
+            }
+            const response = await sendRequest(URLs.getStats, input);
             const data = response.data.data;
             setStats(data);
         } catch (err) {
@@ -54,7 +57,10 @@ export function Stats(props : Props) {
 
     const getCheckoutPage = async () => {
         try {
-            const response = await sendRequest(URLs.getCheckoutPage, null);
+            const input : WithKey<{}> = {
+                key: receivedData.loginKey
+            }
+            const response = await sendRequest(URLs.getCheckoutPage, input);
             const url = response.data.data;
             if (props.openLinkFunc) {
                 props.openLinkFunc(url);

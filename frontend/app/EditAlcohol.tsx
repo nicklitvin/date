@@ -8,7 +8,7 @@ import { Spacing } from "../src/components/Spacing";
 import { observer } from "mobx-react-lite";
 import { useStore } from "../src/store/RootStore";
 import { Redirect, router } from "expo-router";
-import { EditUserInput, PublicProfile } from "../src/interfaces";
+import { EditUserInput, PublicProfile, WithKey } from "../src/interfaces";
 import { sendRequest } from "../src/utils";
 import { URLs } from "../src/urls";
 
@@ -27,7 +27,8 @@ export function Alcohol() {
 
     const changeAlcohol = async () => {
         try {
-            const input : EditUserInput = {
+            const input : WithKey<EditUserInput> = {
+                key: receivedData.loginKey,
                 setting: globals.settingAlcohol,   
                 value: frequency
             }

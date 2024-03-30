@@ -3,11 +3,10 @@ import { PageHeader } from "../../src/components/PageHeader";
 import { profileText } from "../../src/text";
 import { StyledButton, StyledImage, StyledText, StyledView } from "../../src/styledElements";
 import { MyButton } from "../../src/components/Button";
-import axios from "axios";
 import { URLs } from "../../src/urls";
 import { Linking } from "react-native";
-import { PublicProfile, SubscriptionData } from "../../src/interfaces";
-import { createTimeoutSignal, getShortDate, sendRequest } from "../../src/utils";
+import { PublicProfile, SubscriptionData, WithKey } from "../../src/interfaces";
+import { getShortDate, sendRequest } from "../../src/utils";
 import { useStore } from "../../src/store/RootStore";
 import { Link, router } from "expo-router";
 import { testIDS } from "../../src/testIDs";
@@ -45,7 +44,10 @@ export function Profile(props : Props) {
     const load = async () => {
         try {
             if (!profile) {
-                const profileResponse = await sendRequest(URLs.getProfile, null);
+                const input : WithKey<{}> = {
+                    key: receivedData.loginKey
+                }
+                const profileResponse = await sendRequest(URLs.getProfile, input);
                 setProfile(profileResponse.data.data);
             }
 
@@ -58,7 +60,10 @@ export function Profile(props : Props) {
 
     const managePayment = async () => {
         try {
-            const response = await sendRequest(URLs.manageSubscription, null);
+            const input : WithKey<{}> = {
+                key: receivedData.loginKey
+            }
+            const response = await sendRequest(URLs.manageSubscription, input);
             const url = response.data.data;
             if (props.openLinkFunc) {
                 props.openLinkFunc(url)
@@ -73,7 +78,10 @@ export function Profile(props : Props) {
 
     const cancelSubscription = async () => {
         try {
-            await sendRequest(URLs.cancelSubscription, null);
+            const input : WithKey<{}> = {
+                key: receivedData.loginKey
+            }
+            await sendRequest(URLs.cancelSubscription, input);
         } catch (err) {
             console.log(err)
         }
@@ -81,7 +89,10 @@ export function Profile(props : Props) {
 
     const getCheckoutPage = async () => {
         try {
-            const response = await sendRequest(URLs.getCheckoutPage,null);
+            const input : WithKey<{}> = {
+                key: receivedData.loginKey
+            }
+            const response = await sendRequest(URLs.getCheckoutPage,input);
             const url = response.data.data;
             if (props.openLinkFunc) {
                 props.openLinkFunc(url);

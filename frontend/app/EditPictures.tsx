@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { MySimplePage } from "../src/components/SimplePage"
-import { DeleteImageInput, EditUserInput, FileUploadAndURI, PublicProfile, UploadImageInput } from "../src/interfaces";
+import { DeleteImageInput, EditUserInput, FileUploadAndURI, PublicProfile, UploadImageInput, WithKey } from "../src/interfaces";
 import { pictureText } from "../src/text"
 import { StyledButton, StyledText, StyledView } from "../src/styledElements";
 import { globals } from "../src/globals";
@@ -91,7 +91,8 @@ export function EditPictures() {
         }
 
         try {
-            const input : UploadImageInput = {
+            const input : WithKey<UploadImageInput> = {
+                key: receivedData.loginKey,
                 image: {
                     buffer: newUpload.buffer,
                     mimetype: newUpload.mimetype
@@ -107,7 +108,8 @@ export function EditPictures() {
 
     const removeImage = async (uri : string) => {
         try {
-            const input : DeleteImageInput = {
+            const input : WithKey<DeleteImageInput> = {
+                key: receivedData.loginKey,
                 imageID: uri
             };
             const response = await sendRequest(URLs.deleteImage, input);
@@ -129,7 +131,8 @@ export function EditPictures() {
             copy[index1] = copy[index2];
             copy[index2] = saved;
             try {
-                const input : EditUserInput = {
+                const input : WithKey<EditUserInput> = {
+                    key: receivedData.loginKey,
                     setting: globals.settingImages,
                     value: copy
                 }

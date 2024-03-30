@@ -1,5 +1,7 @@
 import { Action } from "./types"
 
+export type WithKey<T> = T & { key?: string }
+
 export interface UserInput {
     email: string
     name: string 
@@ -166,4 +168,8 @@ export interface LoginInput {
 export interface LoginOutput {
     key: string
     newAccount: boolean
+}
+
+export interface EditPushTokenInput {
+    token: string
 }

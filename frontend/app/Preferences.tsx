@@ -4,7 +4,7 @@ import { generalText, preferencesText } from "../src/text";
 import { globals } from "../src/globals";
 import { MyButton } from "../src/components/Button";
 import { useEffect, useState } from "react";
-import { EditUserInput, Preferences } from "../src/interfaces";
+import { EditUserInput, Preferences, WithKey } from "../src/interfaces";
 import { URLs } from "../src/urls";
 import { AgePreference } from "../src/simplePages/AgePreference";
 import { GenderPreference } from "../src/simplePages/GenderPreference";
@@ -61,7 +61,10 @@ export function PreferencePage(props : Props) {
 
     const load = async () => {
         try {
-            const response = await sendRequest(URLs.getPreferences, null);
+            const input : WithKey<{}> = {
+                key: receivedData.loginKey
+            }
+            const response = await sendRequest(URLs.getPreferences, input);
             const data = response.data.data;
             setPreferences(data);
             setGenders(data.genderPreference);
@@ -75,13 +78,15 @@ export function PreferencePage(props : Props) {
         if (noChanges || genders.length == 0) return
 
         try {
-            const genderEdit : EditUserInput = {
+            const genderEdit : WithKey<EditUserInput> = {
+                key: receivedData.loginKey,
                 setting: globals.settingGenderPreference,
                 value: genders
             }
             await sendRequest(URLs.editUser, genderEdit);
             
-            const ageEdit : EditUserInput = {
+            const ageEdit : WithKey<EditUserInput> = {
+                key: receivedData.loginKey,
                 setting: globals.settingAgePreference,
                 value: agePreference
             }

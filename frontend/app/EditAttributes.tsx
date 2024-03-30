@@ -7,7 +7,7 @@ import { globals } from "../src/globals"
 import classNames from "classnames"
 import { observer } from "mobx-react-lite"
 import { useStore } from "../src/store/RootStore"
-import { EditUserInput, PublicProfile } from "../src/interfaces"
+import { EditUserInput, PublicProfile, WithKey } from "../src/interfaces"
 import { URLs } from "../src/urls"
 import { sendRequest } from "../src/utils"
 import { Redirect, router } from "expo-router"
@@ -33,7 +33,8 @@ export function EditAttributes() {
         } 
 
         try {
-            const input : EditUserInput = {
+            const input : WithKey<EditUserInput> = {
+                key: receivedData.loginKey,
                 setting: globals.settingAttributes,
                 value: attributes
             }

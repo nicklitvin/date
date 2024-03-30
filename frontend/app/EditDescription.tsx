@@ -4,7 +4,7 @@ import { MyTextInput } from "../src/components/TextInput";
 import { descriptionText } from "../src/text";
 import { useStore } from "../src/store/RootStore";
 import { Redirect, router } from "expo-router";
-import { EditUserInput, PublicProfile } from "../src/interfaces";
+import { EditUserInput, PublicProfile, WithKey } from "../src/interfaces";
 import { globals } from "../src/globals";
 import { URLs } from "../src/urls";
 import { sendRequest } from "../src/utils";
@@ -23,7 +23,8 @@ export function EditDescription() {
 
     const editDescription = async (description: string) => {
         try {
-            const input : EditUserInput = {
+            const input : WithKey<EditUserInput> = {
+                key: receivedData.loginKey,
                 setting: globals.settingDescription,
                 value: description
             }

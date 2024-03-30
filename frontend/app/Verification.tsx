@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useEffect, useState } from "react";
 import { useStore } from "../src/store/RootStore";
-import { ConfirmVerificationInput, NewCodeInput, NewVerificationInput } from "../src/interfaces";
+import { ConfirmVerificationInput, NewCodeInput, NewVerificationInput, WithKey } from "../src/interfaces";
 import { URLs } from "../src/urls";
 import { MySimplePage } from "../src/components/SimplePage";
 import { eduEmailText, verifyCodeText } from "../src/text";
@@ -21,7 +21,7 @@ interface Props {
 export function Verification(props : Props) {
     const [currentPage, setCurrentPage] = useState<number>(props.currentPage ?? 0);
     const [eduEmail, setEduEmail] = useState<string>(props.eduEmail ?? "");
-    const {globalState} = useStore();
+    const {globalState, receivedData} = useStore();
     const [seconds, setSeconds] = useState<number>(props.customSeconds ?? globals.resendVerificationTimeout);
 
     useEffect( () => {
@@ -41,7 +41,8 @@ export function Verification(props : Props) {
 
     const sendVerification = async (eduEmail : string) => {
         try {
-            const input : NewVerificationInput = {
+            const input : WithKey<NewVerificationInput> = {
+                key: receivedData.loginKey,
                 personalEmail: globalState.email!,
                 schoolEmail: eduEmail
             }
@@ -57,7 +58,8 @@ export function Verification(props : Props) {
 
     const verifyCode = async (code : string) => {
         try {
-            const input : ConfirmVerificationInput = {
+            const input : WithKey<ConfirmVerificationInput> = {
+                key: receivedData.loginKey,
                 personalEmail: globalState.email!,
                 schoolEmail: eduEmail,
                 code: Number(code)
@@ -72,7 +74,8 @@ export function Verification(props : Props) {
         if (seconds > 0) return
 
         try {
-            const input : NewCodeInput = {
+            const input : WithKey<NewCodeInput> = {
+                key: receivedData.loginKey,
                 personalEmail: globalState.email!
             }
             await sendRequest(URLs.newCode, input);

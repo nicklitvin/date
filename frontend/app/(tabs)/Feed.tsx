@@ -2,7 +2,7 @@ import { observer } from "mobx-react-lite";
 import { PageHeader } from "../../src/components/PageHeader";
 import { StyledButton, StyledImage, StyledScroll, StyledText, StyledView } from "../../src/styledElements";
 import { feedText } from "../../src/text";
-import { PublicProfile, SwipeFeed, SwipeStatus } from "../../src/interfaces";
+import { PublicProfile, SwipeFeed, SwipeStatus, WithKey } from "../../src/interfaces";
 import { useEffect, useRef, useState } from "react";
 import { ProfileViewMob } from "../../src/pages/ProfileView";
 import { URLs } from "../../src/urls";
@@ -66,7 +66,10 @@ export function Feed(props : Props) {
 
     const getFeed = async () => {
         try {
-            const response = await sendRequest(URLs.getFeed, null);
+            const input : WithKey<{}> = {
+                key: receivedData.loginKey
+            }
+            const response = await sendRequest(URLs.getFeed, input);
             setFeed(response.data.data);
             setSwipeStatus({
                 feedIndex: 0,
@@ -87,7 +90,10 @@ export function Feed(props : Props) {
         if (!feed || feed.profiles.length == 0) return 
         try {
             let moreFeed : SwipeFeed;
-            const response = await sendRequest(URLs.getFeed, null);
+            const input : WithKey<{}> = {
+                key: receivedData.loginKey
+            }
+            const response = await sendRequest(URLs.getFeed, input);
             moreFeed = response.data.data as SwipeFeed;
             setFeed({
                 profiles: feed.profiles.concat(moreFeed.profiles),

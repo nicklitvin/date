@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { StyledButton, StyledImage, StyledScroll, StyledText, StyledView } from "../../src/styledElements";
 import { matchesText } from "../../src/text";
-import { ChatPreview, NewMatch, NewMatchDataInput } from "../../src/interfaces";
+import { ChatPreview, NewMatch, NewMatchDataInput, WithKey } from "../../src/interfaces";
 import { ChatPreviewBox } from "../../src/components/ChatPreviewBox";
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
@@ -78,7 +78,8 @@ export function Matches(props : Props) {
 
     const getNewMatches = async () => {
         try {
-            const newMatchDataInput : NewMatchDataInput = {
+            const newMatchDataInput : WithKey<NewMatchDataInput> = {
+                key: receivedData.loginKey,
                 timestamp: new Date()
             }
     
@@ -96,7 +97,8 @@ export function Matches(props : Props) {
 
     const getChatPreviews = async () => {
         try {
-            const newMatchDataInput : NewMatchDataInput = {
+            const newMatchDataInput : WithKey<NewMatchDataInput> = {
+                key: receivedData.loginKey,
                 timestamp: new Date()
             }
             const chatPreviewResponse = await sendRequest(URLs.getNewChatPreviews, newMatchDataInput);

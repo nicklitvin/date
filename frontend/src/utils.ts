@@ -1,6 +1,7 @@
 import axios from "axios";
 import { globals } from "./globals";
 import { URLs } from "./urls";
+import { WithKey } from "./interfaces";
 
 export function getChatTimestamp(date : Date, timezone : string) {
     let timestamp = date.toLocaleString(undefined, {

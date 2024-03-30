@@ -2,7 +2,7 @@ import { observer } from "mobx-react-lite";
 import { PageHeader } from "../src/components/PageHeader";
 import { generalText, settingsText } from "../src/text";
 import { StyledButton, StyledText, StyledView } from "../src/styledElements";
-import { EditUserInput, SettingData } from "../src/interfaces";
+import { EditPushTokenInput, EditUserInput, SettingData, WithKey } from "../src/interfaces";
 import { URLs } from "../src/urls";
 import { MyButton } from "../src/components/Button";
 import { useStore } from "../src/store/RootStore";
@@ -63,15 +63,22 @@ export function Settings(props : Props) {
             const token = await Notifications.getExpoPushTokenAsync({
                 projectId: Constants.expoConfig?.extra?.eas.projectId,
             });
-            await sendRequest(URLs.updatePushToken, token)
+            const input : WithKey<EditPushTokenInput> = {
+                token: token.data,
+                key: receivedData.loginKey
+            }
+            await sendRequest(URLs.updatePushToken, input)
 
             globalState.setExpoPushToken(token.data);
         }
     }
 
     const load = async () => {
-        try {   
-            const response = await sendRequest(URLs.getSettings, null);
+        try {
+            const input : WithKey<{}> = {
+                key: receivedData.loginKey
+            }  
+            const response = await sendRequest(URLs.getSettings, input);
             setSettings(response.data.data);
         } catch (err) {
             console.log(err);
@@ -89,7 +96,8 @@ export function Settings(props : Props) {
                 }
             }
 
-            const input : EditUserInput = {
+            const input : WithKey<EditUserInput> = {
+                key: receivedData.loginKey,
                 setting: title,
                 value: value
             }
@@ -107,12 +115,16 @@ export function Settings(props : Props) {
 
     const signOut = () => {
         globalState.setEmail(null);
-        setRedirect(true);
+        if (!props.disableToggle)
+            setRedirect(true);
     }
 
     const deleteAccount = async () => {
         try {
-            await sendRequest(URLs.deleteAccount, null);
+            const input : WithKey<{}> = {
+                key: receivedData.loginKey
+            } 
+            await sendRequest(URLs.deleteAccount, input);
             signOut();
         } catch (err) {}
     }
