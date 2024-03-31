@@ -159,4 +159,42 @@ export class MessageHandler {
 
         return {messagesFromUserID, messagesToUserID};
     }
+
+    public async createSample() {
+        await this.prisma.message.deleteMany({
+            where: {
+                OR: [
+                    {
+                        userID: globals.sampleUserID
+                    },
+                    {
+                        recepientID: globals.sampleUserID
+                    }
+                ]
+            }
+        })
+        const chat1 : MessageInput[] = globals.sampleMessages.map( (val,index) => 
+            ({
+                userID: "oldmatch1",
+                recepientID: globals.sampleUserID,
+                message: val
+            })
+        )
+        const chat2: MessageInput[] = [
+            {
+                userID: globals.sampleUserID,
+                recepientID: "oldmatch2",
+                message: "hi"
+            },
+            {
+                userID: "oldmatch2",
+                recepientID: globals.sampleUserID,
+                message: "hello",
+            }
+        ]
+        const allChats = chat1.concat(chat2);
+        await Promise.all(allChats.map(val => 
+            this.sendMessage(val)
+        ))
+    }
 }

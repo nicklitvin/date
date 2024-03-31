@@ -26,6 +26,13 @@ export const URLs = {
     getPreferences: "/getPreferences",
     login: "/login",
     updatePushToken: "/updatePushToken",
+    getAttributes: "/getAttributes",
+    getClientIDs: "/getClientIDs",
+
+    // STRIPE
     webhook: "/webhook",
-    getAttributes: "/getAttributes"
+
+    // ADMIN
+    deleteEverything: "/deleteEverything",
+    createSample: "/createSample"
 }

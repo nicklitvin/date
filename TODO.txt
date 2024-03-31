@@ -1,5 +1,5 @@
 TODO
-add key to every send request
+sample account
 notification receive, delete receiveDate when new
 sample data for backend and frontend system testing
 announcement/errorlog implement

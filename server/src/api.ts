@@ -1,7 +1,9 @@
 import express from "express";
 import { URLs } from "./urls";
-import { APIRequest, ConfirmVerificationInput, DeleteImageInput, EditUserInput, Email, GetChatInput, GetChatPreviewsInput, GetProfileInput, LoginInput, MessageInput, NewMatchInput, NewVerificationInput, RequestReportInput, RequestUserInput, SubscribeInput, SwipeInput, UnlikeInput, UpdatePushTokenInput, UploadImageInput } from "./interfaces";
+import { APIRequest, ClientIDs, ConfirmVerificationInput, DeleteImageInput, EditUserInput, Email, GetChatInput, GetChatPreviewsInput, GetProfileInput, LoginInput, MessageInput, NewMatchInput, NewVerificationInput, RequestReportInput, RequestUserInput, SubscribeInput, SwipeInput, UnlikeInput, UpdatePushTokenInput, UploadImageInput } from "./interfaces";
 import { Handler } from "./handler";
+import { isAdmin } from "./others";
+import { globals } from "./globals";
 
 export class APIHandler {
     constructor(app : express.Application, handler : Handler) {
@@ -190,11 +192,9 @@ export class APIHandler {
                 const userID = await handler.login.getUserIDByKey(body.key);
     
                 if (!userID) return res.status(401).json();
-    
-                const input : ConfirmVerificationInput = {
-                    ...body,
-                }
-                const output = await handler.verifyUserWithCode(input);
+
+                const output = await handler.verifyUserWithCode(body);
+                
                 return output ? res.status(200).json({
                     data: output
                 }) : res.status(400).json()
@@ -500,9 +500,51 @@ export class APIHandler {
             }
         })
 
-        app.post(URLs.getAttributes, async (req,res) => {
+        app.post(URLs.getAttributes, async (_,res) => {
             try {
                 return res.status(200).json(await handler.attribute.getAttributes());
+            } catch (err) {
+                console.log(err);
+                res.status(500).json();
+            }
+        })
+
+        app.post(URLs.deleteEverything, async (req,res) => {
+            try {
+                const body = req.body as APIRequest<void>;
+                if (isAdmin(body.key)) {
+                    await handler.deleteEverything();
+                    return res.status(200).json();
+                }
+                return res.status(401).json();
+            } catch (err) {
+                console.log(err);
+                res.status(500).json();
+            }
+        })
+
+        app.post(URLs.getClientIDs, async (_, res) => {
+            try {
+                const output : ClientIDs = {
+                    android: process.env.ANDROID_CLIENT_ID,
+                    ios: process.env.APPLE_CLIENT_ID,
+                    expo: process.env.EXPO_CLIENT_ID
+                }
+                return res.status(200).json(output);
+            } catch (err) {
+                console.log(err);
+                res.status(500).json();
+            }
+        })
+
+        app.post(URLs.createSample, async (req,res) => {
+            try {
+                const body = req.body as APIRequest<void>;
+                if (isAdmin(body.key)) {
+                    await handler.createSample()
+                    res.status(200).json();
+                }
+                return res.status(401).json();
             } catch (err) {
                 console.log(err);
                 res.status(500).json();

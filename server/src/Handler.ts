@@ -468,7 +468,13 @@ export class Handler {
 
         if (!schoolValid || schoolTaken || personalTaken) return null;
 
-        return await this.verification.makeVerificationEntry(input);
+        if (input.personalEmail == globals.sampleEmail) {
+            return await this.verification.makeVerificationEntry(
+                input, new Date(2100,1,1), globals.sampleVerificationCode
+            )
+        } else {
+            return await this.verification.makeVerificationEntry(input);
+        }
     }
 
     public async verifyUserWithCode(input : ConfirmVerificationInput) : 
@@ -479,19 +485,22 @@ export class Handler {
             null;
     }
 
-    public async regenerateVerificationCode(email : string) : Promise<number|null> {
-        const verification = await this.verification.getVerificationBySchoolEmail(
-            email
-        );
+    public async regenerateVerificationCode(eduEemail : string) : Promise<number|null> {
+        const verification = await this.verification.getVerificationBySchoolEmail(eduEemail);
         if (!verification) return null;
 
         let newCode : number|undefined; 
         while (true) {
-            newCode = this.verification.generateDigitCode();
-            if (newCode != verification.code) break;
+            if (eduEemail == globals.sampleSchoolEmail) {
+                newCode = globals.sampleVerificationCode;
+                break;
+            } else {
+                newCode = this.verification.generateDigitCode();
+                if (newCode != verification.code) break;
+            }
         }
         const newVerification = await this.verification.regenerateVerificationCode(
-            email, newCode
+            eduEemail, newCode
         );
         return newVerification.code;
     }
@@ -522,7 +531,8 @@ export class Handler {
         } else {
             const userLogin = await this.login.createUser({
                 email: email,
-                expoPushToken: input.expoPushToken
+                expoPushToken: input.expoPushToken,
+                customID: email == globals.sampleEmail ? globals.sampleUserID : undefined
             });
             return {
                 key: userLogin.key,
@@ -540,5 +550,13 @@ export class Handler {
         } else {
             return null;
         }
+    }
+
+    public async createSample() : Promise<void> {
+        await Promise.all([
+            this.user.createSample(),
+            this.swipe.createSample(),
+            this.message.createSample(),
+        ])
     }
 }

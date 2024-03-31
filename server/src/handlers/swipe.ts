@@ -2,6 +2,8 @@ import { Opinion, PrismaClient, Swipe } from "@prisma/client";
 import { randomUUID } from "crypto";
 import { MatchDataOutput, SwipeBreakdown, SwipeInput, UserSwipeStats } from "../interfaces";
 import { startOfWeek, subWeeks } from "date-fns";
+import { globals } from "../globals";
+import { sampleUsers } from "../sample";
 
 export class SwipeHandler {
     private prisma : PrismaClient;
@@ -194,5 +196,62 @@ export class SwipeHandler {
                 userID: userID
             }
         }).then(users => users.map(user => user.swipedUserID));
+    }
+
+    public async createSample() {
+        await this.prisma.swipe.deleteMany({
+            where: {
+                OR: [
+                    {
+                        userID: globals.sampleUserID
+                    },
+                    {
+                        swipedUserID: globals.sampleUserID
+                    }
+                ]
+            }
+        })
+        return Promise.all([
+            this.createSwipe({
+                userID: "newmatch1",
+                action: "Like",
+                swipedUserID: globals.sampleUserID
+            }),
+            this.createSwipe({
+                userID: "newmatch2",
+                action: "Like",
+                swipedUserID: globals.sampleUserID
+            }),
+            this.createSwipe({
+                userID: globals.sampleUserID,
+                action: "Like",
+                swipedUserID: "newmatch1"
+            }),
+            this.createSwipe({
+                userID: globals.sampleUserID,
+                action: "Like",
+                swipedUserID: "newmatch2"
+            }),
+            this.createSwipe({
+                userID: "oldmatch1",
+                action: "Like",
+                swipedUserID: globals.sampleUserID
+            }),
+            this.createSwipe({
+                userID: "oldmatch2",
+                action: "Like",
+                swipedUserID: globals.sampleUserID
+            }),
+            this.createSwipe({
+                userID: globals.sampleUserID,
+                action: "Like",
+                swipedUserID: "oldmatch1"
+            }),
+            this.createSwipe({
+                userID: globals.sampleUserID,
+                action: "Like",
+                swipedUserID: "oldmatch2"
+            }),
+        ])
     }
 }

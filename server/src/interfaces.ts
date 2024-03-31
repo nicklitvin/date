@@ -248,6 +248,7 @@ export interface LoginEntryInput {
     email: string
     expoPushToken?: string
     customDate?: Date
+    customID?: string
 }
 
 export interface LoginOutput {
@@ -278,4 +279,10 @@ export interface Preferences {
 export interface SettingData {
     title: string
     value: boolean
+}
+
+export interface ClientIDs {
+    android?: string
+    ios?: string
+    expo?: string
 }

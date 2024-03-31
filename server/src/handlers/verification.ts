@@ -17,14 +17,15 @@ export class VerificationHandler {
     }
 
     public async makeVerificationEntry(input : NewVerificationInput,
-        customExpireTime = addMinutes(new Date(), globals.verificationExpireMinutes) 
+        customExpireTime = addMinutes(new Date(), globals.verificationExpireMinutes),
+        code = this.generateDigitCode()
         ) : Promise<number> 
     {
         return await this.prisma.verification.create({
             data: {
                 schoolEmail: input.schoolEmail,
                 personalEmail: input.personalEmail,
-                code: this.generateDigitCode(),
+                code: code,
                 expires: customExpireTime,
                 verified: false
             },

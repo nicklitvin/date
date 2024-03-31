@@ -2,6 +2,7 @@ import { PrismaClient, User } from "@prisma/client";
 import { EditUserInput, EloAction, EloUpdateInput, GetProfileListInput, ImageHandler, Preferences, PublicProfile, RequestUserInput, SettingData, SubscriptionData, UserInput } from "../interfaces";
 import { addMonths, differenceInYears } from "date-fns";
 import { globals } from "../globals";
+import { sampleUsers } from "../sample";
 
 export class UserHandler {
     private prisma : PrismaClient;
@@ -13,7 +14,7 @@ export class UserHandler {
     }
 
     public isSchoolEmailValid(email : string) : boolean {
-        return email.endsWith(".edu");
+        return email.endsWith(".edu") || email == globals.sampleEmail;
     }
 
     public getUniversityFromEmail(email : string) : string {
@@ -285,5 +286,16 @@ export class UserHandler {
             endDate: data.subscribeEnd,
             ID: data.subscriptionID ?? undefined
         }
+    }
+
+    public async createSample() : Promise<User[]> {
+        await this.prisma.user.deleteMany({
+            where: {
+                university: globals.sampleUniversity
+            }
+        })
+        return await Promise.all(sampleUsers.map( val => 
+            this.createUser(val)    
+        ))
     }
 }
