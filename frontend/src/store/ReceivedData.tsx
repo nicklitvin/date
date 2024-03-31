@@ -8,7 +8,10 @@ export class ReceivedData {
     @observable public chatPreviews : ChatPreview[]|null = null;
     @observable public newMatches : NewMatch[]|null = null;
     @observable public swipeFeed : SwipeFeed|null = null;
-    @observable public swipeStatus : SwipeStatus|null = null;
+    @observable public swipeStatus : SwipeStatus|null = {
+        feedIndex: 0,
+        lastSwipedIndex: -1
+    };
     @observable public stats : UserSwipeStats|null = null;
     @observable public savedChats : {[userID: string] : Message[]} = {}
     @observable public settings : SettingData[]|null = null;

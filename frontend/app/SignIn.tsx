@@ -26,6 +26,14 @@ export function Home() {
     const [oldAccount, setOldAccount] = useState<boolean>(false);
 
     useEffect( () => {
+        const func = async () => {
+            try {
+                const response = await sendRequest(URLs.getClientIDs, null);
+                receivedData.setClientIDs(response.data.data);
+            } catch (err) {
+                console.log(err);
+            }
+        }
         if (firstLoad) {
             updateAppleAllow();
         }

@@ -1,6 +1,5 @@
 TODO
 notification receive, delete receiveDate when new
-sample data for backend and frontend system testing
 announcement/errorlog implement
 reported page
 

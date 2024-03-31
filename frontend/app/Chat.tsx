@@ -146,11 +146,6 @@ export function Chat(props : Props) {
     }
 
     const sendMessage = async (sentMessage : string, removeID?: string) => {
-        // const messageInput : MessageInput = {
-        //     recepientID: profile!.id,
-        //     message: sentMessage
-        // }
-
         const sendingID = String(currentID);
         setCurrentID(currentID + 1);
 

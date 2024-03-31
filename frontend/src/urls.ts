@@ -27,4 +27,6 @@ export const URLs = {
     getPreferences: "/getPreferences",
     login: "/login",
     updatePushToken: "/updatePushToken",
+    getAttributes: "/getAttributes",
+    getClientIDs: "/getClientIDs",
 }
