@@ -11,5 +11,6 @@ export const testIDS = {
     agePreferenceMin: "ageprefmin",
     agePreferenceMax: "ageprefmax",
 
-    load: "Load"
+    load: "Load",
+    loadNew: "loadNew"
 }

@@ -53,6 +53,17 @@ describe("chat", () => {
         } 
     ]
 
+    const newMessage : Message[] = [
+        {
+            id: "id3",
+            message: "very new message",
+            readStatus: true,
+            recepientID: myUserID,
+            timestamp: new Date(Date.UTC(2000, 0, 1, 10, 0)),
+            userID: recepientProfile.id
+        }
+    ]
+
     const loadChat = async (useSave = false) => {
         const mock = new MockAdapter(axios);
         mock.onPost(URLs.server + URLs.getProfile).replyOnce( config =>
@@ -114,6 +125,18 @@ describe("chat", () => {
 
         await act( () => {
             fireEvent(screen.getByTestId(testIDS.chatScroll), "scroll", scrollVertically)
+        })
+    }
+
+    const loadNewMessages = async (mock : MockAdapter) => {
+        mock.onPost(URLs.server + URLs.getChat).replyOnce( config => 
+            [200, {
+                data: newMessage
+            }]   
+        )
+
+        await act( () => {
+            fireEvent(screen.getByTestId(testIDS.loadNew), "press");
         })
     }
 
@@ -274,5 +297,15 @@ describe("chat", () => {
         expect(getChatLength).toHaveBeenLastCalledWith(
             latestMessages.length + moreMessages.length
         );
+    })
+
+    it("should load recent messages", async () => {
+        const { mock, getChatLength } = await loadChat(false);
+        await loadNewMessages(mock);
+
+        expect(getChatLength).toHaveBeenLastCalledWith(
+            latestMessages.length + newMessage.length
+        )
+        expect(screen.queryByText(newMessage[0].message)).not.toEqual(null);
     })
 })

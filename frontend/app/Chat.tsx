@@ -21,6 +21,7 @@ interface Props {
     getChatLength?: (input : number) => void
     noAutoLoad?: boolean
     getUnsentLength?: (input : number) => void
+    returnSeconds?: (input : number) => void
 }
 
 export function Chat(props : Props) {
@@ -40,6 +41,19 @@ export function Chat(props : Props) {
     const [loadingIDs, setLoadingIDs] = useState<string[]>([]);
     const [showModal, setShowModal] = useState<boolean>(false);
     const [firstLoad, setFirstLoad] = useState<boolean>(true);
+    const [seconds, setSeconds] = useState<number>(globals.chatRefreshSeconds);
+
+    useEffect( () => {
+        if (props.returnSeconds) props.returnSeconds(seconds);
+        if (seconds == 0) {
+            loadNewMessages()
+            setSeconds(globals.chatRefreshSeconds);
+            return;
+        } else {
+            const timer = setTimeout( () => setSeconds(seconds - 1), 1000);
+            return () => clearTimeout(timer);
+        }
+    }, [seconds])
 
     useEffect( () => {
         if (props.getChatLength) props.getChatLength(chat.length);
@@ -132,10 +146,10 @@ export function Chat(props : Props) {
     }
 
     const sendMessage = async (sentMessage : string, removeID?: string) => {
-        const messageInput : MessageInput = {
-            recepientID: profile!.id,
-            message: sentMessage
-        }
+        // const messageInput : MessageInput = {
+        //     recepientID: profile!.id,
+        //     message: sentMessage
+        // }
 
         const sendingID = String(currentID);
         setCurrentID(currentID + 1);
@@ -203,6 +217,28 @@ export function Chat(props : Props) {
         }
     }
 
+    const loadNewMessages = async () => {
+        try {
+            const input : WithKey<GetChatInput> = {
+                fromTime: new Date(),
+                withID: userID,
+                key: receivedData.loginKey!
+            }
+            const chatResponse = await sendRequest(URLs.getChat, input);
+            const chatData = chatResponse.data.data as Message[];
+            const processedChatData = chatData.map( val => ({
+                ...val,
+                timestamp: new Date(val.timestamp)
+            }));
+            const newMessages = processedChatData.filter( 
+                val => val.timestamp.getTime() > chat[0]?.timestamp.getTime() ?? new Date(0).getTime()
+            )
+            setChat(newMessages.concat(chat));
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
     const reportUser = async () => {
         try {
             setShowModal(false);
@@ -261,6 +297,7 @@ export function Chat(props : Props) {
         />
         <StyledView className="w-full h-full">
             <StyledButton testID={testIDS.load} onPress={load}/>
+            <StyledButton testID={testIDS.loadNew} onPress={loadNewMessages}/>
             <PageHeader
                 imageSource={profile?.images[0]}
                 title={profile?.name ?? ""}
