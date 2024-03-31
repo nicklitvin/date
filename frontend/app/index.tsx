@@ -10,7 +10,6 @@ import Constants from "expo-constants";
 import { Platform } from "react-native";
 import { sendRequest } from "../src/utils";
 import { URLs } from "../src/urls";
-import { WithKey } from "../src/interfaces";
 
 Notifications.setNotificationHandler({
     handleNotification: async () => ({

@@ -4,7 +4,9 @@ import { Handler } from "./handler";
 import { APIHandler } from "./api";
 
 const app = express();
-const handler = new Handler(new PrismaClient(), false);
+const handler = new Handler({
+    prisma: new PrismaClient(),
+});
 new APIHandler(app, handler);
     
 app.listen(3000);

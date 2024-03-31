@@ -286,3 +286,8 @@ export interface ClientIDs {
     ios?: string
     expo?: string
 }
+
+export interface APIOutput {
+    data?: any
+    message?: string
+}

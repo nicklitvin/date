@@ -1,9 +1,8 @@
 import express from "express";
 import { URLs } from "./urls";
-import { APIRequest, ClientIDs, ConfirmVerificationInput, DeleteImageInput, EditUserInput, Email, GetChatInput, GetChatPreviewsInput, GetProfileInput, LoginInput, MessageInput, NewMatchInput, NewVerificationInput, RequestReportInput, RequestUserInput, SubscribeInput, SwipeInput, UnlikeInput, UpdatePushTokenInput, UploadImageInput } from "./interfaces";
+import { APIOutput, APIRequest, ClientIDs, ConfirmVerificationInput, DeleteImageInput, EditUserInput, Email, GetChatInput, GetChatPreviewsInput, GetProfileInput, LoginInput, MessageInput, NewMatchInput, NewVerificationInput, RequestReportInput, RequestUserInput, SubscribeInput, SwipeInput, UnlikeInput, UpdatePushTokenInput, UploadImageInput } from "./interfaces";
 import { Handler } from "./handler";
 import { isAdmin } from "./others";
-import { globals } from "./globals";
 
 export class APIHandler {
     constructor(app : express.Application, handler : Handler) {
@@ -22,7 +21,7 @@ export class APIHandler {
                     id: userID!
                 }
                 const output = await handler.createUser(input);
-                return output ? res.status(200).json() : res.status(400).json()
+                return output ? res.status(200).json() : res.status(400).json();
             } catch (err) {
                 console.log(err);
                 return res.status(500).json();
@@ -60,9 +59,9 @@ export class APIHandler {
                     userID: userID
                 }
                 const output = await handler.message.getChat(input);
-                return output ? res.status(200).json({
-                    data: output
-                }) : res.status(400).json()
+                return output ? 
+                    res.status(200).json({data: output} as APIOutput) : 
+                    res.status(400).json()
             } catch (err) {
                 console.log(err);
                 res.status(500).json();
@@ -100,9 +99,9 @@ export class APIHandler {
                     userID: userID
                 }
                 const output = await handler.getNewMatches(input);
-                return output ? res.status(200).json({
-                    data: output
-                }) : res.status(400).json()
+                return output ? 
+                    res.status(200).json({ data: output } as APIOutput) : 
+                    res.status(400).json()
             } catch (err) {
                 console.log(err);
                 res.status(500).json();
@@ -121,9 +120,9 @@ export class APIHandler {
                     userID: userID
                 }
                 const output = await handler.getChatPreviews(input);
-                return output ? res.status(200).json({
-                    data: output
-                }) : res.status(400).json()
+                return output ? 
+                    res.status(200).json({ data: output } as APIOutput) : 
+                    res.status(400).json()
             } catch (err) {
                 console.log(err);
                 res.status(500).json();
@@ -142,9 +141,9 @@ export class APIHandler {
                     userID: userID
                 }
                 const output = await handler.makeSwipe(input);
-                return output ? res.status(200).json({
-                    data: output
-                }) : res.status(400).json()
+                return output ? 
+                    res.status(200).json({ data: output } as APIOutput) : 
+                    res.status(400).json()
             } catch (err) {
                 console.log(err);
                 res.status(500).json();
@@ -159,9 +158,9 @@ export class APIHandler {
                 if (!userID) return res.status(401).json();
     
                 const output = await handler.getSwipeFeed(userID);
-                return output ? res.status(200).json({
-                    data: output
-                }) : res.status(400).json()
+                return output ? 
+                    res.status(200).json({ data: output } as APIOutput) : 
+                    res.status(400).json()
             } catch (err) {
                 console.log(err);
                 res.status(500).json();
@@ -195,9 +194,9 @@ export class APIHandler {
 
                 const output = await handler.verifyUserWithCode(body);
                 
-                return output ? res.status(200).json({
-                    data: output
-                }) : res.status(400).json()
+                return output ? 
+                    res.status(200).json({ data: output } as APIOutput) : 
+                    res.status(400).json()
             } catch (err) {
                 console.log(err);
                 res.status(500).json();
@@ -303,9 +302,9 @@ export class APIHandler {
                 if (!userID) return res.status(401).json();
     
                 const output = await handler.getSubscriptionCheckoutPage(userID);
-                return output ? res.status(200).json({
-                    data: output
-                }) : res.status(400).json()
+                return output ? 
+                    res.status(200).json({ data: output } as APIOutput) : 
+                    res.status(400).json()
             } catch (err) {
                 console.log(err);
                 res.status(500).json();
@@ -380,9 +379,9 @@ export class APIHandler {
                 }
     
                 const output = await handler.unlike(input);
-                return output ? res.status(200).json({
-                    data: output
-                }) : res.status(400).json()
+                return output ? 
+                    res.status(200).json({ data: output } as APIOutput) : 
+                    res.status(400).json()
             } catch (err) {
                 console.log(err);
                 res.status(500).json();
@@ -394,9 +393,9 @@ export class APIHandler {
                 const body = req.body as GetProfileInput;
     
                 const output = await handler.user.getPublicProfile(body.userID);
-                return output ? res.status(200).json({
-                    data: output
-                }) : res.status(400).json()
+                return output ? 
+                    res.status(200).json({ data: output } as APIOutput) : 
+                    res.status(400).json()
             } catch (err) {
                 console.log(err);
                 res.status(500).json();
@@ -411,9 +410,9 @@ export class APIHandler {
                 if (!userID) return res.status(401).json();
 
                 const output = await handler.swipe.getUserSwipeStats(userID);
-                return output ? res.status(200).json({
-                    data: output
-                }) : res.status(400).json()
+                return output ? 
+                    res.status(200).json({ data: output } as APIOutput) : 
+                    res.status(400).json()
             } catch (err) {
                 console.log(err);
                 res.status(500).json();
@@ -428,9 +427,9 @@ export class APIHandler {
                 if (!userID) return res.status(401).json();
     
                 const output = await handler.user.getSubscriptionData(userID);
-                return output ? res.status(200).json({
-                    data: output
-                }) : res.status(400).json()
+                return output ? 
+                    res.status(200).json({ data: output } as APIOutput) : 
+                    res.status(400).json()
             } catch (err) {
                 console.log(err);
                 res.status(500).json();
@@ -445,9 +444,9 @@ export class APIHandler {
                 if (!userID) return res.status(401).json();
 
                 const output = await handler.user.getSettings(userID);
-                return output ? res.status(200).json({
-                    data: output
-                }) : res.status(400).json()
+                return output ? 
+                    res.status(200).json({ data: output } as APIOutput) : 
+                    res.status(400).json()
             } catch (err) {
                 console.log(err);
                 res.status(500).json();
@@ -462,9 +461,9 @@ export class APIHandler {
                 if (!userID) return res.status(401).json();
     
                 const output = await handler.user.getPreferences(userID);
-                return output ? res.status(200).json({
-                    data: output
-                }) : res.status(400).json()
+                return output ? 
+                    res.status(200).json({ data: output } as APIOutput) : 
+                    res.status(400).json()
             } catch (err) {
                 console.log(err);
                 res.status(500).json();
@@ -476,9 +475,9 @@ export class APIHandler {
                 const body = req.body as LoginInput;
 
                 const output = await handler.loginWithToken(body);
-                return output ? res.status(200).json({
-                    data: output
-                }) : res.status(400).json()
+                return output ? 
+                    res.status(200).json({ data: output } as APIOutput) : 
+                    res.status(400).json()
             } catch (err) {
                 console.log(err);
                 res.status(500).json();
@@ -502,7 +501,9 @@ export class APIHandler {
 
         app.post(URLs.getAttributes, async (_,res) => {
             try {
-                return res.status(200).json(await handler.attribute.getAttributes());
+                return res.status(200).json(
+                    { data: await handler.attribute.getAttributes() } as APIOutput
+                );
             } catch (err) {
                 console.log(err);
                 res.status(500).json();
@@ -542,7 +543,7 @@ export class APIHandler {
                 const body = req.body as APIRequest<void>;
                 if (isAdmin(body.key)) {
                     await handler.createSample()
-                    res.status(200).json();
+                    return res.status(200).json();
                 }
                 return res.status(401).json();
             } catch (err) {

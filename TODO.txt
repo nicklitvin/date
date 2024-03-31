@@ -1,4 +1,6 @@
 TODO
+sort out com.nicklitvin.date and lovedu stuff
+
 notification receive, delete receiveDate when new
 announcement/errorlog implement
 reported page
