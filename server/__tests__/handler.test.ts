@@ -696,7 +696,7 @@ describe("handler", () => {
     it("should not create verification code if school email taken", async () => {
         const input = makeVerificationInput();
         const input2 = makeVerificationInput();
-        input2.personalEmail = "other@gmail.com";
+        input2.email = "other@gmail.com";
 
         await handler.verification.makeVerificationEntry(input);
         expect(await handler.getVerificationCode(input2)).toEqual(null);
@@ -712,7 +712,7 @@ describe("handler", () => {
         const code = await handler.verification.makeVerificationEntry(input);
         expect(await handler.verifyUserWithCode({
             code: code + 1,
-            personalEmail: input.personalEmail,
+            email: input.email,
             schoolEmail: input.schoolEmail
         })).toEqual(null);
     })
@@ -722,7 +722,7 @@ describe("handler", () => {
         const code = await handler.verification.makeVerificationEntry(input);
         expect(await handler.verifyUserWithCode({
             code: code,
-            personalEmail: input.personalEmail,
+            email: input.email,
             schoolEmail: input.schoolEmail
         })).not.toEqual(null);
     })
@@ -758,7 +758,7 @@ describe("handler", () => {
         expect(await handler.createUser(input, false)).toEqual(null);
         
         await handler.getVerificationCode({
-            personalEmail: input.email,
+            email: input.email,
             schoolEmail: "a@berkeley.edu"
         })
         expect(await handler.createUser(input, false)).toEqual(null);
@@ -768,13 +768,13 @@ describe("handler", () => {
         const input = await validRequestUserInput();
         const eduEmail = "a@berkeley.edu";
         const code = await handler.getVerificationCode({
-            personalEmail: input.email,
+            email: input.email,
             schoolEmail: eduEmail
         })
 
         await handler.verifyUserWithCode({
             code: code!,
-            personalEmail: input.email,
+            email: input.email,
             schoolEmail: eduEmail
         })
 
@@ -785,13 +785,13 @@ describe("handler", () => {
         const input = await validRequestUserInput();
         const eduEmail = "a@berkeley.edu";
         const code = await handler.getVerificationCode({
-            personalEmail: input.email,
+            email: input.email,
             schoolEmail: eduEmail
         })
 
         await handler.verifyUserWithCode({
             code: code!,
-            personalEmail: input.email,
+            email: input.email,
             schoolEmail: eduEmail
         })
 

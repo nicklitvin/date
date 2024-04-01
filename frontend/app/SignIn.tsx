@@ -4,13 +4,13 @@ import * as Linking from "expo-linking";
 import { useEffect, useState } from "react";
 import { MySimplePage } from "../src/components/SimplePage";
 import { homeText } from "../src/text";
-import { StyledButton } from "../src/styledElements";
+import { StyledButton, StyledText } from "../src/styledElements";
 import { useStore } from "../src/store/RootStore";
 import * as Apple from "expo-apple-authentication";
 import { LoginInput, LoginOutput } from "../src/interfaces";
 import { sendRequest } from "../src/utils";
 import { URLs } from "../src/urls";
-import { Redirect } from "expo-router";
+import { Redirect, router } from "expo-router";
 
 export function Home() {
     const { globalState, receivedData } = useStore();
@@ -20,24 +20,19 @@ export function Home() {
         androidClientId: receivedData.clientIDs?.android,
         expoClientId: receivedData.clientIDs?.expo,
         iosClientId: receivedData.clientIDs?.ios,
-        redirectUri: Linking.createURL("")
+        redirectUri: Linking.createURL("/"),
     });
     const [newAccount, setNewAccount] = useState<boolean>(false);
     const [oldAccount, setOldAccount] = useState<boolean>(false);
 
     useEffect( () => {
         const func = async () => {
-            try {
-                const response = await sendRequest(URLs.getClientIDs, null);
-                receivedData.setClientIDs(response.data.data);
-            } catch (err) {
-                console.log(err);
+            if (firstLoad) {
+                updateAppleAllow();
             }
+            setFirstLoad(false);
         }
-        if (firstLoad) {
-            updateAppleAllow();
-        }
-        setFirstLoad(false);
+        func();
     })
 
     useEffect( () => {
@@ -65,12 +60,28 @@ export function Home() {
             }
             try {
                 const response = await sendRequest(URLs.login, input);
-                receivedData.setLoginKey(response.data.data);
+                const data = response.data.data as LoginOutput;
+                receivedData.setLoginKey(data.key);
+
+                if (data.newAccount) {
+                    setNewAccount(true);
+                } else {
+                    setOldAccount(true);
+                }
             } catch (err) { 
                 console.log(err);
             }
         }
     }
+
+    useEffect( () => {
+        if (newAccount) {
+            router.push("Verification")
+        }
+        if (oldAccount) {
+            router.push("(tabs)")
+        }
+    }, [newAccount, oldAccount])
 
     const googleLogin = async () => {
         try {
@@ -98,9 +109,6 @@ export function Home() {
             console.log(err);
         }
     }
-
-    if (oldAccount) return <Redirect href="(tabs)"/>
-    if (newAccount) return <Redirect href="AccountCreation"/>
     
     return (
         <MySimplePage
@@ -120,8 +128,13 @@ export function Home() {
                         /> : null
                     }
                     <StyledButton
+                        className="w-4/5 bg-front p-5 rounded-xl"
                         onPress={googleLogin}
-                    />
+                    >
+                        <StyledText className="text-back text-center font-bold text-xl">
+                            Sign In With Google
+                        </StyledText>
+                    </StyledButton>
                 </>
                 
             }

@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useEffect, useState } from "react";
 import { useStore } from "../src/store/RootStore";
-import { ConfirmVerificationInput, NewCodeInput, NewVerificationInput, WithKey } from "../src/interfaces";
+import { ConfirmVerificationInput, NewVerificationInput, WithKey } from "../src/interfaces";
 import { URLs } from "../src/urls";
 import { MySimplePage } from "../src/components/SimplePage";
 import { eduEmailText, verifyCodeText } from "../src/text";
@@ -9,6 +9,7 @@ import { MyTextInput } from "../src/components/TextInput";
 import { MyButton } from "../src/components/Button";
 import { globals } from "../src/globals";
 import { sendRequest } from "../src/utils";
+import { router } from "expo-router";
 
 interface Props {
     currentPage?: number
@@ -43,7 +44,6 @@ export function Verification(props : Props) {
         try {
             const input : WithKey<NewVerificationInput> = {
                 key: receivedData.loginKey,
-                personalEmail: globalState.email!,
                 schoolEmail: eduEmail
             }
 
@@ -60,11 +60,11 @@ export function Verification(props : Props) {
         try {
             const input : WithKey<ConfirmVerificationInput> = {
                 key: receivedData.loginKey,
-                personalEmail: globalState.email!,
                 schoolEmail: eduEmail,
                 code: Number(code)
             }
             await sendRequest(URLs.verifyUser, input);
+            router.push("AccountCreation");
         } catch (err) {
             console.log(err);
         }
@@ -74,9 +74,8 @@ export function Verification(props : Props) {
         if (seconds > 0) return
 
         try {
-            const input : WithKey<NewCodeInput> = {
+            const input : WithKey<{}> = {
                 key: receivedData.loginKey,
-                personalEmail: globalState.email!
             }
             await sendRequest(URLs.newCode, input);
             setSeconds(globals.resendVerificationTimeout)

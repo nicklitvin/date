@@ -1,5 +1,8 @@
 TODO
-sort out com.nicklitvin.date and lovedu stuff
+if server down, redirect to error page
+async storage not working
+get attributes on account creation start
+loading when doing prompt
 
 notification receive, delete receiveDate when new
 announcement/errorlog implement

@@ -3,7 +3,6 @@ import { Action } from "./types"
 export type WithKey<T> = T & { key?: string }
 
 export interface UserInput {
-    email: string
     name: string 
     birthday: Date
     ageInterest: number[]
@@ -80,18 +79,12 @@ export interface NewMatch {
 }
 
 export interface NewVerificationInput {
-    personalEmail: string
     schoolEmail: string
 }
 
 export interface ConfirmVerificationInput {
-    personalEmail: string
     schoolEmail: string
     code: number
-}
-
-export interface NewCodeInput {
-    personalEmail: string
 }
 
 export interface DeleteImageInput {

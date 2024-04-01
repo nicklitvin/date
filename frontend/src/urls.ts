@@ -1,5 +1,5 @@
 export const URLs = {
-    server: "https://randomURL",
+    server: "http://192.168.137.1:3000",
     createUser: "/createUser",
     sendMessage: "/sendMessage",
     getChat: "/getChat",
@@ -21,6 +21,7 @@ export const URLs = {
     deleteAccount: "/deleteAccount",
     unlikeUser: "/unlikeUser",
     getProfile: "/getProfile",
+    getMyProfile: "/getMyProfile",
     getStats: "/getStats",
     getSubscription: "/getSubscription",
     getSettings: "/getSettings",

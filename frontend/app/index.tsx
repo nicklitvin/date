@@ -23,6 +23,7 @@ export function Index() {
     const [loading, setLoading] = useState<boolean>(true);
     const { globalState, receivedData } = useStore();
     const [error, setError] = useState<boolean>(false);
+    const [firstLoad, setFirstLoad] = useState<boolean>(true);
 
     const setSampleData = () => {
         receivedData.setProfile({
@@ -158,16 +159,42 @@ export function Index() {
         })
     }
 
+    const retrieveOne = async (request : Function, set : Function) => {
+        try {
+            const response = await request();
+            if (response.data.data) {
+                set(response.data.data);
+                return true;
+            }
+        } catch (err) {
+            // setError(true);
+            return false;
+        }
+    }
+
     const retrieveData = async () => {
         const input = {
             key: receivedData.loginKey
         }
-        const response = await sendRequest(URLs.getProfile,input);
-        receivedData.setProfile(response.data.data);
+        const [profile, clientIDs] = await Promise.all([
+            retrieveOne(
+                () => sendRequest(URLs.getMyProfile, input),
+                (data : any) => receivedData.setProfile(data)
+            ),
+            retrieveOne(
+                () => sendRequest(URLs.getClientIDs, null),
+                (data : any) => receivedData.setClientIDs(data)
+            ),
+        ])
+        if (!clientIDs) {
+
+        }
     }
 
     useEffect( () => {
         const func = async () => {
+            setFirstLoad(false);
+
             if (globals.useStorage) {
                 const AsyncStorage = require("@react-native-async-storage/async-storage");
                 receivedData.setLoginKey(await AsyncStorage.getItem(globals.storageloginKey) ?? "");
@@ -203,13 +230,15 @@ export function Index() {
                     await retrieveData()
                 } catch (err) {
                     console.log(err);
-                    setError(true);
                 }
             }
             setLoading(false);
         }
-        func();
-    })
+        if (firstLoad) {
+            func();
+        }
+    }, [firstLoad])
+
     
     if (loading) {
         return (
@@ -222,8 +251,15 @@ export function Index() {
         return <Redirect href="Error"/>
     } else if (receivedData.profile) {
         return <Redirect href="(tabs)"/>
-    } else {
+    } else if (receivedData.clientIDs) {
         return <Redirect href="SignIn"/>
+    } else {
+        return (
+            <MySimplePage
+                title="Loading..."
+                subtitle="Should not take too long"
+            />
+        )  
     }
 }
 

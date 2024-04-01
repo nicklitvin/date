@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "frontend",
+    "name": "Lovedu",
     "slug": "date",
-    "scheme": "your-app-scheme",
+    "scheme": "com.quest.lovedu",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -23,7 +23,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.nicklitvin.date",
+      "package": "com.quest.lovedu",
       "googleServicesFile": "./google-services.json"
     },
     "web": {

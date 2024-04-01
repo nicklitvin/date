@@ -19,7 +19,6 @@ export interface ErrorLogInput {
 
 interface BasicUserInput {
     id: string
-    email: string   
     name: string
     birthday: Date
     ageInterest: number[]
@@ -33,10 +32,15 @@ interface BasicUserInput {
 
 export interface UserInput extends BasicUserInput {
     images : string[]
+    email: string
 }
 
 export interface RequestUserInput extends BasicUserInput {
     files: FileUpload[]
+}
+
+export interface WithEmail {
+    email: string
 }
 
 export interface EditUserInput {
@@ -212,12 +216,10 @@ export interface GetProfileListInput {
 }
 
 export interface NewVerificationInput {
-    personalEmail: string
     schoolEmail: string
 }
 
 export interface ConfirmVerificationInput {
-    personalEmail: string
     schoolEmail: string
     code: number
 }

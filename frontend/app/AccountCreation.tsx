@@ -19,6 +19,7 @@ import { Alcohol } from "../src/simplePages/Alcohol";
 import { Smoking } from "../src/simplePages/Smoking";
 import { Attributes } from "../src/pages/Attributes";
 import { sendRequest } from "../src/utils";
+import { router } from "expo-router";
 
 export const pageOrder : AccountCreationType[] = [
     "Create Profile","Name","Birthday", "Gender", "Alcohol", "Smoking", "Age Preference", "Gender Preference",
@@ -69,7 +70,6 @@ export function AccountCreation(props : Props) {
             ageInterest: agePreference,
             attributes: attributes,
             description: description,
-            email: globalState.email as string,
             gender: gender!,
             genderInterest: genderPreference,
             alcohol: alcohol,
@@ -84,7 +84,10 @@ export function AccountCreation(props : Props) {
      
         try {
             await sendRequest(URLs.createUser, userInput);
-        } catch (err) {}
+            if (!globals.useSample) router.push("(tabs)");
+        } catch (err) {
+            console.log(err);
+        }
     }
 
     switch (pageOrder[currentPage]) {

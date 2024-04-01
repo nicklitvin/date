@@ -37,7 +37,7 @@ describe("sample", () => {
         expect(await handler.loginWithToken({}, globals.sampleEmail)).not.toEqual(null);
         
         const code = await handler.getVerificationCode({
-            personalEmail: globals.sampleEmail,
+            email: globals.sampleEmail,
             schoolEmail: globals.sampleSchoolEmail
         })
 
@@ -48,7 +48,7 @@ describe("sample", () => {
         ).toEqual(globals.sampleVerificationCode)
 
         expect(await handler.verifyUserWithCode({
-            personalEmail: globals.sampleEmail,
+            email: globals.sampleEmail,
             schoolEmail: globals.sampleSchoolEmail,
             code: globals.sampleVerificationCode
         })).not.toEqual(null);

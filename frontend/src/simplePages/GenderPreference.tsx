@@ -3,6 +3,7 @@ import { MySimplePage } from "../components/SimplePage"
 import { genderPreferenceText } from "../text"
 import { StyledView } from "../styledElements"
 import classNames from "classnames"
+import { Spacing } from "../components/Spacing"
 
 interface Props {
     genders: string[]
@@ -41,13 +42,16 @@ export function GenderPreference(props : Props) {
             )}
         >
             {props.genders.map( val => 
-                <MyButton
-                    key={`gender-pref-${val}`}
-                    smallButton={props.smallButtons}
-                    text={val}
-                    invertColor={genderPreference.includes(val)}
-                    onPressFunction={() => pressGender(val)}
-                />
+                <StyledView key={`gender-pref-${val}`} className="w-full items-center">
+                    <MyButton
+                        smallButton={props.smallButtons}
+                        text={val}
+                        invertColor={genderPreference.includes(val)}
+                        onPressFunction={() => pressGender(val)}
+                    />
+                    <Spacing size="md"/>
+                </StyledView>
+                
             )}
 
         </StyledView>

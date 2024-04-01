@@ -1,6 +1,6 @@
 import express from "express";
 import { URLs } from "./urls";
-import { APIOutput, APIRequest, ClientIDs, ConfirmVerificationInput, DeleteImageInput, EditUserInput, Email, GetChatInput, GetChatPreviewsInput, GetProfileInput, LoginInput, MessageInput, NewMatchInput, NewVerificationInput, RequestReportInput, RequestUserInput, SubscribeInput, SwipeInput, UnlikeInput, UpdatePushTokenInput, UploadImageInput } from "./interfaces";
+import { APIOutput, APIRequest, ClientIDs, ConfirmVerificationInput, DeleteImageInput, EditUserInput, Email, GetChatInput, GetChatPreviewsInput, GetProfileInput, LoginInput, MessageInput, NewMatchInput, NewVerificationInput, RequestReportInput, RequestUserInput, SubscribeInput, SwipeInput, UnlikeInput, UpdatePushTokenInput, UploadImageInput, WithEmail } from "./interfaces";
 import { Handler } from "./handler";
 import { isAdmin } from "./others";
 
@@ -12,13 +12,14 @@ export class APIHandler {
         app.post(URLs.createUser, async (req, res) => {
             try {
                 const body = req.body as APIRequest<RequestUserInput>;
-                const userID = await handler.login.getUserIDByKey(body.key);
+                const user = await handler.login.getUserByKey(body.key);
     
-                if (!userID) return res.status(401).json();
+                if (!user || !user.userID) return res.status(401).json();
     
-                const input : RequestUserInput = {
+                const input : RequestUserInput & WithEmail = {
                     ...body,
-                    id: userID!
+                    id: user.userID,
+                    email: user.email,
                 }
                 const output = await handler.createUser(input);
                 return output ? res.status(200).json() : res.status(400).json();
@@ -170,12 +171,13 @@ export class APIHandler {
         app.post(URLs.newVerification, async (req,res) => {
             try {
                 const body = req.body as APIRequest<NewVerificationInput>;
-                const userID = await handler.login.getUserIDByKey(body.key);
+                const user = await handler.login.getUserByKey(body.key);
     
-                if (!userID) return res.status(401).json();
+                if (!user || !user.userID) return res.status(401).json();
     
-                const input : NewVerificationInput = {
+                const input : NewVerificationInput & WithEmail = {
                     ...body,
+                    email: user.email
                 }
                 const output = await handler.getVerificationCode(input);
                 return output ? res.status(200).json() : res.status(400).json()
@@ -188,14 +190,18 @@ export class APIHandler {
         app.post(URLs.verifyUser, async (req,res) => {
             try {
                 const body = req.body as APIRequest<ConfirmVerificationInput>;
-                const userID = await handler.login.getUserIDByKey(body.key);
+                const user = await handler.login.getUserByKey(body.key);
     
-                if (!userID) return res.status(401).json();
-
-                const output = await handler.verifyUserWithCode(body);
+                if (!user || !user.userID) return res.status(401).json();
+    
+                const input : ConfirmVerificationInput & WithEmail = {
+                    ...body,
+                    email: user.email
+                }
+                const output = await handler.verifyUserWithCode(input);
                 
                 return output ? 
-                    res.status(200).json({ data: output } as APIOutput) : 
+                    res.status(200).json() : 
                     res.status(400).json()
             } catch (err) {
                 console.log(err);
@@ -205,12 +211,15 @@ export class APIHandler {
 
         app.post(URLs.newCode, async (req,res) => {
             try {
-                const body = req.body as APIRequest<Email>;
-                const userID = await handler.login.getUserIDByKey(body.key);
+                const body = req.body as APIRequest<{}>;
+                const user = await handler.login.getUserByKey(body.key);
     
-                if (!userID) return res.status(401).json();
+                if (!user || !user.userID) return res.status(401).json();
     
-                const output = await handler.regenerateVerificationCode(body.email);
+                const verification = await handler.verification.getVerificationByPersonalEmail(user.email);
+                if (!verification) return res.status(401).json();
+
+                const output = await handler.regenerateVerificationCode(verification.schoolEmail);
                 return output ? res.status(200).json() : res.status(400).json()
             } catch (err) {
                 console.log(err);
@@ -402,6 +411,23 @@ export class APIHandler {
             }
         })
 
+        app.post(URLs.getMyProfile, async (req,res) => {
+            try {
+                const body = req.body as APIRequest<{}>;
+                const userID = await handler.login.getUserIDByKey(body.key);
+    
+                if (!userID) return res.status(401).json();
+
+                const output = await handler.user.getPublicProfile(userID);
+                return output ?
+                    res.status(200).json({ data: output } as APIOutput) : 
+                    res.status(400).json()
+
+            } catch (err) {
+                res.status(500).json();
+            }
+        })
+
         app.post(URLs.getStats, async (req,res) => {
             try {
                 const body = req.body as APIRequest<void>;
@@ -531,7 +557,7 @@ export class APIHandler {
                     ios: process.env.APPLE_CLIENT_ID,
                     expo: process.env.EXPO_CLIENT_ID
                 }
-                return res.status(200).json(output);
+                return res.status(200).json({data: output} as APIOutput);
             } catch (err) {
                 console.log(err);
                 res.status(500).json();

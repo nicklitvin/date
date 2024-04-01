@@ -31,7 +31,7 @@ describe("verification", () => {
 
     it("should not get nonverification", async () => {
         expect(await funcs.getVerificationWithCode({
-            personalEmail: personalEmail,
+            email: personalEmail,
             schoolEmail: schoolEmail,
             code: 1234
         })).toEqual(null);
@@ -43,7 +43,7 @@ describe("verification", () => {
 
         expect(await funcs.getVerificationWithCode({
             code: code,
-            personalEmail: input.personalEmail,
+            email: input.email,
             schoolEmail: input.schoolEmail
         })).not.toEqual(null);
     })
@@ -54,7 +54,7 @@ describe("verification", () => {
         
         expect(await funcs.getVerificationWithCode({
             code: code,
-            personalEmail: input.personalEmail,
+            email: input.email,
             schoolEmail: input.schoolEmail
         })).toEqual(null);
     })
@@ -69,7 +69,7 @@ describe("verification", () => {
         const input = makeVerificationInput();
         await funcs.makeVerificationEntry(input);
 
-        expect(await funcs.getVerificationByPersonalEmail(input.personalEmail)).not.toEqual(null);
+        expect(await funcs.getVerificationByPersonalEmail(input.email)).not.toEqual(null);
         expect(await funcs.getVerificationBySchoolEmail(input.schoolEmail)).not.toEqual(null);
     })
 

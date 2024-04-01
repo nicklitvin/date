@@ -1,7 +1,7 @@
 import { PrismaClient, Verification } from "@prisma/client";
 import { globals } from "../globals";
 import { addMinutes } from "date-fns";
-import { NewVerificationInput, ConfirmVerificationInput} from "../interfaces";
+import { NewVerificationInput, ConfirmVerificationInput, WithEmail} from "../interfaces";
 
 export class VerificationHandler {
     private prisma : PrismaClient;
@@ -16,7 +16,7 @@ export class VerificationHandler {
         return Math.floor(Math.random() * (big - small + 1) + small);
     }
 
-    public async makeVerificationEntry(input : NewVerificationInput,
+    public async makeVerificationEntry(input : NewVerificationInput & WithEmail,
         customExpireTime = addMinutes(new Date(), globals.verificationExpireMinutes),
         code = this.generateDigitCode()
         ) : Promise<number> 
@@ -24,7 +24,7 @@ export class VerificationHandler {
         return await this.prisma.verification.create({
             data: {
                 schoolEmail: input.schoolEmail,
-                personalEmail: input.personalEmail,
+                personalEmail: input.email,
                 code: code,
                 expires: customExpireTime,
                 verified: false
@@ -35,12 +35,12 @@ export class VerificationHandler {
         }).then(res => res.code);
     }
 
-    public async getVerificationWithCode(input : ConfirmVerificationInput) : 
+    public async getVerificationWithCode(input : ConfirmVerificationInput & WithEmail) : 
         Promise<Verification|null> 
     {
-        return await this.prisma.verification.findFirst({
+        const data = await this.prisma.verification.findMany({
             where: {
-                personalEmail: input.personalEmail,
+                personalEmail: input.email,
                 schoolEmail: input.schoolEmail,
                 code: input.code,
                 expires: {
@@ -48,6 +48,7 @@ export class VerificationHandler {
                 }
             }
         })
+        return data[0] ?? null
     }
 
     public async verifyUser(schoolEmail : string) : Promise<Verification|null> {

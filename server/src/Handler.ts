@@ -8,7 +8,7 @@ import { SwipeHandler } from "./handlers/swipe";
 import { MessageHandler } from "./handlers/message";
 import { ReportHandler } from "./handlers/report";
 import { StripePaymentHandler } from "./handlers/pay";
-import { ChatPreview, ConfirmVerificationInput, DeleteImageInput, EditUserInput, EloAction, GetChatPreviewsInput, ImageHandler, LoginInput, LoginOutput, MessageInput, NewMatchData, NewMatchInput, NewVerificationInput, PaymentHandler, PublicProfile, RequestReportInput, RequestUserInput, SubscribeInput, SwipeFeed, SwipeInput, UnlikeInput, UnlikeOutput, UploadImageInput, UserInput } from "./interfaces";
+import { ChatPreview, ConfirmVerificationInput, DeleteImageInput, EditUserInput, EloAction, GetChatPreviewsInput, ImageHandler, LoginInput, LoginOutput, MessageInput, NewMatchData, NewMatchInput, NewVerificationInput, PaymentHandler, PublicProfile, RequestReportInput, RequestUserInput, SubscribeInput, SwipeFeed, SwipeInput, UnlikeInput, UnlikeOutput, UploadImageInput, UserInput, WithEmail } from "./interfaces";
 import { globals } from "./globals";
 import { FreeTrialHandler } from "./handlers/freetrial";
 import { VerificationHandler } from "./handlers/verification";
@@ -78,7 +78,7 @@ export class Handler {
         ])
     }
 
-    public async createUser(input : RequestUserInput, 
+    public async createUser(input : RequestUserInput & WithEmail, 
         ignoreVerification = this.ignoreVerification) : Promise<User|null> 
     {
         const [user, verification] = await Promise.all([
@@ -455,20 +455,20 @@ export class Handler {
         }
     }
 
-    public async getVerificationCode(input : NewVerificationInput) : 
+    public async getVerificationCode(input : NewVerificationInput & WithEmail) : 
         Promise<number|null> 
     {
         await this.verification.removeExpiredVerifications();
 
         const [schoolValid, personalTaken, schoolTaken] = await Promise.all([
             this.user.isSchoolEmailValid(input.schoolEmail),
-            this.verification.getVerificationByPersonalEmail(input.personalEmail),
+            this.verification.getVerificationByPersonalEmail(input.email),
             this.verification.getVerificationBySchoolEmail(input.schoolEmail)
         ]);
 
         if (!schoolValid || schoolTaken || personalTaken) return null;
 
-        if (input.personalEmail == globals.sampleEmail) {
+        if (input.email == globals.sampleEmail) {
             return await this.verification.makeVerificationEntry(
                 input, new Date(2100,1,1), globals.sampleVerificationCode
             )
@@ -477,7 +477,7 @@ export class Handler {
         }
     }
 
-    public async verifyUserWithCode(input : ConfirmVerificationInput) : 
+    public async verifyUserWithCode(input : ConfirmVerificationInput & WithEmail) : 
         Promise<Verification|null> 
     {
         return await this.verification.getVerificationWithCode(input) ? 
@@ -526,7 +526,7 @@ export class Handler {
             const userLogin = await this.login.updateKey(email);
             return {
                 key: userLogin.key,
-                newAccount: false
+                newAccount: await this.user.getUserByEmail(email) == null
             };
         } else {
             const userLogin = await this.login.createUser({

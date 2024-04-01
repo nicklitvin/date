@@ -1,6 +1,6 @@
 export const globals = {
     useStorage: false,
-    useSample: true,
+    useSample: false,
 
     genders: ["Male", "Female"],
     minAge: 18,

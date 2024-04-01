@@ -28,6 +28,7 @@ export const URLs = {
     updatePushToken: "/updatePushToken",
     getAttributes: "/getAttributes",
     getClientIDs: "/getClientIDs",
+    getMyProfile: "/getMyProfile",
 
     // STRIPE
     webhook: "/webhook",
