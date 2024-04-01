@@ -526,7 +526,8 @@ export class Handler {
             const userLogin = await this.login.updateKey(email);
             return {
                 key: userLogin.key,
-                newAccount: await this.user.getUserByEmail(email) == null
+                newAccount: await this.user.getUserByEmail(email) == null,
+                verified: Boolean(await this.verification.getVerificationByPersonalEmail(email))
             };
         } else {
             const userLogin = await this.login.createUser({
@@ -536,7 +537,8 @@ export class Handler {
             });
             return {
                 key: userLogin.key,
-                newAccount: true
+                newAccount: true,
+                verified: false
             };
         }
     }

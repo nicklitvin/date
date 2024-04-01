@@ -844,4 +844,28 @@ describe("handler", () => {
         });
         expect(await handler.autoLogin(create.key)).toEqual(null);
     })
+
+    it("should show correct login output after verification", async () => {
+        const email = "a";
+        const eduEmail = "b@lovedu.edu";
+        const code = await handler.getVerificationCode({
+            email: email,
+            schoolEmail: eduEmail
+        })
+        await handler.verifyUserWithCode({
+            code: code!,
+            email: email,
+            schoolEmail: eduEmail
+        })
+        const output = await handler.loginWithToken({}, email);
+        expect(output?.newAccount).toEqual(true);
+        expect(output?.verified).toEqual(true);
+    })
+
+    it("should show correct login output after not verification", async () => {
+        const email = "a";
+        const output = await handler.loginWithToken({}, email);
+        expect(output?.newAccount).toEqual(true);
+        expect(output?.verified).toEqual(false);
+    })
 })

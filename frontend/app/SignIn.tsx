@@ -22,8 +22,7 @@ export function Home() {
         iosClientId: receivedData.clientIDs?.ios,
         redirectUri: Linking.createURL("/"),
     });
-    const [newAccount, setNewAccount] = useState<boolean>(false);
-    const [oldAccount, setOldAccount] = useState<boolean>(false);
+    const [loginOutput, setLoginOutput] = useState<LoginOutput|undefined>();
 
     useEffect( () => {
         const func = async () => {
@@ -41,11 +40,7 @@ export function Home() {
 
     const processLoginOutput = async (output : LoginOutput) => {
         receivedData.setLoginKey(output.key);
-        if (output.newAccount) {
-            setNewAccount(true);
-        } else {
-            setOldAccount(true);
-        }
+        setLoginOutput(output);
     }
 
     const updateAppleAllow = async () => {
@@ -60,14 +55,7 @@ export function Home() {
             }
             try {
                 const response = await sendRequest(URLs.login, input);
-                const data = response.data.data as LoginOutput;
-                receivedData.setLoginKey(data.key);
-
-                if (data.newAccount) {
-                    setNewAccount(true);
-                } else {
-                    setOldAccount(true);
-                }
+                await processLoginOutput(response.data.data as LoginOutput);
             } catch (err) { 
                 console.log(err);
             }
@@ -75,13 +63,12 @@ export function Home() {
     }
 
     useEffect( () => {
-        if (newAccount) {
-            router.push("Verification")
+        if (loginOutput) {
+            if (!loginOutput.newAccount) return router.push("(tabs)")
+            if (loginOutput.verified) return router.push("AccountCreation")
+            else return router.push("Verification")
         }
-        if (oldAccount) {
-            router.push("(tabs)")
-        }
-    }, [newAccount, oldAccount])
+    }, [loginOutput])
 
     const googleLogin = async () => {
         try {

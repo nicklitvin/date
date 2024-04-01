@@ -256,6 +256,7 @@ export interface LoginEntryInput {
 export interface LoginOutput {
     key: string
     newAccount: boolean
+    verified: boolean
 }
 
 export interface Email {

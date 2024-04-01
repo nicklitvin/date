@@ -161,6 +161,7 @@ export interface LoginInput {
 export interface LoginOutput {
     key: string
     newAccount: boolean
+    verified: boolean
 }
 
 export interface EditPushTokenInput {
