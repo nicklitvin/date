@@ -524,10 +524,11 @@ export class Handler {
                 await this.login.updateExpoToken(email, input.expoPushToken);
             }
             const userLogin = await this.login.updateKey(email);
+            const verification = await this.verification.getVerificationByPersonalEmail(email);
             return {
                 key: userLogin.key,
                 newAccount: await this.user.getUserByEmail(email) == null,
-                verified: Boolean(await this.verification.getVerificationByPersonalEmail(email))
+                verified: verification?.verified ?? false
             };
         } else {
             const userLogin = await this.login.createUser({

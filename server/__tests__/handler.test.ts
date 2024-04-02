@@ -848,6 +848,7 @@ describe("handler", () => {
     it("should show correct login output after verification", async () => {
         const email = "a";
         const eduEmail = "b@lovedu.edu";
+        await handler.loginWithToken({}, email);
         const code = await handler.getVerificationCode({
             email: email,
             schoolEmail: eduEmail

@@ -1,8 +1,8 @@
 import express from "express";
 import { URLs } from "./urls";
 import { APIOutput, APIRequest, ClientIDs, ConfirmVerificationInput, DeleteImageInput, EditUserInput, Email, GetChatInput, GetChatPreviewsInput, GetProfileInput, LoginInput, MessageInput, NewMatchInput, NewVerificationInput, RequestReportInput, RequestUserInput, SubscribeInput, SwipeInput, UnlikeInput, UpdatePushTokenInput, UploadImageInput, WithEmail } from "./interfaces";
-import { Handler } from "./handler";
 import { isAdmin } from "./others";
+import { Handler } from "./handler";
 
 export class APIHandler {
     constructor(app : express.Application, handler : Handler) {
