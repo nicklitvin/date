@@ -4,7 +4,7 @@ import { eduEmailText, verifyCodeText } from "../src/text";
 import MockAdapter from "axios-mock-adapter";
 import axios from "axios";
 import { URLs } from "../src/urls";
-import { ConfirmVerificationInput, NewCodeInput, NewVerificationInput } from "../src/interfaces";
+import { ConfirmVerificationInput, NewVerificationInput } from "../src/interfaces";
 import { RootStore, createStoreProvider } from "../src/store/RootStore";
 import { globals } from "../src/globals";
 
@@ -16,7 +16,6 @@ describe("verification", () => {
         const mock = new MockAdapter(axios);
 
         const store = new RootStore();
-        store.globalState.setEmail(personalEmail);
         const StoreProvider = createStoreProvider(store);
 
         const getCurrentPage = jest.fn();
@@ -43,7 +42,6 @@ describe("verification", () => {
 
         mock.onPost(URLs.server + URLs.newVerification).reply( config => {
             const payload = JSON.parse(config.data) as NewVerificationInput;
-            expect(payload.personalEmail).toEqual(personalEmail);
             expect(payload.schoolEmail).toEqual(eduEmail);
             sent = true;
             return [200]
@@ -85,7 +83,6 @@ describe("verification", () => {
         mock.onPost(URLs.server + URLs.verifyUser).reply( config => {
             const payload = JSON.parse(config.data) as ConfirmVerificationInput;
             expect(payload.code).toEqual(Number(code));
-            expect(payload.personalEmail).toEqual(personalEmail);
             expect(payload.schoolEmail).toEqual(eduEmail);
             sent = true;
             return [200]            

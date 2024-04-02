@@ -20,7 +20,7 @@ export class ReceivedData {
     @observable public loginKey : string|undefined = undefined;
 
     @action
-    setProfile(input : PublicProfile) {this.profile = input; }
+    setProfile(input : PublicProfile|null) {this.profile = input; }
 
     @action
     setSubscription(input : SubscriptionData) {this.subscription = input; }

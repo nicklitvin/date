@@ -28,7 +28,6 @@ describe("accountCreation", () => {
 
     it("should create userInput", async () => {
         const store = new RootStore()
-        store.globalState.setEmail("email");
 
         const myName = "name";
         const myBirthday = new Date(2000,2,1);
@@ -36,7 +35,7 @@ describe("accountCreation", () => {
         const myGender = globals.genders[0]; 
         const myGenderPreference = [globals.genders[0], globals.genders[1]];
         const customUploads : FileUploadAndURI[] = [{
-            buffer: Buffer.from("a"),
+            buffer: "a",
             mimetype: "image/jpeg",
             uri: "file://random"
         }];

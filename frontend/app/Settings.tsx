@@ -114,7 +114,8 @@ export function Settings(props : Props) {
     }
 
     const signOut = () => {
-        globalState.setEmail(null);
+        receivedData.setProfile(null);
+        // globalState.setEmail(null);
         if (!props.disableToggle)
             setRedirect(true);
     }

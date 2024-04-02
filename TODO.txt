@@ -1,6 +1,4 @@
 TODO
-send encoded string, decode and then send to aws
-
 if server down, redirect to error page
 async storage not working
 get attributes on account creation start

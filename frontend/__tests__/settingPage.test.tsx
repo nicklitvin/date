@@ -29,7 +29,6 @@ describe("settings", () => {
 
         const store = new RootStore();
         if (useSave) {
-            store.globalState.setEmail("a");
             store.receivedData.setSettings(settingData);
         }
         const StoreProvider = createStoreProvider(store);
