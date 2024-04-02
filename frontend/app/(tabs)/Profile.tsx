@@ -43,16 +43,17 @@ export function Profile(props : Props) {
 
     const load = async () => {
         try {
+            const input : WithKey<{}> = {
+                key: receivedData.loginKey
+            }
+
             if (!profile) {
-                const input : WithKey<{}> = {
-                    key: receivedData.loginKey
-                }
                 const profileResponse = await sendRequest(URLs.getMyProfile, input);
                 setProfile(profileResponse.data.data);
             }
 
             if (!subscription) {
-                const subscriptionResponse = await sendRequest(URLs.getSubscription, null);
+                const subscriptionResponse = await sendRequest(URLs.getSubscription, input);
                 setSubscription(subscriptionResponse.data.data);
             }
         } catch (err) {
