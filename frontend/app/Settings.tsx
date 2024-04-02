@@ -29,11 +29,15 @@ export function Settings(props : Props) {
     const [showModal, setShowModal] = useState<boolean>(false);
     const [settings, setSettings] = useState<SettingData[]>(receivedData.settings ?? []);
     const [redirect, setRedirect] = useState<boolean>(false);
+    const [firstLoad, setFirstLoad] = useState<boolean>(true);
 
     useEffect( () => {
-        if (props.noAutoLoad) return
-        load();   
-    })
+        if (firstLoad) {
+            setFirstLoad(false);
+            if (props.noAutoLoad) return
+            load();   
+        }
+    }, [firstLoad])
 
     useEffect( () => {
         if (settings) {

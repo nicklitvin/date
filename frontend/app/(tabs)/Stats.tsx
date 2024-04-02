@@ -11,8 +11,8 @@ import { Spacing } from "../../src/components/Spacing";
 import { useStore } from "../../src/store/RootStore";
 import { testIDS } from "../../src/testIDs";
 import { useEffect, useState } from "react";
-import { MyDonut } from "../../src/components/Donut";
-import { Weekly } from "../../src/components/Weekly";
+// import { MyDonut } from "../../src/components/Donut";
+// import { Weekly } from "../../src/components/Weekly";
 
 interface Props {
     noAutoLoad?: boolean
@@ -23,6 +23,7 @@ interface Props {
 export function Stats(props : Props) {
     const { receivedData } = useStore();    
     const [stats, setStats] = useState<UserSwipeStats|null>(receivedData.stats);
+    const [firstLoad, setFirstLoad] = useState<boolean>(true);
 
     // let MyDonut;
     // let Weekly;
@@ -32,9 +33,12 @@ export function Stats(props : Props) {
     // }
 
     useEffect( () => {
-        if (props.noAutoLoad) return
-        load();
-    })
+        if (firstLoad) {
+            setFirstLoad(false);
+            if (props.noAutoLoad) return
+            load();
+        }
+    }, [firstLoad])
 
     useEffect( () => {
         if (stats && !receivedData.stats) {
@@ -99,7 +103,7 @@ export function Stats(props : Props) {
         content = (
             <>
                 <StyledView className="px-5">
-                    <StyledText className="font-bold text-xl">
+                    {/* <StyledText className="font-bold text-xl">
                         {statsText.allTimeReceived}
                     </StyledText>
                     <Spacing size="lg"/>
@@ -139,7 +143,7 @@ export function Stats(props : Props) {
                         dislikes={stats.weekly.map( val => val.myDislikes)}
                         likeText={statsText.likesSent}
                         dislikeText={statsText.dislikesSent}
-                    />
+                    /> */}
                 </StyledView>
                 <Spacing size="lg"/>
             </>

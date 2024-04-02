@@ -197,7 +197,9 @@ export function Index() {
 
             if (globals.useStorage) {
                 const AsyncStorage = require("@react-native-async-storage/async-storage");
-                receivedData.setLoginKey(await AsyncStorage.getItem(globals.storageloginKey) ?? "");
+                const key = await AsyncStorage.getItem(globals.storageloginKey);
+                console.log(key);
+                receivedData.setLoginKey(key ?? "");
             }
 
             if (Platform.OS == "android") {

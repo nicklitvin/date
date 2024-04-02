@@ -17,8 +17,8 @@ export function ProfileView() {
     let profile : PublicProfile|undefined;
 
     const myProfile = receivedData.profile?.id == userID ? receivedData.profile : undefined;
-    const newMatch = receivedData.newMatches.find(val => val.profile.id == userID)?.profile;
-    const chatPreview = receivedData.chatPreviews.find(val => val.profile.id == userID)?.profile;
+    const newMatch = receivedData.newMatches?.find(val => val.profile.id == userID)?.profile;
+    const chatPreview = receivedData.chatPreviews?.find(val => val.profile.id == userID)?.profile;
 
     profile = myProfile || newMatch || chatPreview;
 

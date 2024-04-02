@@ -20,7 +20,7 @@ export class LoginHandler {
                 expire: input.customDate ?? addWeeks(new Date(), globals.keyExpirationWeeks),
                 key: randomUUID(),
                 expoPushToken: input.expoPushToken,
-                userID: randomUUID()
+                userID: input.customID ? globals.sampleUserID : randomUUID()
             }
         })
     }

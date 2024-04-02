@@ -47,7 +47,7 @@ export function Profile(props : Props) {
                 const input : WithKey<{}> = {
                     key: receivedData.loginKey
                 }
-                const profileResponse = await sendRequest(URLs.getProfile, input);
+                const profileResponse = await sendRequest(URLs.getMyProfile, input);
                 setProfile(profileResponse.data.data);
             }
 
@@ -55,7 +55,9 @@ export function Profile(props : Props) {
                 const subscriptionResponse = await sendRequest(URLs.getSubscription, null);
                 setSubscription(subscriptionResponse.data.data);
             }
-        } catch (err) {}
+        } catch (err) {
+            console.log(err);
+        }
     }
 
     const managePayment = async () => {

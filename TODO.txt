@@ -3,6 +3,8 @@ if server down, redirect to error page
 async storage not working
 get attributes on account creation start
 loading when doing prompt
+if edit attribute successful, redirect back
+profile view background not fully sized
 
 notification receive, delete receiveDate when new
 announcement/errorlog implement

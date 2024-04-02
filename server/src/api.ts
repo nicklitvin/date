@@ -414,8 +414,10 @@ export class APIHandler {
 
         app.post(URLs.getMyProfile, async (req,res) => {
             try {
-                const body = req.body as APIRequest<{}>;
+                const body : APIRequest<{}> = req.body;
                 const userID = await handler.login.getUserIDByKey(body.key);
+
+                console.log(body,userID);
     
                 if (!userID) return res.status(401).json();
 
