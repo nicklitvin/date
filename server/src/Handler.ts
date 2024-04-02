@@ -89,7 +89,13 @@ export class Handler {
 
         if (verification && verification.verified || ignoreVerification) {
             const imageIDs = await Promise.all(
-                input.files.map( val => this.image.uploadImage(val))
+                input.files.map( val => {
+                    const decoded = Buffer.from(val.buffer,"base64")
+                    return this.image.uploadImage({
+                        buffer: decoded,
+                        mimetype: val.mimetype
+                    })
+                })
             );
     
             const userInput : UserInput = {
@@ -283,7 +289,10 @@ export class Handler {
             !globals.acceptaleImageFormats.includes(input.image.mimetype)
         ) return null;
 
-        const imageID = await this.image.uploadImage(input.image);
+        const imageID = await this.image.uploadImage({
+            buffer: Buffer.from(input.image.buffer, "base64"),
+            mimetype: input.image.mimetype
+        });
         if (!imageID) return null;
 
         return await this.user.editUser({

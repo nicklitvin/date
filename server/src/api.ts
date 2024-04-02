@@ -1,6 +1,6 @@
 import express from "express";
 import { URLs } from "./urls";
-import { APIOutput, APIRequest, ClientIDs, ConfirmVerificationInput, DeleteImageInput, EditUserInput, Email, GetChatInput, GetChatPreviewsInput, GetProfileInput, LoginInput, MessageInput, NewMatchInput, NewVerificationInput, RequestReportInput, RequestUserInput, SubscribeInput, SwipeInput, UnlikeInput, UpdatePushTokenInput, UploadImageInput, WithEmail } from "./interfaces";
+import { APIOutput, APIRequest, ClientIDs, ConfirmVerificationInput, DeleteImageInput, EditUserInput, Email, FileUpload, GetChatInput, GetChatPreviewsInput, GetProfileInput,LoginInput, MessageInput, NewMatchInput, NewVerificationInput, RequestReportInput, RequestUserInput, SubscribeInput, SwipeInput, UnlikeInput, UpdatePushTokenInput, UploadImageInput, WithEmail } from "./interfaces";
 import { isAdmin } from "./others";
 import { Handler } from "./handler";
 
@@ -15,11 +15,12 @@ export class APIHandler {
                 const user = await handler.login.getUserByKey(body.key);
     
                 if (!user || !user.userID) return res.status(401).json();
-    
+
                 const input : RequestUserInput & WithEmail = {
                     ...body,
                     id: user.userID,
                     email: user.email,
+                    files: body.files
                 }
                 const output = await handler.createUser(input);
                 return output ? res.status(200).json() : res.status(400).json();

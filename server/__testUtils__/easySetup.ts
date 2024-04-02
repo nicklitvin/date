@@ -1,6 +1,6 @@
 import { Opinion } from "@prisma/client";
 import { globals } from "../src/globals";
-import { ImageInput, MessageInput, NewVerificationInput, RequestUserInput, SwipeInput, UserInput, UserReportInput, WithEmail } from "../src/interfaces";
+import { FileUpload, ImageInput, MessageInput, NewVerificationInput, RequestUserInput, SwipeInput, UserInput, UserReportInput, WithEmail } from "../src/interfaces";
 import fs from "fs/promises";
 import { randomUUID } from "crypto";
 import mime from "mime-types";
@@ -10,9 +10,9 @@ import { addYears } from "date-fns";
 const imageFilePath = "./__testUtils__/goodImage.jpg";
 const badImageFilePath = "./__testUtils__/badImage.txt";
 
-export async function getImageDetails(good : boolean) : Promise<ImageInput> {
+export async function getImageDetails(good : boolean) : Promise<FileUpload> {
     return {
-        buffer: await fs.readFile(good ? imageFilePath : badImageFilePath),
+        buffer: (await fs.readFile(good ? imageFilePath : badImageFilePath)).toString("base64"),
         mimetype: mime.lookup(good ? imageFilePath : badImageFilePath) as string
     }
 }

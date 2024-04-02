@@ -120,7 +120,7 @@ export interface SwipeBreakdown {
 }
 
 export interface FileUpload {
-    buffer: Buffer
+    buffer: string
     mimetype: string
 }
 

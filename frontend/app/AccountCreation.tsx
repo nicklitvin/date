@@ -63,6 +63,7 @@ export function AccountCreation(props : Props) {
     }, [currentPage])
 
     const createUser = async () => {
+        console.log(uploads[0].buffer);
         const userInput : WithKey<UserInput> = {
             key: receivedData.loginKey,
             name: name,

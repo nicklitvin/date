@@ -16,7 +16,7 @@ export interface UserInput {
 }
 
 export interface FileUpload {
-    buffer: Buffer
+    buffer: string
     mimetype: string
 }
 

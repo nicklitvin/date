@@ -84,9 +84,8 @@ export function Pictures(props : Props) {
                 const assetString = await FileSystem.readAsStringAsync(asset.uri, {
                     encoding: FileSystem.EncodingType.Base64
                 })
-                const buffer = Buffer.from(assetString);
                 newUploads.push({
-                    buffer: buffer,
+                    buffer: assetString,
                     mimetype: asset.mime as string,
                     uri: asset.uri
                 })
