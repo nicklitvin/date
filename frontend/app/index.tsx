@@ -1,4 +1,4 @@
-import { Redirect } from "expo-router";
+import { Redirect, router } from "expo-router";
 import { useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { useStore } from "../src/store/RootStore";
@@ -12,6 +12,8 @@ import { sendRequest } from "../src/utils";
 import { URLs } from "../src/urls";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ProfileViewEmbedMob } from "../src/pages/ProfileViewEmbed";
+import { noWifiText } from "../src/text";
+import { MyButton } from "../src/components/Button";
 
 Notifications.setNotificationHandler({
     handleNotification: async () => ({
@@ -197,52 +199,62 @@ export function Index() {
         }
     }
 
+    const loadData = async () => {
+        const key = await AsyncStorage.getItem(globals.storageloginKey);
+        console.log(key);
+        receivedData.setLoginKey(key ?? "");
+
+        if (Platform.OS == "android") {
+            Notifications.setNotificationChannelAsync("default", {
+                name: "default",
+                importance: Notifications.AndroidImportance.DEFAULT,
+            })
+        }
+
+        if (Device.isDevice) {
+            const { status: existingStatus } = await Notifications.getPermissionsAsync();
+            let finalStatus = existingStatus;
+            if (existingStatus !== 'granted') {
+                const { status } = await Notifications.requestPermissionsAsync();
+                finalStatus = status;
+            }
+            if (finalStatus !== 'granted') {
+                return;
+            }
+            const token = await Notifications.getExpoPushTokenAsync({
+                projectId: Constants.expoConfig?.extra?.eas.projectId,
+            });
+            globalState.setExpoPushToken(token.data);
+        }
+
+        if (globals.useSample) {
+            setSampleData();
+        } else {
+            try {
+                await retrieveData()
+            } catch (err) {
+                console.log(err);
+            }
+        }
+    }
+
     useEffect( () => {
         const func = async () => {
             setFirstLoad(false);
-
-            const key = await AsyncStorage.getItem(globals.storageloginKey);
-            console.log(key);
-            receivedData.setLoginKey(key ?? "");
-
-            if (Platform.OS == "android") {
-                Notifications.setNotificationChannelAsync("default", {
-                    name: "default",
-                    importance: Notifications.AndroidImportance.DEFAULT,
-                })
-            }
-
-            if (Device.isDevice) {
-                const { status: existingStatus } = await Notifications.getPermissionsAsync();
-                let finalStatus = existingStatus;
-                if (existingStatus !== 'granted') {
-                    const { status } = await Notifications.requestPermissionsAsync();
-                    finalStatus = status;
-                }
-                if (finalStatus !== 'granted') {
-                    return;
-                }
-                const token = await Notifications.getExpoPushTokenAsync({
-                    projectId: Constants.expoConfig?.extra?.eas.projectId,
-                });
-                globalState.setExpoPushToken(token.data);
-            }
-
-            if (globals.useSample) {
-                setSampleData();
-            } else {
-                try {
-                    await retrieveData()
-                } catch (err) {
-                    console.log(err);
-                }
-            }
+            await loadData();
             setLoading(false);
         }
         if (firstLoad) {
             func();
         }
     }, [firstLoad])
+
+    const reload = async () => {
+        setError(false);
+        setLoading(true);
+        await loadData()
+        setLoading(false);
+    }
 
     if (loading) {
         return (
@@ -252,7 +264,16 @@ export function Index() {
             />
         )
     } else if (error) {
-        return <Redirect href="Error"/>
+        return <MySimplePage
+            title={noWifiText.pageTitle}
+            subtitle={noWifiText.pageSubtitle}
+            content={
+                <MyButton
+                    onPressFunction={reload}
+                    text={noWifiText.button}
+                />
+        }
+    />
     } else if (receivedData.profile) {
         return <Redirect href="(tabs)"/>
     } else if (receivedData.clientIDs) {

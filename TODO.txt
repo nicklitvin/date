@@ -1,15 +1,20 @@
 TODO
-if server down, redirect to error page
-loading when doing prompt
+make chat bubbles not clickable unless resend
 if edit attribute successful, redirect back
+fix date receiving on server, change to Date
+profile loading again? even though required to sign in
 profile view background not fully sized
 create web buy and stats stuff
 notification receive, delete receiveDate when new
 send email to edu email with code
 announcement/errorlog implement
-reported page
+reported page cant login
 
-BACKEND TODO
+toast error messages, install npx expo install react-native-reanimated react-native-safe-area-context react-native-gesture-handler
+
+
+Optional TODO
+automatically reload if network reconnected
 change elo constants with api?
 messagelowerelo is rewarded?
 add devices to user notification list

@@ -197,3 +197,9 @@ export const signInText = {
     terms: "Terms of Service",
     version: "V1.0.0"
 }
+
+export const noWifiText = {
+    pageTitle: "No Network Connection",
+    pageSubtitle: "",
+    button: "Try Again",
+}
