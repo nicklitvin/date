@@ -1,5 +1,4 @@
 TODO
-make chat bubbles not clickable unless resend
 if edit attribute successful, redirect back
 fix date receiving on server, change to Date
 profile loading again? even though required to sign in
@@ -9,6 +8,7 @@ notification receive, delete receiveDate when new
 send email to edu email with code
 announcement/errorlog implement
 reported page cant login
+why mymessage constantly rerendering in chat
 
 toast error messages, install npx expo install react-native-reanimated react-native-safe-area-context react-native-gesture-handler
 

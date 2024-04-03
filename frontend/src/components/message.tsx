@@ -23,6 +23,7 @@ export function MyMessage(props : Props) {
                     props.error ? "border-danger" : ""
                 )}
                 onPress={props.onPress}
+                disabled={!props.error}
                 testID={`message-${props.text}`}
             >
                 <StyledText className={classNames(
