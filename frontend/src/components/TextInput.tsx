@@ -12,6 +12,7 @@ interface Props {
     maxLength?: number
     returnError?: (input : boolean) => boolean
     newLine?: boolean
+    dontClearAfterSubmit?: boolean
 }
 
 export function MyTextInput(props : Props) {
@@ -27,7 +28,7 @@ export function MyTextInput(props : Props) {
             setShowError(true);
         } else {
             props.onSubmit(message);
-            setMessage("");
+            if (!props.dontClearAfterSubmit) setMessage("");
         }
     }
 

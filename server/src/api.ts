@@ -309,11 +309,12 @@ export class APIHandler {
                 if (!userID) return res.status(401).json();
     
                 const input : EditUserInput = {
-                    ...body,
-                    userID: userID
+                    userID: userID,
+                    setting: body.setting.toLowerCase(),
+                    value: body.value,
                 }
                 const output = await handler.editUser(input);
-                return output ? res.status(200).json() : res.status(400).json()
+                return output ?  res.status(200).json() : res.status(400).json()
             } catch (err) {
                 console.log(err);
                 return res.status(500).json();

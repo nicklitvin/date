@@ -201,7 +201,6 @@ export function Index() {
 
     const loadData = async () => {
         const key = await AsyncStorage.getItem(globals.storageloginKey);
-        console.log(key);
         receivedData.setLoginKey(key ?? "");
 
         if (Platform.OS == "android") {

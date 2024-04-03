@@ -45,7 +45,7 @@ export interface WithEmail {
 
 export interface EditUserInput {
     userID: string
-    setting: (keyof User)
+    setting: string
     value: any
 }
 

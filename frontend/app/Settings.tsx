@@ -71,7 +71,11 @@ export function Settings(props : Props) {
                 token: token.data,
                 key: receivedData.loginKey
             }
-            await sendRequest(URLs.updatePushToken, input)
+            try {
+                await sendRequest(URLs.updatePushToken, input)
+            } catch (err) {
+                console.log(err);
+            }
 
             globalState.setExpoPushToken(token.data);
         }
@@ -108,9 +112,10 @@ export function Settings(props : Props) {
             const copy = [...settings];
             copy[copy.findIndex(val => val.title == title)] = { title, value };
             setSettings(copy);
-            await sendRequest(URLs.editUser, input);
-
+            const response = await sendRequest(URLs.editUser, input);
+            receivedData.setProfile(response.data.data);
         } catch (err) {
+            console.log(err);
             const copy = [...settings];
             copy[copy.findIndex(val => val.title == title)] = { title, value: !value };
             setSettings(copy);
@@ -119,7 +124,6 @@ export function Settings(props : Props) {
 
     const signOut = () => {
         receivedData.setProfile(null);
-        // globalState.setEmail(null);
         if (!props.disableToggle)
             setRedirect(true);
     }

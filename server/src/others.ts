@@ -1,6 +1,6 @@
 import { AttributeType, User } from "@prisma/client";
 
-export const allowedAttributeEdits : (keyof User)[] = ["genderInterest"];
+export const allowedAttributeEdits : string[] = ["genderInterest", "notifications", "description", "ageInterest"];
 
 export function isAdmin(key : string) {
     return process.env.ADMIN_KEY! == key;

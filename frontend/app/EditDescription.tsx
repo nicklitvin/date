@@ -13,11 +13,12 @@ import { useEffect, useState } from "react";
 export function EditDescription() {
     const { receivedData } = useStore();
     const [profile, setProfile] = useState<PublicProfile|null>(receivedData.profile);
-    if (!profile) return <Redirect href="Error"/>
-
+    
     useEffect( () => {
         if (profile) {
             receivedData.setProfile(profile);
+        } else {
+            router.push("Error");
         }
     }, [profile])
 
@@ -28,9 +29,12 @@ export function EditDescription() {
                 setting: globals.settingDescription,
                 value: description
             }
-            const response = await sendRequest(URLs.editUser, input);
-            setProfile(response.data.data);
-            router.back();
+            await sendRequest(URLs.editUser, input);
+            receivedData.setProfile({
+                ...receivedData.profile!,
+                description: description,
+            })
+            router.push("EditProfile");
         } catch (err) {
             console.log(err)
         }
@@ -46,7 +50,8 @@ export function EditDescription() {
                 errorMessage={descriptionText.errorMessage}
                 onSubmit={editDescription}
                 newLine={true}
-                initialInput={profile.description}
+                initialInput={profile?.description}
+                dontClearAfterSubmit={true}
             />
         }
     />
