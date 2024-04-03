@@ -36,7 +36,7 @@ export function Feed(props : Props) {
             load();
         }
         setFirstLoad(false);
-    })
+    }, [firstLoad])
 
     useEffect( () => {
         if (feed) {
@@ -46,7 +46,6 @@ export function Feed(props : Props) {
     }, [feed])
 
     useEffect( () => {
-        console.log(swipeStatus);
         if (swipeStatus) {
             if (props.getFeedIndex) props.getFeedIndex(swipeStatus.feedIndex);
 
@@ -101,7 +100,7 @@ export function Feed(props : Props) {
             });
             setFeed(response.data.data);
         } catch (err) {
-            // console.log(err);
+            console.log(err);
         }
     }
 

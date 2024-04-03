@@ -96,6 +96,7 @@ describe("chat", () => {
                     userID={recepientProfile.id}
                     noAutoLoad={true}
                     getUnsentLength={getUnsentLength}
+                    noRouter={true}
                 />
             </StoreProvider>
         )

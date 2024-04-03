@@ -32,6 +32,9 @@ describe("feed", () => {
         mock.onPost(URLs.server + URLs.getFeed).replyOnce( config => 
             [200, {data: feed}]
         )
+        mock.onPost(URLs.server + URLs.makeSwipe).reply( config => 
+            [200]
+        )
 
         const store = new RootStore();
         store.globalState.setDisableFade(true);
@@ -102,12 +105,8 @@ describe("feed", () => {
             })
         };
 
-        expect(getFeedLength).toHaveBeenLastCalledWith(
-            feed.profiles.length + moreFeed.profiles.length
-        )
-        expect(store.receivedData.swipeFeed?.profiles).toHaveLength(
-            feed.profiles.length + moreFeed.profiles.length
-        )
+        expect(getFeedLength).toHaveBeenLastCalledWith(moreFeed.profiles.length)
+        expect(store.receivedData.swipeFeed?.profiles).toHaveLength(moreFeed.profiles.length);
     })
 
     it("should show no feed", async () => {

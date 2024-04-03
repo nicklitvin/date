@@ -22,6 +22,7 @@ interface Props {
     noAutoLoad?: boolean
     getUnsentLength?: (input : number) => void
     returnSeconds?: (input : number) => void
+    noRouter?: boolean
 }
 
 export function Chat(props : Props) {
@@ -83,7 +84,7 @@ export function Chat(props : Props) {
             scrollRef.current?.scrollToEnd({animated: true});
         }
         setFirstLoad(false);
-    })
+    }, [firstLoad])
 
     const deleteUser = () => {
         receivedData.deleteSavedChat(userID);
@@ -244,7 +245,7 @@ export function Chat(props : Props) {
             await sendRequest(URLs.reportUser, myReport);
             deleteUser();
             if (props.noAutoLoad) return
-            router.push("Matches");
+            if (props.noRouter) router.push("Matches");
         } catch (err) {
             console.log(err);
         }
@@ -260,7 +261,7 @@ export function Chat(props : Props) {
             await sendRequest(URLs.unlikeUser, unlike);
             deleteUser();
             if (props.noAutoLoad) return
-            router.push("Matches");
+            if (!props.noRouter) router.push("Matches");
         } catch (err) {
             console.log(err);
         }
