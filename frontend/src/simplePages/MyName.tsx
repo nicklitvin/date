@@ -14,7 +14,7 @@ export function MyName(props : Props) {
         <MySimplePage
             title={myNameText.pageTitle}
             subtitle={myNameText.pageSubtitle}
-            marginTop="Keyboard"
+            pageType="Keyboard"
             goBackFunc={props.goBack}
             content={
                 <MyTextInput

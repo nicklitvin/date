@@ -3,7 +3,6 @@ if server down, redirect to error page
 loading when doing prompt
 if edit attribute successful, redirect back
 profile view background not fully sized
-home page style, add version, and privacy
 create web buy and stats stuff
 notification receive, delete receiveDate when new
 send email to edu email with code

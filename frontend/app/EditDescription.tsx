@@ -39,7 +39,7 @@ export function EditDescription() {
     return <MySimplePage
         title={descriptionText.pageTitle}
         subtitle={descriptionText.pageSubtitle}
-        marginTop="Keyboard"
+        pageType="Keyboard"
         content={
             <MyTextInput
                 placeholder={descriptionText.inputPlaceholder}

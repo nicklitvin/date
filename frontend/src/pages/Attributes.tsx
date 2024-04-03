@@ -22,7 +22,7 @@ export function AttributesPage(props : Props) {
     return <MySimplePage
         title={attributesText.pageTitle}
         subtitle={attributesText.pageSubtitle}
-        marginTop="Attributes"
+        pageType="Attributes"
         goBackFunc={props.goBack}
         content={
             <StyledView className="w-full flex items-center mt-3">

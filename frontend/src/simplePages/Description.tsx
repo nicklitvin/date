@@ -12,7 +12,7 @@ export function Description(props : Props) {
     return <MySimplePage
         title={descriptionText.pageTitle}
         subtitle={descriptionText.pageSubtitle}
-        marginTop="Keyboard"
+        pageType="Keyboard"
         goBackFunc={props.goBack}
         content={
             <MyTextInput

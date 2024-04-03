@@ -123,7 +123,7 @@ export function Pictures(props : Props) {
         title={pictureText.pageTitle}
         subtitle={pictureText.pageSubtitle}
         goBackFunc={props.goBack}
-        marginTop="Pictures"
+        pageType="Pictures"
         beforeGapContent={
             <>
                 <StyledView className="flex flex-row flex-wrap justify-center">

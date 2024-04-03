@@ -49,7 +49,7 @@ export function EditAttributes() {
     return <MySimplePage
         title={attributesText.pageTitle}
         subtitle={attributesText.pageSubtitle}
-        marginTop="Attributes"
+        pageType="Attributes"
         content={
             <StyledView className="w-full flex items-center mt-3">
                 <StyledText className={classNames(

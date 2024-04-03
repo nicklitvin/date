@@ -78,9 +78,8 @@ export function EditPictures() {
             const assetString = await FileSystem.readAsStringAsync(asset.uri, {
                 encoding: FileSystem.EncodingType.Base64
             })
-            const buffer = Buffer.from(assetString);
             newUpload = {
-                buffer: buffer,
+                buffer: assetString,
                 mimetype: asset.mime as string,
                 uri: asset.uri
             }
@@ -150,7 +149,7 @@ export function EditPictures() {
     return <MySimplePage
         title={pictureText.pageTitle}
         subtitle={pictureText.pageSubtitle}
-        marginTop="Pictures"
+        pageType="Pictures"
         beforeGapContent={
             <>
                 <StyledView className="flex flex-row flex-wrap justify-center">

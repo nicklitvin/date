@@ -190,8 +190,10 @@ export const smokingText = {
     pageSubtitle: "How often do you smoke?"
 }
 
-export const homeText = {
+export const signInText = {
     pageTitle: "Lovedu",
     pageSubtitle: "",
-
+    googleSignIn: "Sign In With Google",
+    terms: "Terms of Service",
+    version: "V1.0.0"
 }

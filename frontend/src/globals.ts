@@ -27,6 +27,7 @@ export const globals = {
     frequencies: ["Never", "Sometimes", "Often"],
     storageloginKey: "LoginKey",
     chatRefreshSeconds: 30,
+    urlTerms: "https://youtube.com",
 
     green: "#4A991A",
     red: "#B81515",

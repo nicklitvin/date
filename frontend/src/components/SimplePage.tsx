@@ -1,6 +1,5 @@
 import classNames from "classnames";
 import { StyledButton, StyledImage, StyledText, StyledView } from "../styledElements";
-import { Keyboard, TouchableWithoutFeedback, View } from "react-native";
 
 type pageType = "Pictures" | "Attributes" | "Keyboard"
 
@@ -9,7 +8,7 @@ interface Props {
     subtitle: string
     beforeGapContent?: any
     content?: any
-    marginTop?: pageType
+    pageType?: pageType
     goBackFunc?: () => any
 }
 
@@ -30,12 +29,12 @@ export function MySimplePage(props : Props) {
             
             <StyledView className={classNames(
                 "flex flex-col items-center p-5",
-                props.marginTop == "Attributes" ? "h-[700px]" : (
-                    props.marginTop == "Pictures" ? "mt-[50px] h-[700px]" : (
-                        props.marginTop == "Keyboard" ? "mt-[200px] h-[200px]" :
+                props.pageType == "Attributes" ? "h-[700px]" : (
+                    props.pageType == "Pictures" ? "mt-[50px] h-[700px]" : (
+                        props.pageType == "Keyboard" ? "mt-[200px] h-[200px]" :
                             "mt-[200px] h-[400px]"
                     )
-                ) ,
+                )
             )}>
                 <StyledText className={`text-3xl font-bold text-center mb-5`}>
                     {props.title}

@@ -91,7 +91,7 @@ export function Verification(props : Props) {
             return <MySimplePage
                 title={eduEmailText.pageTitle}
                 subtitle={eduEmailText.pageSubtitle}
-                marginTop="Keyboard"
+                pageType="Keyboard"
                 content={<MyTextInput
                     placeholder={eduEmailText.inputPlaceholder}
                     errorMessage={eduEmailText.inputError}
@@ -102,7 +102,7 @@ export function Verification(props : Props) {
             return <MySimplePage
                 title={verifyCodeText.pageTitle}
                 subtitle={verifyCodeText.pageSubtitle}
-                marginTop="Keyboard"
+                pageType="Keyboard"
                 content={
                 <>
                     <MyTextInput
