@@ -5,6 +5,7 @@ import { APIHandler } from "./api";
 import bodyParser from "body-parser";
 import { globals } from "./globals";
 import fs from "fs/promises"
+import { attributeList } from "./others";
 
 const app = express();
 app.use(bodyParser.json());
@@ -29,7 +30,7 @@ const func = async () => {
     await handler.createUser({
         ageInterest: [18,30],
         alcohol: "Never",
-        attributes: ["as"],
+        attributes: [attributeList.Fitness[0]],
         birthday: new Date(2000,1,1),
         description: "description",
         email: globals.sampleEmail,

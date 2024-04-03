@@ -6,15 +6,16 @@ import { globals } from "../src/globals";
 import { Picture } from "../src/components/Picture";
 import { MyButton } from "../src/components/Button";
 import { Spacing } from "../src/components/Spacing";
-import { Redirect, router } from "expo-router";
+import { router } from "expo-router";
 import { useStore } from "../src/store/RootStore";
 import { Frequency } from "../src/components/Frequency";
 
 export function EditProfile() {
     const { receivedData } = useStore();
     const profile = receivedData.profile;
-    if (!profile) return <Redirect href="Error"/>
+    if (!profile) router.push("Error");
 
+    if (!profile) return <></>
     return (
         <StyledScroll>
         <StyledView className="w-full h-full bg-back">

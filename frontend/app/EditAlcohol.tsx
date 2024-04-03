@@ -26,16 +26,23 @@ export function Alcohol() {
     }, [profile])
 
     const changeAlcohol = async () => {
+        if (!frequency) return 
+
         try {
             const input : WithKey<EditUserInput> = {
                 key: receivedData.loginKey,
                 setting: globals.settingAlcohol,   
                 value: frequency
             }
-            const response = await sendRequest(URLs.editUser, input);
-            setProfile(response.data.data);
+            await sendRequest(URLs.editUser, input);
+            setProfile({
+                ...profile!,
+                alcohol: frequency
+            })
             router.back();
-        } catch (err) {}
+        } catch (err) {
+            console.log(err);
+        }
     }
 
     return (

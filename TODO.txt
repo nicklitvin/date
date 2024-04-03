@@ -1,5 +1,4 @@
 TODO
-if edit attribute successful, redirect back
 profile loading again? even though required to sign in
 profile view background not fully sized
 create web buy and stats stuff

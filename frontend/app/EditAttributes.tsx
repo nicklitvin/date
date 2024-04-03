@@ -10,19 +10,19 @@ import { useStore } from "../src/store/RootStore"
 import { EditUserInput, PublicProfile, WithKey } from "../src/interfaces"
 import { URLs } from "../src/urls"
 import { sendRequest } from "../src/utils"
-import { Redirect, router } from "expo-router"
+import { router } from "expo-router"
 
 export function EditAttributes() {
     const { receivedData } = useStore();
     const [profile, setProfile] = useState<PublicProfile|null>(receivedData.profile);
     const [showError, setShowError] = useState<boolean>(false);
-    if (!profile) return <Redirect href="Error"/>
-
-    const [attributes, setAttributes] = useState<string[]>(profile.attributes);
+    const [attributes, setAttributes] = useState<string[]>(profile?.attributes ?? []);
 
     useEffect( () => {
         if (profile) {
             receivedData.setProfile(profile);
+        } else {
+            router.push("EditProfile");
         }
     }, [profile])
 
@@ -38,9 +38,12 @@ export function EditAttributes() {
                 setting: globals.settingAttributes,
                 value: attributes
             }
-            const response = await sendRequest(URLs.editUser, input);
-            setProfile(response.data.data);
-            router.back()
+            await sendRequest(URLs.editUser, input);
+            setProfile({
+                ...receivedData.profile!,
+                attributes: attributes
+            })
+            router.back();
         } catch (err) { 
             console.log(err);
         }

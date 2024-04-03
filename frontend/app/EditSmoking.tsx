@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MySimplePage } from "../src/components/SimplePage";
 import { generalText, smokingText } from "../src/text";
 import { globals } from "../src/globals";
@@ -15,23 +15,37 @@ import { observer } from "mobx-react-lite";
 export function EditSmoking() {   
     const { receivedData } = useStore();
     const [profile, setProfile] = useState<PublicProfile|null>(receivedData.profile);
-    if (!profile) return <Redirect href="Error"/>
+    if (!profile) router.push("Error");
 
-    const [frequency, setFrequency] = useState<string|undefined>(profile.smoking); 
+    const [frequency, setFrequency] = useState<string|undefined>(profile?.smoking); 
+    useEffect( () => {
+        if (profile) {
+            receivedData.setProfile(profile)
+        }
+    }, [profile])
 
     const changeAlcohol = async () => {
+        if (!frequency) return
+
         try {
             const input : WithKey<EditUserInput> = {
                 key: receivedData.loginKey,
                 setting: globals.settingSmoking,   
                 value: frequency
             }
-            const response = await sendRequest(URLs.editUser, input);
-            setProfile(response.data.data);
+            await sendRequest(URLs.editUser, input);
+            console.log(frequency);
+            setProfile({
+                ...profile!,
+                smoking: frequency
+            });
             router.back();
-        } catch (err) {}
+        } catch (err) {
+            console.log(err);
+        }
     }
 
+    if (!profile) return <></>
     return (
         <MySimplePage
             title={smokingText.pageTitle}

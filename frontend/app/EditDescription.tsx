@@ -30,11 +30,11 @@ export function EditDescription() {
                 value: description
             }
             await sendRequest(URLs.editUser, input);
-            receivedData.setProfile({
-                ...receivedData.profile!,
-                description: description,
+            setProfile({
+                ...profile!,
+                description: description
             })
-            router.push("EditProfile");
+            router.back();
         } catch (err) {
             console.log(err)
         }
