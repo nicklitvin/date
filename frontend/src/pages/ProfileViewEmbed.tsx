@@ -2,14 +2,14 @@ import { observer } from "mobx-react-lite";
 import { StyledButton, StyledImage, StyledScroll, StyledText, StyledView } from "../styledElements";
 import { PageHeader } from "../components/PageHeader";
 import { profileText, profileViewText } from "../text";
-import { PublicProfile, RequestReportInput, SwipeInput } from "../interfaces";
+import { PublicProfile, RequestReportInput, SwipeInput, WithKey } from "../interfaces";
 import axios from "axios";
 import { Action } from "../types";
 import { URLs } from "../urls";
 import { PictureSeries } from "../components/PictureSeries";
 import { Spacing } from "../components/Spacing";
 import { MyButton } from "../components/Button";
-import { createTimeoutSignal } from "../utils";
+import { createTimeoutSignal, sendRequest } from "../utils";
 import { Frequency } from "../components/Frequency";
 
 interface Props {
@@ -20,21 +20,20 @@ interface Props {
     disableSwiping?: boolean
     reportable?: boolean
     likedMe?: boolean
+    loginKey?: string
 }
 
 export function ProfileViewEmbed(props : Props) {
     const makeSwipe = async (opinion : Action) => {
         if (props.disableSwiping) return
-
         try {
-            const input : SwipeInput = {
+            const input : WithKey<SwipeInput> = {
                 swipedUserID: props.profile.id,
-                action: opinion
+                action: opinion,
+                key: props.loginKey
             }
             if (!props.ignoreRequest) {
-                await axios.post(URLs.server + URLs.makeSwipe, input, {
-                    signal: createTimeoutSignal()
-                });
+                await sendRequest(URLs.makeSwipe, input);
             }
 
             if (props.afterSwipe) props.afterSwipe();
@@ -45,8 +44,9 @@ export function ProfileViewEmbed(props : Props) {
 
     const reportUser = async () => {
         try {
-            const myReport : RequestReportInput = {
-                reportedID: props.profile.id
+            const myReport : WithKey<RequestReportInput> = {
+                reportedID: props.profile.id,
+                key: props.loginKey
             }
             if (!props.ignoreRequest) {
                 await axios.post(URLs.server + URLs.reportUser, myReport, {

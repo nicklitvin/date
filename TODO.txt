@@ -1,4 +1,5 @@
 TODO
+fix frontend tests
 if edit attribute successful, redirect back
 fix date receiving on server, change to Date
 profile loading again? even though required to sign in
@@ -9,6 +10,8 @@ send email to edu email with code
 announcement/errorlog implement
 reported page cant login
 why mymessage constantly rerendering in chat
+update read status on opening chat
+latest message not showing in chat
 
 toast error messages, install npx expo install react-native-reanimated react-native-safe-area-context react-native-gesture-handler
 

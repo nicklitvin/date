@@ -431,7 +431,7 @@ export class Handler {
 
         const [alreadySwipedIDs, likedMeUserIDs] = await Promise.all([
             this.swipe.getSwipedUsers(userID),
-            this.swipe.getLikedMeUsers(userID)
+            this.swipe.getLikedMeUsers(userID),
         ]);
 
         const minDate = addYears(new Date(), -(user.ageInterest[1] + 1));
@@ -439,15 +439,17 @@ export class Handler {
 
         const likedMeProfiles = await this.user.getPublicProfilesFromCriteria({
             include: likedMeUserIDs,
+            exclude: alreadySwipedIDs,
             count: globals.usersInSwipeFeed / 2,
             gender: user.genderInterest,
             minDate: minDate,
             maxDate: maxDate
         });
         const likedMeProfileIDs = likedMeProfiles.map(val => val.id);
+        const excludeList = Array.from(new Set([...alreadySwipedIDs, userID, ...likedMeProfileIDs]));
 
         const otherUsers = await this.user.getPublicProfilesFromCriteria({
-            exclude: [...alreadySwipedIDs, userID, ...likedMeProfileIDs],
+            exclude: excludeList,
             count: globals.usersInSwipeFeed - likedMeProfiles.length,
             maxDate: maxDate,
             minDate: minDate,

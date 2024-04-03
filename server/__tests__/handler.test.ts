@@ -666,12 +666,32 @@ describe("handler", () => {
         await handler.makeSwipe({
             userID: user.id,
             action: "Like",
-            swipedUserID: user3.id
+            swipedUserID: user4.id
         });
         const feed = await handler.getSwipeFeed(user.id);
         expect(feed?.profiles).toHaveLength(1);
         const profileIDs = feed?.profiles.map( val => val.id);
-        expect(profileIDs?.includes(user3.id)).toEqual(false);
+        expect(profileIDs?.includes(user4.id)).toEqual(false);
+    })
+
+    it("should not include match in feed", async () => {
+        const {user, user2, user3, user4} = await createUsersForSwipeFeed();
+
+        await Promise.all([
+            handler.makeSwipe({
+                userID: user.id,
+                action: "Like",
+                swipedUserID: user4.id
+            }),
+            handler.makeSwipe({
+                userID: user4.id,
+                action: "Like",
+                swipedUserID: user.id
+            })
+        ])
+
+        const feed = await handler.getSwipeFeed(user.id);
+        expect(feed?.profiles).toHaveLength(1);
     })
 
     it("should include multiple genders in feed if interested", async () => {

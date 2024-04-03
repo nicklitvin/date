@@ -46,6 +46,7 @@ export function Feed(props : Props) {
     }, [feed])
 
     useEffect( () => {
+        console.log(swipeStatus);
         if (swipeStatus) {
             if (props.getFeedIndex) props.getFeedIndex(swipeStatus.feedIndex);
 
@@ -87,7 +88,6 @@ export function Feed(props : Props) {
     };
 
     const loadMoreFeed = async () => {
-        if (!feed || feed.profiles.length == 0) return 
         try {
             let moreFeed : SwipeFeed;
             const input : WithKey<{}> = {
@@ -95,25 +95,29 @@ export function Feed(props : Props) {
             }
             const response = await sendRequest(URLs.getFeed, input);
             moreFeed = response.data.data as SwipeFeed;
-            setFeed({
-                profiles: feed.profiles.concat(moreFeed.profiles),
-                likedMeIDs: feed.likedMeIDs.concat(moreFeed.likedMeIDs)
-            })
+            setSwipeStatus({
+                feedIndex: 0,
+                lastSwipedIndex: -1
+            });
+            setFeed(response.data.data);
         } catch (err) {
             // console.log(err);
         }
     }
 
     const afterSwipe = () => {
+        const feedI = swipeStatus!.feedIndex;
+        const lastSwipedI = swipeStatus!.lastSwipedIndex
+
         setSwipeStatus({
-            feedIndex: swipeStatus!.feedIndex,
-            lastSwipedIndex: swipeStatus!.lastSwipedIndex + 1
+            feedIndex: feedI,
+            lastSwipedIndex: lastSwipedI + 1
         })
 
         if (globalState.disableFade) {
             setSwipeStatus({
-                feedIndex: swipeStatus!.feedIndex + 1,
-                lastSwipedIndex: swipeStatus!.lastSwipedIndex
+                feedIndex: feedI + 1,
+                lastSwipedIndex: lastSwipedI + 1
             })
             return;
         }
@@ -124,8 +128,8 @@ export function Feed(props : Props) {
             useNativeDriver: true
         }).start(() => {
             setSwipeStatus({
-                feedIndex: swipeStatus!.feedIndex + 1,
-                lastSwipedIndex: swipeStatus!.lastSwipedIndex
+                feedIndex: feedI + 1,
+                lastSwipedIndex: lastSwipedI + 1
             })
             Animated.timing(opacity, {
                 toValue: 1,
@@ -136,9 +140,13 @@ export function Feed(props : Props) {
     }
 
     const refresh = () => {
-        receivedData.setSwipeFeed(null);
-        setFeed(null);
-        setRefreshing(false);
+        const func = async () => {
+            receivedData.setSwipeFeed(null);
+            setFeed(null);
+            await loadMoreFeed();
+            setRefreshing(false);
+        }
+        func();
     }
 
     return (
@@ -186,9 +194,9 @@ export function Feed(props : Props) {
                         profile={feed.profiles[swipeStatus.feedIndex]}
                         afterSwipe={afterSwipe}
                         disableSwiping={swipeStatus.lastSwipedIndex == swipeStatus.feedIndex}
-                        ignoreRequest={true}
                         reportable={true}
                         likedMe={feed.likedMeIDs.includes(feed.profiles[swipeStatus.feedIndex].id)}
+                        loginKey={receivedData.loginKey}
                     />
                 }
             </Animated.View>
