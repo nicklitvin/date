@@ -43,6 +43,7 @@ const func = async () => {
         name: "Michael",
         smoking: "Never"
     })
+    await handler.createSample();
 }
 func();
     

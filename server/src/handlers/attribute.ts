@@ -18,13 +18,13 @@ export class AttributeHandler {
         })
     }
 
-    public async getAttributes() {
+    public async getAttributes() : Promise<{[type: string] : string[]}>{
         const attributes = await this.prisma.attribute.findMany({
             orderBy: {
                 value: "asc"
             }
         });
-        const result = new Map<AttributeType,{id: string, value: string}[]>();
+        const map = new Map<AttributeType,{id: string, value: string}[]>();
 
         for (const attribute of attributes) {
             const entry = {
@@ -32,13 +32,18 @@ export class AttributeHandler {
                 value: attribute.value
             }
 
-            if (result.has(attribute.type)) {
-                const newList = result.get(attribute.type)!;
+            if (map.has(attribute.type)) {
+                const newList = map.get(attribute.type)!;
                 newList.push(entry);
-                result.set(attribute.type, newList)
+                map.set(attribute.type, newList)
             } else {
-                result.set(attribute.type, [entry])
+                map.set(attribute.type, [entry])
             }
+        }
+
+        const result : {[type: string] : string[]}= {};
+        for (const [key, value] of map.entries()) {
+            result[key] = value.map(val => val.value)
         }
 
         return result;
@@ -49,14 +54,13 @@ export class AttributeHandler {
         return deleted.count;
     }
 
-    public async deleteAttribute(id : string) : Promise<Attribute|null> {
-        return await this.getAttributeByID(id) ?
-            await this.prisma.attribute.delete({
-                where: {
-                    id: id
-                }
-            }) :
-            null;
+    public async deleteAttribute(value : string) : Promise<number> {
+        const deleted = await this.prisma.attribute.deleteMany({
+            where: {
+                value: value
+            }
+        });
+        return deleted.count;
     }
 
     public async getAttributeByID(id : string) : Promise<Attribute|null> {

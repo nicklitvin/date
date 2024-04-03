@@ -2,11 +2,12 @@ import { act, fireEvent, render, screen } from "@testing-library/react-native";
 import { FileUploadAndURI } from "../src/interfaces";
 import { birthdayText, genderText, generalText, pictureText } from "../src/text";
 import { globals } from "../src/globals";
-import { Attributes } from "../src/pages/Attributes";
+import { AttributesPage } from "../src/pages/Attributes";
 import { Gender } from "../src/simplePages/Gender";
 import { Birthday } from "../src/simplePages/Birthday";
 import { GenderPreference } from "../src/simplePages/GenderPreference";
 import { Pictures } from "../src/simplePages/Pictures";
+import { receivedAttributes } from "../__testUtils__/easySetup";
 
 describe("test pages", () => {
     it("should not continue if not enough upload", async () => {
@@ -31,12 +32,12 @@ describe("test pages", () => {
         const imageURI_2 = "b";
         const uploads : FileUploadAndURI[] = [
             {
-                buffer: Buffer.from("a"),
+                buffer: "a",
                 mimetype: "image/jpeg",
                 uri: imageURI
             },
             {
-                buffer: Buffer.from("b"),
+                buffer: "b",
                 mimetype: "image/jpeg",
                 uri: imageURI_2
             }
@@ -72,12 +73,12 @@ describe("test pages", () => {
         const imageURI_2 = "b";
         const uploads : FileUploadAndURI[] = [
             {
-                buffer: Buffer.from("a"),
+                buffer: "a",
                 mimetype: "image/jpeg",
                 uri: imageURI
             },
             {
-                buffer: Buffer.from("b"),
+                buffer: "b",
                 mimetype: "image/jpeg",
                 uri: imageURI_2
             }
@@ -143,17 +144,17 @@ describe("test pages", () => {
 
     it("should generate all attributes", async () => {
         render(
-            <Attributes
-                attributes={globals.attributes}
+            <AttributesPage
+                attributes={receivedAttributes}
                 onSubmit={jest.fn()}
                 submitText="submit"
             />
         );
 
-        for (const entry of Object.entries(globals.attributes)) {
+        for (const entry of Object.entries(receivedAttributes)) {
             expect(screen.queryByText(entry[0])).not.toEqual(null);
-            for (const attribute of entry[1]) {
-                expect(screen.queryByText(attribute.value)).not.toEqual(null);
+            for (const value of entry[1]) {
+                expect(screen.queryByText(value)).not.toEqual(null);
             }
         }
     })

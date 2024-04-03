@@ -17,7 +17,7 @@ import { Final } from "../src/simplePages/Final";
 import { Pictures } from "../src/simplePages/Pictures";
 import { Alcohol } from "../src/simplePages/Alcohol";
 import { Smoking } from "../src/simplePages/Smoking";
-import { Attributes } from "../src/pages/Attributes";
+import { AttributesPage } from "../src/pages/Attributes";
 import { sendRequest } from "../src/utils";
 import { router } from "expo-router";
 
@@ -31,6 +31,7 @@ interface Props {
     customBirthday?: Date
     customUploads?: FileUploadAndURI[]
     returnPageNumber?: (input : number) => number
+    noRouter?: boolean
 }
 
 export function AccountCreation(props : Props) {
@@ -49,6 +50,7 @@ export function AccountCreation(props : Props) {
     );
     const [alcohol, setAlcohol] = useState<string>("");
     const [smoking, setSmoking] = useState<string>("");
+    const [firstLoad, setFirstLoad] = useState<boolean>(true);
 
     const goToNextPage = () => {
         setCurrentPage(currentPage + 1);
@@ -84,7 +86,7 @@ export function AccountCreation(props : Props) {
      
         try {
             await sendRequest(URLs.createUser, userInput);
-            if (!globals.useSample) router.push("(tabs)");
+            if (!props.noRouter) router.push("(tabs)");
         } catch (err) {
             console.log(err);
         }
@@ -145,10 +147,10 @@ export function AccountCreation(props : Props) {
                 }}
             />
         case "Attributes":
-            return <Attributes
+            return <AttributesPage
                 selectedAttributes={attributes}
                 goBack={goBack}    
-                attributes={globals.attributes}
+                attributes={receivedData.attributes}
                 onSubmit={(input : string[]) => {
                     setAttributes(input);
                     goToNextPage();

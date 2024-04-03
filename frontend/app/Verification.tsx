@@ -17,6 +17,7 @@ interface Props {
     returnCurrentPage?: (input : number) => any
     returnSeconds?: (input : number) => any
     customSeconds?: number
+    noRouter?: boolean
 }
 
 export function Verification(props : Props) {
@@ -64,7 +65,7 @@ export function Verification(props : Props) {
                 code: Number(code)
             }
             await sendRequest(URLs.verifyUser, input);
-            router.push("AccountCreation");
+            if (!props.noRouter) router.push("AccountCreation");
         } catch (err) {
             console.log(err);
         }

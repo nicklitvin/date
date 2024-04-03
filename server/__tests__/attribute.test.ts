@@ -21,6 +21,10 @@ describe("attribute", () => {
         value: "Piano"
     }
 
+    const fitness = "Fitness";
+    const music = "Music";
+
+
     it("should add attribute value", async () => {
         expect(await funcs.addAttribute(attributeInput)).not.toEqual(null);
     })
@@ -33,15 +37,15 @@ describe("attribute", () => {
         ])
 
         const attributes = await funcs.getAttributes();
-        expect(attributes.get("Fitness")!.length).toEqual(2);
-        expect(attributes.get("Fitness")![0].value).toEqual(attributeInput_2.value);
-        expect(attributes.get("Fitness")![1].value).toEqual(attributeInput.value);
-        expect(attributes.get("Music")!.length).toEqual(1);
-        expect(attributes.get("Music")![0].value).toEqual(attributeInput_3.value);
+        expect(attributes[fitness]!.length).toEqual(2);
+        expect(attributes[fitness]![0]).toEqual(attributeInput_2.value);
+        expect(attributes[fitness]![1]).toEqual(attributeInput.value);
+        expect(attributes[music]!.length).toEqual(1);
+        expect(attributes[music]![0]).toEqual(attributeInput_3.value);
     })
 
     it("should not delete nonattribute value", async () => {
-        expect(await funcs.deleteAttribute("badID")).toEqual(null);
+        expect(await funcs.deleteAttribute("badID")).toEqual(0);
     })
 
     it("should delete attribute", async () => {
@@ -50,12 +54,7 @@ describe("attribute", () => {
             funcs.addAttribute(attributeInput_2),
         ])
 
-        const attributes = await funcs.getAttributes();
-        const attribute_id = attributes.get("Fitness")![0].id;
-        expect(await funcs.deleteAttribute(attribute_id)).toEqual({
-            ...attributeInput_2,
-            id: attribute_id,
-        });
+        expect(await funcs.deleteAttribute(attributeInput.value)).toEqual(1);
     })
 
     it("should delete all attributes", async () => {

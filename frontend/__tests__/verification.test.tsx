@@ -29,6 +29,7 @@ describe("verification", () => {
                     currentPage={currentPage}
                     customSeconds={customSeconds}
                     eduEmail={eduEmail}
+                    noRouter={true}
                 />
             </StoreProvider>
         )

@@ -167,3 +167,7 @@ export interface LoginOutput {
 export interface EditPushTokenInput {
     token: string
 }
+
+export interface Attributes {
+    [type : string] : string[]
+}

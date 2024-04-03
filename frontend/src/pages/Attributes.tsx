@@ -5,16 +5,17 @@ import { StyledScroll, StyledText, StyledView } from "../styledElements"
 import { attributesText } from "../text"
 import { globals } from "../globals"
 import classNames from "classnames"
+import { Attributes } from "../interfaces"
 
 interface Props {
     onSubmit: (input : string[]) => any
-    attributes: { [title : string] : {id: string, value: string}[]}
+    attributes: Attributes
     submitText: string
     goBack?: () => any
     selectedAttributes?: string[]
 }
 
-export function Attributes(props : Props) {
+export function AttributesPage(props : Props) {
     const [attributes, setAttributes] = useState<string[]>(props.selectedAttributes ?? []);
     const [showError, setShowError] = useState<boolean>(false);
 
@@ -46,7 +47,7 @@ export function Attributes(props : Props) {
         beforeGapContent={
             <StyledView className="w-full h-[600px]">
                 <StyledScroll showsVerticalScrollIndicator={false}>
-                    {Object.entries(globals.attributes).map( (entry) => (
+                    {Object.entries(props.attributes).map( (entry) => (
                         <StyledView 
                             className="flex w-full items-center"
                             key={`type-${entry[0]}`}
@@ -55,18 +56,18 @@ export function Attributes(props : Props) {
                                 {entry[0]}
                             </StyledText>
                             <StyledView className="flex flex-row flex-wrap justify-center">
-                                {entry[1].map( (content) =>
+                                {entry[1].map( (value) =>
                                     <StyledView 
-                                        key={`attribute-${content.value}`}
+                                        key={`attribute-${value}`}
                                     >
                                         <MyButton
-                                            text={content.value}
+                                            text={value}
                                             smallButton={true}
-                                            invertColor={attributes.includes(content.value)}
+                                            invertColor={attributes.includes(value)}
                                             onPressFunction={ () => {
                                                 setShowError(false);
                                                 const foundIndex = attributes.findIndex( 
-                                                    selected => selected == content.value
+                                                    selected => selected == value
                                                 )
                                                 if (foundIndex > -1) {
                                                     setAttributes(
@@ -76,7 +77,7 @@ export function Attributes(props : Props) {
                                                     )
                                                 } else {
                                                     setAttributes(
-                                                        [...attributes, content.value]
+                                                        [...attributes, value]
                                                     )
                                                 }
                                             }}

@@ -1,4 +1,4 @@
-import { Message, Prisma, PrismaClient, Swipe, User, UserReport, Verification } from "@prisma/client";
+import { AttributeType, Message, Prisma, PrismaClient, Swipe, User, UserReport, Verification } from "@prisma/client";
 import { AnnouncementHandler } from "./handlers/announcement";
 import { AttributeHandler } from "./handlers/attribute";
 import { ErrorLogHandler } from "./handlers/errorlog";
@@ -8,12 +8,12 @@ import { SwipeHandler } from "./handlers/swipe";
 import { MessageHandler } from "./handlers/message";
 import { ReportHandler } from "./handlers/report";
 import { StripePaymentHandler } from "./handlers/pay";
-import { ChatPreview, ConfirmVerificationInput, DeleteImageInput, EditUserInput, EloAction, GetChatPreviewsInput, ImageHandler, LoginInput, LoginOutput, MessageInput, NewMatchData, NewMatchInput, NewVerificationInput, PaymentHandler, PublicProfile, RequestReportInput, RequestUserInput, SubscribeInput, SwipeFeed, SwipeInput, UnlikeInput, UnlikeOutput, UploadImageInput, UserInput, WithEmail } from "./interfaces";
+import { AttributeValueInput, ChatPreview, ConfirmVerificationInput, DeleteImageInput, EditUserInput, EloAction, GetChatPreviewsInput, ImageHandler, LoginInput, LoginOutput, MessageInput, NewMatchData, NewMatchInput, NewVerificationInput, PaymentHandler, PublicProfile, RequestReportInput, RequestUserInput, SubscribeInput, SwipeFeed, SwipeInput, UnlikeInput, UnlikeOutput, UploadImageInput, UserInput, WithEmail } from "./interfaces";
 import { globals } from "./globals";
 import { FreeTrialHandler } from "./handlers/freetrial";
 import { VerificationHandler } from "./handlers/verification";
 import { addYears } from "date-fns";
-import { allowedAttributeEdits } from "./others";
+import { allowedAttributeEdits, attributeList } from "./others";
 import { LoginHandler } from "./handlers/login";
 import { NotificationHandler } from "./handlers/notification";
 
@@ -569,6 +569,19 @@ export class Handler {
             this.user.createSample(),
             this.swipe.createSample(),
             this.message.createSample(),
+        ])
+        const formattedList = Object.entries(attributeList).flatMap(([key, values]) =>
+            values.map(value => [key, value])
+        );
+    
+        // Convert each element into an object with 'type' and 'value' properties
+        const formattedListWithObjects : AttributeValueInput[] = formattedList.map(([key, value]) => ({
+            type: key as AttributeType,
+            value: value
+        }));
+
+        await Promise.all([
+            formattedListWithObjects.map( val => this.attribute.addAttribute(val))
         ])
     }
 }

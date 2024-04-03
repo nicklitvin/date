@@ -185,9 +185,13 @@ export function Index() {
                 () => sendRequest(URLs.getClientIDs, null),
                 (data : any) => receivedData.setClientIDs(data)
             ),
+            retrieveOne(
+                () => sendRequest(URLs.getAttributes, null),
+                (data: any) => receivedData.setAttributes(data)
+            )
         ])
         if (!clientIDs) {
-
+            setError(true);
         }
     }
 
@@ -198,7 +202,6 @@ export function Index() {
             if (globals.useStorage) {
                 const AsyncStorage = require("@react-native-async-storage/async-storage");
                 const key = await AsyncStorage.getItem(globals.storageloginKey);
-                console.log(key);
                 receivedData.setLoginKey(key ?? "");
             }
 

@@ -37,7 +37,7 @@ describe("profile", () => {
 
     const load = async (subscribed : boolean, useSave = false) => {
         const mock = new MockAdapter(axios);
-        mock.onPost(URLs.server + URLs.getProfile).reply( config => 
+        mock.onPost(URLs.server + URLs.getMyProfile).reply( config => 
             [200, {data: profile}]    
         )
         mock.onPost(URLs.server + URLs.getSubscription).reply( config => 

@@ -7,10 +7,12 @@ import MockAdapter from "axios-mock-adapter";
 import axios from "axios";
 import { URLs } from "../src/urls";
 import AccountCreationMob from "../app/AccountCreation";
+import { receivedAttributes } from "../__testUtils__/easySetup";
 
 describe("accountCreation", () => {
     it("should continue to next page", async () => {
         const store = new RootStore()
+        store.receivedData.setAttributes(receivedAttributes);
         const StoreProvider = createStoreProvider(store);
         render(
             <StoreProvider value={store}>
@@ -28,6 +30,7 @@ describe("accountCreation", () => {
 
     it("should create userInput", async () => {
         const store = new RootStore()
+        store.receivedData.setAttributes(receivedAttributes);
 
         const myName = "name";
         const myBirthday = new Date(2000,2,1);
@@ -40,8 +43,8 @@ describe("accountCreation", () => {
             uri: "file://random"
         }];
         const myAttributes = [
-            globals.attributes.Music[1].value,
-            globals.attributes.Sports[0].value
+            receivedAttributes["music"][0],
+            receivedAttributes["sports"][0]
         ]
         const alcoholFreq = globals.frequencies[1];
         const smokingFreq = globals.frequencies[2];
@@ -73,6 +76,7 @@ describe("accountCreation", () => {
                     customBirthday={myBirthday}
                     customUploads={customUploads}
                     returnPageNumber={returnPageNumber}
+                    noRouter={true}
                 />
             </StoreProvider>
         );

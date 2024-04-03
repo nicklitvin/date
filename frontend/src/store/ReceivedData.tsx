@@ -1,5 +1,5 @@
 import { action, observable } from "mobx";
-import { ChatPreview, clientIDs, Message, NewMatch, Preferences, PublicProfile, SettingData, SubscriptionData, SwipeFeed, SwipeStatus, UserSwipeStats } from "../interfaces";
+import { Attributes, ChatPreview, clientIDs, Message, NewMatch, Preferences, PublicProfile, SettingData, SubscriptionData, SwipeFeed, SwipeStatus, UserSwipeStats } from "../interfaces";
 import { globals } from "../globals";
 
 export class ReceivedData {
@@ -18,6 +18,7 @@ export class ReceivedData {
     @observable public preferences : Preferences|null = null;
     @observable public clientIDs : clientIDs|null = null;
     @observable public loginKey : string|undefined = undefined;
+    @observable public attributes : Attributes = {};
 
     @action
     setProfile(input : PublicProfile|null) {this.profile = input; }
@@ -67,4 +68,7 @@ export class ReceivedData {
             AsyncStorage.setItem(globals.storageloginKey, input ?? "");
         }
     }
+
+    @action
+    setAttributes(input : Attributes) { this.attributes = input; }
 }

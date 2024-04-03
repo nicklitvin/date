@@ -5,10 +5,13 @@ get attributes on account creation start
 loading when doing prompt
 if edit attribute successful, redirect back
 profile view background not fully sized
-
+home page style, add version, and privacy
+create web buy and stats stuff
 notification receive, delete receiveDate when new
+send email to edu email with code
 announcement/errorlog implement
 reported page
+change likes you button layout
 
 BACKEND TODO
 change elo constants with api?
