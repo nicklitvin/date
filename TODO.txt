@@ -1,6 +1,5 @@
 TODO
 if server down, redirect to error page
-async storage not working
 get attributes on account creation start
 loading when doing prompt
 if edit attribute successful, redirect back

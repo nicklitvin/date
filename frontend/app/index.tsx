@@ -10,6 +10,7 @@ import Constants from "expo-constants";
 import { Platform } from "react-native";
 import { sendRequest } from "../src/utils";
 import { URLs } from "../src/urls";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 Notifications.setNotificationHandler({
     handleNotification: async () => ({
@@ -199,11 +200,9 @@ export function Index() {
         const func = async () => {
             setFirstLoad(false);
 
-            if (globals.useStorage) {
-                const AsyncStorage = require("@react-native-async-storage/async-storage");
-                const key = await AsyncStorage.getItem(globals.storageloginKey);
-                receivedData.setLoginKey(key ?? "");
-            }
+            const key = await AsyncStorage.getItem(globals.storageloginKey);
+            console.log(key);
+            receivedData.setLoginKey(key ?? "");
 
             if (Platform.OS == "android") {
                 Notifications.setNotificationChannelAsync("default", {

@@ -1,5 +1,4 @@
 export const globals = {
-    useStorage: false,
     useSample: false,
 
     genders: ["Male", "Female"],
@@ -28,39 +27,6 @@ export const globals = {
     frequencies: ["Never", "Sometimes", "Often"],
     storageloginKey: "LoginKey",
     chatRefreshSeconds: 30,
-
-    // attributes: {
-    //     "Sports": [
-    //         {id: "id", value: "soccer"},
-    //         {id: "id2", value: "basketball"},
-    //         {id: String(Math.random()), value: String(Math.random())},
-    //         {id: String(Math.random()), value: String(Math.random())},
-    //         {id: String(Math.random()), value: String(Math.random())},
-    //         {id: String(Math.random()), value: String(Math.random())},
-    //         {id: String(Math.random()), value: String(Math.random())},
-    //         {id: String(Math.random()), value: String(Math.random())},
-    //         {id: String(Math.random()), value: String(Math.random())},
-    //         {id: String(Math.random()), value: String(Math.random())},
-    //         {id: String(Math.random()), value: String(Math.random())},
-    //         {id: String(Math.random()), value: String(Math.random())},
-    //         {id: String(Math.random()), value: String(Math.random())},
-    //         {id: String(Math.random()), value: String(Math.random())},
-    //         {id: String(Math.random()), value: String(Math.random())},
-    //         {id: String(Math.random()), value: String(Math.random())},
-    //         {id: String(Math.random()), value: String(Math.random())},
-    //         {id: String(Math.random()), value: String(Math.random())},
-    //         {id: String(Math.random()), value: String(Math.random())},
-    //         {id: String(Math.random()), value: String(Math.random())},
-    //         {id: String(Math.random()), value: String(Math.random())},
-    //         {id: String(Math.random()), value: String(Math.random())},
-    //         {id: String(Math.random()), value: String(Math.random())},
-
-    //     ],
-    //     "Music": [
-    //         {id: "id3", value: "pop"},
-    //         {id: "id4", value: "rap"},
-    //     ]
-    // },
 
     green: "#4A991A",
     red: "#B81515",

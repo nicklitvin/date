@@ -1,6 +1,7 @@
 import { action, observable } from "mobx";
 import { Attributes, ChatPreview, clientIDs, Message, NewMatch, Preferences, PublicProfile, SettingData, SubscriptionData, SwipeFeed, SwipeStatus, UserSwipeStats } from "../interfaces";
 import { globals } from "../globals";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export class ReceivedData {
     @observable public profile : PublicProfile|null = null;
@@ -63,10 +64,7 @@ export class ReceivedData {
     @action
     setLoginKey(input : string|undefined) { 
         this.loginKey = input; 
-        if (globals.useStorage) {
-            const AsyncStorage = require("@react-native-async-storage/async-storage");
-            AsyncStorage.setItem(globals.storageloginKey, input ?? "");
-        }
+        AsyncStorage.setItem(globals.storageloginKey, input ?? "");
     }
 
     @action
