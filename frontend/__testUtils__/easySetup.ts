@@ -66,9 +66,3 @@ export const receivedAttributes : Attributes = {
     sports: ["Football","Basketball"],
     music: ["Rap", "K-Pop"]
 }
-
-// export const scrollToTopVal = {nativeEvent: {
-//     contentOffset: {y: 0},
-//     layoutMeasurement: 
-// }};
-// export const scrollToBotVal = {nativeEvent: {contentOffset: {y: 9999}}};

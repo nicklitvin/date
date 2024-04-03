@@ -1,6 +1,5 @@
 TODO
 if server down, redirect to error page
-get attributes on account creation start
 loading when doing prompt
 if edit attribute successful, redirect back
 profile view background not fully sized
@@ -10,7 +9,6 @@ notification receive, delete receiveDate when new
 send email to edu email with code
 announcement/errorlog implement
 reported page
-change likes you button layout
 
 BACKEND TODO
 change elo constants with api?

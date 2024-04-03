@@ -22,7 +22,7 @@ interface Props {
     likedMe?: boolean
 }
 
-export function ProfileView(props : Props) {
+export function ProfileViewEmbed(props : Props) {
     const makeSwipe = async (opinion : Action) => {
         if (props.disableSwiping) return
 
@@ -75,7 +75,7 @@ export function ProfileView(props : Props) {
             />
             <Spacing size="lg"/>
             <StyledView className="px-5">
-                <StyledView>
+                <StyledView className="w-full flex-row items-center">
                     <StyledText className="font-bold text-3xl">
                         {`${props.profile.name}, ${props.profile.age}`}
                     </StyledText>
@@ -86,6 +86,7 @@ export function ProfileView(props : Props) {
                             onPressFunction={() => {}}
                             smallButton={true}
                             invertColor={true}
+                            disable={true}
                         /> : null
                     }
                 </StyledView>
@@ -130,4 +131,4 @@ export function ProfileView(props : Props) {
     )
 }
 
-export const ProfileViewMob = observer(ProfileView);
+export const ProfileViewEmbedMob = observer(ProfileViewEmbed);

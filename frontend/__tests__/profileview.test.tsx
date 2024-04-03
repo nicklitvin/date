@@ -1,5 +1,5 @@
 import { act, fireEvent, render, screen } from "@testing-library/react-native";
-import { ProfileViewMob } from "../src/pages/ProfileView";
+import { ProfileViewEmbedMob } from "../src/pages/ProfileViewEmbed";
 import { makePublicProfile } from "../__testUtils__/easySetup";
 import { testIDS } from "../src/testIDs";
 import { profileViewText } from "../src/text";
@@ -13,7 +13,7 @@ describe("profileview", () => {
         const profile = makePublicProfile("id");
 
         render(
-            <ProfileViewMob
+            <ProfileViewEmbedMob
                 isInSwipeFeed={false}
                 profile={profile}
             />
@@ -27,7 +27,7 @@ describe("profileview", () => {
     it("should render swipe version", async () => {
         const profile = makePublicProfile("id");
         render(
-            <ProfileViewMob
+            <ProfileViewEmbedMob
                 isInSwipeFeed={true}
                 profile={profile}
             />
@@ -53,7 +53,7 @@ describe("profileview", () => {
 
         const afterSwipeFn = jest.fn();
         render(
-            <ProfileViewMob
+            <ProfileViewEmbedMob
                 isInSwipeFeed={true}
                 afterSwipe={afterSwipeFn}
                 profile={profile}

@@ -11,6 +11,7 @@ import { Platform } from "react-native";
 import { sendRequest } from "../src/utils";
 import { URLs } from "../src/urls";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { ProfileViewEmbedMob } from "../src/pages/ProfileViewEmbed";
 
 Notifications.setNotificationHandler({
     handleNotification: async () => ({
@@ -243,7 +244,6 @@ export function Index() {
         }
     }, [firstLoad])
 
-    
     if (loading) {
         return (
             <MySimplePage

@@ -4,7 +4,7 @@ import { StyledButton, StyledImage, StyledScroll, StyledText, StyledView } from 
 import { feedText } from "../../src/text";
 import { PublicProfile, SwipeFeed, SwipeStatus, WithKey } from "../../src/interfaces";
 import { useEffect, useRef, useState } from "react";
-import { ProfileViewMob } from "../../src/pages/ProfileView";
+import { ProfileViewEmbedMob } from "../../src/pages/ProfileViewEmbed";
 import { URLs } from "../../src/urls";
 import { sendRequest } from "../../src/utils";
 import { Animated, RefreshControl, ScrollView } from "react-native";
@@ -181,7 +181,7 @@ export function Feed(props : Props) {
                             {feedText.noMoreFeed}
                         </StyledText>
                     </StyledView> :
-                    <ProfileViewMob
+                    <ProfileViewEmbedMob
                         isInSwipeFeed={true}
                         profile={feed.profiles[swipeStatus.feedIndex]}
                         afterSwipe={afterSwipe}
