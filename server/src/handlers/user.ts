@@ -275,6 +275,7 @@ export class UserHandler {
 
         return [
             {
+                display: globals.notificationDisplayTitle,
                 title: globals.notificationSetting,
                 value: data.notifications
             }

@@ -124,6 +124,7 @@ export interface SubscriptionData {
 }
 
 export interface SettingData {
+    display: string
     title: string
     value: boolean
 }

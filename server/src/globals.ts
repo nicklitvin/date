@@ -27,10 +27,12 @@ export const globals = {
     verificationCodeLength: 4,
     verificationExpireMinutes: 5,
     keyExpirationWeeks: 10,
-    notificationSetting: "Notifications",
+    notificationSetting: "notifications",
+    notificationDisplayTitle: "Notifications",
     notificationChannel: "default",
     newMatchNotifTitle: "New Match!",
     newMatchMessage: "Check out who it is",
+    imageSetting: "images",
 
     // Sample
     sampleUniversity: "lovedu",

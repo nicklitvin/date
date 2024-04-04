@@ -110,14 +110,15 @@ export function Settings(props : Props) {
                 value: value
             }
             const copy = [...settings];
-            copy[copy.findIndex(val => val.title == title)] = { title, value };
+            const index = copy.findIndex(val => val.title == title);
+            copy[index] = { title: title, value: value, display: copy[index].display };
             setSettings(copy);
-            const response = await sendRequest(URLs.editUser, input);
-            receivedData.setProfile(response.data.data);
+            await sendRequest(URLs.editUser, input);
         } catch (err) {
             console.log(err);
             const copy = [...settings];
-            copy[copy.findIndex(val => val.title == title)] = { title, value: !value };
+            const index = copy.findIndex(val => val.title == title);
+            copy[index] = { title: title, value: !value, display: copy[index].display };
             setSettings(copy);
         }
     }
@@ -171,7 +172,7 @@ export function Settings(props : Props) {
                         className="flex flex-row w-full items-center px-5 pb-2"
                     >
                         <StyledText className="text-bold text-xl font-bold">
-                             {setting.title}
+                             {setting.display}
                          </StyledText>
                          <StyledView className="flex-grow"/>
                          <StyledButton

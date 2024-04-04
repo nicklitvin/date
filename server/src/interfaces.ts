@@ -285,6 +285,7 @@ export interface Preferences {
 }
 
 export interface SettingData {
+    display: string
     title: string
     value: boolean
 }

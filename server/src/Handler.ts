@@ -296,7 +296,7 @@ export class Handler {
         if (!imageID) return null;
 
         return await this.user.editUser({
-            setting: "images",
+            setting: globals.imageSetting,
             userID: input.userID,
             value: user.images.concat([imageID])
         })
@@ -308,7 +308,7 @@ export class Handler {
         if (!user || !user.images.includes(input.imageID) || user.images.length == 1) return null;
 
         return await this.user.editUser({
-            setting: "images",
+            setting: globals.imageSetting,
             userID: input.userID,
             value: user.images.filter( val => val != input.imageID)
         })
@@ -327,7 +327,7 @@ export class Handler {
     public async changeImageOrder(input : EditUserInput) : Promise<User|null> {
         const user = await this.user.getUserByID(input.userID);
 
-        if (!user || input.setting != "images") return null;
+        if (!user || input.setting != globals.imageSetting) return null;
 
         try {
             const newOrder = input.value as string[];

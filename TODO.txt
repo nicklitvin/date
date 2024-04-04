@@ -1,5 +1,4 @@
 TODO
-send title and setting type as different keys in settingdata
 router.goback() refresh page when changing settings,preferences
 send email to edu email with code
 preference change changes feed
