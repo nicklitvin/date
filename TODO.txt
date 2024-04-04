@@ -1,6 +1,5 @@
 TODO
 profile loading again? even though required to sign in
-profile view background not fully sized
 create web buy and stats stuff
 notification receive, delete receiveDate when new
 send email to edu email with code

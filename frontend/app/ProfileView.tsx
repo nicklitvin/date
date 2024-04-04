@@ -27,6 +27,7 @@ export function ProfileView() {
     const imageURLs = profile.images.map(val => val.url);
 
     return (
+        <StyledView className="w-full h-full bg-back">
         <StyledScroll showsVerticalScrollIndicator={false}>
         <StyledView className="w-full h-full bg-back">
             <PageHeader
@@ -67,6 +68,7 @@ export function ProfileView() {
             </StyledView>
         </StyledView> 
         </StyledScroll>
+        </StyledView>
     )
 }
 
