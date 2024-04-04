@@ -6,7 +6,7 @@ describe("pay", () => {
 
     it("should create session url", async () => {
         const userID = "userID";
-        expect(await funcs.createSubscriptionSessionURL(userID, true)).
+        expect(await funcs.createSubscriptionSessionURL(userID, "email", true)).
             not.toEqual(null);
     })
 })

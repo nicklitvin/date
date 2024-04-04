@@ -7,7 +7,7 @@ export class MockPaymentHandler implements PaymentHandler {
         return Promise.resolve(true);
     }
 
-    createSubscriptionSessionURL(userID: string, freeTrial: boolean) : 
+    createSubscriptionSessionURL(userID: string, email: string, freeTrial: boolean) : 
         Promise<string> 
     {
         return Promise.resolve("url")

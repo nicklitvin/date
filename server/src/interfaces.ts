@@ -168,7 +168,7 @@ export interface PaymentExtractOutput {
 }
 
 export interface PaymentHandler {
-    createSubscriptionSessionURL(userID : string, freeTrial: boolean) : 
+    createSubscriptionSessionURL(userID : string, email : string, freeTrial: boolean) : 
         Promise<string>
     extractDataFromPayment(signature : string, body : any) : Promise<PaymentExtractOutput|null> 
     cancelSubscription(subscriptionID: string) : Promise<boolean>

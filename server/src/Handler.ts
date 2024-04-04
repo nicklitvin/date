@@ -348,7 +348,7 @@ export class Handler {
         if (!user) return null;
 
         const usedFreeTrial = await this.freeTrial.hasEmailUsedFreeTrial(user.email);
-        return await this.pay.createSubscriptionSessionURL(userID, !usedFreeTrial);
+        return await this.pay.createSubscriptionSessionURL(userID, user.email, !usedFreeTrial);
     }
 
     public async processSubscriptionPay(input : SubscribeInput) : Promise<User|null> {

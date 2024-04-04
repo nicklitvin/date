@@ -11,10 +11,11 @@ export class StripePaymentHandler implements PaymentHandler {
         })
     }
 
-    public async createSubscriptionSessionURL(userID : string, freeTrial: boolean) :
+    public async createSubscriptionSessionURL(userID : string, email : string, freeTrial: boolean) :
         Promise<string> 
     {
         const session = await this.stripe.checkout.sessions.create({
+            customer_email: email,
             mode: "subscription",
             line_items: [
                 {
