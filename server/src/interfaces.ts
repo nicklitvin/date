@@ -95,13 +95,18 @@ export interface ImageInput {
     mimetype: string
 }
 
+export interface ImageElement {
+    url: string
+    id: string
+}   
+
 export interface PublicProfile {
     id: string
     name: string
     age: number
     gender: Gender
     attributes: string[]
-    images: string[]
+    images: ImageElement[]
     description: string
     alcohol: Usage
     smoking: Usage

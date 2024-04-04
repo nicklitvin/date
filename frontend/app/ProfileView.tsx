@@ -24,6 +24,8 @@ export function ProfileView() {
 
     if (!profile) return <Redirect href="Error"/>
 
+    const imageURLs = profile.images.map(val => val.url);
+
     return (
         <StyledScroll showsVerticalScrollIndicator={false}>
         <StyledView className="w-full h-full bg-back">
@@ -32,7 +34,7 @@ export function ProfileView() {
                 imageType="Telescope"
             />
             <PictureSeries
-                imageURLs={profile.images}
+                imageURLs={imageURLs}
             />
             <Spacing size="lg"/>
             <StyledView className="px-5">

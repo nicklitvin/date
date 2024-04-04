@@ -31,9 +31,9 @@ export function EditProfile() {
             <StyledView className="w-full flex flex-wrap flex-row items-center">
             {Array.from({length: globals.maxUploads}).map( (_,index) => (
                 index < profile.images.length ? 
-                <StyledView className="m-2" key={`edit-${profile.images[index]}`}>
+                <StyledView className="m-2" key={`edit-${profile.images[index].id}`}>
                     <Picture
-                        source={profile.images[index]}
+                        source={profile.images[index].url}
                         switching={false}
                         disable={true}
                     />

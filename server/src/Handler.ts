@@ -305,7 +305,7 @@ export class Handler {
     public async deleteImage(input : DeleteImageInput) : Promise<User|null> {
         const user = await this.user.getUserByID(input.userID);
 
-        if (!user || !user.images.includes(input.imageID)) return null;
+        if (!user || !user.images.includes(input.imageID) || user.images.length == 1) return null;
 
         return await this.user.editUser({
             setting: "images",

@@ -2,18 +2,16 @@ import { useEffect, useState } from "react";
 import { MySimplePage } from "../src/components/SimplePage"
 import { DeleteImageInput, EditUserInput, FileUploadAndURI, PublicProfile, UploadImageInput, WithKey } from "../src/interfaces";
 import { pictureText } from "../src/text"
-import { StyledButton, StyledText, StyledView } from "../src/styledElements";
+import { StyledText, StyledView } from "../src/styledElements";
 import { globals } from "../src/globals";
 import * as FileSystem from "expo-file-system";
 import { MyButton } from "../src/components/Button";
 import { Picture } from "../src/components/Picture";
 import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
-import { Buffer } from "buffer"
 import classNames from "classnames";
 import { useStore } from "../src/store/RootStore";
 import { Redirect, router } from "expo-router";
-import axios from "axios";
 import { URLs } from "../src/urls";
 import { createTimeoutSignal, sendRequest } from "../src/utils";
 import { observer } from "mobx-react-lite";
@@ -22,7 +20,7 @@ import { observer } from "mobx-react-lite";
 export function EditPictures() {
     const { receivedData } = useStore();
     const [profile, setProfile] = useState<PublicProfile|null>(receivedData.profile);
-    if (!profile) return <Redirect href="Error"/>
+    if (!profile) router.push("Error");
 
     const [switchURI, setSwitchURI] = useState<string|null>(null);
     const [showError, setShowError] = useState<boolean>(false);
@@ -98,7 +96,10 @@ export function EditPictures() {
                 }
             }
             const response = await sendRequest(URLs.uploadImage, input);
-            setProfile(response.data.data);
+            setProfile({
+                ...profile!,
+                images: response.data.data
+            });
         } catch (err) {
             console.log(err);
             return
@@ -113,7 +114,10 @@ export function EditPictures() {
             };
             const response = await sendRequest(URLs.deleteImage, input);
             if (switchURI == uri) setSwitchURI(null);
-            setProfile(response.data.data);
+            setProfile({
+                ...profile!,
+                images: response.data.data
+            });
         } catch (err) {
             console.log(err);
         }
@@ -123,9 +127,9 @@ export function EditPictures() {
         if (switchURI == uri) {
             setSwitchURI(null);
         } else if (switchURI) {
-            const copy = [...profile.images];
-            const index1 = copy.findIndex( val => val == switchURI);
-            const index2 = copy.findIndex( val => val == uri);
+            const copy = [...profile!.images];
+            const index1 = copy.findIndex( val => val.id == switchURI);
+            const index2 = copy.findIndex( val => val.id == uri);
             const saved = copy[index1];
             copy[index1] = copy[index2];
             copy[index2] = saved;
@@ -133,11 +137,14 @@ export function EditPictures() {
                 const input : WithKey<EditUserInput> = {
                     key: receivedData.loginKey,
                     setting: globals.settingImages,
-                    value: copy
+                    value: copy.map(val => val.id)
                 }
-                const response = await sendRequest(URLs.editUser, input);
+                await sendRequest(URLs.editUser, input);
                 setSwitchURI(null);
-                setProfile(response.data.data);
+                setProfile({
+                    ...profile!,
+                    images: copy
+                });
             } catch (err) {
                 console.log(err);
             }
@@ -146,6 +153,7 @@ export function EditPictures() {
         }
     }
 
+    if (!profile) return <></>
     return <MySimplePage
         title={pictureText.pageTitle}
         subtitle={pictureText.pageSubtitle}
@@ -155,12 +163,12 @@ export function EditPictures() {
                 <StyledView className="flex flex-row flex-wrap justify-center">
                     {Array.from({length : globals.maxUploads}).map( (_,index) => 
                         index < profile.images.length ?
-                        <StyledView key={`picture-${profile.images[index]}`} className="m-2">
+                        <StyledView key={`picture-${profile.images[index].id}`} className="m-2">
                             <Picture
-                                source={profile.images[index]}
-                                switching={profile.images[index] == switchURI}
-                                onPress={() => performSwitch(profile.images[index])}
-                                onRemove={() => removeImage(profile.images[index])}
+                                source={profile.images[index].url}
+                                switching={profile.images[index].id == switchURI}
+                                onPress={() => performSwitch(profile.images[index].id)}
+                                onRemove={() => removeImage(profile.images[index].id)}
                             />
                         </StyledView> :
                         <StyledView

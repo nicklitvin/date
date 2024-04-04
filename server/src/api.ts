@@ -253,7 +253,10 @@ export class APIHandler {
                     userID: userID
                 }
                 const output = await handler.uploadImage(input);
-                return output ? res.status(200).json() : res.status(400).json()
+                const publicProfile = await handler.user.getPublicProfile(userID)
+                return output ? 
+                    res.status(200).json({ data: publicProfile?.images }) : 
+                    res.status(400).json()
             } catch (err) {
                 console.log(err);
                 return res.status(500).json();
@@ -273,7 +276,10 @@ export class APIHandler {
                     userID: userID
                 }
                 const output = await handler.deleteImage(input);
-                return output ? res.status(200).json() : res.status(400).json()
+                const publicProfile = await handler.user.getPublicProfile(userID)
+                return output ? 
+                    res.status(200).json({ data: publicProfile?.images }) : 
+                    res.status(400).json()
             } catch (err) {
                 console.log(err);
                 return res.status(500).json();

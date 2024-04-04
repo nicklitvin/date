@@ -8,7 +8,12 @@ export const makePublicProfile = (id : string = "otherProfileID") : PublicProfil
     attributes: [],
     description: "",
     gender: "",
-    images: ["https://pbs.twimg.com/profile_images/1262372966073016321/DH4rOj9S_400x400.jpg"],
+    images: [
+        {
+            id: "image-id",
+            url: "https://pbs.twimg.com/profile_images/1262372966073016321/DH4rOj9S_400x400.jpg"
+        }
+    ],
     name: "Michael",
     alcohol: "Often",
     smoking: "Sometimes"

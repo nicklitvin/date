@@ -7,7 +7,8 @@ export const allowedAttributeEdits : string[] = [
     "ageInterest",
     "attributes",
     "alcohol",
-    "smoking"
+    "smoking",
+    "images"
 ];
 
 export function isAdmin(key : string) {

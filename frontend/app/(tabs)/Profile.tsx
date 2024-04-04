@@ -128,7 +128,7 @@ export function Profile(props : Props) {
             />
             <StyledView className="flex items-center pt-[100px]">
                 <StyledImage
-                    source={profile?.images[0]}
+                    source={profile?.images[0].url}
                     className="w-[150px] h-[150px] rounded-full"
                 />
                 <StyledText className="font-bold text-xl">

@@ -342,10 +342,25 @@ describe("handler", () => {
 
     it("should delete image from user", async () => {
         const user = await handler.user.createUser(createUserInput("a@berkeley.edu"));
+        await handler.uploadImage({
+            image: {
+                buffer: "a",
+                mimetype: "image/jpeg"
+            },
+            userID: user.id
+        })
         expect(await handler.deleteImage({
             userID: user.id,
             imageID: user.images[0]
         })).not.toEqual(null);
+    })
+
+    it("should not delete only image", async () => {
+        const user = await handler.user.createUser(createUserInput("a@berkeley.edu"));
+        expect(await handler.deleteImage({
+            userID: user.id,
+            imageID: user.images[0]
+        })).toEqual(null);
     })
 
     it("should not edit nonnuser", async () => {

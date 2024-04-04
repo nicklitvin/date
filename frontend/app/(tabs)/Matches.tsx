@@ -229,7 +229,7 @@ export function Matches(props : Props) {
                             >
                                 <StyledView className="flex items-center pr-3">
                                     <StyledImage
-                                        source={match.profile.images[0]}
+                                        source={match.profile.images[0].url}
                                         className="w-[75px] h-[75px] rounded-full"
                                     />
                                 </StyledView>

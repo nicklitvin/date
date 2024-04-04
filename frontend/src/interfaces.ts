@@ -38,13 +38,18 @@ export interface Message {
     readStatus: boolean;
 }
 
+export interface ImageElement {
+    url: string
+    id: string
+}   
+
 export interface PublicProfile {
     id: string
     name: string
     age: number
     gender: string
     attributes: string[]
-    images: string[]
+    images: ImageElement[]
     description: string
     alcohol: string
     smoking: string

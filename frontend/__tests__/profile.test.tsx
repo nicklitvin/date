@@ -15,7 +15,10 @@ describe("profile", () => {
         attributes: [],
         description: "",
         gender: "Male",
-        images: ["image"],
+        images: [{
+            id: "image-id",
+            url: "image"
+        }],
         name: "name",
         alcohol: "Often",
         smoking: "Often"

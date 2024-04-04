@@ -1,5 +1,5 @@
 import { PrismaClient, User } from "@prisma/client";
-import { EditUserInput, EloAction, EloUpdateInput, GetProfileListInput, ImageHandler, Preferences, PublicProfile, RequestUserInput, SettingData, SubscriptionData, UserInput } from "../interfaces";
+import { EditUserInput, EloAction, EloUpdateInput, GetProfileListInput, ImageElement, ImageHandler, Preferences, PublicProfile, RequestUserInput, SettingData, SubscriptionData, UserInput } from "../interfaces";
 import { addMonths, differenceInYears } from "date-fns";
 import { globals } from "../globals";
 import { sampleUsers } from "../sample";
@@ -221,13 +221,15 @@ export class UserHandler {
 
     public async convertUserToPublicProfile(input : User) : Promise<PublicProfile> {
         const age = differenceInYears(new Date(), input.birthday);
-        let imageIDs = input.images;
+        let imageElements : ImageElement[] = [];
 
         if (this.imageHandler) {
-            const imageURLs = await Promise.all(
-                imageIDs.map( imageID => this.imageHandler!.getImageURL(imageID))
+            imageElements = await Promise.all(
+                input.images.map( async (imageID) => ({
+                    id: imageID!,
+                    url: (await this.imageHandler!.getImageURL(imageID))!
+                }))
             )
-            imageIDs = imageURLs.filter( imageURL => imageURL) as string[];
         }
 
         return {
@@ -237,7 +239,7 @@ export class UserHandler {
             attributes: input.attributes,
             description: input.description,
             gender: input.gender,
-            images: imageIDs,
+            images: imageElements,
             alcohol: input.alcohol,
             smoking: input.smoking
         }
