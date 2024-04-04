@@ -9,7 +9,6 @@ why mymessage constantly rerendering in chat
 update read status on opening chat
 latest message not showing in chat
 add error messages to show as toast
-get subscription happens twice
 
 toast error messages, install npx expo install react-native-reanimated react-native-safe-area-context react-native-gesture-handler
 
