@@ -23,11 +23,15 @@ export function Profile(props : Props) {
     const [subscription, setSubscription] = useState<SubscriptionData|null>(
         receivedData.subscription
     )
+    const [firstLoad, setFirstLoad] = useState<boolean>(true);
 
     useEffect( () => {
-        if (props.dontAutoLoad) return
-        load();   
-    })
+        if (firstLoad) {
+            setFirstLoad(false);
+            if (props.dontAutoLoad) return
+            load();   
+        }
+    }, [firstLoad])
 
     useEffect( () => {
         if (profile && !receivedData.profile) {

@@ -12,9 +12,9 @@ add error messages to show as toast
 get subscription happens twice
 
 toast error messages, install npx expo install react-native-reanimated react-native-safe-area-context react-native-gesture-handler
-announcement/errorlog implement
 
 Optional TODO
+announcement/errorlog implement
 automatically reload if network reconnected
 change elo constants with api?
 messagelowerelo is rewarded?
