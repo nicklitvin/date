@@ -17,8 +17,13 @@ export class UserHandler {
         return email.endsWith(".edu") || email == globals.sampleEmail;
     }
 
-    public getUniversityFromEmail(email : string) : string {
-        return email.split("@")[1].split(".edu")[0];
+    public getUniversityFromEmail(email : string) : string|null {
+        try {
+            const uni = email.split("@")[1].split(".edu")[0];
+            return uni;
+        } catch (err) {
+            return null;
+        }
     }
 
     public async createUser(input : UserInput) : Promise<User> {
@@ -26,7 +31,7 @@ export class UserHandler {
             data: {
                 ...input,
                 notifications: true,
-                university: this.getUniversityFromEmail(input.email),
+                university: this.getUniversityFromEmail(input.email)!,
                 subscribeEnd: new Date(),
                 isSubscribed: false,
                 subscriptionID: null,

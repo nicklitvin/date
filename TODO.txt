@@ -1,7 +1,5 @@
 TODO
 profile loading again? even though required to sign in
-create web buy and stats stuff
-notification receive, delete receiveDate when new
 send email to edu email with code
 reported page cant login
 why mymessage constantly rerendering in chat
@@ -9,6 +7,8 @@ update read status on opening chat
 latest message not showing in chat
 add error messages to show as toast
 
+create web buy and stats stuff
+notification receive, delete receiveDate when new
 toast error messages, install npx expo install react-native-reanimated react-native-safe-area-context react-native-gesture-handler
 
 Optional TODO

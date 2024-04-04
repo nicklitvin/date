@@ -5,7 +5,7 @@ import { User } from "@prisma/client";
 import { ChatPreview } from "../src/interfaces";
 import { randomUUID } from "crypto";
 import { createUserInput, createUsersForSwipeFeed, getImageDetails, makeMessageInputWithOneRandom, makeMessageInputWithRandoms, makeTwoUsers, makeTwoUsersAndMatch, makeVerificationInput, matchUsers, validRequestUserInput } from "../__testUtils__/easySetup";
-import { addMinutes, addYears } from "date-fns";
+import { addMinutes, addWeeks, addYears } from "date-fns";
 
 afterEach( async () => {
     await handler.deleteEverything()
@@ -903,5 +903,35 @@ describe("handler", () => {
         const output = await handler.loginWithToken({}, email);
         expect(output?.newAccount).toEqual(true);
         expect(output?.verified).toEqual(false);
+    })
+
+    it("should not give stats if not subscribed", async () => {
+        const user = await handler.user.createUser(createUserInput());
+
+        expect(await handler.getStatsIfSubscribed(user.id,{
+            subscribed: false,
+            endDate: new Date(),
+            ID: "asd"
+        })).toEqual(null);
+    })
+
+    it("should not give stats if expired", async () => {
+        const user = await handler.user.createUser(createUserInput());
+
+        expect(await handler.getStatsIfSubscribed(user.id,{
+            subscribed: true,
+            endDate: addWeeks(new Date(), -1),
+            ID: "asd"
+        })).toEqual(null);
+    })
+
+    it("should give stats if subscribed", async () => {
+        const user = await handler.user.createUser(createUserInput());
+
+        expect(await handler.getStatsIfSubscribed(user.id,{
+            subscribed: true,
+            endDate: addWeeks(new Date(), 1),
+            ID: "asd"
+        })).not.toEqual(null);
     })
 })

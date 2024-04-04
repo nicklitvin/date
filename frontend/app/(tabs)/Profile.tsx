@@ -40,6 +40,7 @@ export function Profile(props : Props) {
     }, [profile])
 
     useEffect( () => {
+        console.log(subscription);
         if (subscription && !receivedData.subscription) {
             receivedData.setSubscription(subscription);
         }

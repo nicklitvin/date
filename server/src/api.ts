@@ -465,10 +465,11 @@ export class APIHandler {
                 const userID = await handler.login.getUserIDByKey(body.key);
                 if (!userID) return res.status(401).json();
 
-                const output = await handler.swipe.getUserSwipeStats(userID);
+                const output = await handler.getStatsIfSubscribed(userID);
                 return output ? 
                     res.status(200).json({ data: output } as APIOutput) : 
                     res.status(400).json()
+                
             } catch (err) {
                 console.log(err);
                 return res.status(500).json();

@@ -8,7 +8,7 @@ import { SwipeHandler } from "./handlers/swipe";
 import { MessageHandler } from "./handlers/message";
 import { ReportHandler } from "./handlers/report";
 import { StripePaymentHandler } from "./handlers/pay";
-import { AttributeValueInput, ChatPreview, ConfirmVerificationInput, DeleteImageInput, EditUserInput, EloAction, GetChatPreviewsInput, ImageHandler, LoginInput, LoginOutput, MessageInput, NewMatchData, NewMatchInput, NewVerificationInput, PaymentHandler, PublicProfile, RequestReportInput, RequestUserInput, SubscribeInput, SwipeFeed, SwipeInput, UnlikeInput, UnlikeOutput, UploadImageInput, UserInput, WithEmail } from "./interfaces";
+import { AttributeValueInput, ChatPreview, ConfirmVerificationInput, DeleteImageInput, EditUserInput, EloAction, GetChatPreviewsInput, ImageHandler, LoginInput, LoginOutput, MessageInput, NewMatchData, NewMatchInput, NewVerificationInput, PaymentHandler, PublicProfile, RequestReportInput, RequestUserInput, SubscribeInput, SubscriptionData, SwipeFeed, SwipeInput, UnlikeInput, UnlikeOutput, UploadImageInput, UserInput, UserSwipeStats, WithEmail } from "./interfaces";
 import { globals } from "./globals";
 import { FreeTrialHandler } from "./handlers/freetrial";
 import { VerificationHandler } from "./handlers/verification";
@@ -585,5 +585,19 @@ export class Handler {
         await Promise.all([
             formattedListWithObjects.map( val => this.attribute.addAttribute(val))
         ])
+    }
+
+    public async getStatsIfSubscribed(userID: string, customInfo? : SubscriptionData) : Promise<UserSwipeStats|null> {
+        const subscriberInfo = customInfo ?? await this.user.getSubscriptionData(userID);
+        if (
+            subscriberInfo &&
+            subscriberInfo.ID && 
+            subscriberInfo.endDate &&
+            subscriberInfo.endDate.getTime() > new Date().getTime() &&
+            subscriberInfo.subscribed 
+        ) {
+            return await this.swipe.getUserSwipeStats(userID);
+        }
+        return null;
     }
 }
