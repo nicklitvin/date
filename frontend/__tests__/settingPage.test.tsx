@@ -7,6 +7,7 @@ import { URLs } from "../src/urls"
 import { settingsText } from "../src/text"
 import SettingsMob from "../app/Settings"
 import { testIDS } from "../src/testIDs"
+import { makePublicProfile } from "../__testUtils__/easySetup"
 
 describe("settings", () => {
     const settingData : SettingData[] = [
@@ -108,7 +109,7 @@ describe("settings", () => {
             const payload = JSON.parse(config.data) as EditUserInput;
             expect(payload.setting).toEqual(settingData[0].title);
             expect(payload.value).toEqual(!settingData[0].value);
-            return [200]
+            return [200, makePublicProfile("id")]
         })
 
         await act( () => {

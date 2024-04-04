@@ -1,9 +1,8 @@
 import { act, fireEvent, render, screen } from "@testing-library/react-native";
-import { EditProfile } from "../src/pages/EditProfile";
 import MockAdapter from "axios-mock-adapter";
 import axios from "axios";
 import { URLs } from "../src/urls";
-import { DeleteImageInput, EditUserInput, PublicProfile, UploadImageInput } from "../src/interfaces";
+import { DeleteImageInput, EditUserInput, ImageElement, PublicProfile, UploadImageInput } from "../src/interfaces";
 import { globals } from "../src/globals";
 import { editProfileText } from "../src/text";
 import { RootStore, createStoreProvider } from "../src/store/RootStore";
@@ -12,7 +11,10 @@ import EditPicturesMob from "../app/EditPictures";
 
 describe("editProfile", () => {
     const description = "description";
-    const uploadURLs = ["url_1", "url_2"];
+    const imageElements : ImageElement[] = [
+        {id: "id_1", url: "url_1"}, 
+        {id: "id_2", url: "url_2"}
+    ];
     const attributes = ["attribute_1", "attribute_2"];
 
     const original = () : PublicProfile => ({
@@ -21,7 +23,7 @@ describe("editProfile", () => {
         gender: "Male",
 
         description: description,
-        images: uploadURLs,
+        images: imageElements,
         attributes: attributes,
         name: "Michael",
         alcohol: "Often",

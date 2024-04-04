@@ -11,6 +11,7 @@ import { useStore } from "../../src/store/RootStore";
 import { Link, router } from "expo-router";
 import { testIDS } from "../../src/testIDs";
 import { useEffect, useState } from "react";
+import Loading from "../Loading";
 
 interface Props {
     openLinkFunc?: (input : string) => any
@@ -40,7 +41,6 @@ export function Profile(props : Props) {
     }, [profile])
 
     useEffect( () => {
-        console.log(subscription);
         if (subscription && !receivedData.subscription) {
             receivedData.setSubscription(subscription);
         }
@@ -112,6 +112,9 @@ export function Profile(props : Props) {
         }
     }
 
+    if (!profile && !props.dontAutoLoad) {
+        return <Loading/>   
+    }
     return (
         <StyledView className="bg-back w-full h-full">
             <StyledButton testID={testIDS.load} onPress={load}/>

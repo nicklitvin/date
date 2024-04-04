@@ -203,3 +203,8 @@ export const noWifiText = {
     pageSubtitle: "",
     button: "Try Again",
 }
+
+export const loadText = {
+    pageTitle: "Loading...",
+    pageSubtitle: "Should not take too long"
+}

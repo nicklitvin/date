@@ -14,6 +14,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ProfileViewEmbedMob } from "../src/pages/ProfileViewEmbed";
 import { noWifiText } from "../src/text";
 import { MyButton } from "../src/components/Button";
+import Loading from "./Loading";
 
 Notifications.setNotificationHandler({
     handleNotification: async () => ({
@@ -283,12 +284,7 @@ export function Index() {
     }
 
     if (loading) {
-        return (
-            <MySimplePage
-                title="Loading..."
-                subtitle="Should not take too long"
-            />
-        )
+        return <Loading/>
     } else if (error) {
         return <MySimplePage
             title={noWifiText.pageTitle}
@@ -306,10 +302,7 @@ export function Index() {
         return <Redirect href="SignIn"/>
     } else {
         return (
-            <MySimplePage
-                title="Loading..."
-                subtitle="Should not take too long"
-            />
+            <Loading/>
         )  
     }
 }

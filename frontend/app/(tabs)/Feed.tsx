@@ -12,6 +12,7 @@ import { globals } from "../../src/globals";
 import { Link } from "expo-router";
 import { useStore } from "../../src/store/RootStore";
 import { testIDS } from "../../src/testIDs";
+import Loading from "../Loading";
 
 interface Props {
     dontAutoLoad?: boolean
@@ -32,10 +33,10 @@ export function Feed(props : Props) {
 
     useEffect( () => {
         if (firstLoad) {
+            setFirstLoad(false);
             if (props.dontAutoLoad) return
             load();
         }
-        setFirstLoad(false);
     }, [firstLoad])
 
     useEffect( () => {
@@ -51,7 +52,7 @@ export function Feed(props : Props) {
 
             receivedData.setSwipeStatus(swipeStatus);
 
-            if (feed && swipeStatus.feedIndex == feed.profiles.length) {
+            if (feed && swipeStatus.feedIndex == feed.profiles.length && swipeStatus.feedIndex > 0) {
                 loadMoreFeed();
             }
             scrollToTop();
@@ -70,11 +71,11 @@ export function Feed(props : Props) {
                 key: receivedData.loginKey
             }
             const response = await sendRequest(URLs.getFeed, input);
-            setFeed(response.data.data);
             setSwipeStatus({
                 feedIndex: 0,
                 lastSwipedIndex: -1
             })
+            setFeed(response.data.data);
         } catch (err) {
             console.log(err);
         }
@@ -100,7 +101,7 @@ export function Feed(props : Props) {
             });
             setFeed(response.data.data);
         } catch (err) {
-            console.log(err);
+            // console.log(err);
         }
     }
 
@@ -148,6 +149,7 @@ export function Feed(props : Props) {
         func();
     }
 
+    if (!feed && !props.dontAutoLoad) return <Loading />
     return (
         <StyledView className="w-full h-full bg-back">
         <StyledButton testID={testIDS.load} onPress={load}/>
