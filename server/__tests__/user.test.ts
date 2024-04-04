@@ -1,9 +1,9 @@
 import { afterEach, describe, expect, it } from "@jest/globals";
 import { handler } from "../jest.setup";
 import { addYears, differenceInMonths } from "date-fns";
-import { globals } from "../src/globals";
 import { createUserInput, createUsersForSwipeFeed, validRequestUserInput } from "../__testUtils__/easySetup";
 import { EloAction } from "../src/interfaces";
+import { eloConstants, userRestrictions, userSettings } from "../src/globals";
 
 afterEach( async () => {
     await handler.user.deleteAllUsers();
@@ -111,11 +111,11 @@ describe("user", () => {
 
     it("should invalidate input", async () => {
         let input = await validRequestUserInput();
-        input.birthday = addYears(new Date(), -(globals.minAge - 1)) 
+        input.birthday = addYears(new Date(), -(userRestrictions.minAge - 1)) 
         expect(funcs.isInputValid(input)).toEqual(false);
 
         input = await validRequestUserInput();
-        input.birthday = addYears(new Date(), -(globals.maxAge + 1));
+        input.birthday = addYears(new Date(), -(userRestrictions.maxAge + 1));
         expect(funcs.isInputValid(input)).toEqual(false);
 
         input = await validRequestUserInput();
@@ -123,11 +123,11 @@ describe("user", () => {
         expect(funcs.isInputValid(input)).toEqual(false);
 
         input = await validRequestUserInput();
-        input.ageInterest = [globals.minAge - 1,20];
+        input.ageInterest = [userRestrictions.minAge - 1,20];
         expect(funcs.isInputValid(input)).toEqual(false);
 
         input = await validRequestUserInput();
-        input.name = "a".repeat(globals.maxNameLength + 1);
+        input.name = "a".repeat(userRestrictions.maxNameLength + 1);
         expect(funcs.isInputValid(input)).toEqual(false);
 
         input = await validRequestUserInput();
@@ -135,11 +135,11 @@ describe("user", () => {
         expect(funcs.isInputValid(input)).toEqual(false);
 
         input = await validRequestUserInput();
-        input.attributes = Array(globals.maxAttributes + 1).fill("a");
+        input.attributes = Array(userRestrictions.maxAttributes + 1).fill("a");
         expect(funcs.isInputValid(input)).toEqual(false);
 
         input = await validRequestUserInput();
-        input.description = "a".repeat(globals.maxDescriptionLength + 1);
+        input.description = "a".repeat(userRestrictions.maxDescriptionLength + 1);
         expect(funcs.isInputValid(input)).toEqual(false);
 
         input = await validRequestUserInput();
@@ -147,11 +147,11 @@ describe("user", () => {
         expect(funcs.isInputValid(input)).toEqual(false);
 
         input = await validRequestUserInput();
-        input.files = Array(globals.minImagesCount - 1).fill(input.files[0]) ;
+        input.files = Array(userRestrictions.minImagesCount - 1).fill(input.files[0]) ;
         expect(funcs.isInputValid(input)).toEqual(false);
 
         input = await validRequestUserInput();
-        input.files = Array(globals.maxImagesCount + 1).fill(input.files[0]);
+        input.files = Array(userRestrictions.maxImagesCount + 1).fill(input.files[0]);
         expect(funcs.isInputValid(input)).toEqual(false);
     })
 
@@ -160,12 +160,12 @@ describe("user", () => {
         const likedByHigherElo = funcs.getEloChange({
             action: EloAction.Like,
             eloDiff: eloDiff,
-            userElo: globals.eloStart
+            userElo: eloConstants.start
         });
         const likedByLowerElo = funcs.getEloChange({
             action: EloAction.Like,
             eloDiff: -eloDiff,
-            userElo: globals.eloStart
+            userElo: eloConstants.start
         });
 
         expect(likedByHigherElo).toBeGreaterThan(0);
@@ -178,12 +178,12 @@ describe("user", () => {
         const dislikedByHigherElo = funcs.getEloChange({
             action: EloAction.Dislike,
             eloDiff: eloDiff,
-            userElo: globals.eloStart
+            userElo: eloConstants.start
         });
         const dislikedByLowerElo = funcs.getEloChange({
             action: EloAction.Dislike,
             eloDiff: -eloDiff,
-            userElo: globals.eloStart
+            userElo: eloConstants.start
         });
 
         expect(dislikedByHigherElo).toBeLessThan(0);
@@ -196,12 +196,12 @@ describe("user", () => {
         const messagedByHigherElo = funcs.getEloChange({
             action: EloAction.Like,
             eloDiff: eloDiff,
-            userElo: globals.eloStart
+            userElo: eloConstants.start
         });
         const messagedByLowerElo = funcs.getEloChange({
             action: EloAction.Like,
             eloDiff: -eloDiff,
-            userElo: globals.eloStart
+            userElo: eloConstants.start
         });
 
         expect(messagedByHigherElo).toBeGreaterThan(0);
@@ -213,12 +213,12 @@ describe("user", () => {
         const eloDiff = 10;
         const loginByHigherElo = funcs.getEloChange({
             action: EloAction.Login,
-            userElo: globals.eloStart + eloDiff,
+            userElo: eloConstants.start + eloDiff,
             eloDiff: eloDiff
         });
         const loginByLowerElo = funcs.getEloChange({
             action: EloAction.Login,
-            userElo: globals.eloStart - eloDiff,
+            userElo: eloConstants.start - eloDiff,
             eloDiff: -eloDiff
         });
 
@@ -231,12 +231,12 @@ describe("user", () => {
         const eloDiff = 10;
         const subscribeByHigherElo = funcs.getEloChange({
             action: EloAction.Subscribe,
-            userElo: globals.eloStart + eloDiff,
+            userElo: eloConstants.start + eloDiff,
             eloDiff: eloDiff
         });
         const subscribeByLowerElo = funcs.getEloChange({
             action: EloAction.Subscribe,
-            userElo: globals.eloStart - eloDiff,
+            userElo: eloConstants.start - eloDiff,
             eloDiff: -eloDiff
         });
 
@@ -249,12 +249,12 @@ describe("user", () => {
         const eloDiff = 10;
         const unsubscribeByHigherElo = funcs.getEloChange({
             action: EloAction.Unsubscribe,
-            userElo: globals.eloStart + eloDiff,
+            userElo: eloConstants.start + eloDiff,
             eloDiff: eloDiff
         });
         const unsubscribeByLowerElo = funcs.getEloChange({
             action: EloAction.Unsubscribe,
-            userElo: globals.eloStart - eloDiff,
+            userElo: eloConstants.start - eloDiff,
             eloDiff: -eloDiff
         });
 
@@ -331,7 +331,7 @@ describe("user", () => {
 
         const output = await funcs.getSettings(input.id);
         expect(output).toHaveLength(1);
-        expect(output![0].title).toEqual(globals.notificationSetting);
+        expect(output![0].title).toEqual(userSettings.notification);
     })
 
     it("should get subscription data", async () => {

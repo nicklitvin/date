@@ -1,7 +1,7 @@
 import { Message } from "@prisma/client";
 import { Expo } from "expo-server-sdk";
-import { globals } from "../globals";
 import { NewMatchData } from "../interfaces";
+import { miscConstants } from "../globals";
 
 interface MessageNotificationInput {
     message: Message
@@ -28,7 +28,7 @@ export class NotificationHandler {
             return await this.client.sendPushNotificationsAsync([
                 {
                     to: input.recepientPushToken,
-                    channelId: globals.notificationChannel,
+                    channelId: miscConstants.notificationChannel,
                     priority: "default",
                     title: input.fromName,
                     body: input.message.message,
@@ -48,8 +48,8 @@ export class NotificationHandler {
     //                 to: input.recepientPushToken,
     //                 channelId: globals.notificationChannel,
     //                 priority: "default",
-    //                 title: globals.newMatchNotifTitle,
-    //                 body: globals.newMatchMessage,
+    //                 title: globals.newMatchNotificationTItle,
+    //                 body: globals.newMatchNotificationMessage,
     //                 data: input.match,
     //             }
     //         ])

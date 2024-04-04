@@ -1,6 +1,6 @@
 import Stripe from "stripe";
 import { PaymentExtractOutput, PaymentHandler } from "../interfaces";
-import { globals } from "../globals";
+import { miscConstants } from "../globals";
 
 export class StripePaymentHandler implements PaymentHandler {
     private stripe : Stripe;
@@ -31,7 +31,7 @@ export class StripePaymentHandler implements PaymentHandler {
                 userID: userID
             },
             subscription_data: {
-                trial_period_days: freeTrial ? globals.freeTrialDays : 0
+                trial_period_days: freeTrial ? miscConstants.freeTrialDays : 0
             }
         });
         return session.url as string;

@@ -1,5 +1,5 @@
+import { sampleContent } from "./globals";
 import { UserInput } from "./interfaces";
-import { globals } from "./globals";
 
 export const sampleUsers : UserInput[] = [
     {
@@ -8,7 +8,7 @@ export const sampleUsers : UserInput[] = [
         alcohol: "Often",
         attributes: ["Soccer", "Music"],
         birthday: new Date(2000,1,1),
-        email: `1@${globals.sampleUniversity}.edu`,
+        email: `1@${sampleContent.uni}.edu`,
         gender: "Male",
         genderInterest: ["Male","Female"],
         images: [],
@@ -22,7 +22,7 @@ export const sampleUsers : UserInput[] = [
         alcohol: "Never",
         attributes: ["Basketball", "Cooking", "Running"],
         birthday: new Date(2002,1,1),
-        email: `2@${globals.sampleUniversity}.edu`,
+        email: `2@${sampleContent.uni}.edu`,
         gender: "Male",
         genderInterest: ["Male","Female"],
         images: [],
@@ -36,7 +36,7 @@ export const sampleUsers : UserInput[] = [
         alcohol: "Sometimes",
         attributes: ["Volleyball", "Rap"],
         birthday: new Date(2004,1,1),
-        email: `3@${globals.sampleUniversity}.edu`,
+        email: `3@${sampleContent.uni}.edu`,
         gender: "Female",
         genderInterest: ["Male","Female"],
         images: [],
@@ -50,7 +50,7 @@ export const sampleUsers : UserInput[] = [
         alcohol: "Never",
         attributes: ["Swim", "Baking"],
         birthday: new Date(2006,1,1),
-        email: `4@${globals.sampleUniversity}.edu`,
+        email: `4@${sampleContent.uni}.edu`,
         gender: "Female",
         genderInterest: ["Male","Female"],
         images: [],
@@ -64,7 +64,7 @@ export const sampleUsers : UserInput[] = [
         alcohol: "Often",
         attributes: ["Concerts", "Gaming"],
         birthday: new Date(2000,1,1),
-        email: `5@${globals.sampleUniversity}.edu`,
+        email: `5@${sampleContent.uni}.edu`,
         gender: "Male",
         genderInterest: ["Female"],
         images: [],
@@ -78,7 +78,7 @@ export const sampleUsers : UserInput[] = [
         alcohol: "Often",
         attributes: ["Soccer", "Music"],
         birthday: new Date(2000,1,1),
-        email: `6@${globals.sampleUniversity}.edu`,
+        email: `6@${sampleContent.uni}.edu`,
         gender: "Female",
         genderInterest: ["Female"],
         images: [],
@@ -92,7 +92,7 @@ export const sampleUsers : UserInput[] = [
         alcohol: "Often",
         attributes: ["Soccer", "Music"],
         birthday: new Date(2000,1,1),
-        email: `7@${globals.sampleUniversity}.edu`,
+        email: `7@${sampleContent.uni}.edu`,
         gender: "Male",
         genderInterest: ["Female"],
         images: [],
@@ -106,7 +106,7 @@ export const sampleUsers : UserInput[] = [
         alcohol: "Often",
         attributes: ["Soccer", "Music"],
         birthday: new Date(2000,1,1),
-        email: `8@${globals.sampleUniversity}.edu`,
+        email: `8@${sampleContent.uni}.edu`,
         gender: "Female",
         genderInterest: ["Female"],
         images: [],

@@ -1,11 +1,11 @@
 import { Opinion } from "@prisma/client";
-import { globals } from "../src/globals";
 import { FileUpload, ImageInput, MessageInput, NewVerificationInput, RequestUserInput, SwipeInput, UserInput, UserReportInput, WithEmail } from "../src/interfaces";
 import fs from "fs/promises";
 import { randomUUID } from "crypto";
 import mime from "mime-types";
 import { handler } from "../jest.setup";
 import { addYears } from "date-fns";
+import { userRestrictions } from "../src/globals";
 
 const imageFilePath = "./__testUtils__/goodImage.jpg";
 const badImageFilePath = "./__testUtils__/badImage.txt";
@@ -17,13 +17,22 @@ export async function getImageDetails(good : boolean) : Promise<FileUpload> {
     }
 }
 
+export async function getImageInput(good : boolean) : Promise<ImageInput> {
+    return {
+        buffer: Buffer.from((await fs.readFile(good ? imageFilePath : badImageFilePath)).toString("base64")),
+        mimetype: mime.lookup(good ? imageFilePath : badImageFilePath) as string
+    }
+}
+
+
+
 export async function validRequestUserInput() : Promise<RequestUserInput & WithEmail> { 
     const upload = await getImageDetails(true);
     return {
         id: randomUUID(),
-        birthday: addYears(new Date(), -globals.minAge),
+        birthday: addYears(new Date(), -userRestrictions.minAge),
         ageInterest: [18,25],
-        attributes: Array.from({length: globals.maxAttributes}, (_,index) => `${index}`),
+        attributes: Array.from({length: userRestrictions.maxAttributes}, (_,index) => `${index}`),
         email: "a@berkeley.edu",
         gender: "Male",
         genderInterest: ["Male", "Female"],
@@ -37,8 +46,8 @@ export async function validRequestUserInput() : Promise<RequestUserInput & WithE
                 mimetype: upload.mimetype
             },
         ],
-        name: "a".repeat(globals.maxNameLength),
-        description: "a".repeat(globals.maxDescriptionLength),
+        name: "a".repeat(userRestrictions.maxNameLength),
+        description: "a".repeat(userRestrictions.maxDescriptionLength),
         smoking: "Never",
         alcohol: "Never",
     }

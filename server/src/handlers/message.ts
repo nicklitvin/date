@@ -1,7 +1,7 @@
 import { Message, PrismaClient } from "@prisma/client";
 import { GetChatInput, GetChatPreviewsInput, MessageInput, ReadStatusInput } from "../interfaces";
 import { randomUUID } from "crypto";
-import { globals } from "../globals";
+import { miscConstants, sampleContent } from "../globals";
 
 export class MessageHandler {
     private prisma : PrismaClient;
@@ -93,7 +93,7 @@ export class MessageHandler {
             orderBy: {
                 timestamp: "desc"
             },
-            take: globals.messagesLoadedInChat
+            take: miscConstants.messagesLoadedInChat
         })
     }
 
@@ -140,7 +140,7 @@ export class MessageHandler {
                     timestamp: "desc"
                 },
                 distinct: ["recepientID"],
-                take: globals.usersLoadedInPreview
+                take: miscConstants.usersLoadedInPreview
             }),
             this.prisma.message.findMany({
                 where: {
@@ -153,7 +153,7 @@ export class MessageHandler {
                     timestamp: "desc"
                 },
                 distinct: ["userID"],
-                take: globals.usersLoadedInPreview
+                take: miscConstants.usersLoadedInPreview
             })
         ]);
 
@@ -165,30 +165,30 @@ export class MessageHandler {
             where: {
                 OR: [
                     {
-                        userID: globals.sampleUserID
+                        userID: sampleContent.userID
                     },
                     {
-                        recepientID: globals.sampleUserID
+                        recepientID: sampleContent.userID
                     }
                 ]
             }
         })
-        const chat1 : MessageInput[] = globals.sampleMessages.map( (val,index) => 
+        const chat1 : MessageInput[] = sampleContent.messages.map( (val,index) => 
             ({
                 userID: "oldmatch1",
-                recepientID: globals.sampleUserID,
+                recepientID: sampleContent.userID,
                 message: val
             })
         )
         const chat2: MessageInput[] = [
             {
-                userID: globals.sampleUserID,
+                userID: sampleContent.userID,
                 recepientID: "oldmatch2",
                 message: "hi"
             },
             {
                 userID: "oldmatch2",
-                recepientID: globals.sampleUserID,
+                recepientID: sampleContent.userID,
                 message: "hello",
             }
         ]

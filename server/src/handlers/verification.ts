@@ -1,7 +1,7 @@
 import { PrismaClient, Verification } from "@prisma/client";
-import { globals } from "../globals";
 import { addMinutes } from "date-fns";
 import { NewVerificationInput, ConfirmVerificationInput, WithEmail} from "../interfaces";
+import { miscConstants } from "../globals";
 
 export class VerificationHandler {
     private prisma : PrismaClient;
@@ -10,14 +10,14 @@ export class VerificationHandler {
         this.prisma = prisma;
     }
 
-    public generateDigitCode(digits = globals.verificationCodeLength) : number {
+    public generateDigitCode(digits = miscConstants.verificationCodeLength) : number {
         const big = Math.pow(10, digits) - 1;
         const small = Math.pow(10,digits - 1);
         return Math.floor(Math.random() * (big - small + 1) + small);
     }
 
     public async makeVerificationEntry(input : NewVerificationInput & WithEmail,
-        customExpireTime = addMinutes(new Date(), globals.verificationExpireMinutes),
+        customExpireTime = addMinutes(new Date(), miscConstants.verificationExpireMinutes),
         code = this.generateDigitCode()
         ) : Promise<number> 
     {
@@ -83,7 +83,7 @@ export class VerificationHandler {
     {
         return await this.prisma.verification.update({
             data: {
-                expires: addMinutes(new Date(), globals.verificationExpireMinutes),
+                expires: addMinutes(new Date(), miscConstants.verificationExpireMinutes),
                 code: code
             },
             where: {

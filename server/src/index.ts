@@ -3,9 +3,9 @@ import express from "express";
 import { Handler } from "./handler";
 import { APIHandler } from "./api";
 import bodyParser from "body-parser";
-import { globals } from "./globals";
 import fs from "fs/promises"
 import { attributeList } from "./others";
+import { sampleContent } from "./globals";
 
 const app = express();
 app.use(bodyParser.json());
@@ -17,15 +17,15 @@ new APIHandler(app, handler);
 
 const func = async () => {
     await handler.deleteEverything();
-    await handler.loginWithToken({},globals.sampleEmail);
+    await handler.loginWithToken({},sampleContent.email);
     await handler.getVerificationCode({
-        email: globals.sampleEmail, 
-        schoolEmail: globals.sampleSchoolEmail
+        email: sampleContent.email, 
+        schoolEmail: sampleContent.eduEmail
     });
     await handler.verifyUserWithCode({
-        email: globals.sampleEmail,
-        schoolEmail: globals.sampleSchoolEmail,
-        code: globals.sampleVerificationCode
+        email: sampleContent.email,
+        schoolEmail: sampleContent.eduEmail,
+        code: sampleContent.code
     })
     await handler.createUser({
         ageInterest: [18,30],
@@ -33,14 +33,14 @@ const func = async () => {
         attributes: [attributeList.Fitness[0]],
         birthday: new Date(2000,1,1),
         description: "description",
-        email: globals.sampleEmail,
+        email: sampleContent.email,
         files: [{
             buffer: Buffer.from(await fs.readFile("./__testUtils__/goodImage.jpg")).toString("base64"),
             mimetype: "image/jpeg"
         }],
         gender: "Female",
         genderInterest: ["Female"],
-        id: globals.sampleUserID,
+        id: sampleContent.userID,
         name: "Michael",
         smoking: "Never"
     })

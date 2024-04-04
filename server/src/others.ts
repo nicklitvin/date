@@ -1,4 +1,4 @@
-import { AttributeType, User } from "@prisma/client";
+import { AttributeType } from "@prisma/client";
 
 export const allowedAttributeEdits : string[] = [
     "genderInterest", 

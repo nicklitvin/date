@@ -1,8 +1,8 @@
 import { PrismaClient, User } from "@prisma/client";
 import { EditUserInput, EloAction, EloUpdateInput, GetProfileListInput, ImageElement, ImageHandler, Preferences, PublicProfile, RequestUserInput, SettingData, SubscriptionData, UserInput } from "../interfaces";
 import { addMonths, differenceInYears } from "date-fns";
-import { globals } from "../globals";
 import { sampleUsers } from "../sample";
+import { displayText, eloConstants, sampleContent, userRestrictions, userSettings } from "../globals";
 
 export class UserHandler {
     private prisma : PrismaClient;
@@ -14,7 +14,7 @@ export class UserHandler {
     }
 
     public isSchoolEmailValid(email : string) : boolean {
-        return email.endsWith(".edu") || email == globals.sampleEmail;
+        return email.endsWith(".edu") || email == sampleContent.email;
     }
 
     public getUniversityFromEmail(email : string) : string|null {
@@ -35,7 +35,7 @@ export class UserHandler {
                 subscribeEnd: new Date(),
                 isSubscribed: false,
                 subscriptionID: null,
-                elo: globals.eloStart
+                elo: eloConstants.start
             }
         })
     }
@@ -124,22 +124,22 @@ export class UserHandler {
 
     public isInputValid(input : RequestUserInput) : boolean {
         return (
-            differenceInYears(new Date(), input.birthday) >= globals.minAge &&
-            differenceInYears(new Date(), input.birthday) <= globals.maxAge &&
+            differenceInYears(new Date(), input.birthday) >= userRestrictions.minAge &&
+            differenceInYears(new Date(), input.birthday) <= userRestrictions.maxAge &&
             input.ageInterest.length == 2 &&
             input.ageInterest[0] < input.ageInterest[1] &&
-            input.ageInterest[0] >= globals.minAge && 
-            input.name.length <= globals.maxNameLength &&
-            input.genderInterest.length <= globals.maxInterestedIn &&
+            input.ageInterest[0] >= userRestrictions.minAge && 
+            input.name.length <= userRestrictions.maxNameLength &&
+            input.genderInterest.length <= userRestrictions.maxInterestedIn &&
             input.genderInterest.length == Array.from(
                 new Set(input.genderInterest)).length &&
-            input.attributes.length <= globals.maxAttributes && 
+            input.attributes.length <= userRestrictions.maxAttributes && 
             input.attributes.length == Array.from(new Set(input.attributes)).length &&
-            input.description.length <= globals.maxDescriptionLength && 
-            input.files.length >= globals.minImagesCount &&
-            input.files.length <= globals.maxImagesCount &&
+            input.description.length <= userRestrictions.maxDescriptionLength && 
+            input.files.length >= userRestrictions.minImagesCount &&
+            input.files.length <= userRestrictions.maxImagesCount &&
             input.files.length == input.files.filter(val => 
-                globals.acceptaleImageFormats.includes(val.mimetype)
+                userRestrictions.acceptaleImageFormats.includes(val.mimetype)
             ).length
         )
     }
@@ -148,33 +148,33 @@ export class UserHandler {
         let change : number = 0;
         switch(input.action) {
             case (EloAction.Like): 
-                change = globals.eloLikeMaxChange * 1 / (1 + Math.pow(10,
-                    -input.eloDiff!/globals.eloDiffToMaxChange)
+                change = eloConstants.maxChangeFromLike * 1 / (1 + Math.pow(10,
+                    -input.eloDiff!/eloConstants.diffToMaxChange)
                 );
                 break;
             case (EloAction.Dislike):
-                change = -globals.eloLikeMaxChange * 1 / (1 + Math.pow(10,
-                    input.eloDiff!/globals.eloDiffToMaxChange)
+                change = -eloConstants.maxChangeFromLike * 1 / (1 + Math.pow(10,
+                    input.eloDiff!/eloConstants.diffToMaxChange)
                 );
                 break;
             case (EloAction.Message):
-                change = globals.eloMessageMaxChange * 1 / (1 + Math.pow(10,
-                    -input.eloDiff!/globals.eloDiffToMaxChange)
+                change = eloConstants.maxChangeFromMessage * 1 / (1 + Math.pow(10,
+                    -input.eloDiff!/eloConstants.diffToMaxChange)
                 );
                 break;
             case (EloAction.Login):
-                change = globals.eloMessageMaxChange * 1 / (1 + Math.pow(10,
-                    -input.eloDiff!/globals.eloDiffToMaxChange)
+                change = eloConstants.maxChangeFromMessage * 1 / (1 + Math.pow(10,
+                    -input.eloDiff!/eloConstants.diffToMaxChange)
                 );
                 break;
             case (EloAction.Subscribe):
-                change = globals.eloSubscribeMaxChange * 1 / (1 + Math.pow(10,
-                    input.eloDiff!/globals.eloDiffToMaxChange)
+                change = eloConstants.maxChangeFromSubscribe * 1 / (1 + Math.pow(10,
+                    input.eloDiff!/eloConstants.diffToMaxChange)
                 );
                 break;
             case (EloAction.Unsubscribe):
-                change = -globals.eloSubscribeMaxChange * 1 / (1 + Math.pow(10,
-                    -input.eloDiff!/globals.eloDiffToMaxChange)
+                change = -eloConstants.maxChangeFromSubscribe * 1 / (1 + Math.pow(10,
+                    -input.eloDiff!/eloConstants.diffToMaxChange)
                 );
                 break;
             
@@ -275,8 +275,8 @@ export class UserHandler {
 
         return [
             {
-                display: globals.notificationDisplayTitle,
-                title: globals.notificationSetting,
+                display: displayText.notification,
+                title: userSettings.notification,
                 value: data.notifications
             }
         ]
@@ -299,7 +299,7 @@ export class UserHandler {
     public async createSample() : Promise<User[]> {
         await this.prisma.user.deleteMany({
             where: {
-                university: globals.sampleUniversity
+                university: sampleContent.uni
             }
         })
         return await Promise.all(sampleUsers.map( val => 

@@ -36,5 +36,8 @@ export const URLs = {
 
     // ADMIN
     deleteEverything: "/deleteEverything",
-    createSample: "/createSample"
+    createSample: "/createSample",
+
+    // OAUTH
+    googleOAuth: "https://www.googleapis.com/userinfo/v2/me",
 }

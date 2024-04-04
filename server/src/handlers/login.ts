@@ -1,10 +1,11 @@
 import { PrismaClient } from "@prisma/client";
-import { globals } from "../globals";
 import { addWeeks } from "date-fns";
 import { randomUUID } from "crypto";
 import axios from "axios";
 import verifyAppleToken from "verify-apple-id-token";
 import { LoginEntryInput } from "../interfaces";
+import { miscConstants, sampleContent } from "../globals";
+import { URLs } from "../urls";
 
 export class LoginHandler {
     private prisma : PrismaClient;
@@ -17,10 +18,10 @@ export class LoginHandler {
         return await this.prisma.login.create({
             data: {
                 email: input.email,
-                expire: input.customDate ?? addWeeks(new Date(), globals.keyExpirationWeeks),
+                expire: input.customDate ?? addWeeks(new Date(), miscConstants.keyExpirationWeeks),
                 key: randomUUID(),
                 expoPushToken: input.expoPushToken,
-                userID: input.customID ? globals.sampleUserID : randomUUID()
+                userID: input.customID ? sampleContent.userID : randomUUID()
             }
         })
     }
@@ -57,7 +58,7 @@ export class LoginHandler {
             },
             data: {
                 key: randomUUID(),
-                expire: addWeeks(new Date(), globals.keyExpirationWeeks)
+                expire: addWeeks(new Date(), miscConstants.keyExpirationWeeks)
             }
         })
     }
@@ -68,7 +69,7 @@ export class LoginHandler {
                 email: email
             },
             data: {
-                expire: addWeeks(new Date(), globals.keyExpirationWeeks)
+                expire: addWeeks(new Date(), miscConstants.keyExpirationWeeks)
             }
         })
     }
@@ -80,7 +81,7 @@ export class LoginHandler {
 
     async getEmailFromGoogleToken(token : string) : Promise<string|null> {
         try {
-            const response = await axios.get(globals.googleOAuth,{
+            const response = await axios.get(URLs.googleOAuth,{
                 headers: {"Authorization": `Bearer ${token}`}
             })   
             return response.data.email as string;

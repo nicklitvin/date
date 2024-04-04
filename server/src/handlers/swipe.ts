@@ -2,8 +2,7 @@ import { Opinion, PrismaClient, Swipe } from "@prisma/client";
 import { randomUUID } from "crypto";
 import { MatchDataOutput, SwipeBreakdown, SwipeInput, UserSwipeStats } from "../interfaces";
 import { startOfWeek, subWeeks } from "date-fns";
-import { globals } from "../globals";
-import { sampleUsers } from "../sample";
+import { sampleContent } from "../globals";
 
 export class SwipeHandler {
     private prisma : PrismaClient;
@@ -203,10 +202,10 @@ export class SwipeHandler {
             where: {
                 OR: [
                     {
-                        userID: globals.sampleUserID
+                        userID: sampleContent.userID
                     },
                     {
-                        swipedUserID: globals.sampleUserID
+                        swipedUserID: sampleContent.userID
                     }
                 ]
             }
@@ -215,40 +214,40 @@ export class SwipeHandler {
             this.createSwipe({
                 userID: "newmatch1",
                 action: "Like",
-                swipedUserID: globals.sampleUserID
+                swipedUserID: sampleContent.userID
             }),
             this.createSwipe({
                 userID: "newmatch2",
                 action: "Like",
-                swipedUserID: globals.sampleUserID
+                swipedUserID: sampleContent.userID
             }),
             this.createSwipe({
-                userID: globals.sampleUserID,
+                userID: sampleContent.userID,
                 action: "Like",
                 swipedUserID: "newmatch1"
             }),
             this.createSwipe({
-                userID: globals.sampleUserID,
+                userID: sampleContent.userID,
                 action: "Like",
                 swipedUserID: "newmatch2"
             }),
             this.createSwipe({
                 userID: "oldmatch1",
                 action: "Like",
-                swipedUserID: globals.sampleUserID
+                swipedUserID: sampleContent.userID
             }),
             this.createSwipe({
                 userID: "oldmatch2",
                 action: "Like",
-                swipedUserID: globals.sampleUserID
+                swipedUserID: sampleContent.userID
             }),
             this.createSwipe({
-                userID: globals.sampleUserID,
+                userID: sampleContent.userID,
                 action: "Like",
                 swipedUserID: "oldmatch1"
             }),
             this.createSwipe({
-                userID: globals.sampleUserID,
+                userID: sampleContent.userID,
                 action: "Like",
                 swipedUserID: "oldmatch2"
             }),

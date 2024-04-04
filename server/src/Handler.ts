@@ -9,13 +9,13 @@ import { MessageHandler } from "./handlers/message";
 import { ReportHandler } from "./handlers/report";
 import { StripePaymentHandler } from "./handlers/pay";
 import { AttributeValueInput, ChatPreview, ConfirmVerificationInput, DeleteImageInput, EditUserInput, EloAction, GetChatPreviewsInput, ImageHandler, LoginInput, LoginOutput, MessageInput, NewMatchData, NewMatchInput, NewVerificationInput, PaymentHandler, PublicProfile, RequestReportInput, RequestUserInput, SubscribeInput, SubscriptionData, SwipeFeed, SwipeInput, UnlikeInput, UnlikeOutput, UploadImageInput, UserInput, UserSwipeStats, WithEmail } from "./interfaces";
-import { globals } from "./globals";
 import { FreeTrialHandler } from "./handlers/freetrial";
 import { VerificationHandler } from "./handlers/verification";
 import { addYears } from "date-fns";
 import { allowedAttributeEdits, attributeList } from "./others";
 import { LoginHandler } from "./handlers/login";
 import { NotificationHandler } from "./handlers/notification";
+import { eloConstants, miscConstants, sampleContent, userRestrictions, userSettings } from "./globals";
 
 interface Props {
     prisma: PrismaClient
@@ -231,7 +231,7 @@ export class Handler {
         const result : ChatPreview[] = [];
 
         for (const chatPreview of allChatPreviews) {
-            if (result.length == globals.usersLoadedInPreview) break;
+            if (result.length == miscConstants.usersLoadedInPreview) break;
 
             if (chatPreview && !usedUserIDs.has(chatPreview.profile.id)) {
                 usedUserIDs.add(chatPreview.profile.id);
@@ -273,7 +273,7 @@ export class Handler {
             this.message.deleteChat(user.id, reportedUser.id)
         ])
 
-        if (reportCount == globals.maxReportCount) {
+        if (reportCount == miscConstants.maxReportCount) {
             await this.deleteUser(reportedUser.id);
         }
 
@@ -285,8 +285,8 @@ export class Handler {
 
         if (
             !user || 
-            user.images.length == globals.maxImagesCount ||
-            !globals.acceptaleImageFormats.includes(input.image.mimetype)
+            user.images.length == userRestrictions.maxImagesCount ||
+            !userRestrictions.acceptaleImageFormats.includes(input.image.mimetype)
         ) return null;
 
         const imageID = await this.image.uploadImage({
@@ -296,7 +296,7 @@ export class Handler {
         if (!imageID) return null;
 
         return await this.user.editUser({
-            setting: globals.imageSetting,
+            setting: userSettings.image,
             userID: input.userID,
             value: user.images.concat([imageID])
         })
@@ -308,7 +308,7 @@ export class Handler {
         if (!user || !user.images.includes(input.imageID) || user.images.length == 1) return null;
 
         return await this.user.editUser({
-            setting: globals.imageSetting,
+            setting: userSettings.image,
             userID: input.userID,
             value: user.images.filter( val => val != input.imageID)
         })
@@ -327,7 +327,7 @@ export class Handler {
     public async changeImageOrder(input : EditUserInput) : Promise<User|null> {
         const user = await this.user.getUserByID(input.userID);
 
-        if (!user || input.setting != globals.imageSetting) return null;
+        if (!user || input.setting != userSettings.image) return null;
 
         try {
             const newOrder = input.value as string[];
@@ -358,7 +358,7 @@ export class Handler {
         await this.user.updateSubscriptionAfterPay(input.userID, input.subscriptionID)
         return await this.user.updateElo(input.userID, this.user.getEloChange({
             action: EloAction.Subscribe,
-            eloDiff: globals.eloStart - user.elo,
+            eloDiff: eloConstants.start - user.elo,
             userElo: user.elo
         }))
     }
@@ -372,7 +372,7 @@ export class Handler {
             await this.user.cancelSubscription(userID)
             return await this.user.updateElo(userID, this.user.getEloChange({
                 action: EloAction.Unsubscribe,
-                eloDiff: globals.eloStart - user.elo,
+                eloDiff: eloConstants.start - user.elo,
                 userElo: user.elo
             }))
         }
@@ -420,7 +420,7 @@ export class Handler {
 
         return data.
             filter( (_,index) => data[index].chat.length == 0).
-            slice(0, globals.usersLoadedInPreview).
+            slice(0, miscConstants.usersLoadedInPreview).
             map( val => ({profile: val.profile!, timestamp: val.timestamp}))
     }
 
@@ -440,7 +440,7 @@ export class Handler {
         const likedMeProfiles = await this.user.getPublicProfilesFromCriteria({
             include: likedMeUserIDs,
             exclude: alreadySwipedIDs,
-            count: globals.usersInSwipeFeed / 2,
+            count: miscConstants.usersInSwipeFeed / 2,
             gender: user.genderInterest,
             minDate: minDate,
             maxDate: maxDate
@@ -450,7 +450,7 @@ export class Handler {
 
         const otherUsers = await this.user.getPublicProfilesFromCriteria({
             exclude: excludeList,
-            count: globals.usersInSwipeFeed - likedMeProfiles.length,
+            count: miscConstants.usersInSwipeFeed - likedMeProfiles.length,
             maxDate: maxDate,
             minDate: minDate,
             gender: user.genderInterest
@@ -479,9 +479,9 @@ export class Handler {
 
         if (!schoolValid || schoolTaken || personalTaken) return null;
 
-        if (input.email == globals.sampleEmail) {
+        if (input.email == sampleContent.email) {
             return await this.verification.makeVerificationEntry(
-                input, new Date(2100,1,1), globals.sampleVerificationCode
+                input, new Date(2100,1,1), sampleContent.code
             )
         } else {
             return await this.verification.makeVerificationEntry(input);
@@ -502,8 +502,8 @@ export class Handler {
 
         let newCode : number|undefined; 
         while (true) {
-            if (eduEemail == globals.sampleSchoolEmail) {
-                newCode = globals.sampleVerificationCode;
+            if (eduEemail == sampleContent.eduEmail) {
+                newCode = sampleContent.code;
                 break;
             } else {
                 newCode = this.verification.generateDigitCode();
@@ -545,7 +545,7 @@ export class Handler {
             const userLogin = await this.login.createUser({
                 email: email,
                 expoPushToken: input.expoPushToken,
-                customID: email == globals.sampleEmail ? globals.sampleUserID : undefined
+                customID: email == sampleContent.email ? sampleContent.userID : undefined
             });
             return {
                 key: userLogin.key,
@@ -576,7 +576,6 @@ export class Handler {
             values.map(value => [key, value])
         );
     
-        // Convert each element into an object with 'type' and 'value' properties
         const formattedListWithObjects : AttributeValueInput[] = formattedList.map(([key, value]) => ({
             type: key as AttributeType,
             value: value

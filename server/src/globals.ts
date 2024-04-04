@@ -1,5 +1,4 @@
-export const globals = {
-    // User Restrictions
+export const userRestrictions = {
     minAge : 18,
     maxAge : 150,
     maxInterestedIn : 2,
@@ -9,38 +8,23 @@ export const globals = {
     acceptaleImageFormats : ["image/jpeg","image/png"],
     maxNameLength : 16,
     maxDescriptionLength : 100,
+}
 
-    // elo
-    eloStart: 1000,
-    eloDiffToMaxChange: 200,
-    eloLikeMaxChange: 20,
-    eloMessageMaxChange: 2,
-    eloLoginMaxChange: 0.5,
-    eloSubscribeMaxChange: 200,
+export const eloConstants = {
+    start: 1000,
+    diffToMaxChange: 200,
+    maxChangeFromLike: 20,
+    maxChangeFromMessage: 2,
+    maxChangeFromSubscribe: 200,
+}
 
-    // Other
-    usersLoadedInPreview : 10,
-    messagesLoadedInChat: 10,
-    maxReportCount: 10,
-    freeTrialDays: 7,
-    usersInSwipeFeed: 10,
-    verificationCodeLength: 4,
-    verificationExpireMinutes: 5,
-    keyExpirationWeeks: 10,
-    notificationSetting: "notifications",
-    notificationDisplayTitle: "Notifications",
-    notificationChannel: "default",
-    newMatchNotifTitle: "New Match!",
-    newMatchMessage: "Check out who it is",
-    imageSetting: "images",
-
-    // Sample
-    sampleUniversity: "lovedu",
-    sampleEmail: "quest.throwaway.acc@gmail.com",
-    sampleSchoolEmail: "quest.throwaway.acc@lovedu.edu",
-    sampleUserID: "sampleUserID",
-    sampleVerificationCode: 1234,
-    sampleMessages: [
+export const sampleContent = {
+    uni: "lovedu",
+    email: "quest.throwaway.acc@gmail.com",
+    eduEmail: "quest.throwaway.acc@lovedu.edu",
+    userID: "userID",
+    code: 1234,
+    messages: [
         "hi", 
         "hey", 
         "this is a very long message so dont mind the fact that it is going to be on multiple lines", 
@@ -61,7 +45,27 @@ export const globals = {
         "spam",
         "spam",
     ],
+}
 
-    //URLS
-    googleOAuth: "https://www.googleapis.com/userinfo/v2/me",
+export const displayText = {
+    notification: "Notifications",
+    newMatchNotificationTItle: "New Match!",
+    newMatchNotificationMessage: "Check out who it is",
+}
+
+export const miscConstants = {
+    usersLoadedInPreview : 10,
+    messagesLoadedInChat: 10,
+    maxReportCount: 10,
+    freeTrialDays: 7,
+    usersInSwipeFeed: 10,
+    verificationCodeLength: 4,
+    verificationExpireMinutes: 5,
+    keyExpirationWeeks: 10,
+    notificationChannel: "default",
+}
+
+export const userSettings = {
+    notification: "notifications",
+    image: "images",
 }

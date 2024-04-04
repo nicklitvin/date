@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it } from "@jest/globals";
 import { handler } from "../jest.setup";
-import { globals } from "../src/globals";
 import { addMinutes } from "date-fns";
 import { makeVerificationInput } from "../__testUtils__/easySetup";
+import { miscConstants } from "../src/globals";
 
 afterEach( async () => {
     await handler.verification.deleteAllVerifications();
@@ -17,10 +17,10 @@ describe("verification", () => {
         for (let i = 0; i < 100; i++) {
             const code = funcs.generateDigitCode();
             expect(code).toBeGreaterThanOrEqual(Math.pow(
-                10,globals.verificationCodeLength - 1)
+                10,miscConstants.verificationCodeLength - 1)
             )
             expect(code).toBeLessThan(Math.pow(
-                10, globals.verificationCodeLength)
+                10, miscConstants.verificationCodeLength)
             )
         }
     })

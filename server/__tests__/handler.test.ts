@@ -1,11 +1,11 @@
 import { afterEach, describe, expect, it } from "@jest/globals";
 import { handler } from "../jest.setup";
-import { globals } from "../src/globals";
 import { User } from "@prisma/client";
 import { ChatPreview } from "../src/interfaces";
 import { randomUUID } from "crypto";
 import { createUserInput, createUsersForSwipeFeed, getImageDetails, makeMessageInputWithOneRandom, makeMessageInputWithRandoms, makeTwoUsers, makeTwoUsersAndMatch, makeVerificationInput, matchUsers, validRequestUserInput } from "../__testUtils__/easySetup";
 import { addMinutes, addWeeks, addYears } from "date-fns";
+import { miscConstants, userRestrictions } from "../src/globals";
 
 afterEach( async () => {
     await handler.deleteEverything()
@@ -14,7 +14,7 @@ afterEach( async () => {
 describe("handler", () => {
     it("should not create user with invalid input", async () => {
         const invalidInput = await validRequestUserInput();
-        invalidInput.birthday = addYears(new Date(), -(globals.minAge - 1))
+        invalidInput.birthday = addYears(new Date(), -(userRestrictions.minAge - 1))
 
         expect(await handler.createUser(invalidInput)).toEqual(null);
     })
@@ -271,7 +271,7 @@ describe("handler", () => {
     it("should delete user after enough reports", async () => {
         const {user, user_2} = await makeTwoUsersAndMatch();
         await Promise.all(
-            Array.from({length: globals.maxReportCount}, () => randomUUID()).map(
+            Array.from({length: miscConstants.maxReportCount}, () => randomUUID()).map(
                 (val) => handler.report.makeReport({
                     userID: val,
                     reportedEmail: user_2.email
@@ -303,7 +303,7 @@ describe("handler", () => {
 
     it("should not upload over max images", async () => {
         const userInput = createUserInput("a@berkeley.edu");
-        const maxImages = Array.from({length: globals.maxImagesCount}).fill(
+        const maxImages = Array.from({length: userRestrictions.maxImagesCount}).fill(
             "imageID") as string[];
         userInput.images = maxImages;
 

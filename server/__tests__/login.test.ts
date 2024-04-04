@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it } from "@jest/globals";
 import { handler } from "../jest.setup";
 import { addWeeks } from "date-fns";
-import { globals } from "../src/globals";
 import { LoginEntryInput } from "../src/interfaces";
+import { miscConstants } from "../src/globals";
 
 afterEach(async () => {
     await handler.login.deleteAllLogin();
@@ -22,7 +22,7 @@ describe("login", () => {
         const user = await funcs.createUser(createInput(email));
 
         expect(user.email).toEqual(email);
-        expect(user.expire.getTime()).toBeGreaterThan(addWeeks(new Date(), globals.keyExpirationWeeks - 1).getTime())
+        expect(user.expire.getTime()).toBeGreaterThan(addWeeks(new Date(), miscConstants.keyExpirationWeeks - 1).getTime())
     })
 
     it("should get user", async () => {
