@@ -1,5 +1,5 @@
 import { Message, PrismaClient } from "@prisma/client";
-import { GetChatInput, GetChatPreviewsInput, MessageInput, ReadStatusInput } from "../interfaces";
+import { GetChatInput, GetMatchesInput, MessageInput, ReadStatusInput } from "../interfaces";
 import { randomUUID } from "crypto";
 import { miscConstants, sampleContent } from "../globals";
 
@@ -127,7 +127,7 @@ export class MessageHandler {
         return deleted.count;
     }
 
-    public async getLatestMessageFromDistinctUsers(input : GetChatPreviewsInput) {
+    public async getLatestMessageFromDistinctUsers(input : GetMatchesInput) {
         const [messagesFromUserID, messagesToUserID] = await Promise.all([
             this.prisma.message.findMany({
                 where: {

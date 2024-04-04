@@ -49,7 +49,7 @@ export interface PublicProfile {
     age: number
     gender: string
     attributes: string[]
-    images: ImageElement[]
+    images: ViewableImage[]
     description: string
     alcohol: string
     smoking: string
@@ -60,7 +60,7 @@ export interface GetChatInput {
     fromTime: Date
 }
 
-export interface RequestReportInput {
+export interface UserReportWithReportedID {
     reportedID: string
 }
 

@@ -1,5 +1,5 @@
 import { Opinion } from "@prisma/client";
-import { FileUpload, ImageInput, MessageInput, NewVerificationInput, RequestUserInput, SwipeInput, UserInput, UserReportInput, WithEmail } from "../src/interfaces";
+import { ImageUploadWithString, ImageUploadInput, MessageInput, NewVerificationInput, SwipeInput, UserInput, UserInputWithFiles, UserReportInput, WithEmail } from "../src/interfaces";
 import fs from "fs/promises";
 import { randomUUID } from "crypto";
 import mime from "mime-types";
@@ -10,23 +10,21 @@ import { userRestrictions } from "../src/globals";
 const imageFilePath = "./__testUtils__/goodImage.jpg";
 const badImageFilePath = "./__testUtils__/badImage.txt";
 
-export async function getImageDetails(good : boolean) : Promise<FileUpload> {
+export async function getImageDetails(good : boolean) : Promise<ImageUploadWithString> {
     return {
-        buffer: (await fs.readFile(good ? imageFilePath : badImageFilePath)).toString("base64"),
+        content: (await fs.readFile(good ? imageFilePath : badImageFilePath)).toString("base64"),
         mimetype: mime.lookup(good ? imageFilePath : badImageFilePath) as string
     }
 }
 
-export async function getImageInput(good : boolean) : Promise<ImageInput> {
+export async function getImageInput(good : boolean) : Promise<ImageUploadInput> {
     return {
         buffer: Buffer.from((await fs.readFile(good ? imageFilePath : badImageFilePath)).toString("base64")),
         mimetype: mime.lookup(good ? imageFilePath : badImageFilePath) as string
     }
 }
 
-
-
-export async function validRequestUserInput() : Promise<RequestUserInput & WithEmail> { 
+export async function validRequestUserInput() : Promise<UserInputWithFiles & WithEmail> { 
     const upload = await getImageDetails(true);
     return {
         id: randomUUID(),
@@ -38,11 +36,11 @@ export async function validRequestUserInput() : Promise<RequestUserInput & WithE
         genderInterest: ["Male", "Female"],
         files: [
             {
-                buffer: upload.buffer,
+                content: upload.content,
                 mimetype: upload.mimetype
             },
             {
-                buffer: upload.buffer,
+                content: upload.content,
                 mimetype: upload.mimetype
             },
         ],

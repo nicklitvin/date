@@ -1,9 +1,9 @@
-import { ImageHandler, ImageInput } from "../src/interfaces";
+import { ImageHandler, ImageUploadInput } from "../src/interfaces";
 
 export class MockImageHandler implements ImageHandler {
     uploadedIDs : string [] = [];
 
-    uploadImage(input : ImageInput) : Promise<string|null> {
+    uploadImage(input : ImageUploadInput) : Promise<string|null> {
         const id = String(Math.random());
         this.uploadedIDs.push(id);
         return Promise.resolve(id);

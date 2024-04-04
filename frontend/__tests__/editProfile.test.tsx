@@ -11,7 +11,7 @@ import EditPicturesMob from "../app/EditPictures";
 
 describe("editProfile", () => {
     const description = "description";
-    const imageElements : ImageElement[] = [
+    const imageElements : ViewableImage[] = [
         {id: "id_1", url: "url_1"}, 
         {id: "id_2", url: "url_2"}
     ];
@@ -23,7 +23,7 @@ describe("editProfile", () => {
         gender: "Male",
 
         description: description,
-        images: imageElements,
+        images: ViewableImages,
         attributes: attributes,
         name: "Michael",
         alcohol: "Often",

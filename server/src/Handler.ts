@@ -8,7 +8,7 @@ import { SwipeHandler } from "./handlers/swipe";
 import { MessageHandler } from "./handlers/message";
 import { ReportHandler } from "./handlers/report";
 import { StripePaymentHandler } from "./handlers/pay";
-import { AttributeValueInput, ChatPreview, ConfirmVerificationInput, DeleteImageInput, EditUserInput, EloAction, GetChatPreviewsInput, ImageHandler, LoginInput, LoginOutput, MessageInput, NewMatchData, NewMatchInput, NewVerificationInput, PaymentHandler, PublicProfile, RequestReportInput, RequestUserInput, SubscribeInput, SubscriptionData, SwipeFeed, SwipeInput, UnlikeInput, UnlikeOutput, UploadImageInput, UserInput, UserSwipeStats, WithEmail } from "./interfaces";
+import { AttributeValueInput, ChatPreview, ConfirmVerificationInput, DeleteImageInput, EditUserInput, EloAction, GetMatchesInput, ImageHandler, LoginInput, LoginOutput, MessageInput, NewMatchData,NewVerificationInput, PaymentHandler,UserReportWithReportedID, SubscribeInput, SubscriptionData, SwipeFeed, SwipeInput, UnlikeInput, UnlikeOutput, UploadImageInput, UserInput, UserInputWithFiles, UserSwipeStats, WithEmail } from "./interfaces";
 import { FreeTrialHandler } from "./handlers/freetrial";
 import { VerificationHandler } from "./handlers/verification";
 import { addYears } from "date-fns";
@@ -78,7 +78,7 @@ export class Handler {
         ])
     }
 
-    public async createUser(input : RequestUserInput & WithEmail, 
+    public async createUser(input : UserInputWithFiles & WithEmail, 
         ignoreVerification = this.ignoreVerification) : Promise<User|null> 
     {
         const [user, verification] = await Promise.all([
@@ -90,7 +90,7 @@ export class Handler {
         if (verification && verification.verified || ignoreVerification) {
             const imageIDs = await Promise.all(
                 input.files.map( val => {
-                    const decoded = Buffer.from(val.buffer,"base64")
+                    const decoded = Buffer.from(val.content,"base64")
                     return this.image.uploadImage({
                         buffer: decoded,
                         mimetype: val.mimetype
@@ -202,7 +202,7 @@ export class Handler {
         return null;
     }
 
-    public async getChatPreviews(input : GetChatPreviewsInput) : 
+    public async getChatPreviews(input : GetMatchesInput) : 
         Promise<ChatPreview[]|null> 
     {
         const user = await this.user.getUserByID(input.userID);
@@ -242,7 +242,7 @@ export class Handler {
         return result;
     }
 
-    public async reportUser(input : RequestReportInput) : Promise<UserReport|null> {
+    public async reportUser(input : UserReportWithReportedID) : Promise<UserReport|null> {
         const [user, reportedUser] = await Promise.all([
             this.user.getUserByID(input.userID),
             this.user.getUserByID(input.reportedID),
@@ -290,7 +290,7 @@ export class Handler {
         ) return null;
 
         const imageID = await this.image.uploadImage({
-            buffer: Buffer.from(input.image.buffer, "base64"),
+            buffer: Buffer.from(input.image.content, "base64"),
             mimetype: input.image.mimetype
         });
         if (!imageID) return null;
@@ -402,12 +402,12 @@ export class Handler {
         };
     }
 
-    public async getNewMatches(input : NewMatchInput) : Promise<NewMatchData[]|null> {
+    public async getNewMatches(input : GetMatchesInput) : Promise<NewMatchData[]|null> {
         const user = await this.user.getUserByID(input.userID);
 
         if (!user) return null;
 
-        const matches = await this.swipe.getAllMatches(input.userID,input.fromTime);
+        const matches = await this.swipe.getAllMatches(input.userID,input.timestamp);
         const data = await Promise.all(matches.map( async (match) => ({
             chat: await this.message.getChat({
                 userID: input.userID,

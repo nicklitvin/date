@@ -1,6 +1,6 @@
 import express from "express";
 import { URLs } from "./urls";
-import { APIOutput, APIRequest, ClientIDs, ConfirmVerificationInput, DeleteImageInput, EditUserInput, Email, FileUpload, GetChatInput, GetChatPreviewsInput, GetProfileInput,LoginInput, MessageInput, NewMatchInput, NewVerificationInput, RequestReportInput, RequestUserInput, SubscribeInput, SwipeInput, UnlikeInput, UpdatePushTokenInput, UploadImageInput, WithEmail } from "./interfaces";
+import { APIOutput, APIRequest, ClientIDs, ConfirmVerificationInput, DeleteImageInput, EditUserInput, GetChatInput, GetProfileInput,LoginInput, MessageInput, GetMatchesInput, NewVerificationInput, UserReportWithReportedID, SubscribeInput, SwipeInput, UnlikeInput, UpdatePushTokenInput, UploadImageInput, UserInputWithFiles, WithEmail } from "./interfaces";
 import { isAdmin } from "./others";
 import { Handler } from "./handler";
 
@@ -11,13 +11,13 @@ export class APIHandler {
 
         app.post(URLs.createUser, async (req, res) => {
             try {
-                const body = req.body as APIRequest<RequestUserInput>;
+                const body = req.body as APIRequest<UserInputWithFiles>;
                 if (!body.key) return res.status(400).json();
 
                 const user = await handler.login.getUserByKey(body.key);
                 if (!user || !user.userID) return res.status(401).json();
 
-                const input : RequestUserInput & WithEmail = {
+                const input : UserInputWithFiles & WithEmail = {
                     ...body,
                     id: user.userID,
                     email: user.email,
@@ -75,13 +75,13 @@ export class APIHandler {
 
         app.post(URLs.reportUser, async (req,res) => {
             try {
-                const body = req.body as APIRequest<RequestReportInput>;
+                const body = req.body as APIRequest<UserReportWithReportedID>;
                 if (!body.key) return res.status(400).json();
     
                 const userID = await handler.login.getUserIDByKey(body.key);
                 if (!userID) return res.status(401).json();
     
-                const input : RequestReportInput = {
+                const input : UserReportWithReportedID = {
                     userID: userID,
                     reportedID: body.reportedID
                 }
@@ -95,15 +95,15 @@ export class APIHandler {
 
         app.post(URLs.getNewMatches, async (req,res) => {
             try {
-                const body = req.body as APIRequest<NewMatchInput>;
+                const body = req.body as APIRequest<GetMatchesInput>;
                 if (!body.key) return res.status(400).json();
     
                 const userID = await handler.login.getUserIDByKey(body.key);
                 if (!userID) return res.status(401).json();
     
-                const input : NewMatchInput = {
+                const input : GetMatchesInput = {
                     userID: userID,
-                    fromTime: new Date(body.fromTime)
+                    timestamp: new Date(body.timestamp)
                 }
                 const output = await handler.getNewMatches(input);
                 return output ? 
@@ -117,13 +117,13 @@ export class APIHandler {
 
         app.post(URLs.getNewChatPreviews, async (req,res) => {
             try {
-                const body = req.body as APIRequest<GetChatPreviewsInput>;
+                const body = req.body as APIRequest<GetMatchesInput>;
                 if (!body.key) return res.status(400).json();
     
                 const userID = await handler.login.getUserIDByKey(body.key);
                 if (!userID) return res.status(401).json();
                 
-                const input : GetChatPreviewsInput = {
+                const input : GetMatchesInput = {
                     userID: userID,
                     timestamp: new Date(body.timestamp)
                 }

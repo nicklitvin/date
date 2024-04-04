@@ -1,7 +1,7 @@
 import { act, fireEvent, render, screen } from "@testing-library/react-native";
 import { RootStore, createStoreProvider } from "../src/store/RootStore";
 import { ChatMob } from "../app/Chat";
-import { GetChatInput, Message, MessageInput, PublicProfile, RequestReportInput } from "../src/interfaces";
+import { GetChatInput, Message, MessageInput, PublicProfile, UserReportWithReportedID } from "../src/interfaces";
 import { chatText } from "../src/text";
 import { testIDS } from "../src/testIDs";
 import { getChatTimestamp } from "../src/utils";
@@ -183,7 +183,7 @@ describe("chat", () => {
         }])
 
         mock.onPost(URLs.server + URLs.reportUser).reply( config => {
-            const payload = JSON.parse(config.data) as RequestReportInput;
+            const payload = JSON.parse(config.data) as UserReportWithReportedID;
             expect(payload.reportedID).toEqual(recepientProfile.id);
             sent = true;
             return [200]

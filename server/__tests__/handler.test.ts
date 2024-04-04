@@ -344,7 +344,7 @@ describe("handler", () => {
         const user = await handler.user.createUser(createUserInput("a@berkeley.edu"));
         await handler.uploadImage({
             image: {
-                buffer: "a",
+                content: "a",
                 mimetype: "image/jpeg"
             },
             userID: user.id
@@ -524,7 +524,7 @@ describe("handler", () => {
     it("should not get new matches from nonuser", async () => {
         expect(await handler.getNewMatches({
             userID: "random",
-            fromTime: new Date()
+            timestamp: new Date()
         })).toEqual(null);
     })
 
@@ -537,7 +537,7 @@ describe("handler", () => {
         });
         const newMatches = await handler.getNewMatches({
             userID: user.id,
-            fromTime: new Date()
+            timestamp: new Date()
         });
 
         expect(newMatches).toHaveLength(0);
@@ -554,7 +554,7 @@ describe("handler", () => {
 
         const newMatches = await handler.getNewMatches({
             userID: user.id,
-            fromTime: new Date()
+            timestamp: new Date()
         });
 
         expect(newMatches).toHaveLength(2);
@@ -565,7 +565,7 @@ describe("handler", () => {
 
         const newMatches1 = await handler.getNewMatches({
             userID: user.id,
-            fromTime: new Date(match2.getTime() - 1)
+            timestamp: new Date(match2.getTime() - 1)
         });
         expect(newMatches1).toHaveLength(1);
         expect(newMatches1![0].profile.id).toEqual(user2.id);

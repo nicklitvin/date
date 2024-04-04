@@ -3,7 +3,7 @@ import { MyTextInput } from "../src/components/TextInput";
 import { chatText, generalText } from "../src/text";
 import { useEffect, useRef, useState } from "react";
 import { useStore } from "../src/store/RootStore";
-import { GetChatInput, GetProfileInput, Message, MessageInput, PublicProfile, RequestReportInput, SwipeInput, UnlikeInput, WithKey } from "../src/interfaces";
+import { GetChatInput, GetProfileInput, Message, MessageInput, PublicProfile, UserReportWithReportedID, SwipeInput, UnlikeInput, WithKey } from "../src/interfaces";
 import { globals } from "../src/globals";
 import { StyledButton, StyledImage, StyledScroll, StyledText, StyledView } from "../src/styledElements";
 import { testIDS } from "../src/testIDs";
@@ -238,7 +238,7 @@ export function Chat(props : Props) {
     const reportUser = async () => {
         try {
             setShowModal(false);
-            const myReport : WithKey<RequestReportInput> = {
+            const myReport : WithKey<UserReportWithReportedID> = {
                 key: receivedData.loginKey,
                 reportedID: profile!.id
             }

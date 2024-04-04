@@ -2,7 +2,7 @@ import { observer } from "mobx-react-lite";
 import { StyledButton, StyledImage, StyledScroll, StyledText, StyledView } from "../styledElements";
 import { PageHeader } from "../components/PageHeader";
 import { profileText, profileViewText } from "../text";
-import { PublicProfile, RequestReportInput, SwipeInput, WithKey } from "../interfaces";
+import { PublicProfile, UserReportWithReportedID, SwipeInput, WithKey } from "../interfaces";
 import axios from "axios";
 import { Action } from "../types";
 import { URLs } from "../urls";
@@ -44,7 +44,7 @@ export function ProfileViewEmbed(props : Props) {
 
     const reportUser = async () => {
         try {
-            const myReport : WithKey<RequestReportInput> = {
+            const myReport : WithKey<UserReportWithReportedID> = {
                 reportedID: props.profile.id,
                 key: props.loginKey
             }

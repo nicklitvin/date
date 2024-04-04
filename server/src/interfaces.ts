@@ -1,4 +1,4 @@
-import { AttributeType, Gender, Message, Opinion, Swipe, Usage, User } from "@prisma/client"
+import { AttributeType, Gender, Message, Opinion, Swipe, Usage } from "@prisma/client"
 
 export interface AnnouncementInput {
     startTime: Date
@@ -35,8 +35,8 @@ export interface UserInput extends BasicUserInput {
     email: string
 }
 
-export interface RequestUserInput extends BasicUserInput {
-    files: FileUpload[]
+export interface UserInputWithFiles extends BasicUserInput {
+    files: ImageUploadWithString[]
 }
 
 export interface WithEmail {
@@ -73,7 +73,7 @@ export interface GetChatInput {
     fromTime: Date
 }
 
-export interface RequestReportInput {
+export interface UserReportWithReportedID {
     userID: string
     reportedID: string
 }
@@ -83,19 +83,12 @@ export interface UserReportInput {
     reportedEmail: string
 }
 
-export interface EditUserSubscriptionInput {
-    userID: string
-    subscribeEnd: Date
-    isSubscribed: boolean
-    subscriptionID: string | undefined
-}
-
-export interface ImageInput {
+export interface ImageUploadInput {
     buffer: Buffer
     mimetype: string
 }
 
-export interface ImageElement {
+export interface ViewableImage {
     url: string
     id: string
 }   
@@ -106,7 +99,7 @@ export interface PublicProfile {
     age: number
     gender: Gender
     attributes: string[]
-    images: ImageElement[]
+    images: ViewableImage[]
     description: string
     alcohol: Usage
     smoking: Usage
@@ -124,12 +117,12 @@ export interface SwipeBreakdown {
     dislikedMe: number
 }
 
-export interface FileUpload {
-    buffer: string
+export interface ImageUploadWithString {
+    content: string
     mimetype: string
 }
 
-export interface GetChatPreviewsInput {
+export interface GetMatchesInput {
     userID: string
     timestamp: Date
 }
@@ -140,7 +133,7 @@ export interface ChatPreview {
 }
 
 export interface ImageHandler {
-    uploadImage(input : ImageInput) : Promise<string|null>
+    uploadImage(input : ImageUploadInput) : Promise<string|null>
     getImageURL(id : string) : Promise<string|null>
     deleteImage(id : string) : Promise<string|null>
     getAllImageIDs() : Promise<string[]>
@@ -149,7 +142,7 @@ export interface ImageHandler {
 
 export interface UploadImageInput {
     userID: string
-    image: FileUpload
+    image: ImageUploadWithString
 }
 
 export interface DeleteImageInput {
@@ -168,8 +161,7 @@ export interface PaymentExtractOutput {
 }
 
 export interface PaymentHandler {
-    createSubscriptionSessionURL(userID : string, email : string, freeTrial: boolean) : 
-        Promise<string>
+    createSubscriptionSessionURL(userID : string, email : string, freeTrial: boolean) : Promise<string>
     extractDataFromPayment(signature : string, body : any) : Promise<PaymentExtractOutput|null> 
     cancelSubscription(subscriptionID: string) : Promise<boolean>
 }
@@ -182,11 +174,6 @@ export interface UnlikeInput {
 export interface UnlikeOutput {
     newSwipe: Swipe,
     deletedMessages: number
-}
-
-export interface NewMatchInput {
-    userID: string
-    fromTime: Date
 }
 
 export interface EloUpdateInput {
@@ -262,10 +249,6 @@ export interface LoginOutput {
     key: string
     newAccount: boolean
     verified: boolean
-}
-
-export interface Email {
-    email : string
 }
 
 export type APIRequest<T> = Omit<T,"userID"|"id"> & {key : string};

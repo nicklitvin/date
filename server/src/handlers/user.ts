@@ -1,5 +1,5 @@
 import { PrismaClient, User } from "@prisma/client";
-import { EditUserInput, EloAction, EloUpdateInput, GetProfileListInput, ImageElement, ImageHandler, Preferences, PublicProfile, RequestUserInput, SettingData, SubscriptionData, UserInput } from "../interfaces";
+import { EditUserInput, EloAction, EloUpdateInput, GetProfileListInput, ViewableImage, ImageHandler, Preferences, PublicProfile, SettingData, SubscriptionData, UserInput, UserInputWithFiles } from "../interfaces";
 import { addMonths, differenceInYears } from "date-fns";
 import { sampleUsers } from "../sample";
 import { displayText, eloConstants, sampleContent, userRestrictions, userSettings } from "../globals";
@@ -122,7 +122,7 @@ export class UserHandler {
         })
     }
 
-    public isInputValid(input : RequestUserInput) : boolean {
+    public isInputValid(input : UserInputWithFiles) : boolean {
         return (
             differenceInYears(new Date(), input.birthday) >= userRestrictions.minAge &&
             differenceInYears(new Date(), input.birthday) <= userRestrictions.maxAge &&
@@ -226,7 +226,7 @@ export class UserHandler {
 
     public async convertUserToPublicProfile(input : User) : Promise<PublicProfile> {
         const age = differenceInYears(new Date(), input.birthday);
-        let imageElements : ImageElement[] = [];
+        let imageElements : ViewableImage[] = [];
 
         if (this.imageHandler) {
             imageElements = await Promise.all(
