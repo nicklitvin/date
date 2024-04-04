@@ -316,7 +316,7 @@ export class APIHandler {
     
                 const input : EditUserInput = {
                     userID: userID,
-                    setting: body.setting.toLowerCase(),
+                    setting: body.setting,
                     value: body.value,
                 }
                 const output = await handler.editUser(input);

@@ -42,18 +42,21 @@ export function GenderPreference(props : Props) {
             )}
         >
             {props.genders.map( val => 
-                <StyledView key={`gender-pref-${val}`} className="w-full items-center">
+                <StyledView 
+                    key={`gender-pref-${val}`} 
+                    className={classNames(
+                        props.embed ? "" : "w-full items-center"
+                    )}
+                >
                     <MyButton
                         smallButton={props.smallButtons}
                         text={val}
                         invertColor={genderPreference.includes(val)}
                         onPressFunction={() => pressGender(val)}
                     />
-                    <Spacing size="md"/>
+                    {props.embed ? null : <Spacing size="md"/>}
                 </StyledView>
-                
             )}
-
         </StyledView>
     )
 

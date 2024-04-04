@@ -29,6 +29,7 @@ export function PreferencePage(props : Props) {
         globals.minAge, globals.maxAge
     ])
     const [noChanges, setNoChanges] = useState<boolean>(false);
+    const [firstLoad, setFirstLoad] = useState<boolean>(true);
 
     useEffect( () => {
         if (preferences) {
@@ -37,9 +38,12 @@ export function PreferencePage(props : Props) {
     }, [preferences])
 
     useEffect( () => {
-        if (props.noAutoLoad) return
-        load();
-    })
+        if (firstLoad) {
+            setFirstLoad(true)
+            if (props.noAutoLoad) return
+            load();
+        }
+    }, [firstLoad])
 
     useEffect( () => {
         if (props.returnGenderCount) props.returnGenderCount(genders.length);
@@ -122,15 +126,13 @@ export function PreferencePage(props : Props) {
                 <StyledText className="font-bold text-xl pt-4 pb-2">
                     {preferencesText.headerGender}
                 </StyledText>
-                <StyledView className="flex w-full flex-row">
-                    <GenderPreference
-                        genders={globals.genders}
-                        genderState={genders}
-                        embed={true}
-                        setGenders={setGenders}
-                        smallButtons={true}
-                    />
-                </StyledView>
+                <GenderPreference
+                    genders={globals.genders}
+                    genderState={genders}
+                    embed={true}
+                    setGenders={setGenders}
+                    smallButtons={true}
+                />
                 <StyledText className={classNames(
                     "font-base text-danger",
                     genders.length == 0 ? "opacity-100" : "opacity-0"

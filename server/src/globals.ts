@@ -50,6 +50,14 @@ export const globals = {
         "spam",
         "spam",
         "spam",
+        "spam",
+        "spam",
+        "spam",
+        "spam",
+        "spam",
+        "spam",
+        "spam",
+        "spam",
     ],
 
     //URLS
