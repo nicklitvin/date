@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { MySimplePage } from "../components/SimplePage"
-import { FileUploadAndURI } from "../interfaces";
 import { pictureText } from "../text"
 import { StyledButton, StyledText, StyledView } from "../styledElements";
 import { globals } from "../globals";
@@ -11,10 +10,11 @@ import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
 import { Buffer } from "buffer"
 import classNames from "classnames";
+import { UploadImageInputWithURI } from "../interfaces";
 
 interface Props {
-    uploads: FileUploadAndURI[]
-    onSubmit: (input : FileUploadAndURI[]) => any
+    uploads: UploadImageInputWithURI[]
+    onSubmit: (input : UploadImageInputWithURI[]) => any
     submitText: string
     returnUploadLength?: (input : number) => number
     returnSwitchURI?: (input : string|null) => string|null
@@ -22,7 +22,7 @@ interface Props {
 }
 
 export function Pictures(props : Props) {
-    const [uploads, setUploads] = useState<FileUploadAndURI[]>(props.uploads);
+    const [uploads, setUploads] = useState<UploadImageInputWithURI[]>(props.uploads);
     const [switchURI, setSwitchURI] = useState<string|null>(null);
     const [showError, setShowError] = useState<boolean>(false);
 
@@ -78,15 +78,17 @@ export function Pictures(props : Props) {
             return
         }
 
-        const newUploads : FileUploadAndURI[] = [];
+        const newUploads : UploadImageInputWithURI[] = [];
         for (const asset of assets) {
             try {
                 const assetString = await FileSystem.readAsStringAsync(asset.uri, {
                     encoding: FileSystem.EncodingType.Base64
                 })
                 newUploads.push({
-                    buffer: assetString,
-                    mimetype: asset.mime as string,
+                    image: {
+                        content: assetString,
+                        mimetype: asset.mime as string
+                    },
                     uri: asset.uri
                 })
             } catch (err) {

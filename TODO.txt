@@ -1,11 +1,13 @@
 TODO
+
 router.goback() refresh page when changing settings,preferences
+    preference change changes feed
 send email to edu email with code
-preference change changes feed
 reported page cant login
 why mymessage constantly rerendering in chat
-update read status on opening chat
 latest message not showing in chat
+send read receipt
+move keyboard in long chat
 
 create web buy and stats stuff
 notification receive, delete receiveDate when new

@@ -27,6 +27,7 @@ const func = async () => {
         schoolEmail: sampleContent.eduEmail,
         code: sampleContent.code
     })
+    const fileString = (await fs.readFile("./__testUtils__/goodImage.jpg")).toString("base64");
     await handler.createUser({
         ageInterest: [18,30],
         alcohol: "Never",
@@ -35,7 +36,7 @@ const func = async () => {
         description: "description",
         email: sampleContent.email,
         files: [{
-            buffer: Buffer.from(await fs.readFile("./__testUtils__/goodImage.jpg")).toString("base64"),
+            content: fileString,
             mimetype: "image/jpeg"
         }],
         gender: "Female",

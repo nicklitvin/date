@@ -130,9 +130,7 @@ export function Matches(props : Props) {
             const input : NewMatchDataInput = {
                 timestamp: new Date(newMatches.at(-1)!.timestamp.getTime() - 1)
             }
-            const response = await axios.post(URLs.server + URLs.getNewMatches, input, {
-                signal: createTimeoutSignal()
-            }); 
+            const response = await sendRequest(URLs.getNewMatches, input);
             receivedNewMatches = response.data.data;
             receivedNewMatches = receivedNewMatches.map( val => ({
                 ...val,
@@ -229,7 +227,7 @@ export function Matches(props : Props) {
                             >
                                 <StyledView className="flex items-center pr-3">
                                     <StyledImage
-                                        source={match.profile.images[0].url}
+                                        source={match.profile.images[0]?.url}
                                         className="w-[75px] h-[75px] rounded-full"
                                     />
                                 </StyledView>

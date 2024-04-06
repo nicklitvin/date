@@ -34,7 +34,6 @@ export function EditSmoking() {
                 value: frequency
             }
             await sendRequest(URLs.editUser, input);
-            console.log(frequency);
             setProfile({
                 ...profile!,
                 smoking: frequency

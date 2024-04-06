@@ -2,7 +2,7 @@ import { act, fireEvent, render, screen } from "@testing-library/react-native";
 import MockAdapter from "axios-mock-adapter";
 import axios from "axios";
 import { URLs } from "../src/urls";
-import { DeleteImageInput, EditUserInput, ImageElement, PublicProfile, UploadImageInput } from "../src/interfaces";
+import { DeleteImageInput, EditUserInput, PublicProfile, UploadImageInput, ViewableImage } from "../src/interfaces";
 import { globals } from "../src/globals";
 import { editProfileText } from "../src/text";
 import { RootStore, createStoreProvider } from "../src/store/RootStore";
@@ -23,7 +23,7 @@ describe("editProfile", () => {
         gender: "Male",
 
         description: description,
-        images: ViewableImages,
+        images: imageElements,
         attributes: attributes,
         name: "Michael",
         alcohol: "Often",

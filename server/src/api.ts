@@ -40,8 +40,9 @@ export class APIHandler {
                 if (!userID) return res.status(401).json();
     
                 const input : MessageInput = {
-                    ...body,
-                    userID: userID
+                    userID: userID,
+                    message: body.message,
+                    recepientID: body.recepientID
                 }
                 const output = await handler.sendMessage(input);
                 return output ? res.status(200).json() : res.status(400).json()
@@ -249,8 +250,8 @@ export class APIHandler {
                 if (!userID) return res.status(401).json();
     
                 const input : UploadImageInput = {
-                    ...body,
-                    userID: userID
+                    userID: userID,
+                    image: body.image
                 }
                 const output = await handler.uploadImage(input);
                 const publicProfile = await handler.user.getPublicProfile(userID)

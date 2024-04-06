@@ -13,10 +13,12 @@ describe("settings", () => {
     const settingData : SettingData[] = [
         {
             title: "title",
+            display: "titleDisplay",
             value: true
         },
         {
             title: "title2",
+            display: "title2Display",
             value: false
         }
     ]
@@ -56,7 +58,7 @@ describe("settings", () => {
         const { store } = await load();
 
         for (const setting of settingData) {
-            expect(screen.queryByText(setting.title)).not.toEqual(null);
+            expect(screen.queryByText(setting.display)).not.toEqual(null);
         }
 
         expect(store.receivedData.settings).toHaveLength(settingData.length);
@@ -66,7 +68,7 @@ describe("settings", () => {
         await load(true);
 
         for (const setting of settingData) {
-            expect(screen.queryByText(setting.title)).not.toEqual(null);
+            expect(screen.queryByText(setting.display)).not.toEqual(null);
         }
     })
 

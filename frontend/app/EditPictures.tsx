@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { MySimplePage } from "../src/components/SimplePage"
-import { DeleteImageInput, EditUserInput, FileUploadAndURI, PublicProfile, UploadImageInput, WithKey } from "../src/interfaces";
+import { DeleteImageInput, EditUserInput, PublicProfile, UploadImageInput, UploadImageInputWithURI, WithKey } from "../src/interfaces";
 import { pictureText } from "../src/text"
 import { StyledText, StyledView } from "../src/styledElements";
 import { globals } from "../src/globals";
@@ -71,14 +71,16 @@ export function EditPictures() {
             return
         }
 
-        let newUpload : FileUploadAndURI;
+        let newUpload : UploadImageInputWithURI;
         try {
             const assetString = await FileSystem.readAsStringAsync(asset.uri, {
                 encoding: FileSystem.EncodingType.Base64
             })
             newUpload = {
-                buffer: assetString,
-                mimetype: asset.mime as string,
+                image: {
+                    content: assetString,
+                    mimetype: asset.mime as string
+                },
                 uri: asset.uri
             }
         } catch (err) {
@@ -91,8 +93,8 @@ export function EditPictures() {
             const input : WithKey<UploadImageInput> = {
                 key: receivedData.loginKey,
                 image: {
-                    buffer: newUpload.buffer,
-                    mimetype: newUpload.mimetype
+                    content: newUpload.image.content,
+                    mimetype: newUpload.image.mimetype
                 }
             }
             const response = await sendRequest(URLs.uploadImage, input);

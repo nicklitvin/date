@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { generalText } from "../src/text";
 import { globals } from "../src/globals";
-import { FileUploadAndURI, UserInput, WithKey } from "../src/interfaces";
+import { UploadImageInputWithURI, UserInput, WithKey } from "../src/interfaces";
 import { observer } from "mobx-react-lite";
 import { useStore } from "../src/store/RootStore";
 import { AccountCreationType } from "../src/types";
@@ -29,7 +29,7 @@ export const pageOrder : AccountCreationType[] = [
 interface Props {
     customPageStart? : number
     customBirthday?: Date
-    customUploads?: FileUploadAndURI[]
+    customUploads?: UploadImageInputWithURI[]
     returnPageNumber?: (input : number) => number
     noRouter?: boolean
 }
@@ -44,7 +44,7 @@ export function AccountCreation(props : Props) {
     const [genderPreference, setGenderPreference] = useState<string[]>([]);
     const [description, setDescription] = useState<string>("");
     const [attributes, setAttributes] = useState<string[]>([]);
-    const [uploads, setUploads] = useState<FileUploadAndURI[]>(props.customUploads ?? []);
+    const [uploads, setUploads] = useState<UploadImageInputWithURI[]>(props.customUploads ?? []);
     const [agePreference, setAgePreference] = useState<[number, number]>(
         [globals.minAge, globals.maxAge]
     );
@@ -76,12 +76,10 @@ export function AccountCreation(props : Props) {
             genderInterest: genderPreference,
             alcohol: alcohol,
             smoking: smoking,
-            files: uploads.map( upload => {
-                return {
-                    buffer: upload.buffer,
-                    mimetype: upload.mimetype
-                }
-            })
+            files: uploads.map( upload => ({
+                content: upload.image.content,
+                mimetype: upload.image.mimetype
+            }))
         };
      
         try {
@@ -175,7 +173,7 @@ export function AccountCreation(props : Props) {
             return <Pictures
                 goBack={goBack}
                 uploads={uploads}
-                onSubmit={(input : FileUploadAndURI[]) => {
+                onSubmit={(input : UploadImageInputWithURI[]) => {
                     setUploads(input);
                     goToNextPage();
                 }}

@@ -10,18 +10,9 @@ export interface UserInput {
     genderInterest: string[]
     attributes: string[]
     description: string
-    files: FileUpload[]
+    files: ImageUploadWithString[]
     alcohol: string
     smoking: string
-}
-
-export interface FileUpload {
-    buffer: string
-    mimetype: string
-}
-
-export interface FileUploadAndURI extends FileUpload {
-    uri: string
 }
 
 export interface MessageInput {
@@ -38,10 +29,23 @@ export interface Message {
     readStatus: boolean;
 }
 
-export interface ImageElement {
+export interface ViewableImage {
     url: string
     id: string
-}   
+} 
+
+export interface ImageUploadWithString {
+    content: string
+    mimetype: string
+}
+
+export interface UploadImageInput {
+    image: ImageUploadWithString
+}
+
+export interface UploadImageInputWithURI extends UploadImageInput{
+    uri: string
+}
 
 export interface PublicProfile {
     id: string
@@ -94,10 +98,6 @@ export interface ConfirmVerificationInput {
 
 export interface DeleteImageInput {
     imageID: string
-}
-
-export interface UploadImageInput {
-    image: FileUpload
 }
 
 export interface EditUserInput {
