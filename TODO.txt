@@ -1,5 +1,4 @@
 TODO
-
 router.goback() refresh page when changing settings,preferences
     preference change changes feed
 send email to edu email with code

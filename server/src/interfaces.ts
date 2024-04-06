@@ -283,3 +283,7 @@ export interface APIOutput {
     data?: any
     message?: string
 }
+
+export interface MailHandler {
+    sendVerificationCode(email : string, code : number) : Promise<any>
+}
