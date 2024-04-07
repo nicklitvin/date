@@ -21,7 +21,7 @@ describe("message suite", () => {
         await funcs.sendMessage(messageInput);
         expect(await funcs.updateReadStatus({
             userID: "random",
-            fromID: messageInput.recepientID,
+            toID: messageInput.recepientID,
             timestamp: new Date()
         })).toEqual(0);
     })
@@ -31,7 +31,7 @@ describe("message suite", () => {
         await funcs.sendMessage(messageInput);
         expect(await funcs.updateReadStatus({
             userID: messageInput.userID,
-            fromID: messageInput.recepientID,
+            toID: messageInput.recepientID,
             timestamp: new Date()
         })).toEqual(0);
     })
@@ -41,7 +41,7 @@ describe("message suite", () => {
         await funcs.sendMessage(messageInput);
         expect(await funcs.updateReadStatus({
             userID: messageInput.recepientID,
-            fromID: messageInput.userID,
+            toID: messageInput.userID,
             timestamp: new Date()
         })).toEqual(1);
     })

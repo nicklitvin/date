@@ -26,7 +26,7 @@ export class MessageHandler {
     public async updateReadStatus(input : ReadStatusInput) : Promise<number> {
         const updated = await this.prisma.message.updateMany({
             where: {
-                userID: input.fromID,
+                userID: input.toID,
                 recepientID: input.userID,
                 timestamp: {
                     "lte": input.timestamp

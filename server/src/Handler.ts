@@ -8,7 +8,7 @@ import { SwipeHandler } from "./handlers/swipe";
 import { MessageHandler } from "./handlers/message";
 import { ReportHandler } from "./handlers/report";
 import { StripePaymentHandler } from "./handlers/pay";
-import { AttributeValueInput, ChatPreview, ConfirmVerificationInput, DeleteImageInput, EditUserInput, EloAction, GetMatchesInput, ImageHandler, LoginInput, LoginOutput, MessageInput, NewMatchData,NewVerificationInput, PaymentHandler,UserReportWithReportedID, SubscribeInput, SubscriptionData, SwipeFeed, SwipeInput, UnlikeInput, UnlikeOutput, UploadImageInput, UserInput, UserInputWithFiles, UserSwipeStats, WithEmail, MailHandler } from "./interfaces";
+import { AttributeValueInput, ChatPreview, ConfirmVerificationInput, DeleteImageInput, EditUserInput, EloAction, GetMatchesInput, ImageHandler, LoginInput, LoginOutput, MessageInput, NewMatchData,NewVerificationInput, PaymentHandler,UserReportWithReportedID, SubscribeInput, SubscriptionData, SwipeFeed, SwipeInput, UnlikeInput, UnlikeOutput, UploadImageInput, UserInput, UserInputWithFiles, UserSwipeStats, WithEmail, MailHandler, ReadStatusInput } from "./interfaces";
 import { FreeTrialHandler } from "./handlers/freetrial";
 import { VerificationHandler } from "./handlers/verification";
 import { addYears } from "date-fns";
@@ -92,7 +92,7 @@ export class Handler {
         ])
         if (user || !this.user.isInputValid(input)) return null;
 
-        if (verification && verification.verified || ignoreVerification) {
+        if ( (verification && verification.verified) || ignoreVerification) {
             const imageIDs = await Promise.all(
                 input.files.map( val => {
                     const decoded = Buffer.from(val.content,"base64")
@@ -601,6 +601,26 @@ export class Handler {
             subscriberInfo.subscribed 
         ) {
             return await this.swipe.getUserSwipeStats(userID);
+        }
+        return null;
+    }
+
+    public async updateReadStatus(input : ReadStatusInput) : Promise<number|null> {
+        const [user, recepient, userOpinion, recepientOpinion] = await Promise.all([
+            this.user.getUserByID(input.userID),
+            this.user.getUserByID(input.toID),
+            this.swipe.getSwipeByUsers(input.userID, input.toID),
+            this.swipe.getSwipeByUsers(input.toID, input.userID)
+        ])
+
+        if (user && recepient && userOpinion?.action == "Like" && 
+            recepientOpinion?.action == "Like"
+        ) {
+            return await this.message.updateReadStatus({
+                userID: input.userID,
+                toID: input.toID,
+                timestamp: input.timestamp
+            })           
         }
         return null;
     }

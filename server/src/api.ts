@@ -1,6 +1,6 @@
 import express from "express";
 import { URLs } from "./urls";
-import { APIOutput, APIRequest, ClientIDs, ConfirmVerificationInput, DeleteImageInput, EditUserInput, GetChatInput, GetProfileInput,LoginInput, MessageInput, GetMatchesInput, NewVerificationInput, UserReportWithReportedID, SubscribeInput, SwipeInput, UnlikeInput, UpdatePushTokenInput, UploadImageInput, UserInputWithFiles, WithEmail } from "./interfaces";
+import { APIOutput, APIRequest, ClientIDs, ConfirmVerificationInput, DeleteImageInput, EditUserInput, GetChatInput, GetProfileInput,LoginInput, MessageInput, GetMatchesInput, NewVerificationInput, UserReportWithReportedID, SubscribeInput, SwipeInput, UnlikeInput, UpdatePushTokenInput, UploadImageInput, UserInputWithFiles, WithEmail, ReadStatusInput } from "./interfaces";
 import { isAdmin } from "./others";
 import { Handler } from "./handler";
 
@@ -612,6 +612,29 @@ export class APIHandler {
                     return res.status(200).json();
                 }
                 return res.status(401).json();
+            } catch (err) {
+                console.log(err);
+                return res.status(500).json();
+            }
+        })
+
+        app.post(URLs.sendReadStatus, async (req,res) => {
+            try {
+                const body = req.body as APIRequest<ReadStatusInput>;
+                if (!body.key) return res.status(400).json();
+
+                const userID = await handler.login.getUserIDByKey(body.key);
+                if (!userID) return res.status(401).json();
+
+                const output = await handler.updateReadStatus({
+                    timestamp: new Date(body.timestamp),
+                    userID: userID,
+                    toID: body.toID
+                })
+    
+                // const output = await handler.login.updateExpoToken(userID,body.expoPushToken);
+                return output ? res.status(200).json() : res.status(400).json()
+
             } catch (err) {
                 console.log(err);
                 return res.status(500).json();

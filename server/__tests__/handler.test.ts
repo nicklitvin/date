@@ -937,4 +937,40 @@ describe("handler", () => {
             ID: "asd"
         })).not.toEqual(null);
     })
+
+    it("should update read status update if not match", async () => {
+        const user = await handler.user.createUser(createUserInput("a@berkeley.edu"));
+        const user2 = await handler.user.createUser(createUserInput("b@berkeley.edu"));
+        await handler.swipe.createSwipe({
+            userID: user.id,
+            action: "Like",
+            swipedUserID: user2.id
+        })
+
+        expect(await handler.updateReadStatus({
+            userID: user.id,
+            toID: user2.id,
+            timestamp: new Date() 
+        })).toEqual(null);
+    })
+
+    it("should update read status", async () => {
+        const {user, user_2} = await makeTwoUsersAndMatch();
+        await Promise.all([
+            handler.sendMessage({userID: user.id, recepientID: user_2.id, message: "1"}),
+            handler.sendMessage({userID: user.id, recepientID: user_2.id, message: "2"}),
+            handler.sendMessage({userID: user.id, recepientID: user_2.id, message: "3"}),
+        ])
+
+        expect(await handler.updateReadStatus({
+            userID: user.id,
+            toID: user_2.id,
+            timestamp: addMinutes(new Date(),1)
+        })).toEqual(0);
+        expect(await handler.updateReadStatus({
+            userID: user_2.id,
+            toID: user.id,
+            timestamp: addMinutes(new Date(),1)
+        })).toEqual(3);
+    })
 })

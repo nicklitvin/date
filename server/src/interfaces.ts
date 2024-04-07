@@ -63,7 +63,7 @@ export interface MessageInput {
 
 export interface ReadStatusInput {
     userID: string
-    fromID: string
+    toID: string
     timestamp: Date
 }
 
@@ -301,4 +301,10 @@ export abstract class MailHandler {
     getVerificationCount() : number {
         return this.count;
     }
+}
+
+export interface ReadReceiptNotificationInput {
+    toPushToken: string
+    fromUserID: string
+    date: Date
 }

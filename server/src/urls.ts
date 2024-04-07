@@ -30,6 +30,7 @@ export const URLs = {
     getAttributes: "/getAttributes",
     getClientIDs: "/getClientIDs",
     getMyProfile: "/getMyProfile",
+    sendReadStatus: "/sendReadStatus",
 
     // STRIPE
     webhook: "/webhook",

@@ -1,6 +1,6 @@
 import { Message } from "@prisma/client";
 import { Expo } from "expo-server-sdk";
-import { NewMatchData } from "../interfaces";
+import { NewMatchData, ReadReceiptNotificationInput } from "../interfaces";
 import { miscConstants } from "../globals";
 
 interface MessageNotificationInput {
@@ -40,6 +40,21 @@ export class NotificationHandler {
             return null;
         }
     }
+
+    // public async readReceipt(input : ReadReceiptNotificationInput) {
+    //     try {
+    //         return await this.client.sendPushNotificationsAsync([
+    //             {
+    //                 to: input.toPushToken,
+    //                 channelId: miscConstants.notificationChannel,
+    //                 priority: "normal",
+    //             }
+    //         ])
+    //     } catch (err) {
+    //         console.log(err);
+    //         return null;
+    //     }
+    // }
 
     // public async newMatch(input : MatchNotificationInput) {
     //     try {
