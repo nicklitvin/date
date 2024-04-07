@@ -1,7 +1,6 @@
 TODO
 router.goback() refresh page when changing settings,preferences
     preference change changes feed
-send email to edu email with code
 reported page cant login
 why mymessage constantly rerendering in chat
 latest message not showing in chat

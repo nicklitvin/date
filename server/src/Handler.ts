@@ -8,7 +8,7 @@ import { SwipeHandler } from "./handlers/swipe";
 import { MessageHandler } from "./handlers/message";
 import { ReportHandler } from "./handlers/report";
 import { StripePaymentHandler } from "./handlers/pay";
-import { AttributeValueInput, ChatPreview, ConfirmVerificationInput, DeleteImageInput, EditUserInput, EloAction, GetMatchesInput, ImageHandler, LoginInput, LoginOutput, MessageInput, NewMatchData,NewVerificationInput, PaymentHandler,UserReportWithReportedID, SubscribeInput, SubscriptionData, SwipeFeed, SwipeInput, UnlikeInput, UnlikeOutput, UploadImageInput, UserInput, UserInputWithFiles, UserSwipeStats, WithEmail } from "./interfaces";
+import { AttributeValueInput, ChatPreview, ConfirmVerificationInput, DeleteImageInput, EditUserInput, EloAction, GetMatchesInput, ImageHandler, LoginInput, LoginOutput, MessageInput, NewMatchData,NewVerificationInput, PaymentHandler,UserReportWithReportedID, SubscribeInput, SubscriptionData, SwipeFeed, SwipeInput, UnlikeInput, UnlikeOutput, UploadImageInput, UserInput, UserInputWithFiles, UserSwipeStats, WithEmail, MailHandler } from "./interfaces";
 import { FreeTrialHandler } from "./handlers/freetrial";
 import { VerificationHandler } from "./handlers/verification";
 import { addYears } from "date-fns";
@@ -16,13 +16,15 @@ import { allowedAttributeEdits, attributeList } from "./others";
 import { LoginHandler } from "./handlers/login";
 import { NotificationHandler } from "./handlers/notification";
 import { eloConstants, miscConstants, sampleContent, userRestrictions, userSettings } from "./globals";
+import { GmailHandler } from "./handlers/mail";
 
 interface Props {
     prisma: PrismaClient
     ignoreVerificaton?: boolean
     disableNotifications?: boolean
-    imageHandler? : ImageHandler
-    paymentHandler? : PaymentHandler
+    imageHandler?: ImageHandler
+    paymentHandler?: PaymentHandler
+    mailHandler?: MailHandler
 } 
 
 export class Handler {
@@ -39,6 +41,7 @@ export class Handler {
     public verification : VerificationHandler;
     public login : LoginHandler;
     public notification : NotificationHandler;
+    public mail : MailHandler;
 
     private ignoreVerification : boolean;
     private disableNotifications : boolean;
@@ -46,6 +49,7 @@ export class Handler {
     constructor(props : Props) {
         this.image = props.imageHandler ?? new S3ImageHandler()
         this.pay = props.paymentHandler ?? new StripePaymentHandler()
+        this.mail = props.mailHandler ?? new GmailHandler()
         this.ignoreVerification = props.ignoreVerificaton ?? false
         this.disableNotifications = props.disableNotifications ?? false
 
@@ -75,6 +79,7 @@ export class Handler {
             this.freeTrial.deleteAllFreeTrialUsedUsers(),
             this.verification.deleteAllVerifications(),
             this.login.deleteAllLogin(),
+            this.mail.clearVerificationCount()
         ])
     }
 
@@ -479,13 +484,12 @@ export class Handler {
 
         if (!schoolValid || schoolTaken || personalTaken) return null;
 
-        if (input.email == sampleContent.email) {
-            return await this.verification.makeVerificationEntry(
-                input, new Date(2100,1,1), sampleContent.code
-            )
-        } else {
-            return await this.verification.makeVerificationEntry(input);
-        }
+        const code = input.email == sampleContent.email ?
+            await this.verification.makeVerificationEntry(input, new Date(2100,1,1), sampleContent.code) :
+            await this.verification.makeVerificationEntry(input)
+
+        await this.mail.sendVerificationCode(input.schoolEmail, code);
+        return code;
     }
 
     public async verifyUserWithCode(input : ConfirmVerificationInput & WithEmail) : 
@@ -513,6 +517,7 @@ export class Handler {
         const newVerification = await this.verification.regenerateVerificationCode(
             eduEemail, newCode
         );
+        await this.mail.sendVerificationCode(eduEemail, newCode);
         return newVerification.code;
     }
 

@@ -284,6 +284,21 @@ export interface APIOutput {
     message?: string
 }
 
-export interface MailHandler {
-    sendVerificationCode(email : string, code : number) : Promise<any>
+export abstract class MailHandler {
+    protected count : number;
+
+    constructor() {
+        this.count = 0;
+    }
+
+    abstract sendVerificationCode(email : string, code : number) : Promise<any>
+    
+    clearVerificationCount() : number {
+        const total = this.count;
+        this.count = 0;
+        return total;
+    }
+    getVerificationCount() : number {
+        return this.count;
+    }
 }

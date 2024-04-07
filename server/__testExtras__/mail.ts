@@ -1,9 +1,13 @@
 import { MailHandler } from "../src/interfaces";
 
-export class MockEmailHandler implements MailHandler {
-    constructor() {}
+export class MockEmailHandler extends MailHandler {
+    constructor() {
+        super();
+    }
 
     sendVerificationCode(email: string, code: number): Promise<any> {
-        return Promise.resolve(`sending ${code} to ${email}`);
+        const message = `sending ${code} to ${email}`;
+        this.count += 1;
+        return Promise.resolve(message);
     }
 }

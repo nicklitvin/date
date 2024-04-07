@@ -3,12 +3,13 @@ import SMTPTransport from "nodemailer/lib/smtp-transport";
 import dotenv from "dotenv";
 import { MailHandler } from "../interfaces";
 
-export class GmailHandler implements MailHandler {
+export class GmailHandler extends MailHandler {
     private transport : Transporter<SMTPTransport.SentMessageInfo>;
 
     constructor() {
+        super();
         dotenv.config();
-
+        
         this.transport = createTransport({
             service: "gmail",
             host: "smtp.gmail.com",

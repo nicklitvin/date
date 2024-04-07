@@ -739,7 +739,9 @@ describe("handler", () => {
 
     it("should create verification code", async () => {
         const input = makeVerificationInput();
+        expect(handler.mail.getVerificationCount()).toEqual(0);
         expect(await handler.getVerificationCode(input)).not.toEqual(null);
+        expect(handler.mail.getVerificationCount()).toEqual(1);
     })
 
     it("should not verify user if wrong code", async () => {
@@ -770,6 +772,7 @@ describe("handler", () => {
         const input = makeVerificationInput();
         await handler.verification.makeVerificationEntry(input);
         expect(await handler.regenerateVerificationCode(input.schoolEmail)).not.toEqual(null);
+        expect(handler.mail.getVerificationCount()).toEqual(1);
     })
 
     it("should delete expired verifications when verifying", async () => {
