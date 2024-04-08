@@ -9,11 +9,6 @@ interface MessageNotificationInput {
     recepientPushToken: string
 }
 
-interface MatchNotificationInput {
-    match: NewMatchData
-    recepientPushToken: string
-}
-
 export class NotificationHandler {
     private client : Expo;
     

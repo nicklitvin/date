@@ -138,4 +138,32 @@ describe("message suite", () => {
         expect(data_2.messagesFromUserID.length).toEqual(0);
         expect(data_2.messagesToUserID.length).toEqual(0);
     })
+
+    it("should get read status of no message", async () => {
+        expect(await funcs.hasUserReadLatestMessage({senderID: "1", receiverID: "2"})).toEqual(false);
+    })
+
+    it("should get read status of last message", async () => {
+        await funcs.sendMessage(makeMessageInput(userID, userID_2), new Date(10));
+
+        expect(await funcs.hasUserReadLatestMessage({
+            senderID: userID, receiverID: userID_2
+        })).toEqual(false);
+
+        await funcs.updateReadStatus({
+            userID: userID_2,
+            toID: userID,
+            timestamp: new Date(11)
+        });
+
+        expect(await funcs.hasUserReadLatestMessage({
+            senderID: userID, receiverID: userID_2
+        })).toEqual(true);
+
+        await funcs.sendMessage(makeMessageInput(userID, userID_2), new Date(13));
+
+        expect(await funcs.hasUserReadLatestMessage({
+            senderID: userID, receiverID: userID_2
+        })).toEqual(false);
+    })
 })

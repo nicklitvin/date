@@ -632,7 +632,6 @@ export class APIHandler {
                     toID: body.toID
                 })
     
-                // const output = await handler.login.updateExpoToken(userID,body.expoPushToken);
                 return output ? res.status(200).json() : res.status(400).json()
 
             } catch (err) {

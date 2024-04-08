@@ -39,6 +39,23 @@ export class MessageHandler {
         return updated.count;
     }
 
+    public async hasUserReadLatestMessage(input : {
+        senderID : string
+        receiverID : string
+    }) : Promise<boolean> {
+        const message = await this.prisma.message.findMany({
+            where: {
+                userID: input.senderID,
+                recepientID: input.receiverID
+            },
+            orderBy: {
+                timestamp: "desc"
+            },
+            take: 1
+        });
+        return message.length > 0 ? message[0].readStatus : false;
+    }
+
     public async getMessage(id : string) : Promise<Message|null> {
         return await this.prisma.message.findUnique({
             where: {
