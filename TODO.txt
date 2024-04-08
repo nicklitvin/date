@@ -1,6 +1,4 @@
 TODO
-getLastReadTimestamp api endpoint, check every 30 sec
-
 router.goback() refresh page when changing settings,preferences
     preference change changes feed
 reported page cant login

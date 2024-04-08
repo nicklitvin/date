@@ -1,6 +1,6 @@
 import express from "express";
 import { URLs } from "./urls";
-import { APIOutput, APIRequest, ClientIDs, ConfirmVerificationInput, DeleteImageInput, EditUserInput, GetChatInput, GetProfileInput,LoginInput, MessageInput, GetMatchesInput, NewVerificationInput, UserReportWithReportedID, SubscribeInput, SwipeInput, UnlikeInput, UpdatePushTokenInput, UploadImageInput, UserInputWithFiles, WithEmail, ReadStatusInput } from "./interfaces";
+import { APIOutput, APIRequest, ClientIDs, ConfirmVerificationInput, DeleteImageInput, EditUserInput, GetChatInput, GetProfileInput,LoginInput, MessageInput, GetMatchesInput, NewVerificationInput, UserReportWithReportedID, SubscribeInput, SwipeInput, UnlikeInput, UpdatePushTokenInput, UploadImageInput, UserInputWithFiles, WithEmail, ReadStatusInput, GetReadStatusInput } from "./interfaces";
 import { isAdmin } from "./others";
 import { Handler } from "./handler";
 
@@ -633,6 +633,29 @@ export class APIHandler {
                 })
     
                 return output ? res.status(200).json() : res.status(400).json()
+
+            } catch (err) {
+                console.log(err);
+                return res.status(500).json();
+            }
+        })
+
+        app.post(URLs.getReadStatus, async (req,res) => {
+            try {
+                const body = req.body as APIRequest<GetReadStatusInput>;
+                if (!body.key) return res.status(400).json();
+
+                const userID = await handler.login.getUserIDByKey(body.key);
+                if (!userID) return res.status(401).json();
+
+                const output = await handler.getReadStatus({
+                    userID: userID,
+                    readerID: body.readerID
+                })
+    
+                return output ? 
+                    res.status(200).json({ data: output}) : 
+                    res.status(400).json()
 
             } catch (err) {
                 console.log(err);

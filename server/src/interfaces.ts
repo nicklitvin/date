@@ -308,3 +308,8 @@ export interface ReadReceiptNotificationInput {
     fromUserID: string
     date: Date
 }
+
+export interface GetReadStatusInput {
+    userID: string
+    readerID: string
+}

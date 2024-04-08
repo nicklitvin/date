@@ -31,6 +31,7 @@ export const URLs = {
     getClientIDs: "/getClientIDs",
     getMyProfile: "/getMyProfile",
     sendReadStatus: "/sendReadStatus",
+    getReadStatus: "/getReadStatus",
 
     // STRIPE
     webhook: "/webhook",
