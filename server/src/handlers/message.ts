@@ -210,8 +210,8 @@ export class MessageHandler {
             }
         ]
         const allChats = chat1.concat(chat2);
-        await Promise.all(allChats.map(val => 
-            this.sendMessage(val)
+        await Promise.all(allChats.map( (val,index) => 
+            this.sendMessage(val, new Date(index))
         ))
     }
 }

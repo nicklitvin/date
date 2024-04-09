@@ -20,7 +20,7 @@ describe("chat", () => {
         description: "",
         gender: "Male",
         id: "abc",
-        images: ["imageURL"],
+        images: [{id: "image_id_1", url: "image_url_1"}],
         alcohol: "Often",
         smoking: "Never"
     }
@@ -36,7 +36,7 @@ describe("chat", () => {
         {
             id: "id1",
             message: "hey",
-            readStatus: true,
+            readStatus: false,
             recepientID: myUserID,
             timestamp: new Date(Date.UTC(2000, 0, 1, 8, 0)),
             userID: recepientProfile.id
@@ -78,6 +78,7 @@ describe("chat", () => {
                 data: latestMessages
             }]
         })
+        mock.onPost(URLs.server + URLs.sendReadStatus).reply(config => [200])
 
         const store = new RootStore();
         store.globalState.setTimezone(timezone);
@@ -308,5 +309,20 @@ describe("chat", () => {
             latestMessages.length + newMessage.length
         )
         expect(screen.queryByText(newMessage[0].message)).not.toEqual(null);
+    })
+
+    it("should update my read status", async () => {
+        expect(latestMessages[1].userID).toEqual(recepientProfile.id);
+        expect(latestMessages[1].readStatus).toEqual(false);
+
+        const { store } = await loadChat();
+
+        store.receivedData.setChatPreviews([{
+            message: latestMessages[0],
+            profile: recepientProfile
+        }])
+
+        const index = store.receivedData.chatPreviews?.findIndex( val => val.profile.id == recepientProfile.id);
+        expect(store.receivedData.chatPreviews![index!].message.readStatus).toEqual(true);
     })
 })

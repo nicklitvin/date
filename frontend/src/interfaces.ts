@@ -177,3 +177,8 @@ export interface EditPushTokenInput {
 export interface Attributes {
     [type : string] : string[]
 }
+
+export interface ReadStatusInput {
+    toID: string
+    timestamp: Date
+}

@@ -1,4 +1,10 @@
 TODO
+every x seconds, request new message to add to chat
+if last sent message is mine, request read update from other person every x seconds
+
+every x seconds request new chat request and new matches on adjacent tabs, reset the current loaded ones
+make sure to delete timers when not on those pages
+
 router.goback() refresh page when changing settings,preferences
     preference change changes feed
 reported page cant login

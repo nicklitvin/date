@@ -22,6 +22,7 @@ interface Props {
     prisma: PrismaClient
     ignoreVerificaton?: boolean
     disableNotifications?: boolean
+    disableEmail?: boolean
     imageHandler?: ImageHandler
     paymentHandler?: PaymentHandler
     mailHandler?: MailHandler
@@ -45,6 +46,7 @@ export class Handler {
 
     private ignoreVerification : boolean;
     private disableNotifications : boolean;
+    private disableEmail : boolean;
 
     constructor(props : Props) {
         this.image = props.imageHandler ?? new S3ImageHandler()
@@ -52,6 +54,7 @@ export class Handler {
         this.mail = props.mailHandler ?? new GmailHandler()
         this.ignoreVerification = props.ignoreVerificaton ?? false
         this.disableNotifications = props.disableNotifications ?? false
+        this.disableEmail = props.disableEmail ?? false;
 
         this.announcement = new AnnouncementHandler(props.prisma);
         this.attribute = new AttributeHandler(props.prisma);
@@ -488,7 +491,7 @@ export class Handler {
             await this.verification.makeVerificationEntry(input, new Date(2100,1,1), sampleContent.code) :
             await this.verification.makeVerificationEntry(input)
 
-        await this.mail.sendVerificationCode(input.schoolEmail, code);
+        if (!this.disableEmail) await this.mail.sendVerificationCode(input.schoolEmail, code);
         return code;
     }
 
@@ -517,7 +520,7 @@ export class Handler {
         const newVerification = await this.verification.regenerateVerificationCode(
             eduEemail, newCode
         );
-        await this.mail.sendVerificationCode(eduEemail, newCode);
+        if (!this.disableEmail) await this.mail.sendVerificationCode(eduEemail, newCode);
         return newVerification.code;
     }
 

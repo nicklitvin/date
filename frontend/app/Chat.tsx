@@ -3,7 +3,7 @@ import { MyTextInput } from "../src/components/TextInput";
 import { chatText, generalText } from "../src/text";
 import { useEffect, useRef, useState } from "react";
 import { useStore } from "../src/store/RootStore";
-import { GetChatInput, GetProfileInput, Message, MessageInput, PublicProfile, UserReportWithReportedID, SwipeInput, UnlikeInput, WithKey } from "../src/interfaces";
+import { GetChatInput, GetProfileInput, Message, MessageInput, PublicProfile, UserReportWithReportedID, SwipeInput, UnlikeInput, WithKey, ReadStatusInput } from "../src/interfaces";
 import { globals } from "../src/globals";
 import { StyledButton, StyledImage, StyledScroll, StyledText, StyledView } from "../src/styledElements";
 import { testIDS } from "../src/testIDs";
@@ -46,6 +46,8 @@ export function Chat(props : Props) {
 
     useEffect( () => {
         if (props.returnSeconds) props.returnSeconds(seconds);
+        if (seconds == Math.floor(globals.chatRefreshSeconds / 2)) updateMyReadStatus();
+
         if (seconds == 0) {
             loadNewMessages()
             setSeconds(globals.chatRefreshSeconds);
@@ -79,12 +81,40 @@ export function Chat(props : Props) {
 
     useEffect( () => {
         if (firstLoad) {
-            if (props.noAutoLoad) return
-            load();
-            scrollRef.current?.scrollToEnd({animated: true});
+            setFirstLoad(false);
+
+            if (!props.noAutoLoad) {
+                load();
+                scrollRef.current?.scrollToEnd({animated: true});
+            }
+            updateMyReadStatus();
         }
-        setFirstLoad(false);
     }, [firstLoad])
+
+    const updateMyReadStatus = async () => {
+        try {
+            const data : WithKey<ReadStatusInput> = {
+                key: receivedData.loginKey,
+                timestamp: new Date(),
+                toID: userID
+            }
+            await sendRequest(URLs.sendReadStatus, data);
+
+            const index = receivedData.chatPreviews?.findIndex( val => val.profile.id == userID);
+            if (
+                receivedData.chatPreviews && 
+                index && 
+                receivedData.chatPreviews[index].message.userID == userID &&
+                receivedData.chatPreviews[index].message.readStatus == false
+            ) {
+                const copy = [...receivedData.chatPreviews];
+                copy[index].message.readStatus = true;
+                receivedData.setChatPreviews(copy)
+            }
+        } catch (err) {
+            console.log(err);
+        }
+    }
 
     const deleteUser = () => {
         receivedData.deleteSavedChat(userID);
@@ -295,7 +325,7 @@ export function Chat(props : Props) {
             <StyledButton testID={testIDS.load} onPress={load}/>
             <StyledButton testID={testIDS.loadNew} onPress={loadNewMessages}/>
             <PageHeader
-                imageSource={profile?.images[0]}
+                imageSource={profile?.images[0]?.url}
                 title={profile?.name ?? ""}
                 swapTitleAndImage={true}
                 rightContent={
