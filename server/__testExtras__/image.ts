@@ -1,6 +1,7 @@
-import { ImageHandler, ImageUploadInput } from "../src/interfaces";
+import { ImageUploadInput } from "../src/interfaces";
+import { ImageHandler } from "../src/abstracts";
 
-export class MockImageHandler implements ImageHandler {
+export class MockImageHandler extends ImageHandler {
     uploadedIDs : string [] = [];
 
     uploadImage(input : ImageUploadInput) : Promise<string|null> {

@@ -1,6 +1,6 @@
 import express from "express";
 import { URLs } from "./urls";
-import { APIOutput, APIRequest, ClientIDs, ConfirmVerificationInput, DeleteImageInput, EditUserInput, GetChatInput, GetProfileInput,LoginInput, MessageInput, GetMatchesInput, NewVerificationInput, UserReportWithReportedID, SubscribeInput, SwipeInput, UnlikeInput, UpdatePushTokenInput, UploadImageInput, UserInputWithFiles, WithEmail, ReadStatusInput, GetReadStatusInput, JustUserID } from "./interfaces";
+import { APIOutput, APIRequest, ClientIDs, ConfirmVerificationInput, DeleteImageInput, EditUserInput, GetChatInput, GetProfileInput,LoginInput, MessageInput, GetMatchesInput, NewVerificationInput, UserReportWithReportedID, SubscribeInput, SwipeInput, UnlikeInput, UpdatePushTokenInput, UploadImageInput, UserInputWithFiles, JustEmail, ReadStatusInput, GetReadStatusInput, JustUserID } from "./interfaces";
 import { isAdmin } from "./others";
 import { Handler } from "./handler";
 
@@ -17,7 +17,7 @@ export class APIHandler {
                 const user = await handler.login.getUserByKey(body.key);
                 if (!user || !user.userID) return res.status(401).json();
 
-                const input : UserInputWithFiles & WithEmail = {
+                const input : UserInputWithFiles & JustEmail = {
                     id: user.userID,
                     email: user.email,
                     files: body.files,
@@ -196,7 +196,7 @@ export class APIHandler {
                 const user = await handler.login.getUserByKey(body.key);
                 if (!user || !user.userID) return res.status(401).json();
     
-                const input : NewVerificationInput & WithEmail = {
+                const input : NewVerificationInput & JustEmail = {
                     ...body,
                     email: user.email
                 }
@@ -216,7 +216,7 @@ export class APIHandler {
                 const user = await handler.login.getUserByKey(body.key);
                 if (!user || !user.userID) return res.status(401).json();
     
-                const input : ConfirmVerificationInput & WithEmail = {
+                const input : ConfirmVerificationInput & JustEmail = {
                     email: user.email,
                     code: body.code,
                     schoolEmail: body.schoolEmail

@@ -8,7 +8,7 @@ import { SwipeHandler } from "./handlers/swipe";
 import { MessageHandler } from "./handlers/message";
 import { ReportHandler } from "./handlers/report";
 import { StripePaymentHandler } from "./handlers/pay";
-import { AttributeValueInput, ChatPreview, ConfirmVerificationInput, DeleteImageInput, EditUserInput, EloAction, GetMatchesInput, ImageHandler, LoginInput, LoginOutput, MessageInput, NewMatchData,NewVerificationInput, PaymentHandler,UserReportWithReportedID, SubscribeInput, SubscriptionData, SwipeFeed, SwipeInput, UnlikeInput, UnlikeOutput, UploadImageInput, UserInput, UserInputWithFiles, UserSwipeStats, WithEmail, MailHandler, ReadStatusInput, GetReadStatusInput } from "./interfaces";
+import { AttributeValueInput, ChatPreview, ConfirmVerificationInput, DeleteImageInput, EditUserInput, EloAction, GetMatchesInput, LoginInput, LoginOutput, MessageInput, NewMatchData,NewVerificationInput, UserReportWithReportedID, SubscribeInput, SubscriptionData, SwipeFeed, SwipeInput, UnlikeInput, UnlikeOutput, UploadImageInput, UserInput, UserInputWithFiles, UserSwipeStats, JustEmail, ReadStatusInput, GetReadStatusInput } from "./interfaces";
 import { FreeTrialHandler } from "./handlers/freetrial";
 import { VerificationHandler } from "./handlers/verification";
 import { addYears } from "date-fns";
@@ -17,6 +17,7 @@ import { LoginHandler } from "./handlers/login";
 import { NotificationHandler } from "./handlers/notification";
 import { eloConstants, miscConstants, sampleContent, userRestrictions, userSettings } from "./globals";
 import { GmailHandler } from "./handlers/mail";
+import { ImageHandler, MailHandler, PaymentHandler } from "./abstracts";
 
 interface Props {
     prisma: PrismaClient
@@ -86,7 +87,7 @@ export class Handler {
         ])
     }
 
-    public async createUser(input : UserInputWithFiles & WithEmail, 
+    public async createUser(input : UserInputWithFiles & JustEmail, 
         ignoreVerification = this.ignoreVerification) : Promise<User|null> 
     {
         const [user, verification] = await Promise.all([
@@ -474,7 +475,7 @@ export class Handler {
         }
     }
 
-    public async getVerificationCode(input : NewVerificationInput & WithEmail) : 
+    public async getVerificationCode(input : NewVerificationInput & JustEmail) : 
         Promise<number|null> 
     {
         await this.verification.removeExpiredVerifications();
@@ -495,7 +496,7 @@ export class Handler {
         return code;
     }
 
-    public async verifyUserWithCode(input : ConfirmVerificationInput & WithEmail) : 
+    public async verifyUserWithCode(input : ConfirmVerificationInput & JustEmail) : 
         Promise<Verification|null> 
     {
         return await this.verification.getVerificationWithCode(input) ? 

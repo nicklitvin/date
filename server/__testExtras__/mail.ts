@@ -1,4 +1,4 @@
-import { MailHandler } from "../src/interfaces";
+import { MailHandler } from "../src/abstracts";
 
 export class MockEmailHandler extends MailHandler {
     constructor() {

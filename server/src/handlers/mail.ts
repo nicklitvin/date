@@ -1,7 +1,7 @@
 import { createTransport, Transporter} from "nodemailer";
 import SMTPTransport from "nodemailer/lib/smtp-transport";
 import dotenv from "dotenv";
-import { MailHandler } from "../interfaces";
+import { MailHandler } from "../abstracts";
 
 export class GmailHandler extends MailHandler {
     private transport : Transporter<SMTPTransport.SentMessageInfo>;

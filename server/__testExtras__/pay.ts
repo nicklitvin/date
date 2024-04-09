@@ -1,4 +1,5 @@
-import { PaymentExtractOutput, PaymentHandler } from "../src/interfaces"
+import { PaymentExtractOutput } from "../src/interfaces"
+import { PaymentHandler } from "../src/abstracts";
 
 export class MockPaymentHandler implements PaymentHandler {
     constructor() {}

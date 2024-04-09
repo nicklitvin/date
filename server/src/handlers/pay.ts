@@ -1,11 +1,13 @@
 import Stripe from "stripe";
-import { PaymentExtractOutput, PaymentHandler } from "../interfaces";
+import { PaymentExtractOutput } from "../interfaces";
 import { miscConstants } from "../globals";
+import { PaymentHandler } from "../abstracts";
 
-export class StripePaymentHandler implements PaymentHandler {
+export class StripePaymentHandler extends PaymentHandler {
     private stripe : Stripe;
 
     constructor() {
+        super();
         this.stripe = new Stripe(process.env.STRIPE_API_KEY!, {
             typescript: true
         })

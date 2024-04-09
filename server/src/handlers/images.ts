@@ -4,7 +4,8 @@ import { randomUUID } from "crypto";
 import dotenv from "dotenv";
 import sharp from "sharp";
 import axios from "axios";
-import { ImageHandler, ImageUploadInput } from "../interfaces";
+import { ImageUploadInput } from "../interfaces";
+import { ImageHandler } from "../abstracts";
 
 dotenv.config();
 const bucket = process.env.BUCKET_NAME!;

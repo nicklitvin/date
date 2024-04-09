@@ -1,5 +1,5 @@
 import { Opinion } from "@prisma/client";
-import { ImageUploadWithString, ImageUploadInput, MessageInput, NewVerificationInput, SwipeInput, UserInput, UserInputWithFiles, UserReportInput, WithEmail } from "../src/interfaces";
+import { ImageUploadWithString, ImageUploadInput, MessageInput, NewVerificationInput, SwipeInput, UserInput, UserInputWithFiles, UserReportInput, JustEmail } from "../src/interfaces";
 import fs from "fs/promises";
 import { randomUUID } from "crypto";
 import mime from "mime-types";
@@ -24,7 +24,7 @@ export async function getImageInput(good : boolean) : Promise<ImageUploadInput> 
     }
 }
 
-export async function validRequestUserInput() : Promise<UserInputWithFiles & WithEmail> { 
+export async function validRequestUserInput() : Promise<UserInputWithFiles & JustEmail> { 
     const upload = await getImageDetails(true);
     return {
         id: randomUUID(),
@@ -199,7 +199,7 @@ export async function createUsersForSwipeFeed() {
 }
 
 export function makeVerificationInput(personalEmail? : string, schoolEmail? : string) 
-    : NewVerificationInput & WithEmail
+    : NewVerificationInput & JustEmail
 {
     return {
         email: personalEmail ?? "a@gmail.com",

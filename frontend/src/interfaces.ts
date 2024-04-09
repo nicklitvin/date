@@ -1,6 +1,14 @@
 import { Action } from "./types"
 
+// APP-ONLY
+
 export type WithKey<T> = T & { key?: string }
+
+export interface UploadImageInputWithURI extends UploadImageInput{
+    uri: string
+}
+
+// SERVER-COPIES
 
 export interface UserInput {
     name: string 
@@ -41,10 +49,6 @@ export interface ImageUploadWithString {
 
 export interface UploadImageInput {
     image: ImageUploadWithString
-}
-
-export interface UploadImageInputWithURI extends UploadImageInput{
-    uri: string
 }
 
 export interface PublicProfile {

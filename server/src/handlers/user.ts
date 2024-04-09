@@ -1,5 +1,6 @@
 import { PrismaClient, User } from "@prisma/client";
-import { EditUserInput, EloAction, EloUpdateInput, GetProfileListInput, ViewableImage, ImageHandler, Preferences, PublicProfile, SettingData, SubscriptionData, UserInput, UserInputWithFiles } from "../interfaces";
+import { EditUserInput, EloAction, EloUpdateInput, GetProfileListInput, ViewableImage, Preferences, PublicProfile, SettingData, SubscriptionData, UserInput, UserInputWithFiles } from "../interfaces";
+import { ImageHandler } from "../abstracts";
 import { addMonths, differenceInYears } from "date-fns";
 import { sampleUsers } from "../sample";
 import { displayText, eloConstants, sampleContent, userRestrictions, userSettings } from "../globals";

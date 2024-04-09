@@ -39,7 +39,7 @@ export interface UserInputWithFiles extends BasicUserInput {
     files: ImageUploadWithString[]
 }
 
-export interface WithEmail {
+export interface JustEmail {
     email: string
 }
 
@@ -132,14 +132,6 @@ export interface ChatPreview {
     message: Message
 }
 
-export interface ImageHandler {
-    uploadImage(input : ImageUploadInput) : Promise<string|null>
-    getImageURL(id : string) : Promise<string|null>
-    deleteImage(id : string) : Promise<string|null>
-    getAllImageIDs() : Promise<string[]>
-    deleteAllImages() : Promise<number>
-}
-
 export interface UploadImageInput {
     userID: string
     image: ImageUploadWithString
@@ -158,12 +150,6 @@ export interface SubscribeInput {
 export interface PaymentExtractOutput {
     userID: string
     subscriptionID: string
-}
-
-export interface PaymentHandler {
-    createSubscriptionSessionURL(userID : string, email : string, freeTrial: boolean) : Promise<string>
-    extractDataFromPayment(signature : string, body : any) : Promise<PaymentExtractOutput|null> 
-    cancelSubscription(subscriptionID: string) : Promise<boolean>
 }
 
 export interface UnlikeInput {
@@ -284,25 +270,6 @@ export interface APIOutput {
     message?: string
 }
 
-export abstract class MailHandler {
-    protected count : number;
-
-    constructor() {
-        this.count = 0;
-    }
-
-    abstract sendVerificationCode(email : string, code : number) : Promise<any>
-    
-    clearVerificationCount() : number {
-        const total = this.count;
-        this.count = 0;
-        return total;
-    }
-    getVerificationCount() : number {
-        return this.count;
-    }
-}
-
 export interface ReadReceiptNotificationInput {
     toPushToken: string
     fromUserID: string
@@ -317,3 +284,4 @@ export interface GetReadStatusInput {
 export interface JustUserID {
     userID: string
 }
+
