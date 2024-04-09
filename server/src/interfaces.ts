@@ -251,7 +251,7 @@ export interface LoginOutput {
     verified: boolean
 }
 
-export type APIRequest<T> = Omit<T,"userID"|"id"> & {key : string};
+export type APIRequest<T> = T & {key : string};
 
 export interface GetProfileInput {
     userID: string
@@ -312,4 +312,8 @@ export interface ReadReceiptNotificationInput {
 export interface GetReadStatusInput {
     userID: string
     readerID: string
+}
+
+export interface JustUserID {
+    userID: string
 }
