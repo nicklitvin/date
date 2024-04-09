@@ -3,7 +3,7 @@ import { MyTextInput } from "../src/components/TextInput";
 import { chatText, generalText } from "../src/text";
 import { useEffect, useRef, useState } from "react";
 import { useStore } from "../src/store/RootStore";
-import { GetChatInput, GetProfileInput, Message, MessageInput, PublicProfile, UserReportWithReportedID, SwipeInput, UnlikeInput, WithKey, ReadStatusInput, GetReadStatusInput } from "../src/interfaces";
+import { GetChatInput, Message, MessageInput, PublicProfile, UserReportWithReportedID, SwipeInput, UnlikeInput, WithKey, ReadStatusInput, GetReadStatusInput, JustUserID } from "../src/interfaces";
 import { globals } from "../src/globals";
 import { StyledButton, StyledImage, StyledScroll, StyledText, StyledView } from "../src/styledElements";
 import { testIDS } from "../src/testIDs";
@@ -99,6 +99,7 @@ export function Chat(props : Props) {
         
         try {
             const input : WithKey<GetReadStatusInput> = {
+                userID: receivedData.profile?.id!,
                 readerID: userID
             }
             const response = await sendRequest(URLs.getReadStatus, input);
@@ -117,6 +118,7 @@ export function Chat(props : Props) {
     const updateMyReadStatus = async () => {
         try {
             const data : WithKey<ReadStatusInput> = {
+                userID: receivedData.profile?.id!,
                 key: receivedData.loginKey,
                 timestamp: new Date(),
                 toID: userID
@@ -170,7 +172,7 @@ export function Chat(props : Props) {
 
     const getProfile = async () => {
         try {
-            const profileInput : GetProfileInput = {
+            const profileInput : JustUserID = {
                 userID: userID!
             }
             const profileResponse = await sendRequest(URLs.getProfile, profileInput);
@@ -183,6 +185,7 @@ export function Chat(props : Props) {
     const getChat = async () => {
         try {
             const chatInput : WithKey<GetChatInput> = {
+                userID: receivedData.profile?.id!,
                 key: receivedData.loginKey,
                 fromTime: new Date(),
                 withID: userID!
@@ -249,6 +252,7 @@ export function Chat(props : Props) {
             if (chat.length == 0) return
 
             const input : WithKey<GetChatInput> = {
+                userID: receivedData.profile?.id!,
                 key: receivedData.loginKey,
                 withID: profile!.id,
                 fromTime: new Date(chat.at(-1)!.timestamp.getTime() - 1)
@@ -269,6 +273,7 @@ export function Chat(props : Props) {
     const loadNewMessages = async () => {
         try {
             const input : WithKey<GetChatInput> = {
+                userID: receivedData.profile?.id!,
                 fromTime: new Date(),
                 withID: userID,
                 key: receivedData.loginKey!
@@ -292,6 +297,7 @@ export function Chat(props : Props) {
         try {
             setShowModal(false);
             const myReport : WithKey<UserReportWithReportedID> = {
+                userID: receivedData.profile?.id!,
                 key: receivedData.loginKey,
                 reportedID: profile!.id
             }
@@ -308,6 +314,7 @@ export function Chat(props : Props) {
         try {
             setShowModal(false);
             const unlike : WithKey<UnlikeInput> = {
+                userID: receivedData.profile?.id!,
                 key: receivedData.loginKey,
                 withID: profile!.id
             }

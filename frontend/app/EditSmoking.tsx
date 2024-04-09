@@ -29,6 +29,7 @@ export function EditSmoking() {
 
         try {
             const input : WithKey<EditUserInput> = {
+                userID: receivedData.profile?.id!,
                 key: receivedData.loginKey,
                 setting: globals.settingSmoking,   
                 value: frequency

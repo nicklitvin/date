@@ -1,5 +1,5 @@
 import { act, fireEvent, render, screen } from "@testing-library/react-native"
-import { ChatPreview, Message, NewMatch, NewMatchDataInput, PublicProfile } from "../src/interfaces";
+import { ChatPreview, Message, NewMatchData, PublicProfile } from "../src/interfaces";
 import { makePublicProfile, makeReceivedMessage, makeSentMessage, scrollHorizontally, scrollVertically } from "../__testUtils__/easySetup";
 import { testIDS } from "../src/testIDs";
 import MockAdapter from "axios-mock-adapter";
@@ -35,7 +35,7 @@ describe("matches", () => {
         }
     ]
 
-    const newMatches : NewMatch[] = [
+    const newMatches : NewMatchData[] = [
         {
             profile: profiles[2],
             timestamp: new Date(5)
@@ -46,7 +46,7 @@ describe("matches", () => {
         }
     ];
 
-    const moreNewMatches : NewMatch[] = [
+    const moreNewMatches : NewMatchData[] = [
         {
             profile: profiles[4],
             timestamp: new Date(3)

@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { StyledButton, StyledImage, StyledScroll, StyledText, StyledView } from "../../src/styledElements";
 import { matchesText } from "../../src/text";
-import { ChatPreview, NewMatch, NewMatchDataInput, WithKey } from "../../src/interfaces";
+import { ChatPreview, GetMatchesInput, NewMatchData, WithKey } from "../../src/interfaces";
 import { ChatPreviewBox } from "../../src/components/ChatPreviewBox";
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
@@ -24,7 +24,7 @@ interface Props {
 export function Matches(props : Props) {
     const { receivedData } = useStore();
 
-    const [newMatches, setNewMatches] = useState<NewMatch[]>(receivedData.newMatches ?? []);
+    const [newMatches, setNewMatches] = useState<NewMatchData[]>(receivedData.newMatches ?? []);
     const [chatPreviews, setChatPreviews] = useState<ChatPreview[]>(receivedData.chatPreviews ?? []);
 
     const newMatchScrollRef = useRef<ScrollView>(null);
@@ -78,14 +78,15 @@ export function Matches(props : Props) {
 
     const getNewMatches = async () => {
         try {
-            const newMatchDataInput : WithKey<NewMatchDataInput> = {
+            const newMatchDataInput : WithKey<GetMatchesInput> = {
                 key: receivedData.loginKey,
-                timestamp: new Date()
+                timestamp: new Date(),
+                userID: receivedData.profile?.id!
             }
     
             const newMatchResponse = await sendRequest(URLs.getNewMatches, newMatchDataInput);
-            const data = newMatchResponse.data.data as NewMatch[];
-            const processed : NewMatch[] = data.map( val => ({
+            const data = newMatchResponse.data.data as NewMatchData[];
+            const processed : NewMatchData[] = data.map( val => ({
                 profile: val.profile,
                 timestamp: new Date(val.timestamp)
             })) 
@@ -97,9 +98,10 @@ export function Matches(props : Props) {
 
     const getChatPreviews = async () => {
         try {
-            const newMatchDataInput : WithKey<NewMatchDataInput> = {
+            const newMatchDataInput : WithKey<GetMatchesInput> = {
                 key: receivedData.loginKey,
-                timestamp: new Date()
+                timestamp: new Date(),
+                userID: receivedData.profile?.id!
             }
             const chatPreviewResponse = await sendRequest(URLs.getNewChatPreviews, newMatchDataInput);
             const data = chatPreviewResponse.data.data as ChatPreview[];
@@ -126,9 +128,11 @@ export function Matches(props : Props) {
         setMatchRequestTime(new Date());
 
         try {
-            let receivedNewMatches : NewMatch[] = [];
-            const input : NewMatchDataInput = {
-                timestamp: new Date(newMatches.at(-1)!.timestamp.getTime() - 1)
+            let receivedNewMatches : NewMatchData[] = [];
+            const input : WithKey<GetMatchesInput> = {
+                userID: receivedData.profile?.id!,
+                timestamp: new Date(newMatches.at(-1)!.timestamp.getTime() - 1),
+                key: receivedData.loginKey
             }
             const response = await sendRequest(URLs.getNewMatches, input);
             receivedNewMatches = response.data.data;
@@ -153,7 +157,9 @@ export function Matches(props : Props) {
 
         try {
             let newChatPreviews : ChatPreview[] = [];
-            const input : NewMatchDataInput = {
+            const input : WithKey<GetMatchesInput> = {
+                userID: receivedData.profile?.id!,
+                key: receivedData.loginKey,
                 timestamp: new Date(chatPreviews.at(-1)!.message.timestamp.getTime() - 1)
             }
 

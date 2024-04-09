@@ -34,6 +34,7 @@ export function EditAttributes() {
 
         try {
             const input : WithKey<EditUserInput> = {
+                userID: receivedData.profile?.id!,
                 key: receivedData.loginKey,
                 setting: globals.settingAttributes,
                 value: attributes

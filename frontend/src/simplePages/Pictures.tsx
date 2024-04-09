@@ -10,11 +10,11 @@ import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
 import { Buffer } from "buffer"
 import classNames from "classnames";
-import { UploadImageInputWithURI } from "../interfaces";
+import { ImageWithURI } from "../interfaces";
 
 interface Props {
-    uploads: UploadImageInputWithURI[]
-    onSubmit: (input : UploadImageInputWithURI[]) => any
+    uploads: ImageWithURI[]
+    onSubmit: (input : ImageWithURI[]) => any
     submitText: string
     returnUploadLength?: (input : number) => number
     returnSwitchURI?: (input : string|null) => string|null
@@ -22,7 +22,7 @@ interface Props {
 }
 
 export function Pictures(props : Props) {
-    const [uploads, setUploads] = useState<UploadImageInputWithURI[]>(props.uploads);
+    const [uploads, setUploads] = useState<ImageWithURI[]>(props.uploads);
     const [switchURI, setSwitchURI] = useState<string|null>(null);
     const [showError, setShowError] = useState<boolean>(false);
 
@@ -78,7 +78,7 @@ export function Pictures(props : Props) {
             return
         }
 
-        const newUploads : UploadImageInputWithURI[] = [];
+        const newUploads : ImageWithURI[] = [];
         for (const asset of assets) {
             try {
                 const assetString = await FileSystem.readAsStringAsync(asset.uri, {

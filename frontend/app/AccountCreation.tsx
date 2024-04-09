@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { generalText } from "../src/text";
 import { globals } from "../src/globals";
-import { UploadImageInputWithURI, UserInput, WithKey } from "../src/interfaces";
+import { ImageWithURI, UserInputWithFiles, WithKey } from "../src/interfaces";
 import { observer } from "mobx-react-lite";
 import { useStore } from "../src/store/RootStore";
 import { AccountCreationType } from "../src/types";
@@ -29,7 +29,7 @@ export const pageOrder : AccountCreationType[] = [
 interface Props {
     customPageStart? : number
     customBirthday?: Date
-    customUploads?: UploadImageInputWithURI[]
+    customUploads?: ImageWithURI[]
     returnPageNumber?: (input : number) => number
     noRouter?: boolean
 }
@@ -44,7 +44,7 @@ export function AccountCreation(props : Props) {
     const [genderPreference, setGenderPreference] = useState<string[]>([]);
     const [description, setDescription] = useState<string>("");
     const [attributes, setAttributes] = useState<string[]>([]);
-    const [uploads, setUploads] = useState<UploadImageInputWithURI[]>(props.customUploads ?? []);
+    const [uploads, setUploads] = useState<ImageWithURI[]>(props.customUploads ?? []);
     const [agePreference, setAgePreference] = useState<[number, number]>(
         [globals.minAge, globals.maxAge]
     );
@@ -65,7 +65,8 @@ export function AccountCreation(props : Props) {
     }, [currentPage])
 
     const createUser = async () => {
-        const userInput : WithKey<UserInput> = {
+        const userInput : WithKey<UserInputWithFiles> = {
+
             key: receivedData.loginKey,
             name: name,
             birthday: birthday,
@@ -173,7 +174,7 @@ export function AccountCreation(props : Props) {
             return <Pictures
                 goBack={goBack}
                 uploads={uploads}
-                onSubmit={(input : UploadImageInputWithURI[]) => {
+                onSubmit={(input : ImageWithURI[]) => {
                     setUploads(input);
                     goToNextPage();
                 }}

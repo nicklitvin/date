@@ -2,9 +2,8 @@ import { observer } from "mobx-react-lite";
 import { StyledButton, StyledImage, StyledScroll, StyledText, StyledView } from "../styledElements";
 import { PageHeader } from "../components/PageHeader";
 import { profileText, profileViewText } from "../text";
-import { PublicProfile, UserReportWithReportedID, SwipeInput, WithKey } from "../interfaces";
+import { PublicProfile, UserReportWithReportedID, SwipeInput, WithKey, Opinion } from "../interfaces";
 import axios from "axios";
-import { Action } from "../types";
 import { URLs } from "../urls";
 import { PictureSeries } from "../components/PictureSeries";
 import { Spacing } from "../components/Spacing";
@@ -21,13 +20,15 @@ interface Props {
     reportable?: boolean
     likedMe?: boolean
     loginKey?: string
+    userID?: string
 }
 
 export function ProfileViewEmbed(props : Props) {
-    const makeSwipe = async (opinion : Action) => {
+    const makeSwipe = async (opinion : Opinion) => {
         if (props.disableSwiping) return
         try {
             const input : WithKey<SwipeInput> = {
+                userID: props.userID!,
                 swipedUserID: props.profile.id,
                 action: opinion,
                 key: props.loginKey
@@ -45,6 +46,7 @@ export function ProfileViewEmbed(props : Props) {
     const reportUser = async () => {
         try {
             const myReport : WithKey<UserReportWithReportedID> = {
+                userID: props.userID!,
                 reportedID: props.profile.id,
                 key: props.loginKey
             }
@@ -69,9 +71,9 @@ export function ProfileViewEmbed(props : Props) {
                 />
             }
             <PictureSeries
-                imageURLs={props.profile.images}
+                imageURLs={props.profile.images.map(val => val.url)}
                 swipable={props.isInSwipeFeed}
-                swipeFunction={(opinion : Action) => makeSwipe(opinion)}
+                swipeFunction={(opinion : Opinion) => makeSwipe(opinion)}
             />
             <Spacing size="lg"/>
             <StyledView className="px-5">

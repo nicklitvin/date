@@ -2,7 +2,7 @@ import { act, fireEvent, render, screen } from "@testing-library/react-native"
 import { createProfileText, descriptionText, generalText, myNameText } from "../src/text";
 import { globals } from "../src/globals";
 import { RootStore, createStoreProvider } from "../src/store/RootStore";
-import { UploadImageInputWithURI, UserInputWithFiles } from "../src/interfaces";
+import { ImageWithURI, UserInputWithFiles } from "../src/interfaces";
 import MockAdapter from "axios-mock-adapter";
 import axios from "axios";
 import { URLs } from "../src/urls";
@@ -37,10 +37,10 @@ describe("accountCreation", () => {
         const myDescription = "description";
         const myGender = globals.genders[0]; 
         const myGenderPreference = [globals.genders[0], globals.genders[1]];
-        const customUploads : UploadImageInputWithURI[] = [{
+        const customUploads : ImageWithURI[] = [{
             image: {
                 content: "a",
-                mimetype: "iamge/jpeg"
+                mimetype: "image/jpeg"
             },
             uri: "file://random"
         }];
@@ -53,7 +53,7 @@ describe("accountCreation", () => {
 
         const mock = new MockAdapter(axios);
         mock.onPost(URLs.server + URLs.createUser).reply( config => {
-            const userInput = JSON.parse(config.data) as UserInput;
+            const userInput = JSON.parse(config.data) as UserInputWithFiles;
             expect(userInput?.name).toEqual(myName);
             expect(new Date(userInput?.birthday).getTime()).toEqual(myBirthday.getTime());
             expect(userInput?.gender).toEqual(myGender);

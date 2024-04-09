@@ -1,11 +1,22 @@
-import { Action } from "./types"
-
 // APP-ONLY
 
 export type WithKey<T> = T & { key?: string }
 
-export interface UploadImageInputWithURI extends UploadImageInput{
+export interface ImageWithURI {
+    image: {
+        content: string
+        mimetype: string
+    }
     uri: string
+}
+
+export interface SwipeStatus {
+    feedIndex : number
+    lastSwipedIndex : number
+}
+
+export interface Attributes {
+    [type : string] : string[]
 }
 
 // SCHEMA-TYPES
@@ -16,9 +27,10 @@ export interface Message {
     userID: string
     recepientID: string
     message: string
+    readStatus: boolean
 }
 
-enum Opinion {
+export enum Opinion {
     Like,
     Dislike
 }
@@ -43,7 +55,6 @@ export interface ErrorLogInput {
 }
 
 interface BasicUserInput {
-    id: string
     name: string
     birthday: Date
     ageInterest: number[]
@@ -408,10 +419,6 @@ export interface JustUserID {
 
 // export interface EditPushTokenInput {
 //     token: string
-// }
-
-// export interface Attributes {
-//     [type : string] : string[]
 // }
 
 // export interface ReadStatusInput {

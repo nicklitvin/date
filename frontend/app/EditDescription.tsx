@@ -25,6 +25,7 @@ export function EditDescription() {
     const editDescription = async (description: string) => {
         try {
             const input : WithKey<EditUserInput> = {
+                userID: receivedData.profile?.id!,
                 key: receivedData.loginKey,
                 setting: globals.settingDescription,
                 value: description

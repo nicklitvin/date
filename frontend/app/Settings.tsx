@@ -2,7 +2,7 @@ import { observer } from "mobx-react-lite";
 import { PageHeader } from "../src/components/PageHeader";
 import { generalText, settingsText } from "../src/text";
 import { StyledButton, StyledText, StyledView } from "../src/styledElements";
-import { EditPushTokenInput, EditUserInput, SettingData, WithKey } from "../src/interfaces";
+import { EditUserInput, SettingData, UpdatePushTokenInput, WithKey } from "../src/interfaces";
 import { URLs } from "../src/urls";
 import { MyButton } from "../src/components/Button";
 import { useStore } from "../src/store/RootStore";
@@ -67,8 +67,9 @@ export function Settings(props : Props) {
             const token = await Notifications.getExpoPushTokenAsync({
                 projectId: Constants.expoConfig?.extra?.eas.projectId,
             });
-            const input : WithKey<EditPushTokenInput> = {
-                token: token.data,
+            const input : WithKey<UpdatePushTokenInput> = {
+                userID: receivedData.profile?.id!,
+                expoPushToken: token.data,
                 key: receivedData.loginKey
             }
             try {
@@ -105,6 +106,7 @@ export function Settings(props : Props) {
             }
 
             const input : WithKey<EditUserInput> = {
+                userID: receivedData.profile?.id!,
                 key: receivedData.loginKey,
                 setting: title,
                 value: value

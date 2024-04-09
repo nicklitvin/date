@@ -1,4 +1,4 @@
-import { Attributes, Message, PublicProfile } from "../src/interfaces";
+import { Message, PublicProfile } from "../src/interfaces";
 
 export const myUserID = "userID";
 
@@ -67,7 +67,7 @@ export const scrollHorizontally : {nativeEvent : ScrollEvent} = {
     }
 }
 
-export const receivedAttributes : Attributes = {
+export const receivedAttributes = {
     sports: ["Football","Basketball"],
     music: ["Rap", "K-Pop"]
 }

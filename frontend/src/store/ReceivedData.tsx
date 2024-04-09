@@ -1,5 +1,5 @@
 import { action, observable } from "mobx";
-import { Attributes, ChatPreview, clientIDs, Message, NewMatch, Preferences, PublicProfile, SettingData, SubscriptionData, SwipeFeed, SwipeStatus, UserSwipeStats } from "../interfaces";
+import { Attributes, ChatPreview, ClientIDs, Message, NewMatchData, Preferences, PublicProfile, SettingData, SubscriptionData, SwipeFeed, SwipeStatus, UserSwipeStats } from "../interfaces";
 import { globals } from "../globals";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -7,7 +7,7 @@ export class ReceivedData {
     @observable public profile : PublicProfile|null = null;
     @observable public subscription : SubscriptionData|null = null;
     @observable public chatPreviews : ChatPreview[]|null = null;
-    @observable public newMatches : NewMatch[]|null = null;
+    @observable public newMatches : NewMatchData[]|null = null;
     @observable public swipeFeed : SwipeFeed|null = null;
     @observable public swipeStatus : SwipeStatus|null = {
         feedIndex: 0,
@@ -17,7 +17,7 @@ export class ReceivedData {
     @observable public savedChats : {[userID: string] : Message[]} = {}
     @observable public settings : SettingData[]|null = null;
     @observable public preferences : Preferences|null = null;
-    @observable public clientIDs : clientIDs|null = null;
+    @observable public clientIDs : ClientIDs|null = null;
     @observable public loginKey : string|undefined = undefined;
     @observable public attributes : Attributes = {};
 
@@ -37,7 +37,7 @@ export class ReceivedData {
     setStats(input : UserSwipeStats|null) { this.stats = input; }
 
     @action 
-    setNewMatches(input : NewMatch[]|null) { this.newMatches = input; }
+    setNewMatches(input : NewMatchData[]|null) { this.newMatches = input; }
 
     @action
     addSavedChat(userID : string, chat : Message[]) { 
@@ -59,7 +59,7 @@ export class ReceivedData {
     setPreferences(input : Preferences) { this.preferences = input; }
 
     @action
-    setClientIDs(input : clientIDs ) { this.clientIDs = input; }
+    setClientIDs(input : ClientIDs ) { this.clientIDs = input; }
 
     @action
     setLoginKey(input : string|undefined) { 

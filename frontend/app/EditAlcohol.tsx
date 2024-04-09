@@ -30,6 +30,7 @@ export function Alcohol() {
 
         try {
             const input : WithKey<EditUserInput> = {
+                userID: receivedData.profile?.id!,
                 key: receivedData.loginKey,
                 setting: globals.settingAlcohol,   
                 value: frequency
