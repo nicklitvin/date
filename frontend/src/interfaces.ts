@@ -182,3 +182,7 @@ export interface ReadStatusInput {
     toID: string
     timestamp: Date
 }
+
+export interface GetReadStatusInput {
+    readerID: string
+}

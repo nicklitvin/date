@@ -654,7 +654,7 @@ export class APIHandler {
                 })
     
                 return output ? 
-                    res.status(200).json({ data: output}) : 
+                    res.status(200).json({ data: output }) : 
                     res.status(400).json()
 
             } catch (err) {

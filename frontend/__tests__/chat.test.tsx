@@ -46,7 +46,7 @@ describe("chat", () => {
         {
             id: "id2",
             message: "sooo",
-            readStatus: true,
+            readStatus: false,
             recepientID: recepientProfile.id,
             timestamp: new Date(Date.UTC(2000, 0, 1, 6, 0)),
             userID: myUserID

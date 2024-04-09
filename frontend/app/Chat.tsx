@@ -3,7 +3,7 @@ import { MyTextInput } from "../src/components/TextInput";
 import { chatText, generalText } from "../src/text";
 import { useEffect, useRef, useState } from "react";
 import { useStore } from "../src/store/RootStore";
-import { GetChatInput, GetProfileInput, Message, MessageInput, PublicProfile, UserReportWithReportedID, SwipeInput, UnlikeInput, WithKey, ReadStatusInput } from "../src/interfaces";
+import { GetChatInput, GetProfileInput, Message, MessageInput, PublicProfile, UserReportWithReportedID, SwipeInput, UnlikeInput, WithKey, ReadStatusInput, GetReadStatusInput } from "../src/interfaces";
 import { globals } from "../src/globals";
 import { StyledButton, StyledImage, StyledScroll, StyledText, StyledView } from "../src/styledElements";
 import { testIDS } from "../src/testIDs";
@@ -46,7 +46,10 @@ export function Chat(props : Props) {
 
     useEffect( () => {
         if (props.returnSeconds) props.returnSeconds(seconds);
-        if (seconds == Math.floor(globals.chatRefreshSeconds / 2)) updateMyReadStatus();
+        if (seconds == Math.floor(globals.chatRefreshSeconds / 2)) {
+            updateMyReadStatus();
+            updateRecepientReadStatus();
+        }
 
         if (seconds == 0) {
             loadNewMessages()
@@ -90,6 +93,26 @@ export function Chat(props : Props) {
             updateMyReadStatus();
         }
     }, [firstLoad])
+
+    const updateRecepientReadStatus = async () => {
+        if (chat.length == 0 || chat.at(-1)?.userID == userID) return 
+        
+        try {
+            const input : WithKey<GetReadStatusInput> = {
+                readerID: userID
+            }
+            const response = await sendRequest(URLs.getReadStatus, input);
+            if (response.data.data == true) {
+                const copy : Message[] = [...chat].map( val => ({
+                    ...val,
+                    readStatus: true
+                }))
+                setChat(copy);
+            }
+        } catch (err) {
+            console.log(err);
+        }
+    }
 
     const updateMyReadStatus = async () => {
         try {

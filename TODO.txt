@@ -5,6 +5,8 @@ if last sent message is mine, request read update from other person every x seco
 every x seconds request new chat request and new matches on adjacent tabs, reset the current loaded ones
 make sure to delete timers when not on those pages
 
+sendSelfID in every request and use key to verify if authorized
+
 router.goback() refresh page when changing settings,preferences
     preference change changes feed
 reported page cant login
