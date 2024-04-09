@@ -1,5 +1,79 @@
 import { AttributeType, Gender, Message, Opinion, Swipe, Usage } from "@prisma/client"
 
+// SERVER-ONLY
+
+export interface HandlerUserInput extends UserInputWithFiles {
+    email: string
+    userID: string
+}
+
+export interface UserInput extends BasicUserInput {
+    images : string[]
+    email: string
+    id: string
+}
+
+export interface JustEmail {
+    email: string
+}
+
+export interface UserReportInput {
+    userID: string
+    reportedEmail: string
+}
+
+export interface EloUpdateInput {
+    userElo: number,
+    action: EloAction,
+    /** Positive => higher elo than user, Negative => lower elo */
+    eloDiff: number
+}
+
+export type APIRequest<T> = T & {key : string};
+
+export enum EloAction {
+    Like,
+    Dislike,
+    Message,
+    Subscribe,
+    Unsubscribe,
+    Login
+}
+
+export interface PaymentExtractOutput {
+    userID: string
+    subscriptionID: string
+}
+
+export interface GetProfileListInput {
+    minDate: Date,
+    maxDate: Date,
+    gender: Gender[]
+
+    include?: string[]
+    exclude?: string[]
+    count?: number
+}
+
+export interface LoginEntryInput {
+    email: string
+    expoPushToken?: string
+    customDate?: Date
+    customID?: string
+}
+
+export interface SubscribeInput {
+    userID: string
+    subscriptionID: string
+}
+
+export interface UnlikeOutput {
+    newSwipe: Swipe,
+    deletedMessages: number
+}
+
+// SHARED-WITH-CLIENT
+
 export interface AnnouncementInput {
     startTime: Date
     endTime: Date
@@ -18,7 +92,6 @@ export interface ErrorLogInput {
 }
 
 interface BasicUserInput {
-    id: string
     name: string
     birthday: Date
     ageInterest: number[]
@@ -30,17 +103,8 @@ interface BasicUserInput {
     smoking: Usage
 }
 
-export interface UserInput extends BasicUserInput {
-    images : string[]
-    email: string
-}
-
 export interface UserInputWithFiles extends BasicUserInput {
     files: ImageUploadWithString[]
-}
-
-export interface JustEmail {
-    email: string
 }
 
 export interface EditUserInput {
@@ -76,11 +140,6 @@ export interface GetChatInput {
 export interface UserReportWithReportedID {
     userID: string
     reportedID: string
-}
-
-export interface UserReportInput {
-    userID: string
-    reportedEmail: string
 }
 
 export interface ImageUploadInput {
@@ -142,55 +201,14 @@ export interface DeleteImageInput {
     imageID: string
 }
 
-export interface SubscribeInput {
-    userID: string
-    subscriptionID: string
-}
-
-export interface PaymentExtractOutput {
-    userID: string
-    subscriptionID: string
-}
-
 export interface UnlikeInput {
     userID: string
     withID: string
 }
 
-export interface UnlikeOutput {
-    newSwipe: Swipe,
-    deletedMessages: number
-}
-
-export interface EloUpdateInput {
-    userElo: number,
-    action: EloAction,
-    /** Positive => higher elo than user, Negative => lower elo */
-    eloDiff: number
-}
-
-export enum EloAction {
-    Like,
-    Dislike,
-    Message,
-    Subscribe,
-    Unsubscribe,
-    Login
-}
-
 export interface SwipeFeed {
     profiles: PublicProfile[]
     likedMeIDs: string[]
-}
-
-export interface GetProfileListInput {
-    minDate: Date,
-    maxDate: Date,
-    gender: Gender[]
-
-    include?: string[]
-    exclude?: string[]
-    count?: number
 }
 
 export interface NewVerificationInput {
@@ -224,23 +242,10 @@ export interface LoginInput {
     expoPushToken?: string
 }
 
-export interface LoginEntryInput {
-    email: string
-    expoPushToken?: string
-    customDate?: Date
-    customID?: string
-}
-
 export interface LoginOutput {
     key: string
     newAccount: boolean
     verified: boolean
-}
-
-export type APIRequest<T> = T & {key : string};
-
-export interface GetProfileInput {
-    userID: string
 }
 
 export interface UpdatePushTokenInput {
@@ -284,4 +289,3 @@ export interface GetReadStatusInput {
 export interface JustUserID {
     userID: string
 }
-

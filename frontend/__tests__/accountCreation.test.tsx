@@ -2,7 +2,7 @@ import { act, fireEvent, render, screen } from "@testing-library/react-native"
 import { createProfileText, descriptionText, generalText, myNameText } from "../src/text";
 import { globals } from "../src/globals";
 import { RootStore, createStoreProvider } from "../src/store/RootStore";
-import { UploadImageInputWithURI, UserInput } from "../src/interfaces";
+import { UploadImageInputWithURI, UserInputWithFiles } from "../src/interfaces";
 import MockAdapter from "axios-mock-adapter";
 import axios from "axios";
 import { URLs } from "../src/urls";

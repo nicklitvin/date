@@ -53,7 +53,7 @@ export class MyServer {
             }],
             gender: "Female",
             genderInterest: ["Female"],
-            id: sampleContent.userID,
+            userID: sampleContent.userID,
             name: "Michael",
             smoking: "Never"
         })

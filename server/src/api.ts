@@ -1,6 +1,6 @@
 import express from "express";
 import { URLs } from "./urls";
-import { APIOutput, APIRequest, ClientIDs, ConfirmVerificationInput, DeleteImageInput, EditUserInput, GetChatInput, GetProfileInput,LoginInput, MessageInput, GetMatchesInput, NewVerificationInput, UserReportWithReportedID, SubscribeInput, SwipeInput, UnlikeInput, UpdatePushTokenInput, UploadImageInput, UserInputWithFiles, JustEmail, ReadStatusInput, GetReadStatusInput, JustUserID } from "./interfaces";
+import { APIOutput, APIRequest, ClientIDs, ConfirmVerificationInput, DeleteImageInput, EditUserInput, GetChatInput, LoginInput, MessageInput, GetMatchesInput, NewVerificationInput, UserReportWithReportedID, SubscribeInput, SwipeInput, UnlikeInput, UpdatePushTokenInput, UploadImageInput, UserInputWithFiles, JustEmail, ReadStatusInput, GetReadStatusInput, JustUserID, UserInput, HandlerUserInput } from "./interfaces";
 import { isAdmin } from "./others";
 import { Handler } from "./handler";
 
@@ -17,8 +17,8 @@ export class APIHandler {
                 const user = await handler.login.getUserByKey(body.key);
                 if (!user || !user.userID) return res.status(401).json();
 
-                const input : UserInputWithFiles & JustEmail = {
-                    id: user.userID,
+                const input : HandlerUserInput = {
+                    userID: user.userID,
                     email: user.email,
                     files: body.files,
                     ageInterest: body.ageInterest,
@@ -439,7 +439,7 @@ export class APIHandler {
 
         app.post(URLs.getProfile, async (req,res) => {
             try {
-                const body = req.body as GetProfileInput;
+                const body = req.body as JustUserID;
     
                 const output = await handler.user.getPublicProfile(body.userID);
                 return output ? 

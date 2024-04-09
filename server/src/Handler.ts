@@ -8,7 +8,7 @@ import { SwipeHandler } from "./handlers/swipe";
 import { MessageHandler } from "./handlers/message";
 import { ReportHandler } from "./handlers/report";
 import { StripePaymentHandler } from "./handlers/pay";
-import { AttributeValueInput, ChatPreview, ConfirmVerificationInput, DeleteImageInput, EditUserInput, EloAction, GetMatchesInput, LoginInput, LoginOutput, MessageInput, NewMatchData,NewVerificationInput, UserReportWithReportedID, SubscribeInput, SubscriptionData, SwipeFeed, SwipeInput, UnlikeInput, UnlikeOutput, UploadImageInput, UserInput, UserInputWithFiles, UserSwipeStats, JustEmail, ReadStatusInput, GetReadStatusInput } from "./interfaces";
+import { AttributeValueInput, ChatPreview, ConfirmVerificationInput, DeleteImageInput, EditUserInput, EloAction, GetMatchesInput, LoginInput, LoginOutput, MessageInput, NewMatchData,NewVerificationInput, UserReportWithReportedID, SubscribeInput, SubscriptionData, SwipeFeed, SwipeInput, UnlikeInput, UnlikeOutput, UploadImageInput, UserInput, UserInputWithFiles, UserSwipeStats, JustEmail, ReadStatusInput, GetReadStatusInput, HandlerUserInput } from "./interfaces";
 import { FreeTrialHandler } from "./handlers/freetrial";
 import { VerificationHandler } from "./handlers/verification";
 import { addYears } from "date-fns";
@@ -87,8 +87,7 @@ export class Handler {
         ])
     }
 
-    public async createUser(input : UserInputWithFiles & JustEmail, 
-        ignoreVerification = this.ignoreVerification) : Promise<User|null> 
+    public async createUser(input : HandlerUserInput, ignoreVerification = this.ignoreVerification) : Promise<User|null> 
     {
         const [user, verification] = await Promise.all([
             this.user.getUserByEmail(input.email),
@@ -108,7 +107,7 @@ export class Handler {
             );
     
             const userInput : UserInput = {
-                id: input.id,
+                id: input.userID,
                 birthday: input.birthday,
                 attributes: input.attributes,
                 description: input.description,
