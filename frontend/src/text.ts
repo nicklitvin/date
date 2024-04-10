@@ -200,7 +200,7 @@ export const signInText = {
 
 export const noWifiText = {
     pageTitle: "No Network Connection",
-    pageSubtitle: "",
+    pageSubtitle: "Or the server is down for now",
     button: "Try Again",
 }
 

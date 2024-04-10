@@ -1,15 +1,10 @@
 TODO
-every x seconds request new chat request and new matches on adjacent tabs, reset the current loaded ones
-make sure to delete timers when not on those pages
-
 delete images if error with creating user
 
 router.goback() refresh page when changing settings,preferences
     preference change changes feed
 reported page cant login
-why mymessage constantly rerendering in chat
 latest message not showing in chat
-send read receipt
 move keyboard in long chat
 
 create web buy and stats stuff

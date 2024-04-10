@@ -24,13 +24,17 @@ export function Verification(props : Props) {
     const [currentPage, setCurrentPage] = useState<number>(props.currentPage ?? 0);
     const [eduEmail, setEduEmail] = useState<string>(props.eduEmail ?? "");
     const {globalState, receivedData} = useStore();
-    const [seconds, setSeconds] = useState<number>(props.customSeconds ?? globals.resendVerificationTimeout);
+    const [seconds, setSeconds] = useState<number>(props.customSeconds ?? 0);
+    const [timer, setTimer] = useState<NodeJS.Timeout|undefined>(undefined);
 
     useEffect( () => {
         if (props.returnSeconds) props.returnSeconds(seconds);
         if (seconds == 0) return
-        const timer = setTimeout( () => setSeconds(seconds - 1), 1000);
-        return () => clearTimeout(timer);
+        
+        if (timer) clearTimeout(timer);
+        const newTimer = setTimeout( () => setSeconds(seconds - 1), 1000);
+        setTimer(newTimer);
+        return
     }, [seconds])
 
     useEffect( () => {
@@ -38,6 +42,7 @@ export function Verification(props : Props) {
     }, [currentPage])
 
     const goToNextPage = () => {
+        setSeconds(globals.resendVerificationTimeout)
         setCurrentPage(currentPage + 1);
     }
 
