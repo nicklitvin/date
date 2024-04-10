@@ -6,6 +6,7 @@ import bodyParser from "body-parser";
 import { sampleContent } from "./globals";
 import { attributeList } from "./others";
 import fs from "fs/promises";
+import { sampleUsers } from "./sample";
 
 export class MyServer {
     public readonly port = 3000;
@@ -58,7 +59,7 @@ export class MyServer {
         }
         
         if (this.createUser) {
-            const fileString = (await fs.readFile("./__testUtils__/goodImage.jpg")).toString("base64");
+            const fileString = (await fs.readFile("./__testUtils__/images/michael1.jpg")).toString("base64");
             await this.handler.createUser({
                 ageInterest: [18,30],
                 alcohol: "Never",
@@ -77,8 +78,26 @@ export class MyServer {
                 smoking: "Never"
             })
         }
-        
-        await this.handler.createSample();
+
+        const images = ["keanu1.jpg","keanu2.jpg","leo1.jpg","scarlett1.jpg","cate1.jpg","morgan1.jpg","anne1.jpg","samuel1.jpg","jennifer1.jpg",];
+        const buffers = await Promise.all(images.map(val => fs.readFile(`__testUtils__/images/${val}`)));
+
+        const imageIDs = await Promise.all(buffers.map( val => this.handler.image.uploadImage({
+            buffer: val,
+            mimetype: "image/jpeg"
+        }))) as string[]
+
+        const copy = sampleUsers;
+        copy[0].images = [imageIDs[0],imageIDs[1]];
+        copy[1].images = [imageIDs[2]];
+        copy[2].images = [imageIDs[3]];
+        copy[3].images = [imageIDs[4]];
+        copy[4].images = [imageIDs[5]];
+        copy[5].images = [imageIDs[6]];
+        copy[6].images = [imageIDs[7]];
+        copy[7].images = [imageIDs[8]];
+
+        await this.handler.createSample(copy);
     }
 
     close() {

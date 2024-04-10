@@ -5,7 +5,7 @@ import { miscConstants, sampleContent } from "../src/globals";
 
 describe("sample", () => {
     beforeEach( async () => {
-        await handler.createSample();
+        await handler.createSample(sampleUsers);
     })
 
     it("should create data", async () => {

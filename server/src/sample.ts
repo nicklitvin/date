@@ -11,10 +11,11 @@ export const sampleUsers : UserInput[] = [
         email: `1@${sampleContent.uni}.edu`,
         gender: "Male",
         genderInterest: ["Male","Female"],
-        images: [],
+        images: [
+        ],
         smoking: "Sometimes",
-        name: "User 1",
-        description: "This is a little description about me",
+        name: "Keanu",
+        description: "Actor aka John Wick aka Neo",
     },
     {
         id: "feed2",
@@ -25,10 +26,11 @@ export const sampleUsers : UserInput[] = [
         email: `2@${sampleContent.uni}.edu`,
         gender: "Male",
         genderInterest: ["Male","Female"],
-        images: [],
+        images: [
+        ],
         smoking: "Never",
-        name: "User 2",
-        description: "Should be in feed",
+        name: "Leo",
+        description: "Leonardo Wilhelm DiCaprio is an American actor and film producer. Known for his work in biographical and period films, he is the recipient of numerous accolades, including an Academy Award, a British Academy Film Award, and three Golden Globe Awards.",
     },
     {
         id: "feed3",
@@ -39,10 +41,11 @@ export const sampleUsers : UserInput[] = [
         email: `3@${sampleContent.uni}.edu`,
         gender: "Female",
         genderInterest: ["Male","Female"],
-        images: [],
+        images: [
+        ],
         smoking: "Sometimes",
-        name: "User 3",
-        description: "Should be in feed",
+        name: "Scarlett",
+        description: "Scarlett Ingrid Johansson is an American actress. The world's highest-paid actress in 2018 and 2019, she has been featured multiple times on the Forbes Celebrity 100 list. Time named her one of the 100 most influential people in the world in 2021.",
     },
     {
         id: "feed4",
@@ -53,10 +56,11 @@ export const sampleUsers : UserInput[] = [
         email: `4@${sampleContent.uni}.edu`,
         gender: "Female",
         genderInterest: ["Male","Female"],
-        images: [],
+        images: [
+        ],
         smoking: "Never",
-        name: "User 5",
-        description: "Should be in feed",
+        name: "Cate",
+        description: "Catherine Elise Blanchett AC is an Australian actor and producer. She is recognised for her versatile work across independent films, blockbusters and the stage",
     },
     {
         id: "newmatch1",
@@ -67,10 +71,11 @@ export const sampleUsers : UserInput[] = [
         email: `5@${sampleContent.uni}.edu`,
         gender: "Male",
         genderInterest: ["Female"],
-        images: [],
+        images: [
+        ],
         smoking: "Never",
-        name: "New Match 1",
-        description: "Should be in feed",
+        name: "Morgan",
+        description: " ",
     },
     {
         id: "newmatch2",
@@ -81,10 +86,11 @@ export const sampleUsers : UserInput[] = [
         email: `6@${sampleContent.uni}.edu`,
         gender: "Female",
         genderInterest: ["Female"],
-        images: [],
+        images: [
+        ],
         smoking: "Never",
-        name: "New Match 2",
-        description: "Should be in feed",
+        name: "Anne",
+        description: "Anne Jacqueline Hathaway is an American actress. Her accolades include an Academy Award, a British Academy Film Award, a Golden Globe Award, and a Primetime Emmy Award. Her films have grossed over $6.8 billion worldwide, and she appeared on the Forbes Celebrity 100 list in 2009.",
     },
     {
         id: "oldmatch1",
@@ -95,10 +101,11 @@ export const sampleUsers : UserInput[] = [
         email: `7@${sampleContent.uni}.edu`,
         gender: "Male",
         genderInterest: ["Female"],
-        images: [],
+        images: [
+        ],
         smoking: "Never",
-        name: "Old Match 1",
-        description: "Should be in feed",
+        name: "Samuel",
+        description: "Motherfu...",
     },
     {
         id: "oldmatch2",
@@ -109,9 +116,10 @@ export const sampleUsers : UserInput[] = [
         email: `8@${sampleContent.uni}.edu`,
         gender: "Female",
         genderInterest: ["Female"],
-        images: [],
+        images: [
+        ],
         smoking: "Never",
-        name: "Old Match 1",
-        description: "Should be in feed",
+        name: "Jennifer",
+        description: "Hunger Games winner",
     },
 ]

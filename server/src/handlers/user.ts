@@ -297,13 +297,13 @@ export class UserHandler {
         }
     }
 
-    public async createSample() : Promise<User[]> {
+    public async createSample(users : UserInput[]) : Promise<User[]> {
         await this.prisma.user.deleteMany({
             where: {
                 university: sampleContent.uni
             }
         })
-        return await Promise.all(sampleUsers.map( val => 
+        return await Promise.all(users.map( val => 
             this.createUser(val)    
         ))
     }

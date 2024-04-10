@@ -585,9 +585,9 @@ export class Handler {
         }
     }
 
-    public async createSample() : Promise<void> {
+    public async createSample(users : UserInput[]) : Promise<void> {
         await Promise.all([
-            this.user.createSample(),
+            this.user.createSample(users),
             this.swipe.createSample(),
             this.message.createSample(),
         ])

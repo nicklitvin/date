@@ -90,13 +90,11 @@ export function Feed(props : Props) {
 
     const loadMoreFeed = async () => {
         try {
-            let moreFeed : SwipeFeed;
             const input : WithKey<JustUserID> = {
                 userID: receivedData.profile?.id!,
                 key: receivedData.loginKey
             }
             const response = await sendRequest(URLs.getFeed, input);
-            moreFeed = response.data.data as SwipeFeed;
             setSwipeStatus({
                 feedIndex: 0,
                 lastSwipedIndex: -1

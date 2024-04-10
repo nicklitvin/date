@@ -613,22 +613,6 @@ export class APIHandler {
             }
         })
 
-        app.post(URLs.createSample, async (req,res) => {
-            try {
-                const body = req.body as APIRequest<void>;
-                if (!body.key) return res.status(400).json();
-
-                if (isAdmin(body.key)) {
-                    await handler.createSample()
-                    return res.status(200).json();
-                }
-                return res.status(401).json();
-            } catch (err) {
-                console.log(err);
-                return res.status(500).json();
-            }
-        })
-
         app.post(URLs.sendReadStatus, async (req,res) => {
             try {
                 const body = req.body as APIRequest<ReadStatusInput>;

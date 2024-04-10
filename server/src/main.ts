@@ -2,9 +2,9 @@ import { MyServer } from "./myServer";
 
 const server = new MyServer({
     disableEmail: true,
-    createUser: false,
+    createUser: true,
     loginUser: true,
-    verifyUser: false
+    verifyUser: true
 });
 server.createSample();
 console.log(`running server on port ${server.port}`)
