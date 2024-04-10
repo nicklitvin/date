@@ -5,7 +5,7 @@ import { ChatPreview } from "../src/interfaces";
 import { randomUUID } from "crypto";
 import { createUserInput, createUsersForSwipeFeed, getImageDetails, makeMessageInputWithOneRandom, makeMessageInputWithRandoms, makeTwoUsers, makeTwoUsersAndMatch, makeVerificationInput, matchUsers, validRequestUserInput } from "../__testUtils__/easySetup";
 import { addMinutes, addWeeks, addYears } from "date-fns";
-import { miscConstants, userRestrictions } from "../src/globals";
+import { miscConstants, sampleContent, userRestrictions } from "../src/globals";
 
 afterEach( async () => {
     await handler.deleteEverything()
@@ -227,8 +227,8 @@ describe("handler", () => {
         const { user, user_2 } = await makeTwoUsers();
         await handler.reportUser({
             userID: user.id,
-            reportedID: user_2.id
-        })
+            reportedID: user_2.id,
+        }, user_2.email)
         const swipe = await handler.swipe.getSwipeByUsers(user.id, user_2.id);
         expect(swipe?.action).toEqual("Dislike");
     })
@@ -251,7 +251,7 @@ describe("handler", () => {
         expect(await handler.reportUser({
             userID: user.id,
             reportedID: user_2.id
-        })).not.toEqual(null);        
+        }, user_2.email)).not.toEqual(null);        
 
         const [userOpinion, user2Opinion, chat] = await Promise.all([
             handler.swipe.getSwipeByUsers(user.id, user_2.id),
@@ -282,8 +282,10 @@ describe("handler", () => {
         await handler.reportUser({
             userID: user.id,
             reportedID: user_2.id
-        })
+        }, user_2.email);
+
         expect(await handler.user.getUserByID(user_2.id)).toEqual(null);
+        expect(await handler.swipe.getSwipeCountWithUser(user_2.id)).toEqual(0);
     })
 
     it("should no upload image for nonuser", async () => {
@@ -972,5 +974,27 @@ describe("handler", () => {
             toID: user.id,
             timestamp: addMinutes(new Date(),1)
         })).toEqual(3);
+    })
+
+    it("should not login user with max reports", async () => {
+        const login = await handler.loginWithToken({},sampleContent.email);
+        await handler.verification.makeVerificationEntry({
+            email: sampleContent.email,
+            schoolEmail: sampleContent.eduEmail
+        })
+        await handler.verifyUserWithCode({
+            code: sampleContent.code,
+            email: sampleContent.email,
+            schoolEmail: sampleContent.eduEmail
+        })
+        await Promise.all(Array.from({length: miscConstants.maxReportCount}, () => randomUUID()).map( (val) => 
+            handler.report.makeReport({
+                userID: val,
+                reportedEmail: sampleContent.eduEmail
+            })
+        ));
+
+        expect(await handler.loginWithToken({},sampleContent.email)).toEqual(null);
+        expect(await handler.autoLogin(login?.key!)).toEqual(null);
     })
 })

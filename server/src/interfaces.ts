@@ -72,6 +72,10 @@ export interface UnlikeOutput {
     deletedMessages: number
 }
 
+export interface WithEmail {
+    email: string
+}
+
 // SHARED-WITH-CLIENT
 
 export interface AnnouncementInput {

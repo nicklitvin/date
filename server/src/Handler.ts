@@ -148,6 +148,7 @@ export class Handler {
             deleteAllUserImages(),
             this.message.deleteAllChatsWithUser(foundUser.id),
             this.user.deleteUser(foundUser.id),
+            this.swipe.deleteSwipesWithUser(userID)
         ])
         return {images, messages, user};
     }
@@ -250,17 +251,19 @@ export class Handler {
         return result;
     }
 
-    public async reportUser(input : UserReportWithReportedID) : Promise<UserReport|null> {
+    public async reportUser(input : UserReportWithReportedID, customEduEmail?: string) : Promise<UserReport|null> {
         const [user, reportedUser] = await Promise.all([
             this.user.getUserByID(input.userID),
             this.user.getUserByID(input.reportedID),
         ])
 
-        if (!(user && reportedUser) || user.id == reportedUser.id) return null;
+        const eduEmail = customEduEmail ?? (await this.verification.getVerificationByPersonalEmail(reportedUser?.email!))?.schoolEmail;
+
+        if (!(user && reportedUser && eduEmail) || user.id == reportedUser.id) return null;
 
         const [existingReport, reportCount] = await Promise.all([
-            this.report.getReportByUsers(user.id, reportedUser.email),
-            this.report.getReportCountForEmail(reportedUser.email)
+            this.report.getReportByUsers(user.id, eduEmail),
+            this.report.getReportCountForEmail(eduEmail)
         ])
 
         if (existingReport) return null;
@@ -270,7 +273,7 @@ export class Handler {
         const [report] = await Promise.all([
             this.report.makeReport({
                 userID: input.userID,
-                reportedEmail: reportedUser.email
+                reportedEmail: eduEmail
             }),
             swipe ? this.swipe.updateSwipe(swipe.id, "Dislike") : 
                 this.swipe.createSwipe({
@@ -544,6 +547,10 @@ export class Handler {
             }
             const userLogin = await this.login.updateKey(email);
             const verification = await this.verification.getVerificationByPersonalEmail(email);
+            const reportCount = await this.report.getReportCountForEmail(verification?.schoolEmail!);
+
+            if (reportCount >= miscConstants.maxReportCount) return null;
+
             return {
                 key: userLogin.key,
                 newAccount: await this.user.getUserByEmail(email) == null,
@@ -565,6 +572,10 @@ export class Handler {
 
     public async autoLogin(key : string) : Promise<string|null> {
         const userLogin = await this.login.getUserByKey(key);
+
+        const verification = await this.verification.getVerificationByPersonalEmail(userLogin?.email!);
+        const reportCount = await this.report.getReportCountForEmail(verification?.schoolEmail!);
+        if (reportCount >= miscConstants.maxReportCount) return null;
         
         if (userLogin &&  userLogin.expire.getTime() > new Date().getTime()) {
             await this.login.updateExpiration(userLogin.email);

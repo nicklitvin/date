@@ -1,6 +1,4 @@
 TODO
-delete images if error with creating user
-
 router.goback() refresh page when changing settings,preferences
     preference change changes feed
 reported page cant login

@@ -253,4 +253,27 @@ export class SwipeHandler {
             }),
         ])
     }
+
+    public async deleteSwipesWithUser(userID: string) : Promise<number> {
+        const deleted = await this.prisma.swipe.deleteMany({
+            where: {
+                OR: [
+                    {userID: userID},
+                    {swipedUserID: userID}
+                ]
+            }
+        });
+        return deleted.count;
+    }
+
+    public async getSwipeCountWithUser(userID: string) : Promise<number> {
+        return await this.prisma.swipe.count({
+            where: {
+                OR: [
+                    {userID: userID},
+                    {swipedUserID: userID}
+                ]
+            }
+        })
+    }
 }

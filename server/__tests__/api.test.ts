@@ -9,7 +9,9 @@ describe("api", () => {
     let server : MyServer;
 
     beforeAll( () => {
-        server = new MyServer()
+        server = new MyServer({
+            disableEmail: true
+        })
     })
 
     afterEach( async () => {
