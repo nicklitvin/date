@@ -2,7 +2,7 @@ import { observer } from "mobx-react-lite";
 import { PageHeader } from "../src/components/PageHeader";
 import { generalText, settingsText } from "../src/text";
 import { StyledButton, StyledText, StyledView } from "../src/styledElements";
-import { EditUserInput, SettingData, UpdatePushTokenInput, WithKey } from "../src/interfaces";
+import { EditUserInput, JustUserID, SettingData, UpdatePushTokenInput, WithKey } from "../src/interfaces";
 import { URLs } from "../src/urls";
 import { MyButton } from "../src/components/Button";
 import { useStore } from "../src/store/RootStore";
@@ -84,9 +84,10 @@ export function Settings(props : Props) {
 
     const load = async () => {
         try {
-            const input : WithKey<{}> = {
+            const input : WithKey<JustUserID> = {
+                userID: receivedData.profile?.id!,
                 key: receivedData.loginKey
-            }  
+            }
             const response = await sendRequest(URLs.getSettings, input);
             setSettings(response.data.data);
         } catch (err) {
@@ -133,9 +134,10 @@ export function Settings(props : Props) {
 
     const deleteAccount = async () => {
         try {
-            const input : WithKey<{}> = {
+            const input : WithKey<JustUserID> = {
+                userID: receivedData.profile?.id!,
                 key: receivedData.loginKey
-            } 
+            }
             await sendRequest(URLs.deleteAccount, input);
             signOut();
         } catch (err) {}

@@ -5,7 +5,7 @@ import { StyledButton, StyledImage, StyledText, StyledView } from "../../src/sty
 import { MyButton } from "../../src/components/Button";
 import { URLs } from "../../src/urls";
 import { Linking } from "react-native";
-import { PublicProfile, SubscriptionData, WithKey } from "../../src/interfaces";
+import { JustUserID, PublicProfile, SubscriptionData, WithKey } from "../../src/interfaces";
 import { getShortDate, sendRequest } from "../../src/utils";
 import { useStore } from "../../src/store/RootStore";
 import { Link, router } from "expo-router";
@@ -48,7 +48,8 @@ export function Profile(props : Props) {
 
     const load = async () => {
         try {
-            const input : WithKey<{}> = {
+            const input : WithKey<JustUserID> = {
+                userID: receivedData.profile?.id!,
                 key: receivedData.loginKey
             }
 
@@ -68,7 +69,8 @@ export function Profile(props : Props) {
 
     const managePayment = async () => {
         try {
-            const input : WithKey<{}> = {
+            const input : WithKey<JustUserID> = {
+                userID: receivedData.profile?.id!,
                 key: receivedData.loginKey
             }
             const response = await sendRequest(URLs.manageSubscription, input);
@@ -86,7 +88,8 @@ export function Profile(props : Props) {
 
     const cancelSubscription = async () => {
         try {
-            const input : WithKey<{}> = {
+            const input : WithKey<JustUserID> = {
+                userID: receivedData.profile?.id!,
                 key: receivedData.loginKey
             }
             await sendRequest(URLs.cancelSubscription, input);
@@ -97,7 +100,8 @@ export function Profile(props : Props) {
 
     const getCheckoutPage = async () => {
         try {
-            const input : WithKey<{}> = {
+            const input : WithKey<JustUserID> = {
+                userID: receivedData.profile?.id!,
                 key: receivedData.loginKey
             }
             const response = await sendRequest(URLs.getCheckoutPage,input);

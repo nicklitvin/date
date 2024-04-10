@@ -6,7 +6,7 @@ import {signInText } from "../src/text";
 import { StyledButton, StyledImage, StyledText, StyledView } from "../src/styledElements";
 import { useStore } from "../src/store/RootStore";
 import * as Apple from "expo-apple-authentication";
-import { LoginInput, LoginOutput } from "../src/interfaces";
+import { JustUserID, LoginInput, LoginOutput, WithKey } from "../src/interfaces";
 import { sendRequest } from "../src/utils";
 import { URLs } from "../src/urls";
 import { router } from "expo-router";
@@ -68,11 +68,27 @@ export function SignIn() {
     }
 
     useEffect( () => {
-        if (loginOutput) {
-            if (!loginOutput.newAccount) return router.push("(tabs)")
+        if (!loginOutput) return
+
+        const func = async () => {
+            if (!loginOutput.newAccount) {
+                try {
+                    const input : WithKey<{}> = {
+                        key: loginOutput.key
+                    }
+                    const response = await sendRequest(URLs.getMyProfile,input);
+                    receivedData.setProfile(response.data.data);
+                    return router.push("(tabs)")
+                } catch (err) {
+                    console.log(err);
+                }
+            }
+
             if (loginOutput.verified) return router.push("AccountCreation")
             else return router.push("Verification")
         }
+
+        func();
     }, [loginOutput])
 
     const googleLogin = async () => {

@@ -4,7 +4,7 @@ import { generalText, preferencesText } from "../src/text";
 import { globals } from "../src/globals";
 import { MyButton } from "../src/components/Button";
 import { useEffect, useState } from "react";
-import { EditUserInput, Preferences, WithKey } from "../src/interfaces";
+import { EditUserInput, JustUserID, Preferences, WithKey } from "../src/interfaces";
 import { URLs } from "../src/urls";
 import { AgePreference } from "../src/simplePages/AgePreference";
 import { GenderPreference } from "../src/simplePages/GenderPreference";
@@ -65,7 +65,8 @@ export function PreferencePage(props : Props) {
 
     const load = async () => {
         try {
-            const input : WithKey<{}> = {
+            const input : WithKey<JustUserID> = {
+                userID: receivedData.profile?.id!,
                 key: receivedData.loginKey
             }
             const response = await sendRequest(URLs.getPreferences, input);

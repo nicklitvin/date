@@ -30,4 +30,7 @@ describe("api", () => {
         const response = await axios.get(`http://localhost:${server.port}`);
         expect(response.status == 200);
     })
+
+    it("should create user", async () => {
+    })
 })

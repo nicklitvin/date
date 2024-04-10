@@ -47,7 +47,7 @@ export function ChatPreviewBox(props : Props) {
         >
             <StyledImage
                 className="w-[70px] h-[70px] rounded-full"
-                source={props.chatPreview.profile.images[0].url}
+                source={props.chatPreview.profile.images[0]?.url}
             />
             <StyledView className="ml-3 flex flex-col justify-center flex-1">
                 <StyledView className="flex w-full flex-row items-center">

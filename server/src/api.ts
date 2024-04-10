@@ -457,7 +457,7 @@ export class APIHandler {
                 if (!body.key) return res.status(400).json();
 
                 const userID = await handler.login.getUserIDByKey(body.key);
-                if (!isAdmin(body.key) || !userID) return res.status(401).json();
+                if (!userID) return res.status(401).json();
 
                 const output = await handler.user.getPublicProfile(userID);
                 return output ?
@@ -643,7 +643,7 @@ export class APIHandler {
                     toID: body.toID
                 })
     
-                return output ? res.status(200).json() : res.status(400).json()
+                return output != null ? res.status(200).json() : res.status(400).json()
 
             } catch (err) {
                 console.log(err);

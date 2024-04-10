@@ -43,6 +43,7 @@ export function Chat(props : Props) {
     const [showModal, setShowModal] = useState<boolean>(false);
     const [firstLoad, setFirstLoad] = useState<boolean>(true);
     const [seconds, setSeconds] = useState<number>(globals.chatRefreshSeconds);
+    const [timer, setTimer] = useState<NodeJS.Timeout|undefined>(undefined);
 
     useEffect( () => {
         if (props.returnSeconds) props.returnSeconds(seconds);
@@ -56,8 +57,10 @@ export function Chat(props : Props) {
             setSeconds(globals.chatRefreshSeconds);
             return;
         } else {
-            const timer = setTimeout( () => setSeconds(seconds - 1), 1000);
-            return () => clearTimeout(timer);
+            if (timer) clearTimeout(timer);
+            const newTimer = setTimeout( () => setSeconds(seconds - 1), 1000);
+            setTimer(newTimer);
+            return
         }
     }, [seconds])
 
@@ -212,7 +215,7 @@ export function Chat(props : Props) {
             readStatus: false,
             recepientID: profile!.id,
             timestamp: new Date(),
-            userID: ""
+            userID: receivedData.profile?.id!
         }
         setLoadingIDs(loadingIDs.concat(sendingID));
         setChat([sendingChat].concat(chat.filter( val => val.id != removeID)));
@@ -302,6 +305,7 @@ export function Chat(props : Props) {
                 reportedID: profile!.id
             }
             await sendRequest(URLs.reportUser, myReport);
+            if (timer) clearTimeout(timer);
             deleteUser();
             if (props.noAutoLoad) return
             if (props.noRouter) router.push("Matches");
@@ -319,6 +323,8 @@ export function Chat(props : Props) {
                 withID: profile!.id
             }
             await sendRequest(URLs.unlikeUser, unlike);
+            if (timer) clearTimeout(timer);
+
             deleteUser();
             if (props.noAutoLoad) return
             if (!props.noRouter) router.push("Matches");

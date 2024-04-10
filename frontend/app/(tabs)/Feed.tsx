@@ -2,7 +2,7 @@ import { observer } from "mobx-react-lite";
 import { PageHeader } from "../../src/components/PageHeader";
 import { StyledButton, StyledImage, StyledScroll, StyledText, StyledView } from "../../src/styledElements";
 import { feedText } from "../../src/text";
-import { PublicProfile, SwipeFeed, SwipeStatus, WithKey } from "../../src/interfaces";
+import { JustUserID, PublicProfile, SwipeFeed, SwipeStatus, WithKey } from "../../src/interfaces";
 import { useEffect, useRef, useState } from "react";
 import { ProfileViewEmbedMob } from "../../src/pages/ProfileViewEmbed";
 import { URLs } from "../../src/urls";
@@ -67,8 +67,9 @@ export function Feed(props : Props) {
 
     const getFeed = async () => {
         try {
-            const input : WithKey<{}> = {
-                key: receivedData.loginKey
+            const input : WithKey<JustUserID> = {
+                key: receivedData.loginKey,
+                userID: receivedData.profile?.id!
             }
             const response = await sendRequest(URLs.getFeed, input);
             setSwipeStatus({
@@ -90,7 +91,8 @@ export function Feed(props : Props) {
     const loadMoreFeed = async () => {
         try {
             let moreFeed : SwipeFeed;
-            const input : WithKey<{}> = {
+            const input : WithKey<JustUserID> = {
+                userID: receivedData.profile?.id!,
                 key: receivedData.loginKey
             }
             const response = await sendRequest(URLs.getFeed, input);
@@ -198,6 +200,7 @@ export function Feed(props : Props) {
                         reportable={true}
                         likedMe={feed.likedMeIDs.includes(feed.profiles[swipeStatus.feedIndex].id)}
                         loginKey={receivedData.loginKey}
+                        userID={receivedData.profile?.id!}
                     />
                 }
             </Animated.View>

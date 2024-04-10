@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { UserSwipeStats, WithKey } from "../../src/interfaces";
+import { JustUserID, UserSwipeStats, WithKey } from "../../src/interfaces";
 import { statsText } from "../../src/text";
 import { StyledButton, StyledScroll, StyledText, StyledView } from "../../src/styledElements";
 import { PageHeader } from "../../src/components/PageHeader";
@@ -48,7 +48,8 @@ export function Stats(props : Props) {
 
     const load = async () => {
         try {
-            const input : WithKey<{}> = {
+            const input : WithKey<JustUserID> = {
+                userID: receivedData.profile?.id!,
                 key: receivedData.loginKey
             }
             const response = await sendRequest(URLs.getStats, input);
@@ -61,7 +62,8 @@ export function Stats(props : Props) {
 
     const getCheckoutPage = async () => {
         try {
-            const input : WithKey<{}> = {
+            const input : WithKey<JustUserID> = {
+                userID: receivedData.profile?.id!,
                 key: receivedData.loginKey
             }
             const response = await sendRequest(URLs.getCheckoutPage, input);
