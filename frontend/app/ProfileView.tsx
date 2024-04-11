@@ -25,7 +25,6 @@ export function ProfileView() {
     if (!profile) return <Redirect href="Error"/>
 
     const imageURLs = profile.images.map(val => val.url);
-    console.log("AS",imageURLs);
 
     return (
         <StyledView className="w-full h-full bg-back">

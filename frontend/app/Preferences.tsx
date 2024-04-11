@@ -23,25 +23,20 @@ interface Props {
 
 export function PreferencePage(props : Props) {
     const { receivedData } = useStore();
-    const [preferences, setPreferences] = useState<Preferences|null>(receivedData.preferences);
-    const [genders, setGenders] = useState<string[]>(preferences?.genderPreference ?? []); 
-    const [agePreference, setAgePreference] = useState<[number,number]>(preferences?.agePreference ?? [
+    const savedPreferences = receivedData.preferences;
+
+    const [genders, setGenders] = useState<string[]>(savedPreferences?.genderPreference ?? []); 
+    const [agePreference, setAgePreference] = useState<[number,number]>(savedPreferences?.agePreference ?? [
         globals.minAge, globals.maxAge
     ])
     const [noChanges, setNoChanges] = useState<boolean>(false);
     const [firstLoad, setFirstLoad] = useState<boolean>(true);
 
     useEffect( () => {
-        if (preferences) {
-            receivedData.setPreferences(preferences)
-        }
-    }, [preferences])
-
-    useEffect( () => {
         if (firstLoad) {
-            setFirstLoad(true)
+            setFirstLoad(false)
             if (props.noAutoLoad) return
-            load();
+            if (!savedPreferences) load();
         }
     }, [firstLoad])
 
@@ -50,18 +45,18 @@ export function PreferencePage(props : Props) {
         if (props.returnMinAge) props.returnMinAge(agePreference[0]);
         if (props.returnMaxAge) props.returnMaxAge(agePreference[1]);
 
-        if (!preferences) {
+        if (!savedPreferences) {
             setNoChanges(true);
             return;
         }
 
         setNoChanges(
-            agePreference[0] == preferences?.agePreference[0] && 
-            agePreference[1] == preferences?.agePreference[1] &&
-            genders.length == preferences.genderPreference.length && 
-            genders.every( val => preferences.genderPreference.includes(val))
+            agePreference[0] == savedPreferences?.agePreference[0] && 
+            agePreference[1] == savedPreferences?.agePreference[1] &&
+            genders.length == savedPreferences.genderPreference.length && 
+            genders.every( val => savedPreferences.genderPreference.includes(val))
         )
-    }, [genders, agePreference, preferences])
+    }, [genders, agePreference, savedPreferences])
 
     const load = async () => {
         try {
@@ -71,7 +66,7 @@ export function PreferencePage(props : Props) {
             }
             const response = await sendRequest(URLs.getPreferences, input);
             const data = response.data.data;
-            setPreferences(data);
+            receivedData.setPreferences(response.data.data);
             setGenders(data.genderPreference);
             setAgePreference(data.agePreference);
         } catch (err) {
@@ -98,16 +93,17 @@ export function PreferencePage(props : Props) {
                 value: agePreference
             }
             await sendRequest(URLs.editUser, ageEdit);
-
-            setPreferences({
+            receivedData.setPreferences({
                 agePreference: agePreference,
                 genderPreference: genders
             })
+            receivedData.setSwipeFeed(null);
         } catch (err) {
             console.log(err);
         }
     }
 
+    if (!savedPreferences) return <></>
     return (
         <StyledView className="w-full h-full bg-back">
             <StyledButton onPress={load} testID={testIDS.load}/>
