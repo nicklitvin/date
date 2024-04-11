@@ -65,6 +65,14 @@ export function createTimeoutSignal() {
     return control.signal;
 }
 
+export function setCustomTimer(callback : () => any, seconds : number) : NodeJS.Timeout {
+    const newTimer = setTimeout(callback, seconds*1000);
+    if (process.env.NODE_ENV == "test") {
+        newTimer.unref()
+    }
+    return newTimer;
+}
+
 export async function sendRequest(subURL : string, data : any) {
     const print = true;
 

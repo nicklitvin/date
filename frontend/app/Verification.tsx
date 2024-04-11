@@ -8,7 +8,7 @@ import { eduEmailText, verifyCodeText } from "../src/text";
 import { MyTextInput } from "../src/components/TextInput";
 import { MyButton } from "../src/components/Button";
 import { globals } from "../src/globals";
-import { sendRequest } from "../src/utils";
+import { sendRequest, setCustomTimer } from "../src/utils";
 import { router } from "expo-router";
 
 interface Props {
@@ -32,7 +32,7 @@ export function Verification(props : Props) {
         if (seconds == 0) return
         
         if (timer) clearTimeout(timer);
-        const newTimer = setTimeout( () => setSeconds(seconds - 1), 1000);
+        const newTimer = setCustomTimer( () => setSeconds(seconds - 1), 1);
         setTimer(newTimer);
         return
     }, [seconds])

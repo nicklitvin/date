@@ -20,10 +20,8 @@ interface Props {
 
 export function Profile(props : Props) {
     const { globalState, receivedData } = useStore();
-    const [profile, setProfile] = useState<PublicProfile|null>(receivedData.profile);
-    const [subscription, setSubscription] = useState<SubscriptionData|null>(
-        receivedData.subscription
-    )
+    const savedProfile = receivedData.profile;
+    const savedSubscription = receivedData.subscription;
     const [firstLoad, setFirstLoad] = useState<boolean>(true);
 
     useEffect( () => {
@@ -34,18 +32,6 @@ export function Profile(props : Props) {
         }
     }, [firstLoad])
 
-    useEffect( () => {
-        if (profile && !receivedData.profile) {
-            receivedData.setProfile(profile)
-        }
-    }, [profile])
-
-    useEffect( () => {
-        if (subscription && !receivedData.subscription) {
-            receivedData.setSubscription(subscription);
-        }
-    }, [subscription])
-
     const load = async () => {
         try {
             const input : WithKey<JustUserID> = {
@@ -53,14 +39,14 @@ export function Profile(props : Props) {
                 key: receivedData.loginKey
             }
 
-            if (!profile) {
+            if (!savedProfile) {
                 const profileResponse = await sendRequest(URLs.getMyProfile, input);
-                setProfile(profileResponse.data.data);
+                receivedData.setProfile(profileResponse.data.data);
             }
 
-            if (!subscription) {
+            if (!savedSubscription) {
                 const subscriptionResponse = await sendRequest(URLs.getSubscription, input);
-                setSubscription(subscriptionResponse.data.data);
+                receivedData.setSubscription(subscriptionResponse.data.data);
             }
         } catch (err) {
             console.log(err);
@@ -116,7 +102,7 @@ export function Profile(props : Props) {
         }
     }
 
-    if (!profile && !props.dontAutoLoad) {
+    if ( (!savedProfile || !savedSubscription) && !props.dontAutoLoad) {
         return <Loading/>   
     }
     return (
@@ -136,14 +122,14 @@ export function Profile(props : Props) {
             />
             <StyledView className="flex items-center pt-[100px]">
                 <StyledImage
-                    source={profile?.images[0].url}
+                    source={savedProfile?.images[0].url}
                     className="w-[150px] h-[150px] rounded-full"
                 />
                 <StyledText className="font-bold text-xl">
-                    {`${profile?.name}, ${profile?.age}`}
+                    {`${savedProfile?.name}, ${savedProfile?.age}`}
                 </StyledText>
                 <StyledText className="text-xl">
-                    {subscription?.subscribed ? profileText.premiumTier : profileText.freeTier}
+                    {savedSubscription?.subscribed ? profileText.premiumTier : profileText.freeTier}
                 </StyledText>
                 <StyledView className="w-full pt-3 flex items-center">
                     <MyButton
@@ -158,14 +144,14 @@ export function Profile(props : Props) {
                     />
                 </StyledView>
                 {
-                    subscription?.subscribed ? 
+                    savedSubscription?.subscribed ? 
                     <StyledView className="flex flex-col w-full pt-5 items-center">
                         <StyledText className="font-bold text-xl">
                             {profileText.subscriptionStatus}
                         </StyledText>
                         <StyledText className="text-xl">
                             {`Next payment of $6.99 on ${getShortDate(
-                                subscription.endDate!, globalState.timeZone
+                                savedSubscription.endDate!, globalState.timeZone
                             )}`}
                         </StyledText>
                         <StyledView className="w-full flex items-center pt-3">

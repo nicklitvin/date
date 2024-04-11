@@ -7,7 +7,7 @@ import { GetChatInput, Message, MessageInput, PublicProfile, UserReportWithRepor
 import { globals } from "../src/globals";
 import { StyledButton, StyledImage, StyledScroll, StyledText, StyledView } from "../src/styledElements";
 import { testIDS } from "../src/testIDs";
-import { getChatTimestamp, sendRequest } from "../src/utils";
+import { getChatTimestamp, sendRequest, setCustomTimer } from "../src/utils";
 import { PageHeader } from "../src/components/PageHeader";
 import { MyMessage } from "../src/components/Message";
 import { URLs } from "../src/urls";
@@ -58,7 +58,7 @@ export function Chat(props : Props) {
             return;
         } else {
             if (timer) clearTimeout(timer);
-            const newTimer = setTimeout( () => setSeconds(seconds - 1), 1000);
+            const newTimer = setCustomTimer( () => setSeconds(seconds - 1), 1)
             setTimer(newTimer);
             return
         }

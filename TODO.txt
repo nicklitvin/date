@@ -1,7 +1,7 @@
 TODO
 router.goback() refresh page when changing settings,preferences
     preference change changes feed
-reported page cant login
+reported page cant login, add to login output
 latest message not showing in chat
 move keyboard in long chat
 

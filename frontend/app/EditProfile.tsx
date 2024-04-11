@@ -13,9 +13,12 @@ import { Frequency } from "../src/components/Frequency";
 export function EditProfile() {
     const { receivedData } = useStore();
     const profile = receivedData.profile;
-    if (!profile) router.push("Error");
 
-    if (!profile) return <></>
+    if (!profile) {
+        router.push("Error");
+        return <></>
+    } 
+
     return (
         <StyledScroll>
         <StyledView className="w-full h-full bg-back">
