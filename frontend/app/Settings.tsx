@@ -26,6 +26,7 @@ interface Props {
 
 export function Settings(props : Props) {
     const {globalState, receivedData} = useStore();
+
     const [showModal, setShowModal] = useState<boolean>(false);
     const [settings, setSettings] = useState<SettingData[]>(receivedData.settings ?? []);
     const [redirect, setRedirect] = useState<boolean>(false);
@@ -35,7 +36,7 @@ export function Settings(props : Props) {
         if (firstLoad) {
             setFirstLoad(false);
             if (props.noAutoLoad) return
-            load();   
+            if (settings.length == 0) load();   
         }
     }, [firstLoad])
 

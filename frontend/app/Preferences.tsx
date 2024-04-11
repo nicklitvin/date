@@ -103,7 +103,6 @@ export function PreferencePage(props : Props) {
         }
     }
 
-    if (!savedPreferences) return <></>
     return (
         <StyledView className="w-full h-full bg-back">
             <StyledButton onPress={load} testID={testIDS.load}/>
