@@ -39,8 +39,6 @@ describe("feed", () => {
         const store = new RootStore();
         store.globalState.setDisableFade(true);
         const StoreProvider = createStoreProvider(store);
-        const getFeedIndex = jest.fn();
-        const getFeedLength = jest.fn();
 
         if (useSave) {
             store.receivedData.setSwipeFeed(feed)
@@ -50,8 +48,6 @@ describe("feed", () => {
             <StoreProvider value={store}>
                 <FeedMob
                     dontAutoLoad={true}
-                    getFeedIndex={getFeedIndex}
-                    getFeedLength={getFeedLength}
                 />
             </StoreProvider>
         )
@@ -62,7 +58,7 @@ describe("feed", () => {
             })
         }
 
-        return { store, mock, getFeedIndex, getFeedLength }
+        return { store, mock }
     }
 
     const loadMore = async (mock : MockAdapter) => {
@@ -78,25 +74,27 @@ describe("feed", () => {
     }
 
     it("should load feed", async () => {
-        const { getFeedLength } = await load();
+        const { store } = await load();
 
-        expect(getFeedLength).toHaveBeenLastCalledWith(feed.profiles.length);
+        expect(store.receivedData.swipeFeed?.profiles).toHaveLength(feed.profiles.length);
     })
 
     it("should go to next person", async () => {
-        const { getFeedIndex } = await load();
+        const { store } = await load();
 
-        expect(getFeedIndex).toHaveBeenLastCalledWith(0);
+        expect(store.globalState.swipeStatus?.feedIndex).toEqual(0);
+        expect(store.globalState.swipeStatus?.lastSwipedIndex).toEqual(-1);
 
         await act( () => {
             fireEvent(screen.getByTestId(testIDS.swipeLike), "press")
         });
 
-        expect(getFeedIndex).toHaveBeenLastCalledWith(1);
+        expect(store.globalState.swipeStatus?.feedIndex).toEqual(1);
+        expect(store.globalState.swipeStatus?.lastSwipedIndex).toEqual(0);
     })
 
     it("should load more", async () => {
-        const { mock, getFeedLength, store } = await load();
+        const { mock, store } = await load();
         loadMore(mock)
 
         for (const _ of feed.profiles) {
@@ -105,12 +103,13 @@ describe("feed", () => {
             })
         };
 
-        expect(getFeedLength).toHaveBeenLastCalledWith(moreFeed.profiles.length)
-        expect(store.receivedData.swipeFeed?.profiles).toHaveLength(moreFeed.profiles.length);
+        expect(store.receivedData.swipeFeed?.profiles).toHaveLength(moreFeed.profiles.length)
+        expect(store.globalState.swipeStatus?.feedIndex).toEqual(0);
+        expect(store.globalState.swipeStatus?.lastSwipedIndex).toEqual(-1);
     })
 
     it("should show no feed", async () => {
-        const { mock, getFeedLength, store } = await load();
+        const { mock, store } = await load();
         loadNothing(mock)
 
         for (const _ of feed.profiles) {

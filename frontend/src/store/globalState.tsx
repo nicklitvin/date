@@ -1,4 +1,5 @@
 import { action, makeAutoObservable, observable } from "mobx";
+import { SwipeStatus } from "../interfaces";
 
 export class GlobalState {
     @observable public useHttp : boolean = true;
@@ -6,10 +7,20 @@ export class GlobalState {
     @observable public ignoreRequest : boolean = true;
     @observable public disableFade : boolean = false;
     @observable public expoPushToken : string|null = null;
+    @observable public swipeStatus : SwipeStatus|null = null;
 
     constructor() {
         makeAutoObservable(this);
     }
+
+    @action
+    setSwipeStatus(input : SwipeStatus) { this.swipeStatus = input; }
+
+    @action
+    resetSwipeStatus() { this.swipeStatus = {
+        feedIndex: 0,
+        lastSwipedIndex: -1
+    }}
 
     @action
     setUseHttp(value : boolean) { this.useHttp = value; }

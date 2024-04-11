@@ -9,10 +9,6 @@ export class ReceivedData {
     @observable public chatPreviews : ChatPreview[]|null = null;
     @observable public newMatches : NewMatchData[]|null = null;
     @observable public swipeFeed : SwipeFeed|null = null;
-    @observable public swipeStatus : SwipeStatus|null = {
-        feedIndex: 0,
-        lastSwipedIndex: -1
-    };
     @observable public stats : UserSwipeStats|null = null;
     @observable public savedChats : {[userID: string] : Message[]} = {}
     @observable public settings : SettingData[]|null = null;
@@ -52,9 +48,6 @@ export class ReceivedData {
     deleteSavedChat(userID : string) {
         delete this.savedChats[userID]
     }
-
-    @action
-    setSwipeStatus(input : SwipeStatus) { this.swipeStatus = input; }
 
     @action
     setSettings(input : SettingData[]) { this.settings = input; }

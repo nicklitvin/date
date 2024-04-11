@@ -22,7 +22,7 @@ interface Props {
 }
 
 export function PreferencePage(props : Props) {
-    const { receivedData } = useStore();
+    const { globalState, receivedData } = useStore();
     const savedPreferences = receivedData.preferences;
 
     const [genders, setGenders] = useState<string[]>(savedPreferences?.genderPreference ?? []); 
@@ -98,6 +98,7 @@ export function PreferencePage(props : Props) {
                 genderPreference: genders
             })
             receivedData.setSwipeFeed(null);
+            globalState.resetSwipeStatus();
         } catch (err) {
             console.log(err);
         }
