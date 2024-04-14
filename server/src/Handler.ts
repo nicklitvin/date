@@ -549,13 +549,15 @@ export class Handler {
             const verification = await this.verification.getVerificationByPersonalEmail(email);
             const reportCount = await this.report.getReportCountForEmail(verification?.schoolEmail!);
 
-            if (reportCount >= miscConstants.maxReportCount) return null;
-
-            return {
-                key: userLogin.key,
-                newAccount: await this.user.getUserByEmail(email) == null,
-                verified: verification?.verified ?? false
-            };
+            return reportCount >= miscConstants.maxReportCount ?
+                {
+                    banned: true
+                } :
+                {
+                    key: userLogin.key,
+                    newAccount: await this.user.getUserByEmail(email) == null,
+                    verified: verification?.verified ?? false
+                }
         } else {
             const userLogin = await this.login.createUser({
                 email: email,

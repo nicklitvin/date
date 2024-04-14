@@ -1,5 +1,4 @@
 TODO
-reported page cant login, add to login output
 chat
     establish websocket
     load chat in advance to avoid glitchy

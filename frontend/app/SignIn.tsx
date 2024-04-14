@@ -6,7 +6,7 @@ import {signInText } from "../src/text";
 import { StyledButton, StyledImage, StyledText, StyledView } from "../src/styledElements";
 import { useStore } from "../src/store/RootStore";
 import * as Apple from "expo-apple-authentication";
-import { JustUserID, LoginInput, LoginOutput, WithKey } from "../src/interfaces";
+import { LoginInput, LoginOutput, WithKey } from "../src/interfaces";
 import { sendRequest } from "../src/utils";
 import { URLs } from "../src/urls";
 import { router } from "expo-router";
@@ -71,6 +71,8 @@ export function SignIn() {
         if (!loginOutput) return
 
         const func = async () => {
+            if (loginOutput.banned) return router.push("Reported");
+
             if (!loginOutput.newAccount) {
                 try {
                     const input : WithKey<{}> = {

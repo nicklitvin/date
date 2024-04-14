@@ -206,9 +206,10 @@ export interface LoginInput {
 }
 
 export interface LoginOutput {
-    key: string
-    newAccount: boolean
-    verified: boolean
+    key?: string
+    newAccount?: boolean
+    verified?: boolean
+    banned?: boolean
 }
 
 export interface UpdatePushTokenInput {

@@ -994,7 +994,8 @@ describe("handler", () => {
             })
         ));
 
-        expect(await handler.loginWithToken({},sampleContent.email)).toEqual(null);
+        const output = await handler.loginWithToken({},sampleContent.email);
+        expect(output?.banned).toEqual(true);
         expect(await handler.autoLogin(login?.key!)).toEqual(null);
     })
 })

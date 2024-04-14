@@ -208,3 +208,8 @@ export const loadText = {
     pageTitle: "Loading...",
     pageSubtitle: "Should not take too long"
 }
+
+export const reportedText = {
+    pageTitle: "You have been banned!",
+    pageSubtitle: "Your account has been suspended from this platform for not complying with our guidelines. If you believe this ban is unjustified, contact customer support."
+}

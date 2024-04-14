@@ -32,6 +32,7 @@ export default function App() {
                                     <Stack.Screen name="Error"/>
                                     <Stack.Screen name="Chat"/>
                                     <Stack.Screen name="Verification"/>
+                                    <Stack.Screen name="Reported"/>
                                 </Stack>
                             </StyledView>
                         </StyledView>
