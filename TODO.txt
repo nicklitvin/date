@@ -1,4 +1,8 @@
 TODO
+terms
+premium page
+integrate stripe subscription
+
 chat
     establish websocket
     load chat in advance to avoid glitchy
