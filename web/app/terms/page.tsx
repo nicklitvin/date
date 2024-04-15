@@ -38,7 +38,6 @@ export default function Terms() {
             <Title text={text.title}/> 
             <div className="h-2"/>
             <p className="text-sm whitespace-pre-wrap">{text.content}</p>
-            <div className="h-5"/>
         </div>
     )
 }

@@ -1,5 +1,4 @@
 TODO
-terms
 premium page
 integrate stripe subscription
 
