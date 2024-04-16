@@ -78,4 +78,7 @@ export const errorText = {
     userNotVerified: "User not verified",
     cannotSwipeSelf: "Cannot swipe self",
     cannotSwipeAgain: "Cannot swipe again",
+    cannotSendMessage: "Cannot send message",
+    cannotReportSelf: "Cannot report self",
+    cannotReportAgain: "Cannot report again",
 }

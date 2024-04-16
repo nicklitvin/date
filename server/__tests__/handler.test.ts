@@ -99,16 +99,19 @@ describe("handler", () => {
         const user = await handler.user.createUser(createUserInput("a@berkeley.edu"));
         const user_2 = await handler.user.createUser(createUserInput("b@berkeley.edu"));
 
-        expect(await handler.sendMessage({
+        const output1 = await handler.sendMessage({
             userID: "random",
             recepientID: user_2.id,
             message: ""
-        })).toEqual(null);
-        expect(await handler.sendMessage({
+        });
+        expect(output1.message).toEqual(errorText.cannotSendMessage);
+
+        const output2 = await handler.sendMessage({
             userID: user.id,
             recepientID: "random",
             message: ""
-        })).toEqual(null);
+        });
+        expect(output2.message).toEqual(errorText.cannotSendMessage);
     })
 
     it("should not send message if not match 2", async () => {
@@ -120,43 +123,49 @@ describe("handler", () => {
             swipedUserID: user_2.id,
             action: "Like"
         })
-        expect(await handler.sendMessage({
+        const output1 = await handler.sendMessage({
             userID: user.id,
             recepientID: user_2.id,
             message: ""
-        })).toEqual(null);
+        });
+        expect(output1.message).toEqual(errorText.cannotSendMessage);
 
         await handler.swipe.createSwipe({
             userID: user_2.id,
             swipedUserID: user.id,
             action: "Dislike"
         })
-        expect(await handler.sendMessage({
+        const output2 = await handler.sendMessage({
             userID: user.id,
             recepientID: user_2.id,
             message: ""
-        })).toEqual(null);
+        });
+        expect(output2.message).toEqual(errorText.cannotSendMessage);
     })
 
     it("should send message to match", async () => {
         const {user, user_2} = await makeTwoUsersAndMatch();
-        expect(await handler.sendMessage({
+        const output = await handler.sendMessage({
             userID: user.id,
             recepientID: user_2.id,
             message: ""
-        })).not.toEqual(null);
-        expect(await handler.sendMessage({
+        })
+        expect(output.data).not.toEqual(null);
+
+        const output1 = await handler.sendMessage({
             userID: user_2.id,
             recepientID: user.id,
             message: ""
-        })).not.toEqual(null);
+        });
+        expect(output1.data).not.toEqual(null);
     })
 
     it("should not get chat preview for nonuser", async () => {
-        expect(await handler.getChatPreviews({
+        const output = await handler.getChatPreviews({
             userID: "random",
             timestamp: new Date()
-        })).toEqual(null);
+        })
+        expect(output.message).toEqual(errorText.notValidUser);
     })
 
     it("should get chat preview", async () => {
@@ -189,10 +198,12 @@ describe("handler", () => {
             }, new Date(20)),
         ])
 
-        const previews = await handler.getChatPreviews({
+        const output = await handler.getChatPreviews({
             userID: user.id,
             timestamp: new Date()
-        }) as ChatPreview[];
+        });
+        
+        const previews = output.data!;
         expect(previews.length).toEqual(2);
         expect(previews[0].profile.id).toEqual(user_3.id);
         expect(previews[0].message.id).toEqual(m3.id);
@@ -202,35 +213,51 @@ describe("handler", () => {
 
     it("should not get chat preview if no messages", async () => {
         const {user} = await makeTwoUsersAndMatch();
-        const previews = await handler.getChatPreviews({
+        const output = await handler.getChatPreviews({
             userID: user.id,
             timestamp: new Date()
         })
-        expect(previews?.length).toEqual(0);
+        expect(output.data?.length).toEqual(0);
     })
 
     it("should not add report from nonuser", async () => {
         const user = await handler.user.createUser(createUserInput("a@berkeley.edu"));
-        expect(await handler.reportUser({
+        const output = await handler.reportUser({
             userID: "random",
             reportedID: user.id
-        })).toEqual(null);
+        });
+        expect(output.message).toEqual(errorText.notValidUser);
     })
 
     it("should not report nonuser", async () => {
         const user = await handler.user.createUser(createUserInput("a@berkeley.edu"));
-        expect(await handler.reportUser({
+        const output = await handler.reportUser({
             userID: user.id,
             reportedID: "random"
-        })).toEqual(null);
+        });
+        expect(output.message).toEqual(errorText.notValidUser);
     })
 
     it("should not report self", async () => {
         const user = await handler.user.createUser(createUserInput("a@berkeley.edu"));
-        expect(await handler.reportUser({
+        const output = await handler.reportUser({
             userID: user.id,
             reportedID: user.id
-        })).toEqual(null);
+        });
+        expect(output.message).toEqual(errorText.notValidUser);
+    })
+
+    it("should not report twice", async () => {
+        const { user, user_2 } = await makeTwoUsers();
+        await handler.reportUser({
+            userID: user.id,
+            reportedID: user_2.id,
+        }, user_2.email)
+        const output = await handler.reportUser({
+            userID: user.id,
+            reportedID: user_2.id,
+        }, user_2.email)
+        expect(output.message).toEqual(errorText.cannotReportAgain);
     })
 
     it("should disliked swipe if report", async () => {
@@ -258,10 +285,11 @@ describe("handler", () => {
             })
         ])
 
-        expect(await handler.reportUser({
+        const output = await handler.reportUser({
             userID: user.id,
             reportedID: user_2.id
-        }, user_2.email)).not.toEqual(null);        
+        }, user_2.email);
+        expect(output.data).not.toEqual(null);
 
         const [userOpinion, user2Opinion, chat] = await Promise.all([
             handler.swipe.getSwipeByUsers(user.id, user_2.id),

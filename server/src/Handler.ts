@@ -184,7 +184,7 @@ export class Handler {
         return { data: swipe };
     }
 
-    public async sendMessage(input : MessageInput) : Promise<Message|null> {
+    public async sendMessage(input : MessageInput) : Promise<APIOutput<Message>> {
         const [user, recepient, userOpinion, recepientOpinion] = await Promise.all([
             this.user.getUserByID(input.userID),
             this.user.getUserByID(input.recepientID),
@@ -213,16 +213,16 @@ export class Handler {
                     })
                 }
             }
-            return message
+            return { data: message }
         }
-        return null;
+        return { message: errorText.cannotSendMessage};
     }
 
     public async getChatPreviews(input : GetMatchesInput) : 
-        Promise<ChatPreview[]|null> 
+        Promise<APIOutput<ChatPreview[]>> 
     {
         const user = await this.user.getUserByID(input.userID);
-        if (!user) return null;
+        if (!user) return { message : errorText.notValidUser };
 
         const messages = await this.message.getLatestMessageFromDistinctUsers(input);
         const combined = messages.messagesFromUserID.concat(messages.messagesToUserID).
@@ -255,10 +255,10 @@ export class Handler {
             }
         }
 
-        return result;
+        return { data: result};
     }
 
-    public async reportUser(input : UserReportWithReportedID, customEduEmail?: string) : Promise<UserReport|null> {
+    public async reportUser(input : UserReportWithReportedID, customEduEmail?: string) : Promise<APIOutput<UserReport>> {
         const [user, reportedUser] = await Promise.all([
             this.user.getUserByID(input.userID),
             this.user.getUserByID(input.reportedID),
@@ -266,14 +266,15 @@ export class Handler {
 
         const eduEmail = customEduEmail ?? (await this.verification.getVerificationByPersonalEmail(reportedUser?.email!))?.schoolEmail;
 
-        if (!(user && reportedUser && eduEmail) || user.id == reportedUser.id) return null;
+        if (!(user && reportedUser && eduEmail)) return { message: errorText.notValidUser }
+        if (user.id == reportedUser.id) return { message: errorText.cannotReportSelf }
 
         const [existingReport, reportCount] = await Promise.all([
             this.report.getReportByUsers(user.id, eduEmail),
             this.report.getReportCountForEmail(eduEmail)
         ])
 
-        if (existingReport) return null;
+        if (existingReport) return { message : errorText.cannotReportAgain };
 
         const swipe = await this.swipe.getSwipeByUsers(user.id, reportedUser.id);
 
@@ -295,7 +296,7 @@ export class Handler {
             await this.deleteUser(reportedUser.id);
         }
 
-        return report
+        return { data: report }
     }
 
     public async uploadImage(input : UploadImageInput) : Promise<User|null> {
