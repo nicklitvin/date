@@ -94,5 +94,9 @@ export const errorText = {
     invalidImageOrder: "Invalid image order",
     noSubscription: "No active subscription",
     cannotUnlike: "Cannot unlike",
-    alreadyDislike: "Already disliked"
+    alreadyDislike: "Already disliked",
+    invalidSchool: "Invalid school email",
+    emailInUse: "Email aready in use",
+    invalidVerificationCode: "Incorrect Code",
+    noVerification: "No Verification to regenerate",
 }

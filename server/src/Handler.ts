@@ -498,7 +498,7 @@ export class Handler {
     }
 
     public async getVerificationCode(input : NewVerificationInput & JustEmail) : 
-        Promise<number|null> 
+        Promise<APIOutput<number>> 
     {
         await this.verification.removeExpiredVerifications();
 
@@ -508,27 +508,30 @@ export class Handler {
             this.verification.getVerificationBySchoolEmail(input.schoolEmail)
         ]);
 
-        if (!schoolValid || schoolTaken || personalTaken) return null;
+        if (!schoolValid) return { message: errorText.invalidSchool}
+        if (schoolTaken || personalTaken) return { message: errorText.emailInUse}
 
         const code = input.email == sampleContent.email ?
             await this.verification.makeVerificationEntry(input, new Date(2100,1,1), sampleContent.code) :
             await this.verification.makeVerificationEntry(input)
 
         if (!this.disableEmail) await this.mail.sendVerificationCode(input.schoolEmail, code);
-        return code;
+        return { data: code };
     }
 
     public async verifyUserWithCode(input : ConfirmVerificationInput & JustEmail) : 
-        Promise<Verification|null> 
+        Promise<APIOutput<Verification>> 
     {
-        return await this.verification.getVerificationWithCode(input) ? 
-            await this.verification.verifyUser(input.schoolEmail) :
-            null;
+        const verification = await this.verification.getVerificationWithCode(input);
+        if (!verification) return { message: errorText.invalidVerificationCode}
+
+        const verified = await this.verification.verifyUser(input.schoolEmail);
+        return verified ? { data: verified } : { message : errorText.serverError}
     }
 
-    public async regenerateVerificationCode(eduEemail : string) : Promise<number|null> {
+    public async regenerateVerificationCode(eduEemail : string) : Promise<APIOutput<number>> {
         const verification = await this.verification.getVerificationBySchoolEmail(eduEemail);
-        if (!verification) return null;
+        if (!verification) return { message: errorText.noVerification };
 
         let newCode : number|undefined; 
         while (true) {
@@ -544,7 +547,7 @@ export class Handler {
             eduEemail, newCode
         );
         if (!this.disableEmail) await this.mail.sendVerificationCode(eduEemail, newCode);
-        return newVerification.code;
+        return { data: newVerification.code };
     }
 
     public async loginWithToken(input : LoginInput, customEmail? : string) : Promise<LoginOutput|null> {

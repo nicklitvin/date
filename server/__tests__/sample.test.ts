@@ -41,11 +41,10 @@ describe("sample", () => {
             schoolEmail: sampleContent.eduEmail
         })
 
-        expect(code).toEqual(sampleContent.code);
+        expect(code.data).toEqual(sampleContent.code);
 
-        expect(
-            await handler.regenerateVerificationCode(sampleContent.eduEmail)
-        ).toEqual(sampleContent.code)
+        const regenerate = await handler.regenerateVerificationCode(sampleContent.eduEmail);
+        expect(regenerate.data).toEqual(sampleContent.code);
 
         expect(await handler.verifyUserWithCode({
             email: sampleContent.email,

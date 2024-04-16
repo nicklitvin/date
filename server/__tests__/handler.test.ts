@@ -808,13 +808,15 @@ describe("handler", () => {
         const input = makeVerificationInput();
         input.schoolEmail = "b@berkeley.edu"
         await handler.verification.makeVerificationEntry(input);
-        expect(await handler.getVerificationCode(input)).toEqual(null);
+        const output = await handler.getVerificationCode(input);
+        expect(output.message).toEqual(errorText.emailInUse);
     })
 
     it("should not create verification for bad school email", async () => {
         const input = makeVerificationInput();
         input.schoolEmail = "bad";
-        expect(await handler.getVerificationCode(input)).toEqual(null);
+        const output = await handler.getVerificationCode(input);
+        expect(output.message).toEqual(errorText.invalidSchool);
     })
 
     it("should not create verification code if school email taken", async () => {
@@ -823,44 +825,50 @@ describe("handler", () => {
         input2.email = "other@gmail.com";
 
         await handler.verification.makeVerificationEntry(input);
-        expect(await handler.getVerificationCode(input2)).toEqual(null);
+        const output = await handler.getVerificationCode(input2);
+        expect(output.message).toEqual(errorText.emailInUse);
     })
 
     it("should create verification code", async () => {
         const input = makeVerificationInput();
         expect(handler.mail.getVerificationCount()).toEqual(0);
-        expect(await handler.getVerificationCode(input)).not.toEqual(null);
+        const output = await handler.getVerificationCode(input);
+        expect(output.data).not.toEqual(null);
         expect(handler.mail.getVerificationCount()).toEqual(1);
     })
 
     it("should not verify user if wrong code", async () => {
         const input = makeVerificationInput();
         const code = await handler.verification.makeVerificationEntry(input);
-        expect(await handler.verifyUserWithCode({
+        const output = await handler.verifyUserWithCode({
             code: code + 1,
             email: input.email,
             schoolEmail: input.schoolEmail
-        })).toEqual(null);
+        });
+        expect(output.message).toEqual(errorText.invalidVerificationCode);
     })
 
     it("should verify user if correct code", async () => {
         const input = makeVerificationInput();
         const code = await handler.verification.makeVerificationEntry(input);
-        expect(await handler.verifyUserWithCode({
+        const output = await handler.verifyUserWithCode({
             code: code,
             email: input.email,
             schoolEmail: input.schoolEmail
-        })).not.toEqual(null);
+        });
+        expect(output.data).not.toEqual(null);
     })
 
     it("should not regenerate code if schoolEmail is not verifying", async () => {
-        expect(await handler.regenerateVerificationCode("random")).toEqual(null);
+        const output = await handler.regenerateVerificationCode("random");
+        expect(output.message).toEqual(errorText.noVerification);
     })
 
     it("should regenerate verification code", async () => {
         const input = makeVerificationInput();
         await handler.verification.makeVerificationEntry(input);
-        expect(await handler.regenerateVerificationCode(input.schoolEmail)).not.toEqual(null);
+        const output = await handler.regenerateVerificationCode(input.schoolEmail);
+        expect(output.data).not.toEqual(null);
         expect(handler.mail.getVerificationCount()).toEqual(1);
     })
 
@@ -896,13 +904,13 @@ describe("handler", () => {
     it("should create user after verification", async () => {
         const input = await validRequestUserInput();
         const eduEmail = "a@berkeley.edu";
-        const code = await handler.getVerificationCode({
+        const codeOutput = await handler.getVerificationCode({
             email: input.email,
             schoolEmail: eduEmail
         })
 
         await handler.verifyUserWithCode({
-            code: code!,
+            code: codeOutput.data!,
             email: input.email,
             schoolEmail: eduEmail
         })
@@ -914,13 +922,13 @@ describe("handler", () => {
     it("should delete verification if user deleted", async () => {
         const input = await validRequestUserInput();
         const eduEmail = "a@berkeley.edu";
-        const code = await handler.getVerificationCode({
+        const outputCode = await handler.getVerificationCode({
             email: input.email,
             schoolEmail: eduEmail
         })
 
         await handler.verifyUserWithCode({
-            code: code!,
+            code: outputCode.data!,
             email: input.email,
             schoolEmail: eduEmail
         })
@@ -979,12 +987,12 @@ describe("handler", () => {
         const email = "a";
         const eduEmail = "b@lovedu.edu";
         await handler.loginWithToken({}, email);
-        const code = await handler.getVerificationCode({
+        const outputCode = await handler.getVerificationCode({
             email: email,
             schoolEmail: eduEmail
         })
         await handler.verifyUserWithCode({
-            code: code!,
+            code: outputCode.data!,
             email: email,
             schoolEmail: eduEmail
         })
