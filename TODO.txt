@@ -1,6 +1,6 @@
 TODO
-premium page
-integrate stripe subscription
+only get subscription url if not subscribed
+success page
 
 chat
     establish websocket

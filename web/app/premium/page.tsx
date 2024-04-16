@@ -2,6 +2,10 @@
 "use client"
 import { Title } from "../_components/Title";
 import { Button } from "../_components/Button";
+import axios from "axios";
+import { redirect, useSearchParams } from 'next/navigation'
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 const text = {
     title: "Lovedu Premium",
@@ -15,7 +19,7 @@ Here is a list of benefits that you will receive upon purchasing the premium ser
     purchaseButton: "Purchase Premium for $6.99/month",
     smallText: 
 `Premium will be $6.99/month to all users. Managing your subscription and viewing statistics are actions that can be done through the mobile app. Upon cancellation of the subscription the user will continue to receive all of the listed benefits until the end of the billing month but will notice an immediate lower exposure of their profile to other users to counteract the increase made at the beginning of the subscription.`,
-    smallTextHeader: "Additional Notes",
+    smallTextHeader: "Side Notes",
 }
 
 interface TextProp {
@@ -38,8 +42,22 @@ function TextBlock(props : TextProp) {
 }
 
 export default function Premium() {
+    const params = useSearchParams();
+    const router = useRouter();
+
     const redirectToPremium = async () => {
-        return
+        try {
+            const userID = params.get("userID");
+            if (!userID) return toast.error("No userID in URL");
+
+            const response = await axios.get(`/api/checkout?userID=${userID}`);
+            router.push(response.data.data);
+        } catch (err : any) {
+            console.log(err);
+            const message = err.response?.data?.message;
+            if (message) return toast.error(message);
+            else toast.error("Error with Request")
+        }
     }
 
     return (
@@ -94,7 +112,7 @@ export default function Premium() {
                     text={text.purchaseButton}
                 />
             </div>
-            <p className="text-sm font-bold text-center mt-3">{text.smallTextHeader}</p>
+            <p className="text-sm font-bold text-center mt-6">{text.smallTextHeader}</p>
             <p className="text-xs text-center">
                 {text.smallText}
             </p>

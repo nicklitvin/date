@@ -344,8 +344,7 @@ export class APIHandler {
                 const body = req.body as APIRequest<JustUserID>;
                 if (!body.key) return res.status(400).json();
     
-                const userID = await handler.login.getUserIDByKey(body.key);
-                if (!(isAdmin(body.key) || userID || userID == body.userID)) return res.status(401).json();
+                if (!(isAdmin(body.key) || body.userID || body.userID == body.userID)) return res.status(401).json();
     
                 const output = await handler.getSubscriptionCheckoutPage(body.userID);
                 return output ? 

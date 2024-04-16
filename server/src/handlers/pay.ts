@@ -27,7 +27,7 @@ export class StripePaymentHandler extends PaymentHandler {
             ],
             
             success_url: process.env.SUCCESS_RETURN_URL!,
-            cancel_url: process.env.CANCEL_RETURN_URL!,
+            cancel_url: `${process.env.CANCEL_RETURN_URL!}${userID}`,
             allow_promotion_codes: true,
             metadata: {
                 userID: userID
