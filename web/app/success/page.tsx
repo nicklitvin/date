@@ -1,11 +1,10 @@
-"use client"
 
 const text = {
-    title: "Lovedu",
-    subtitle: "An online dating platform aimed at students with features to help improve performance without predatory tactics",
+    title: "Payment successful",
+    subtitle: "You may now return to the app and view your benefits"
 }
 
-export default function Home() {
+export default function Success() {
     return (
         <div className="flex flex-col gap-5 p-5 items-center mt-[250px] ">
             <h1 className="text-3xl font-bold text-center w-full">
