@@ -369,35 +369,39 @@ export class Handler {
         if (user.isSubscribed) return { message : errorText.alreadySubscribed };
 
         const usedFreeTrial = await this.freeTrial.hasEmailUsedFreeTrial(user.email);
-        return { data: await this.pay.createSubscriptionSessionURL(userID, user.email, !usedFreeTrial) }
+        const output = await this.pay.createSubscriptionSessionURL(userID, user.email, !usedFreeTrial);
+        return output ? { data: output } : { message: errorText.serverError }
     }
 
-    public async processSubscriptionPay(input : SubscribeInput) : Promise<User|null> {
+    public async processSubscriptionPay(input : SubscribeInput) : Promise<APIOutput<User>> {
         const user = await this.user.getUserByID(input.userID);
-        if (!user) return null;
+        if (!user) return { message: errorText.notValidUser };
 
         await this.user.updateSubscriptionAfterPay(input.userID, input.subscriptionID)
-        return await this.user.updateElo(input.userID, this.user.getEloChange({
+        const output = await this.user.updateElo(input.userID, this.user.getEloChange({
             action: EloAction.Subscribe,
             eloDiff: eloConstants.start - user.elo,
             userElo: user.elo
         }))
+        return output ? { data: output } : { message: errorText.serverError }
     }
 
-    public async cancelSubscription(userID: string) : Promise<User|null> {
+    public async cancelSubscription(userID: string) : Promise<APIOutput<User>> {
         const user = await this.user.getUserByID(userID);
 
-        if (!user || !user.subscriptionID) return null;
+        if (!user) return { message: errorText.notValidUser }
+        if (!user.subscriptionID) return { message: errorText.noSubscription };
 
         if (await this.pay.cancelSubscription(user.subscriptionID)) {
             await this.user.cancelSubscription(userID)
-            return await this.user.updateElo(userID, this.user.getEloChange({
+            const output = await this.user.updateElo(userID, this.user.getEloChange({
                 action: EloAction.Unsubscribe,
                 eloDiff: eloConstants.start - user.elo,
                 userElo: user.elo
             }))
+            return output ? { data: output } : { message: errorText.serverError }
         }
-        return null;
+        return { message: errorText.serverError };
     }
 
     public async unlike(input : UnlikeInput) : Promise<UnlikeOutput|null> {

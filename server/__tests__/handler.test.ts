@@ -520,19 +520,22 @@ describe("handler", () => {
     })
 
     it("should not cancel subscription for nonuser", async () => {
-        expect(await handler.cancelSubscription("random")).toEqual(null);
+        const output = await handler.cancelSubscription("random");
+        expect(output.message).toEqual(errorText.notValidUser);
     })
 
     it("should not cancel subscription if user has none", async () => {
         const user = await handler.user.createUser(createUserInput("a@berkeley.edu"));
-        expect(await handler.cancelSubscription(user.id)).toEqual(null);
+        const output = await handler.cancelSubscription(user.id);
+        expect(output.message).toEqual(errorText.noSubscription);
     })
 
     it("should cancel subscription for user", async () => {
         const user = await handler.user.createUser(createUserInput("a@berkeley.edu"));
         await handler.user.updateSubscriptionAfterPay(user.id, "subscriptionId");
         
-        const after = await handler.cancelSubscription(user.id) as User;
+        const output = await handler.cancelSubscription(user.id);
+        const after = output.data as User;
         expect(after.isSubscribed).toEqual(false);
         expect(after.subscriptionID).toEqual(null);
     })
@@ -675,10 +678,11 @@ describe("handler", () => {
     it("should update subscription when user pays", async () => {
         const subscriptionID = "id";
         const user = await handler.user.createUser(createUserInput("a@berkeley.edu"));
-        const after = await handler.processSubscriptionPay({
+        const output = await handler.processSubscriptionPay({
             userID: user.id,
             subscriptionID: subscriptionID
         });
+        const after = output.data as User;
 
         expect(after?.subscriptionID).toEqual(subscriptionID);
         expect(after?.isSubscribed).toEqual(true);
@@ -686,20 +690,23 @@ describe("handler", () => {
 
     it("should increase elo when user pays", async () => {
         const user = await handler.user.createUser(createUserInput("a@berkeley.edu"));
-        const after = await handler.processSubscriptionPay({
+        const output = await handler.processSubscriptionPay({
             userID: user.id,
             subscriptionID: "id"
         });
+        const after = output.data as User;
         expect(after?.elo).toBeGreaterThan(user.elo);
     })
 
     it("should decrease elo when user cancels", async () => {
         const user = await handler.user.createUser(createUserInput("a@berkeley.edu"));
-        const before = await handler.processSubscriptionPay({
+        const output0 = await handler.processSubscriptionPay({
             userID: user.id,
             subscriptionID: "id"
         });
-        const after = await handler.cancelSubscription(user.id);
+        const before = output0.data as User;
+        const output = await handler.cancelSubscription(user.id);
+        const after = output.data as User;
         expect(after!.elo).toBeLessThan(before!.elo);
     })
 

@@ -73,6 +73,7 @@ export const userSettings = {
 export const errorText = {
     notValidUser: "Not a valid user",
     cannotEditUser: "Cannot edit user",
+    serverError: "Server Error",
 
     alreadySubscribed: "Cannot purchase subscription if already subscribed",
     userAlreadyExists: "User already exists",
@@ -91,4 +92,5 @@ export const errorText = {
     cannotDeleteImage: "Cannot delete image",
     invalidUserSetting: "Invalid user setting",
     invalidImageOrder: "Invalid image order",
+    noSubscription: "No active subscription",
 }
