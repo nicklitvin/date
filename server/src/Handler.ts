@@ -299,66 +299,66 @@ export class Handler {
         return { data: report }
     }
 
-    public async uploadImage(input : UploadImageInput) : Promise<User|null> {
+    public async uploadImage(input : UploadImageInput) : Promise<APIOutput<User>> {
         const user = await this.user.getUserByID(input.userID);
 
-        if (
-            !user || 
-            user.images.length == userRestrictions.maxImagesCount ||
-            !userRestrictions.acceptaleImageFormats.includes(input.image.mimetype)
-        ) return null;
+        if (!user) return { message: errorText.notValidUser}
+        if (user.images.length == userRestrictions.maxImagesCount) return { message : errorText.tooManyImages}
+        if (!userRestrictions.acceptaleImageFormats.includes(input.image.mimetype)) return { message: errorText.invalidImageFormat}
 
         const imageID = await this.image.uploadImage({
             buffer: Buffer.from(input.image.content, "base64"),
             mimetype: input.image.mimetype
         });
-        if (!imageID) return null;
+        if (!imageID) return { message: errorText.errorWithUpload };
 
-        return await this.user.editUser({
+        const output = await this.user.editUser({
             setting: userSettings.image,
             userID: input.userID,
             value: user.images.concat([imageID])
-        })
+        });
+        return output ? {data: output} : {message: errorText.errorWithUpload}
     }
 
-    public async deleteImage(input : DeleteImageInput) : Promise<User|null> {
+    public async deleteImage(input : DeleteImageInput) : Promise<APIOutput<User>> {
         const user = await this.user.getUserByID(input.userID);
 
-        if (!user || !user.images.includes(input.imageID) || user.images.length == 1) return null;
+        if (!user) return { message: errorText.notValidUser }
+        if (!user.images.includes(input.imageID)) return {message: errorText.imageDoesNotExist}
+        if (user.images.length == 1) return {message: errorText.cannotDeleteOnlyImage};
 
-        return await this.user.editUser({
+        const output = await this.user.editUser({
             setting: userSettings.image,
             userID: input.userID,
             value: user.images.filter( val => val != input.imageID)
         })
+        return output ? { data: output } : { message: errorText.cannotDeleteImage } 
     }
 
-    public async editUser(input : EditUserInput) : Promise<User|null> {
+    public async editUser(input : EditUserInput) : Promise<APIOutput<User>> {
         const user = await this.user.getUserByID(input.userID);
 
-        if (!user || !allowedAttributeEdits.includes(input.setting)) {
-            return null;
-        }
+        if (!user) return { message: errorText.notValidUser} 
+        if (!allowedAttributeEdits.includes(input.setting)) return { message: errorText.invalidUserSetting}
 
-        return await this.user.editUser(input);
+        const output = await this.user.editUser(input);
+        return output ? { data: output } : { message: errorText.cannotEditUser }
     }
 
-    public async changeImageOrder(input : EditUserInput) : Promise<User|null> {
+    public async changeImageOrder(input : EditUserInput) : Promise<APIOutput<User>> {
         const user = await this.user.getUserByID(input.userID);
 
-        if (!user || input.setting != userSettings.image) return null;
+        if (!user) return { message: errorText.notValidUser}
+        if (input.setting != userSettings.image) return { message: errorText.invalidUserSetting};
 
-        try {
-            const newOrder = input.value as string[];
-            if (newOrder.length == user.images.length && 
-                user.images.every( val => newOrder.includes(val))) 
-            {
-                return await this.user.editUser(input);
-            } else {
-                return null;
-            }
-        } catch (err) {
-            return null;
+        const newOrder = input.value as string[];
+        if (newOrder.length == user.images.length && 
+            user.images.every( val => newOrder.includes(val))) 
+        {
+            const output = await this.user.editUser(input);
+            return output ? { data: output } : { message: errorText.invalidImageOrder};
+        } else {
+            return { message: errorText.invalidImageOrder };
         }
     }
 

@@ -327,18 +327,20 @@ describe("handler", () => {
     })
 
     it("should no upload image for nonuser", async () => {
-        expect(await handler.uploadImage({
+        const output = await handler.uploadImage({
             userID: "random",
             image: await getImageDetails(true)
-        })).toEqual(null);
+        });
+        expect(output.message).toEqual(errorText.notValidUser);
     })
 
     it("should not upload bad image", async () => {
         const user = await handler.user.createUser(createUserInput("a@berkeley.edu"));
-        expect(await handler.uploadImage({
+        const output = await handler.uploadImage({
             userID: user.id,
             image: await getImageDetails(false)
-        })).toEqual(null);
+        });
+        expect(output.message).toEqual(errorText.invalidImageFormat);
     })
 
     it("should not upload over max images", async () => {
@@ -348,10 +350,11 @@ describe("handler", () => {
         userInput.images = maxImages;
 
         const user = await handler.user.createUser(userInput);
-        expect(await handler.uploadImage({
+        const output = await handler.uploadImage({
             userID: user.id,
             image: await getImageDetails(true)
-        })).toEqual(null);
+        });
+        expect(output.message).toEqual(errorText.tooManyImages);
     })
 
     it("should upload image", async () => {
@@ -361,23 +364,24 @@ describe("handler", () => {
             image: await getImageDetails(true)
         });
 
-        expect(after).not.toEqual(null);
-        expect(after?.images.length).toEqual(user.images.length + 1);
+        expect(after?.data!.images.length).toEqual(user.images.length + 1);
     })
 
     it("should not delete image from nonuser", async () => {
-        expect(await handler.deleteImage({
+        const output = await handler.deleteImage({
             userID: "random",
             imageID: "imageID"
-        })).toEqual(null);
+        });
+        expect(output.message).toEqual(errorText.notValidUser);
     })
 
     it("should not delete nonimage from user", async () => {
         const user = await handler.user.createUser(createUserInput("a@berkeley.edu"));
-        expect(await handler.deleteImage({
+        const output = await handler.deleteImage({
             userID: user.id,
             imageID: "random"
-        })).toEqual(null);
+        });
+        expect(output.message).toEqual(errorText.imageDoesNotExist);
     })
 
     it("should delete image from user", async () => {
@@ -389,61 +393,68 @@ describe("handler", () => {
             },
             userID: user.id
         })
-        expect(await handler.deleteImage({
+        const output = await handler.deleteImage({
             userID: user.id,
             imageID: user.images[0]
-        })).not.toEqual(null);
+        });
+        expect(output.data).not.toEqual(null);
     })
 
     it("should not delete only image", async () => {
         const user = await handler.user.createUser(createUserInput("a@berkeley.edu"));
-        expect(await handler.deleteImage({
+        const output = await handler.deleteImage({
             userID: user.id,
             imageID: user.images[0]
-        })).toEqual(null);
+        });
+        expect(output.message).toEqual(errorText.cannotDeleteOnlyImage);
     })
 
     it("should not edit nonnuser", async () => {
-        expect(await handler.editUser({
+        const output = await handler.editUser({
             userID: "random",
             setting: "email",
             value: "1"
-        })).toEqual(null);
+        });
+        expect(output.message).toEqual(errorText.notValidUser);
     })
 
     it("should not edit not allowed attribute", async () => {
         const user = await handler.user.createUser(createUserInput("a@berkeley.edu"));
-        expect(await handler.editUser({
+        const output = await handler.editUser({
             userID: user.id,
             setting: "birthday",
             value: new Date()
-        })).toEqual(null);
+        });
+        expect(output.message).toEqual(errorText.invalidUserSetting);
     })
 
     it("should edit user", async () => {
         const user = await handler.user.createUser(createUserInput("a@berkeley.edu"));
-        expect(await handler.editUser({
+        const output = await handler.editUser({
             userID: user.id,
             setting: "genderInterest",
             value: ["Female"]
-        })).not.toEqual(null);
+        });
+        expect(output.data).not.toEqual(null);
     })
 
     it("should not change image order of nonuser", async () => {
-        expect(await handler.changeImageOrder({
+        const output = await handler.changeImageOrder({
             userID: "random",
             setting: "images",
             value: ["1","2"]
-        })).toEqual(null);
+        });
+        expect(output.message).toEqual(errorText.notValidUser);
     })
 
     it("should not change image order with bad input", async () => {
         const user = await handler.user.createUser(createUserInput("a@berkeley.edu"));
-        expect(await handler.changeImageOrder({
+        const output = await handler.changeImageOrder({
             userID: user.id,
             setting: "images",
             value: "1"
-        })).toEqual(null);
+        });
+        expect(output.message).toEqual(errorText.invalidImageOrder);
     })
 
     it("should not change image order if images dont match", async () => {
@@ -451,21 +462,26 @@ describe("handler", () => {
         userInput.images = ["1","2"];
 
         const user = await handler.user.createUser(userInput);
-        expect(await handler.changeImageOrder({
+        const output = await handler.changeImageOrder({
             userID: user.id,
             setting: "images",
             value: ["1"]
-        })).toEqual(null);
-        expect(await handler.changeImageOrder({
+        });
+        expect(output.message).toEqual(errorText.invalidImageOrder);
+
+        const output1 = await handler.changeImageOrder({
             userID: user.id,
             setting: "images",
             value: ["1","2","3"]
-        })).toEqual(null);
-        expect(await handler.changeImageOrder({
+        });
+        expect(output1.message).toEqual(errorText.invalidImageOrder);
+
+        const output2 = await handler.changeImageOrder({
             userID: user.id,
             setting: "images",
             value: [1,2]
-        })).toEqual(null);
+        });
+        expect(output2.message).toEqual(errorText.invalidImageOrder);
     })
 
     it("should change image order", async () => {
@@ -473,11 +489,12 @@ describe("handler", () => {
         userInput.images = ["1","2"];
 
         const user = await handler.user.createUser(userInput);
-        const after = await handler.changeImageOrder({
+        const output = await handler.changeImageOrder({
             userID: user.id,
             setting: "images",
             value: ["2","1"]
         })
+        const after = output.data!;
         expect(after?.images.length).toEqual(2);
         expect(after?.images[0]).toEqual(userInput.images[1]);
         expect(after?.images[1]).toEqual(userInput.images[0]);

@@ -72,6 +72,8 @@ export const userSettings = {
 
 export const errorText = {
     notValidUser: "Not a valid user",
+    cannotEditUser: "Cannot edit user",
+
     alreadySubscribed: "Cannot purchase subscription if already subscribed",
     userAlreadyExists: "User already exists",
     invalidUserInput: "Invalid user input",
@@ -81,4 +83,12 @@ export const errorText = {
     cannotSendMessage: "Cannot send message",
     cannotReportSelf: "Cannot report self",
     cannotReportAgain: "Cannot report again",
+    tooManyImages: "Cannot upload more than 6 images",
+    invalidImageFormat: "Invalid image format",
+    errorWithUpload: "Error with upload. Try again.",
+    imageDoesNotExist: "Image does not exist",
+    cannotDeleteOnlyImage: "Cannot have 0 images",
+    cannotDeleteImage: "Cannot delete image",
+    invalidUserSetting: "Invalid user setting",
+    invalidImageOrder: "Invalid image order",
 }
