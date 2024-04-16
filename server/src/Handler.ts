@@ -634,7 +634,7 @@ export class Handler {
         ])
     }
 
-    public async getStatsIfSubscribed(userID: string, customInfo? : SubscriptionData) : Promise<UserSwipeStats|null> {
+    public async getStatsIfSubscribed(userID: string, customInfo? : SubscriptionData) : Promise<APIOutput<UserSwipeStats>> {
         const subscriberInfo = customInfo ?? await this.user.getSubscriptionData(userID);
         if (
             subscriberInfo &&
@@ -643,12 +643,13 @@ export class Handler {
             subscriberInfo.endDate.getTime() > new Date().getTime() &&
             subscriberInfo.subscribed 
         ) {
-            return await this.swipe.getUserSwipeStats(userID);
+            return { data: await this.swipe.getUserSwipeStats(userID) };
         }
-        return null;
+        if (!subscriberInfo) return {message: errorText.notValidUser}
+        return {message : errorText.noSubscription};
     }
 
-    public async updateReadStatus(input : ReadStatusInput) : Promise<number|null> {
+    public async updateReadStatus(input : ReadStatusInput) : Promise<APIOutput<number>> {
         const [user, recepient, userOpinion, recepientOpinion] = await Promise.all([
             this.user.getUserByID(input.userID),
             this.user.getUserByID(input.toID),
@@ -659,19 +660,35 @@ export class Handler {
         if (user && recepient && userOpinion?.action == "Like" && 
             recepientOpinion?.action == "Like"
         ) {
-            return await this.message.updateReadStatus({
-                userID: input.userID,
-                toID: input.toID,
-                timestamp: input.timestamp
-            })           
+            return {
+                data: await this.message.updateReadStatus({
+                    userID: input.userID,
+                    toID: input.toID,
+                    timestamp: input.timestamp
+                })        
+            }   
         }
-        return null;
+        return { message: errorText.cannotUpdateReadStatus};
     }
 
-    public async getReadStatus(input : GetReadStatusInput) : Promise<boolean> {
-        return await this.message.hasUserReadLatestMessage({
-            senderID: input.userID,
-            receiverID: input.readerID
-        })
+    public async getReadStatus(input : GetReadStatusInput) : Promise<APIOutput<boolean>> {
+        const [user, recepient, userOpinion, recepientOpinion] = await Promise.all([
+            this.user.getUserByID(input.userID),
+            this.user.getUserByID(input.readerID),
+            this.swipe.getSwipeByUsers(input.userID, input.readerID),
+            this.swipe.getSwipeByUsers(input.readerID, input.userID)
+        ])
+
+        if (user && recepient && userOpinion?.action == "Like" && 
+            recepientOpinion?.action == "Like"
+        ) {
+            return {
+                data: await this.message.hasUserReadLatestMessage({
+                    senderID: input.userID,
+                    receiverID: input.readerID
+                })
+            }
+        } 
+        return { message: errorText.cannotGetReadStatus }
     }
 }

@@ -102,5 +102,7 @@ export const errorText = {
     invalidLoginToken: "Invalid Login Token",
     bannedFromPlatform: "You have been banned",
     incorrectKey: "Incorrect AutoLogin Key",
-    expiredKey: "Key has expired. Login again."
+    expiredKey: "Key has expired. Login again.",
+    cannotUpdateReadStatus: "Cannot update read status",
+    cannotGetReadStatus: "Cannot get read status",
 }

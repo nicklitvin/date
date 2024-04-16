@@ -1,14 +1,10 @@
 TODO
-only get subscription url if not subscribed
-success page
-
 chat
     establish websocket
     load chat in advance to avoid glitchy
     latest message not showing in chat
     move keyboard in long chat
 
-create web buy and stats stuff
 notification receive, delete receiveDate when new
 toast error messages, install npx expo install react-native-reanimated react-native-safe-area-context react-native-gesture-handler
 isntall rsg paths for graph

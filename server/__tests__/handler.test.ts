@@ -1015,31 +1015,34 @@ describe("handler", () => {
     it("should not give stats if not subscribed", async () => {
         const user = await handler.user.createUser(createUserInput());
 
-        expect(await handler.getStatsIfSubscribed(user.id,{
+        const output = await handler.getStatsIfSubscribed(user.id,{
             subscribed: false,
             endDate: new Date(),
             ID: "asd"
-        })).toEqual(null);
+        });
+        expect(output.message).toEqual(errorText.noSubscription);
     })
 
     it("should not give stats if expired", async () => {
         const user = await handler.user.createUser(createUserInput());
 
-        expect(await handler.getStatsIfSubscribed(user.id,{
+        const output = await handler.getStatsIfSubscribed(user.id,{
             subscribed: true,
             endDate: addWeeks(new Date(), -1),
             ID: "asd"
-        })).toEqual(null);
+        });
+        expect(output.message).toEqual(errorText.noSubscription);
     })
 
     it("should give stats if subscribed", async () => {
         const user = await handler.user.createUser(createUserInput());
 
-        expect(await handler.getStatsIfSubscribed(user.id,{
+        const output = await handler.getStatsIfSubscribed(user.id,{
             subscribed: true,
             endDate: addWeeks(new Date(), 1),
             ID: "asd"
-        })).not.toEqual(null);
+        });
+        expect(output.data).not.toEqual(null);
     })
 
     it("should update read status update if not match", async () => {
@@ -1051,11 +1054,12 @@ describe("handler", () => {
             swipedUserID: user2.id
         })
 
-        expect(await handler.updateReadStatus({
+        const output = await handler.updateReadStatus({
             userID: user.id,
             toID: user2.id,
             timestamp: new Date() 
-        })).toEqual(null);
+        });
+        expect(output.data).not.toEqual(null);
     })
 
     it("should update read status", async () => {
@@ -1066,16 +1070,19 @@ describe("handler", () => {
             handler.sendMessage({userID: user.id, recepientID: user_2.id, message: "3"}),
         ])
 
-        expect(await handler.updateReadStatus({
+        const output = await handler.updateReadStatus({
             userID: user.id,
             toID: user_2.id,
             timestamp: addMinutes(new Date(),1)
-        })).toEqual(0);
-        expect(await handler.updateReadStatus({
+        });
+        expect(output.data).toEqual(0);
+
+        const output1 = await handler.updateReadStatus({
             userID: user_2.id,
             toID: user.id,
             timestamp: addMinutes(new Date(),1)
-        })).toEqual(3);
+        })
+        expect(output1.data).toEqual(3);
     })
 
     it("should not login user with max reports", async () => {
