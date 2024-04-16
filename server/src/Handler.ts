@@ -404,17 +404,17 @@ export class Handler {
         return { message: errorText.serverError };
     }
 
-    public async unlike(input : UnlikeInput) : Promise<UnlikeOutput|null> {
+    public async unlike(input : UnlikeInput) : Promise<APIOutput<UnlikeOutput>> {
         const [user, matchUser] = await Promise.all([
             this.user.getUserByID(input.userID),
             this.user.getUserByID(input.withID)
         ]);
 
-        if (!user || !matchUser) return null;
+        if (!user || !matchUser) return { message: errorText.notValidUser };
 
         const swipe = await this.swipe.getSwipeByUsers(user.id, matchUser.id);
-
-        if (!swipe || swipe.action == "Dislike") return null;
+        if (!swipe) return { message: errorText.cannotUnlike }
+        if (swipe.action == "Dislike") return { message: errorText.alreadyDislike };
 
         const [newSwipe, messagesDeleted] = await Promise.all([
             this.swipe.updateSwipe(swipe.id, "Dislike"),
@@ -422,15 +422,17 @@ export class Handler {
         ])
 
         return {
-            deletedMessages: messagesDeleted,
-            newSwipe: newSwipe as Swipe
+            data: {
+                deletedMessages: messagesDeleted,
+                newSwipe: newSwipe as Swipe
+            }
         };
     }
 
-    public async getNewMatches(input : GetMatchesInput) : Promise<NewMatchData[]|null> {
+    public async getNewMatches(input : GetMatchesInput) : Promise<APIOutput<NewMatchData[]>> {
         const user = await this.user.getUserByID(input.userID);
 
-        if (!user) return null;
+        if (!user) return { message: errorText.notValidUser };
 
         const matches = await this.swipe.getAllMatches(input.userID,input.timestamp);
         const data = await Promise.all(matches.map( async (match) => ({
@@ -443,16 +445,18 @@ export class Handler {
             timestamp: match.timestamp
         })));
 
-        return data.
-            filter( (_,index) => data[index].chat.length == 0).
-            slice(0, miscConstants.usersLoadedInPreview).
-            map( val => ({profile: val.profile!, timestamp: val.timestamp}))
+        return {
+            data: data.
+                filter( (_,index) => data[index].chat.length == 0).
+                slice(0, miscConstants.usersLoadedInPreview).
+                map( val => ({profile: val.profile!, timestamp: val.timestamp}))
+        }
     }
 
-    public async getSwipeFeed(userID: string) : Promise<SwipeFeed|null> {
+    public async getSwipeFeed(userID: string) : Promise<APIOutput<SwipeFeed>> {
         const user = await this.user.getUserByID(userID);
 
-        if (!user) return null;
+        if (!user) return { message: errorText.notValidUser };
 
         const [alreadySwipedIDs, likedMeUserIDs] = await Promise.all([
             this.swipe.getSwipedUsers(userID),
@@ -486,8 +490,10 @@ export class Handler {
         );
 
         return {
-            profiles: combined,
-            likedMeIDs: likedMeProfileIDs          
+            data: {
+                profiles: combined,
+                likedMeIDs: likedMeProfileIDs          
+            }
         }
     }
 

@@ -542,18 +542,20 @@ describe("handler", () => {
 
     it("should not unlike if nonuser", async () => {
         const user = await handler.user.createUser(createUserInput("a@berkeley.edu"));
-        expect(await handler.unlike({
+        const output = await handler.unlike({
             userID: "random",
             withID: user.id
-        })).toEqual(null);
+        });
+        expect(output.message).toEqual(errorText.notValidUser);
     })
 
     it("should not unlike from nonuser", async () => {
         const user = await handler.user.createUser(createUserInput("a@berkeley.edu"));
-        expect(await handler.unlike({
+        const output = await handler.unlike({
             userID: user.id,
             withID: "random"
-        })).toEqual(null);
+        });
+        expect(output.message).toEqual(errorText.notValidUser);
     })
 
     it("should not unlike if not liked", async () => {
@@ -562,10 +564,11 @@ describe("handler", () => {
             handler.user.createUser(createUserInput("b@berkeley.edu"))
         ]);
 
-        expect(await handler.unlike({
+        const output = await handler.unlike({
             userID: user.id,
             withID: user_2.id
-        })).toEqual(null);
+        });
+        expect(output.message).toEqual(errorText.cannotUnlike);
     })
 
     it("should unlike and delete chat", async () => {
@@ -583,19 +586,21 @@ describe("handler", () => {
             })
         ]);
 
-        const deleted = await handler.unlike({
+        const output = await handler.unlike({
             userID: user.id,
             withID: user_2.id
         })
+        const deleted = output.data;
         expect(deleted?.deletedMessages).toEqual(2);
         expect(deleted?.newSwipe).not.toEqual(null);
     })
 
     it("should not get new matches from nonuser", async () => {
-        expect(await handler.getNewMatches({
+        const output = await handler.getNewMatches({
             userID: "random",
             timestamp: new Date()
-        })).toEqual(null);
+        });
+        expect(output.message).toEqual(errorText.notValidUser);
     })
 
     it("should not get new matches if sent message", async () => {
@@ -605,10 +610,11 @@ describe("handler", () => {
             userID: user.id,
             recepientID: user_2.id
         });
-        const newMatches = await handler.getNewMatches({
+        const output = await handler.getNewMatches({
             userID: user.id,
             timestamp: new Date()
         });
+        const newMatches = output.data;
 
         expect(newMatches).toHaveLength(0);
     })
@@ -622,10 +628,11 @@ describe("handler", () => {
         const match2 = await matchUsers(user.id, user3.id);
         expect(match.getTime()).not.toEqual(match2.getTime());
 
-        const newMatches = await handler.getNewMatches({
+        const output = await handler.getNewMatches({
             userID: user.id,
             timestamp: new Date()
         });
+        const newMatches = output.data;
 
         expect(newMatches).toHaveLength(2);
         expect(newMatches![0].profile.id).toEqual(user3.id);
@@ -633,10 +640,11 @@ describe("handler", () => {
         expect(newMatches![1].profile.id).toEqual(user2.id);
         expect(newMatches![1].timestamp.getTime()).toEqual(match.getTime());
 
-        const newMatches1 = await handler.getNewMatches({
+        const output1 = await handler.getNewMatches({
             userID: user.id,
             timestamp: new Date(match2.getTime() - 1)
         });
+        const newMatches1 = output1.data;
         expect(newMatches1).toHaveLength(1);
         expect(newMatches1![0].profile.id).toEqual(user2.id);
         expect(newMatches1![0].timestamp.getTime()).toEqual(match.getTime());
@@ -711,13 +719,15 @@ describe("handler", () => {
     })
 
     it("should not get swipe feed for nonuser", async () => {
-        expect(await handler.getSwipeFeed("random")).toEqual(null);
+        const output = await handler.getSwipeFeed("random");
+        expect(output.message).toEqual(errorText.notValidUser);
     })
 
     it("should get swipe feed, no swipes done", async () => {
         const {user, user2, user3, user4} = await createUsersForSwipeFeed();
 
-        const feed = await handler.getSwipeFeed(user.id);
+        const output = await handler.getSwipeFeed(user.id);
+        const feed = output.data;
         expect(feed?.profiles).toHaveLength(2);
         const profileIDs = feed?.profiles.map( val => val.id);
         expect(profileIDs?.includes(user4.id)).toEqual(true);
@@ -732,7 +742,8 @@ describe("handler", () => {
             swipedUserID: user.id
         });
         
-        const feed = await handler.getSwipeFeed(user.id);
+        const output = await handler.getSwipeFeed(user.id);
+        const feed = output.data;
         expect(feed?.likedMeIDs.includes(user3.id)).toEqual(true);
     })
 
@@ -744,7 +755,8 @@ describe("handler", () => {
             swipedUserID: user.id
         });
         
-        const feed = await handler.getSwipeFeed(user.id);
+        const output = await handler.getSwipeFeed(user.id);
+        const feed = output.data;
         expect(feed?.profiles).toHaveLength(2);
         const profileIDs = feed?.profiles.map( val => val.id);
         expect(profileIDs?.includes(user2.id)).toEqual(false);
@@ -757,7 +769,8 @@ describe("handler", () => {
             action: "Like",
             swipedUserID: user4.id
         });
-        const feed = await handler.getSwipeFeed(user.id);
+        const output = await handler.getSwipeFeed(user.id);
+        const feed = output.data;
         expect(feed?.profiles).toHaveLength(1);
         const profileIDs = feed?.profiles.map( val => val.id);
         expect(profileIDs?.includes(user4.id)).toEqual(false);
@@ -779,13 +792,15 @@ describe("handler", () => {
             })
         ])
 
-        const feed = await handler.getSwipeFeed(user.id);
+        const output = await handler.getSwipeFeed(user.id);
+        const feed = output.data;
         expect(feed?.profiles).toHaveLength(1);
     })
 
     it("should include multiple genders in feed if interested", async () => {
         const {user, user2, user3, user4} = await createUsersForSwipeFeed();
-        const feed = await handler.getSwipeFeed(user4.id);
+        const output = await handler.getSwipeFeed(user4.id);
+        const feed = output.data;
         expect(feed?.profiles).toHaveLength(3);
     })
 

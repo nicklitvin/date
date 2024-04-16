@@ -93,4 +93,6 @@ export const errorText = {
     invalidUserSetting: "Invalid user setting",
     invalidImageOrder: "Invalid image order",
     noSubscription: "No active subscription",
+    cannotUnlike: "Cannot unlike",
+    alreadyDislike: "Already disliked"
 }
