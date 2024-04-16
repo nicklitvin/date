@@ -550,7 +550,7 @@ export class Handler {
         return { data: newVerification.code };
     }
 
-    public async loginWithToken(input : LoginInput, customEmail? : string) : Promise<LoginOutput|null> {
+    public async loginWithToken(input : LoginInput, customEmail? : string) : Promise<APIOutput<LoginOutput>> {
         let email = customEmail ?? 
         (
             input.appleToken ? 
@@ -562,7 +562,7 @@ export class Handler {
             )
         );
         
-        if (!email) return null;
+        if (!email) return {message: errorText.invalidLoginToken};
 
         if (await this.login.getUserByEmail(email)) {
             if (input.expoPushToken) {
@@ -574,12 +574,14 @@ export class Handler {
 
             return reportCount >= miscConstants.maxReportCount ?
                 {
-                    banned: true
+                    data: {banned: true}
                 } :
                 {
-                    key: userLogin.key,
-                    newAccount: await this.user.getUserByEmail(email) == null,
-                    verified: verification?.verified ?? false
+                    data: {
+                        key: userLogin.key,
+                        newAccount: await this.user.getUserByEmail(email) == null,
+                        verified: verification?.verified ?? false
+                    }
                 }
         } else {
             const userLogin = await this.login.createUser({
@@ -588,26 +590,28 @@ export class Handler {
                 customID: email == sampleContent.email ? sampleContent.userID : undefined
             });
             return {
-                key: userLogin.key,
-                newAccount: true,
-                verified: false
+                data: {
+                    key: userLogin.key,
+                    newAccount: true,
+                    verified: false
+                }
             };
         }
     }
 
-    public async autoLogin(key : string) : Promise<string|null> {
+    public async autoLogin(key : string) : Promise<APIOutput<string>> {
         const userLogin = await this.login.getUserByKey(key);
 
         const verification = await this.verification.getVerificationByPersonalEmail(userLogin?.email!);
         const reportCount = await this.report.getReportCountForEmail(verification?.schoolEmail!);
-        if (reportCount >= miscConstants.maxReportCount) return null;
+        if (reportCount >= miscConstants.maxReportCount) return { message: errorText.bannedFromPlatform };
+        if (!userLogin) return { message: errorText.incorrectKey}
+        if (!(userLogin.expire.getTime() > new Date().getTime())) return { message: errorText.expiredKey }
         
-        if (userLogin &&  userLogin.expire.getTime() > new Date().getTime()) {
-            await this.login.updateExpiration(userLogin.email);
-            return key;
-        } else {
-            return null;
-        }
+        await this.login.updateExpiration(userLogin.email);
+        return {
+            data: key
+        };
     }
 
     public async createSample(users : UserInput[]) : Promise<void> {

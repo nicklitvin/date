@@ -942,9 +942,10 @@ describe("handler", () => {
     })
 
     it("should not login bad token", async () => {
-        expect(await handler.loginWithToken({
+        const output = await handler.loginWithToken({
             appleToken: "bad"
-        })).toEqual(null);
+        });
+        expect(output.message).toEqual(errorText.invalidLoginToken);
     })
 
 
@@ -953,7 +954,7 @@ describe("handler", () => {
 
         expect(await handler.login.getUserByEmail(email)).toEqual(null);
         const output = await handler.loginWithToken({appleToken: "a"}, email);
-        expect(await handler.login.getUserByKey(output?.key as string)).not.toEqual(null);
+        expect(await handler.login.getUserByKey(output?.data?.key as string)).not.toEqual(null);
     })
 
     it("should update key if existing entry", async () => {
@@ -961,17 +962,19 @@ describe("handler", () => {
 
         const create = await handler.login.createUser({email});
         const after = await handler.loginWithToken({appleToken: "a"}, email);
-        expect(create.key).not.toEqual(after);
+        expect(create.key).not.toEqual(after.data?.key);
     })
 
     it("should not login with bad key", async () => {
-        expect(await handler.autoLogin("bad")).toEqual(null);
+        const output = await handler.autoLogin("bad");
+        expect(output.message).toEqual(errorText.incorrectKey);
     })
 
     it("should not update key if auto login and existing", async () => {
         const email = "a";
         const create = await handler.login.createUser({email});
-        expect(await handler.autoLogin(create.key)).toEqual(create.key);
+        const output = await handler.autoLogin(create.key);
+        expect(output.data).toEqual(create.key);
     })
 
     it("should not auto login with expired key", async () => {
@@ -980,7 +983,8 @@ describe("handler", () => {
             email: email, 
             customDate: new Date(0)
         });
-        expect(await handler.autoLogin(create.key)).toEqual(null);
+        const output = await handler.autoLogin(create.key);
+        expect(output.message).toEqual(errorText.expiredKey);
     })
 
     it("should show correct login output after verification", async () => {
@@ -997,15 +1001,15 @@ describe("handler", () => {
             schoolEmail: eduEmail
         })
         const output = await handler.loginWithToken({}, email);
-        expect(output?.newAccount).toEqual(true);
-        expect(output?.verified).toEqual(true);
+        expect(output?.data?.newAccount).toEqual(true);
+        expect(output?.data?.verified).toEqual(true);
     })
 
     it("should show correct login output after not verification", async () => {
         const email = "a";
         const output = await handler.loginWithToken({}, email);
-        expect(output?.newAccount).toEqual(true);
-        expect(output?.verified).toEqual(false);
+        expect(output?.data?.newAccount).toEqual(true);
+        expect(output?.data?.verified).toEqual(false);
     })
 
     it("should not give stats if not subscribed", async () => {
@@ -1093,7 +1097,9 @@ describe("handler", () => {
         ));
 
         const output = await handler.loginWithToken({},sampleContent.email);
-        expect(output?.banned).toEqual(true);
-        expect(await handler.autoLogin(login?.key!)).toEqual(null);
+        expect(output?.data?.banned).toEqual(true);
+
+        const autoOutput = await handler.autoLogin(login?.data?.key!);
+        expect(autoOutput.message).toEqual(errorText.bannedFromPlatform);
     })
 })

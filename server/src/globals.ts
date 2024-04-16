@@ -99,4 +99,8 @@ export const errorText = {
     emailInUse: "Email aready in use",
     invalidVerificationCode: "Incorrect Code",
     noVerification: "No Verification to regenerate",
+    invalidLoginToken: "Invalid Login Token",
+    bannedFromPlatform: "You have been banned",
+    incorrectKey: "Incorrect AutoLogin Key",
+    expiredKey: "Key has expired. Login again."
 }
