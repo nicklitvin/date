@@ -275,8 +275,8 @@ export interface ClientIDs {
     expo?: string
 }
 
-export interface APIOutput {
-    data?: any
+export interface APIOutput<T> {
+    data?: T
     message?: string
 }
 

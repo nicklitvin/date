@@ -129,7 +129,7 @@ export async function matchUsers(userID : string, userID_2 : string) : Promise<D
             action: "Like"
         })
     ])
-    return swipe!.timestamp;
+    return swipe!.data!.timestamp;
 }
 
 export async function makeTwoUsersAndMatch() {

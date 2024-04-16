@@ -8,14 +8,14 @@ import { SwipeHandler } from "./handlers/swipe";
 import { MessageHandler } from "./handlers/message";
 import { ReportHandler } from "./handlers/report";
 import { StripePaymentHandler } from "./handlers/pay";
-import { AttributeValueInput, ChatPreview, ConfirmVerificationInput, DeleteImageInput, EditUserInput, EloAction, GetMatchesInput, LoginInput, LoginOutput, MessageInput, NewMatchData,NewVerificationInput, UserReportWithReportedID, SubscribeInput, SubscriptionData, SwipeFeed, SwipeInput, UnlikeInput, UnlikeOutput, UploadImageInput, UserInput, UserInputWithFiles, UserSwipeStats, JustEmail, ReadStatusInput, GetReadStatusInput, HandlerUserInput } from "./interfaces";
+import { AttributeValueInput, ChatPreview, ConfirmVerificationInput, DeleteImageInput, EditUserInput, EloAction, GetMatchesInput, LoginInput, LoginOutput, MessageInput, NewMatchData,NewVerificationInput, UserReportWithReportedID, SubscribeInput, SubscriptionData, SwipeFeed, SwipeInput, UnlikeInput, UnlikeOutput, UploadImageInput, UserInput, UserSwipeStats, JustEmail, ReadStatusInput, GetReadStatusInput, HandlerUserInput, APIOutput } from "./interfaces";
 import { FreeTrialHandler } from "./handlers/freetrial";
 import { VerificationHandler } from "./handlers/verification";
 import { addYears } from "date-fns";
 import { allowedAttributeEdits, attributeList } from "./others";
 import { LoginHandler } from "./handlers/login";
 import { NotificationHandler } from "./handlers/notification";
-import { eloConstants, miscConstants, sampleContent, userRestrictions, userSettings } from "./globals";
+import { eloConstants, errorText, miscConstants, sampleContent, userRestrictions, userSettings } from "./globals";
 import { GmailHandler } from "./handlers/mail";
 import { ImageHandler, MailHandler, PaymentHandler } from "./abstracts";
 
@@ -87,13 +87,15 @@ export class Handler {
         ])
     }
 
-    public async createUser(input : HandlerUserInput, ignoreVerification = this.ignoreVerification) : Promise<User|null> 
+    public async createUser(input : HandlerUserInput, ignoreVerification = this.ignoreVerification) : Promise<APIOutput<User>> 
     {
         const [user, verification] = await Promise.all([
             this.user.getUserByEmail(input.email),
             this.verification.getVerificationByPersonalEmail(input.email)
         ])
-        if (user || !this.user.isInputValid(input)) return null;
+        if (user) return { message: errorText.userAlreadyExists}
+
+        if (!this.user.isInputValid(input)) return { message: errorText.invalidUserInput };
 
         if ( (verification && verification.verified) || ignoreVerification) {
             const imageIDs = await Promise.all(
@@ -121,14 +123,14 @@ export class Handler {
                 smoking: input.smoking,
             }
     
-            return await this.user.createUser(userInput);
+            return { data: await this.user.createUser(userInput) };
         }
-        return null;
+        return { message: errorText.userNotVerified };
     }
 
-    public async deleteUser(userID : string) {
+    public async deleteUser(userID : string) : Promise<APIOutput<{ images : number, messages: number, user : User|null, swipes: number}>> {
         const foundUser = await this.user.getUserByID(userID);
-        if (!foundUser) return null;
+        if (!foundUser) return { message: errorText.notValidUser };
 
         const deleteAllUserImages = async () : Promise<number> => {
             const deleted = await Promise.all(
@@ -144,25 +146,30 @@ export class Handler {
             await this.verification.deleteVerification(verification!.schoolEmail)
         }
 
-        const [images, messages, user]= await Promise.all([
+        const [images, messages, user, swipes] = await Promise.all([
             deleteAllUserImages(),
             this.message.deleteAllChatsWithUser(foundUser.id),
             this.user.deleteUser(foundUser.id),
             this.swipe.deleteSwipesWithUser(userID)
         ])
-        return {images, messages, user};
+        return { data: {
+            images: images,
+            messages: messages,
+            user: user,
+            swipes: swipes
+        }}
     }
 
-    public async makeSwipe(input : SwipeInput) : Promise<Swipe|null> {
+    public async makeSwipe(input : SwipeInput) : Promise<APIOutput<Swipe>> {
         const [user, swipedUser, previousSwipe] = await Promise.all([
             this.user.getUserByID(input.userID),
             this.user.getUserByID(input.swipedUserID),
             this.swipe.getSwipeByUsers(input.userID, input.swipedUserID)
         ])
 
-        if (!user || !swipedUser || user.id == swipedUser.id || previousSwipe) {
-            return null;
-        }
+        if (!user || !swipedUser) return { message : errorText.notValidUser}
+        if (user.id == swipedUser.id) return { message : errorText.cannotSwipeSelf }
+        if (previousSwipe) return { message : errorText.cannotSwipeAgain }
 
         const [swipe, _] = await Promise.all([
             this.swipe.createSwipe(input),
@@ -174,7 +181,7 @@ export class Handler {
         ])
 
 
-        return swipe;
+        return { data: swipe };
     }
 
     public async sendMessage(input : MessageInput) : Promise<Message|null> {
@@ -354,12 +361,14 @@ export class Handler {
         }
     }
 
-    public async getSubscriptionCheckoutPage(userID: string) : Promise<string|null> {
+    public async getSubscriptionCheckoutPage(userID: string) : Promise<APIOutput<string>> {
         const user = await this.user.getUserByID(userID);
-        if (!user) return null;
+        if (!user) return { message: errorText.notValidUser };
+
+        if (user.isSubscribed) return { message : errorText.alreadySubscribed };
 
         const usedFreeTrial = await this.freeTrial.hasEmailUsedFreeTrial(user.email);
-        return await this.pay.createSubscriptionSessionURL(userID, user.email, !usedFreeTrial);
+        return { data: await this.pay.createSubscriptionSessionURL(userID, user.email, !usedFreeTrial) }
     }
 
     public async processSubscriptionPay(input : SubscribeInput) : Promise<User|null> {

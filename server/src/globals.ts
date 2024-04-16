@@ -69,3 +69,13 @@ export const userSettings = {
     notification: "notifications",
     image: "images",
 }
+
+export const errorText = {
+    notValidUser: "Not a valid user",
+    alreadySubscribed: "Cannot purchase subscription if already subscribed",
+    userAlreadyExists: "User already exists",
+    invalidUserInput: "Invalid user input",
+    userNotVerified: "User not verified",
+    cannotSwipeSelf: "Cannot swipe self",
+    cannotSwipeAgain: "Cannot swipe again",
+}

@@ -5,7 +5,7 @@ import { ChatPreview } from "../src/interfaces";
 import { randomUUID } from "crypto";
 import { createUserInput, createUsersForSwipeFeed, getImageDetails, makeMessageInputWithOneRandom, makeMessageInputWithRandoms, makeTwoUsers, makeTwoUsersAndMatch, makeVerificationInput, matchUsers, validRequestUserInput } from "../__testUtils__/easySetup";
 import { addMinutes, addWeeks, addYears } from "date-fns";
-import { miscConstants, sampleContent, userRestrictions } from "../src/globals";
+import { errorText, miscConstants, sampleContent, userRestrictions } from "../src/globals";
 
 afterEach( async () => {
     await handler.deleteEverything()
@@ -16,21 +16,25 @@ describe("handler", () => {
         const invalidInput = await validRequestUserInput();
         invalidInput.birthday = addYears(new Date(), -(userRestrictions.minAge - 1))
 
-        expect(await handler.createUser(invalidInput)).toEqual(null);
+        const output = await handler.createUser(invalidInput);
+        expect(output.message).toEqual(errorText.invalidUserInput);
     })
 
     it("should not create existing user", async () => {
-        expect(await handler.createUser(await validRequestUserInput())).not.toEqual(null);
-        expect(await handler.createUser(await validRequestUserInput())).toEqual(null);
+        await handler.createUser(await validRequestUserInput());
+        const output = await handler.createUser(await validRequestUserInput());
+        expect(output.message).toEqual(errorText.userAlreadyExists);
     })
 
     it("should not delete nonuser", async () => {
-        expect(await handler.deleteUser("random")).toEqual(null);
+        const output = await handler.deleteUser("random");
+        expect(output.message).toEqual(errorText.notValidUser);
     })
 
     it("should delete user ", async () => {
-        const user = await handler.createUser(await validRequestUserInput()) as User;
-        
+        const created = await handler.createUser(await validRequestUserInput());
+        const user = created.data as User;
+
         await Promise.all([
             handler.message.sendMessage(makeMessageInputWithOneRandom(user.id)),
             handler.message.sendMessage(makeMessageInputWithOneRandom(user.id,true)),
@@ -38,51 +42,57 @@ describe("handler", () => {
         ])
 
         const deleted = await handler.deleteUser(user.id);
-        expect(deleted?.user).toEqual(user);
-        expect(deleted?.images).toEqual(user.images.length);
-        expect(deleted?.messages).toEqual(2);
+        expect(deleted?.data?.user).toEqual(user);
+        expect(deleted?.data?.images).toEqual(user.images.length);
+        expect(deleted?.data?.messages).toEqual(2);
     })
 
     it("should no swipe if nonusers", async () => {
         const user = await handler.user.createUser(createUserInput("a@berkeley.edu"));
 
-        expect(await handler.makeSwipe({
+        const output = await handler.makeSwipe({
             userID: user.id,
             swipedUserID: "random",
             action: "Like"
-        })).toEqual(null);
+        });
+        expect(output.message).toEqual(errorText.notValidUser);
 
-        expect(await handler.makeSwipe({
+        const output1 = await handler.makeSwipe({
             userID: "random",
             swipedUserID: user.id,
             action: "Like"
-        })).toEqual(null);
+        })
+        expect(output1.message).toEqual(errorText.notValidUser);
     })
 
     it("should not swipe if already done", async () => {
         const user = await handler.user.createUser(createUserInput("a@berkeley.edu"));
         const user_2 = await handler.user.createUser(createUserInput("b@berkeley.edu"));
 
-        expect(await handler.makeSwipe({
-            userID: user.id,
-            swipedUserID: user_2.id,
-            action: "Dislike"
-        })).not.toEqual(null);
 
-        expect(await handler.makeSwipe({
+        await handler.makeSwipe({
             userID: user.id,
             swipedUserID: user_2.id,
             action: "Dislike"
-        })).toEqual(null);
+        })
+
+        const output = await handler.makeSwipe({
+            userID: user.id,
+            swipedUserID: user_2.id,
+            action: "Dislike"
+        });
+        expect(output.message).toEqual(errorText.cannotSwipeAgain);
     })
 
     it("should not swipe self", async () => {
         const user = await handler.user.createUser(createUserInput("a@berkeley.edu"));
-        expect(await handler.makeSwipe({
+        const output = await handler.makeSwipe({
             userID: user.id,
             swipedUserID: user.id,
             action: "Dislike"
-        })).toEqual(null);
+        });
+
+        expect(output.message).toEqual(errorText.cannotSwipeSelf);
     })
 
     it("should not send message if not match 1", async () => {
@@ -446,12 +456,22 @@ describe("handler", () => {
     })
 
     it("should not create checkout page for nonuser", async () => {
-        expect(await handler.getSubscriptionCheckoutPage("random")).toEqual(null);
+        const output = await handler.getSubscriptionCheckoutPage("random");
+        expect(output.message).toEqual(errorText.notValidUser);
     })
 
     it("should create checkout page for user", async () => {
         const user = await handler.user.createUser(createUserInput("a@berkeley.edu"));
-        expect(await handler.getSubscriptionCheckoutPage(user.id)).not.toEqual(null);
+        const output = await handler.getSubscriptionCheckoutPage(user.id);
+        expect(output.data).not.toEqual(null);
+    })
+
+    it("should not create checkout page for user if already subscribed", async () => {
+        const user = await handler.user.createUser(createUserInput("a@berkeley.edu"));
+        await handler.processSubscriptionPay({subscriptionID: "random", userID: user.id});
+
+        const output = await handler.getSubscriptionCheckoutPage(user.id);
+        expect(output.message).toEqual(errorText.alreadySubscribed);
     })
 
     it("should not cancel subscription for nonuser", async () => {
@@ -795,13 +815,15 @@ describe("handler", () => {
 
     it("should not create user if not verified", async () => {
         const input = await validRequestUserInput();
-        expect(await handler.createUser(input, false)).toEqual(null);
+        const output = await handler.createUser(input, false);
+        expect(output.message).toEqual(errorText.userNotVerified);
         
         await handler.getVerificationCode({
             email: input.email,
             schoolEmail: "a@berkeley.edu"
         })
-        expect(await handler.createUser(input, false)).toEqual(null);
+        const output1 = await handler.createUser(input, false);
+        expect(output1.message).toEqual(errorText.userNotVerified);
     })
 
     it("should create user after verification", async () => {
@@ -818,7 +840,8 @@ describe("handler", () => {
             schoolEmail: eduEmail
         })
 
-        expect(await handler.createUser(input, false)).not.toEqual(null);
+        const output = await handler.createUser(input, false);
+        expect(output.data).not.toEqual(null);
     })
 
     it("should delete verification if user deleted", async () => {
@@ -836,7 +859,7 @@ describe("handler", () => {
         })
 
         const user = await handler.createUser(input, false);
-        await handler.deleteUser(user!.id);
+        await handler.deleteUser(user!.data!.id);
 
         expect(await handler.verification.getVerificationBySchoolEmail(
             eduEmail
