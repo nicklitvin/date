@@ -18,6 +18,7 @@ import { NotificationHandler } from "./handlers/notification";
 import { eloConstants, errorText, miscConstants, sampleContent, userRestrictions, userSettings } from "./globals";
 import { GmailHandler } from "./handlers/mail";
 import { ImageHandler, MailHandler, PaymentHandler } from "./abstracts";
+import { SocketHandler } from "./handlers/socket";
 
 interface Props {
     prisma: PrismaClient
@@ -44,6 +45,7 @@ export class Handler {
     public login : LoginHandler;
     public notification : NotificationHandler;
     public mail : MailHandler;
+    public socket : SocketHandler;
 
     private ignoreVerification : boolean;
     private disableNotifications : boolean;
@@ -67,7 +69,8 @@ export class Handler {
         this.freeTrial = new FreeTrialHandler(props.prisma);
         this.verification = new VerificationHandler(props.prisma);
         this.login = new LoginHandler(props.prisma);
-        this.notification = new NotificationHandler()
+        this.notification = new NotificationHandler();
+        this.socket = new SocketHandler();
     }
 
     public async deleteEverything() {

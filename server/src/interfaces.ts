@@ -78,6 +78,11 @@ export interface WithEmail {
 
 // SHARED-WITH-CLIENT
 
+export type SocketPayload = {
+    message?: Message,
+    match?: NewMatchData
+}
+
 export interface AnnouncementInput {
     startTime: Date
     endTime: Date

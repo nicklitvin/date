@@ -45,82 +45,28 @@ premium
 if ever try catch error, send post to server with message
 Make different user authentication rules list of functions that must pass
 
-PUBLIC
-BASIC
-PREMIUM
-ADMIN
+Socket Manager
 
-USER ATTRIBUTES
+user connects to server
+data: key
 
-FITNESS
-Soccer
-Basketball
-Football
-Tennis
-Cricket
-Basketball
-Golf
-Swim
-Volleyball
-Ice Hockey
-Table Tennis
-Badminton
-Martial Arts
-Track & Field
-Weightlifting
-Running
-Ski/Snowboard
-Surf
+server has map of sockets
+find userID based onkey
+userID : { socketID, ttl: }
+update ttl everytime socket interaction
 
-MUSIC
-Pop
-Rock
-Hip-Hop
-R&B
-Country
-Jazz
-Electronic
-Classical
-Lo-fi
-K-pop
-J-pop
-EDM
-Indie
-Latin Pop
-Folk
+user sends message
+key -> userID -> add to db -> find receipent userID -> if in socket map -> send message
 
-FOOD
-Vegeterian/Vegan
-Home Chef
-Sweet Tooth
-Coffee
-Tea
-Late-Night Snacker
-Home Baker
-Streetfood
+user receives message
+if message matches chat id the user is in:
+    move from new matches if applicable
+    append to message list
+    update chat preview with latest message
 
+if message does not match
+    move from new matches if applicable
+    update chat preview with latest message
 
-
-
-ENTERTAINMENT
-Online Gaming
-Concerts
-NightLife
-Road Trip
-Photography
-
-
-Road Trip
-Reading Books
-Movie Nights
-Outdoor Adventures
-Concert-Goer
-Board Games
-Hiking
-Cooking
-Traveling Abroad
-Karaoke
-Art Exhibitions
-Wine Tasting
-Photography
-Beach Days
+if new match, append to new match list
+    for both users involved
