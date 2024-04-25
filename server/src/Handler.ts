@@ -174,15 +174,27 @@ export class Handler {
         if (user.id == swipedUser.id) return { message : errorText.cannotSwipeSelf }
         if (previousSwipe) return { message : errorText.cannotSwipeAgain }
 
-        const [swipe, _] = await Promise.all([
+        const [swipe, reverseSwipe, _] = await Promise.all([
             this.swipe.createSwipe(input),
+            this.swipe.getSwipeByUsers(input.swipedUserID, input.userID),
             this.user.updateElo(swipedUser.id, this.user.getEloChange({
                 action: input.action == "Like" ? EloAction.Like : EloAction.Dislike,
                 eloDiff: user.elo - swipedUser.elo,
                 userElo: swipedUser.elo 
-            }))
+            })),
         ])
 
+        if (input.action == "Like" && reverseSwipe && reverseSwipe.action == "Like" && 
+            this.socket.isUserConnected(input.swipedUserID)
+        ) {
+            const profile = await this.user.convertUserToPublicProfile(user);
+            this.socket.sendUserMessage(input.swipedUserID, {
+                match: {
+                    profile: profile,
+                    timestamp: new Date()
+                }
+            })
+        }
 
         return { data: swipe };
     }
@@ -206,6 +218,11 @@ export class Handler {
                     eloDiff: user.elo - recepient.elo
                 }))
             ])
+            if (this.socket.isUserConnected(recepient.id)) {
+                this.socket.sendUserMessage(recepient.id, {
+                    message: message
+                })
+            }
             if (!this.disableNotifications) {
                 const recepientLogin = await this.login.getUserByEmail(recepient.email);
                 if (recepientLogin?.expoPushToken) {

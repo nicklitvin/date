@@ -206,3 +206,12 @@ export function makeVerificationInput(personalEmail? : string, schoolEmail? : st
         schoolEmail: schoolEmail ?? "a@berkeley.edu"
     }
 }
+
+export function makeMockWebSocket() : any {
+    const payloads : string[] = [];
+
+    return {
+        send: (payload : string) => payloads.push(payload),
+        payloads: payloads
+    }
+}

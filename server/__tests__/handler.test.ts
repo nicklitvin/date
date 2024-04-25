@@ -1,9 +1,9 @@
 import { afterEach, describe, expect, it } from "@jest/globals";
 import { handler } from "../jest.setup";
-import { User } from "@prisma/client";
-import { ChatPreview } from "../src/interfaces";
+import { Message, User } from "@prisma/client";
+import { ChatPreview, NewMatchData } from "../src/interfaces";
 import { randomUUID } from "crypto";
-import { createUserInput, createUsersForSwipeFeed, getImageDetails, makeMessageInputWithOneRandom, makeMessageInputWithRandoms, makeTwoUsers, makeTwoUsersAndMatch, makeVerificationInput, matchUsers, validRequestUserInput } from "../__testUtils__/easySetup";
+import { createUserInput, createUsersForSwipeFeed, getImageDetails, makeMessageInputWithOneRandom, makeMessageInputWithRandoms, makeMockWebSocket, makeTwoUsers, makeTwoUsersAndMatch, makeVerificationInput, matchUsers, validRequestUserInput } from "../__testUtils__/easySetup";
 import { addMinutes, addWeeks, addYears } from "date-fns";
 import { errorText, miscConstants, sampleContent, userRestrictions } from "../src/globals";
 
@@ -1108,5 +1108,51 @@ describe("handler", () => {
 
         const autoOutput = await handler.autoLogin(login?.data?.key!);
         expect(autoOutput.message).toEqual(errorText.bannedFromPlatform);
+    })
+
+    it("should send message to recepient through socket", async () => {
+        const { user, user_2 } = await makeTwoUsersAndMatch();
+        const user2Socket = makeMockWebSocket();
+        const message = "hi";
+
+        handler.socket.addSocket({
+            userID: user_2.id,
+            socket: user2Socket
+        })
+        
+        await handler.sendMessage({
+            userID: user.id,
+            recepientID: user_2.id,
+            message: message
+        });
+
+        const received : Message = JSON.parse(user2Socket.payloads[0]).message;
+        expect(received.message).toEqual(message);
+    })
+
+    it("should send match to recepient", async () => {
+        const { user, user_2 } = await makeTwoUsers();
+        const user2Socket = makeMockWebSocket();
+
+        handler.socket.addSocket({
+            userID: user_2.id,
+            socket: user2Socket
+        });
+
+        await handler.makeSwipe({
+            userID: user_2.id,
+            swipedUserID: user.id,
+            action: "Like"
+        })
+        expect(user2Socket.payloads).toHaveLength(0);
+
+        await handler.makeSwipe({
+            userID: user.id,
+            swipedUserID: user_2.id,
+            action: "Like"
+        });
+        expect(user2Socket.payloads).toHaveLength(1);
+        const payload : NewMatchData = JSON.parse(user2Socket.payloads[0]).match;
+        expect(payload.profile.id).toEqual(user.id);
     })
 })

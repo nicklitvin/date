@@ -1,10 +1,8 @@
 TODO
-chat
-    establish websocket
-    load chat in advance to avoid glitchy
-    latest message not showing in chat
-    move keyboard in long chat
-
+send read status thru websocket
+create socket server
+make user connect to socket
+make appropriate responses, remove
 notification receive, delete receiveDate when new
 toast error messages, install npx expo install react-native-reanimated react-native-safe-area-context react-native-gesture-handler
 isntall rsg paths for graph
