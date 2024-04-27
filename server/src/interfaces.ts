@@ -81,6 +81,7 @@ export interface WithEmail {
 export type SocketPayload = {
     message?: Message,
     match?: NewMatchData
+    readUpdate?: Date
 }
 
 export interface AnnouncementInput {

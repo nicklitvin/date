@@ -1,7 +1,5 @@
 TODO
-send read status thru websocket
-create socket server
-make user connect to socket
+make socketpayload for client to server and vice versa
 make appropriate responses, remove
 notification receive, delete receiveDate when new
 toast error messages, install npx expo install react-native-reanimated react-native-safe-area-context react-native-gesture-handler
