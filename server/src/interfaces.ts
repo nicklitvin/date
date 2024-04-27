@@ -78,10 +78,15 @@ export interface WithEmail {
 
 // SHARED-WITH-CLIENT
 
-export type SocketPayload = {
+export interface SocketPayloadToClient {
     message?: Message,
-    match?: NewMatchData
-    readUpdate?: Date
+    match?: NewMatchData,
+    inputProcessed?: boolean
+}
+
+export interface SocketPayloadToServer {
+    message?: MessageInput
+    readUpdate?: ReadStatusInput
 }
 
 export interface AnnouncementInput {

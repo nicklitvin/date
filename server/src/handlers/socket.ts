@@ -1,7 +1,7 @@
 import { addHours, addMinutes } from "date-fns";
-import { SocketPayload } from "../interfaces";
 import { randomUUID } from "crypto";
 import { WebSocket } from "ws";
+import { SocketPayloadToClient } from "../interfaces";
 
 interface DeleteData {
     socketsDeleted : number,
@@ -105,7 +105,7 @@ export class SocketHandler {
         return this.connectedSockets.has(userID);
     }
 
-    public sendUserMessage(userID: string, data : SocketPayload) : boolean {
+    public sendUserMessage(userID: string, data : SocketPayloadToClient) : boolean {
         try {
             const socket = this.connectedSockets.get(userID)?.socket;
             const object = JSON.stringify(data);
