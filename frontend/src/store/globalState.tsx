@@ -1,5 +1,6 @@
 import { action, makeAutoObservable, observable } from "mobx";
 import { SwipeStatus } from "../interfaces";
+import { SocketUser } from "../components/SocketUser";
 
 export class GlobalState {
     @observable public useHttp : boolean = true;
@@ -8,10 +9,14 @@ export class GlobalState {
     @observable public disableFade : boolean = false;
     @observable public expoPushToken : string|null = null;
     @observable public swipeStatus : SwipeStatus|null = null;
+    @observable public socketUser : SocketUser|null = null;
 
     constructor() {
         makeAutoObservable(this);
     }
+
+    @action
+    setSocketUser(input : SocketUser) { this.socketUser = input; }
 
     @action
     setSwipeStatus(input : SwipeStatus) { this.swipeStatus = input; }

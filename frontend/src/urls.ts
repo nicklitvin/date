@@ -33,4 +33,5 @@ export const URLs = {
     getClientIDs: "/getClientIDs",
     sendReadStatus: "/sendReadStatus",
     getReadStatus: "/getReadStatus",
+    websocket: "/ws"
 }

@@ -82,3 +82,17 @@ export async function sendRequest(subURL : string, data : any) {
     if (print) console.log("response from", subURL, response?.data?.data);
     return response;
 }
+
+export function makeBriefSummaryText(message : string, myMessage : boolean) {
+    let returnedMessage = message;
+
+    if (myMessage) {
+        returnedMessage = `You: ${returnedMessage}`
+    }
+
+    if (returnedMessage.length > globals.maxPreviewMessageLength) {
+        returnedMessage = returnedMessage.slice(0,globals.maxPreviewMessageLength) + "..."
+    }
+
+    return returnedMessage
+}

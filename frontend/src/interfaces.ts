@@ -37,6 +37,17 @@ export enum Opinion {
 
 // SERVER-COPIES
 
+export interface SocketPayloadToClient {
+    message?: Message,
+    match?: NewMatchData,
+    inputProcessed?: boolean
+}
+
+export interface SocketPayloadToServer {
+    message?: MessageInput
+    readUpdate?: ReadStatusInput
+}
+
 export interface AnnouncementInput {
     startTime: Date
     endTime: Date
@@ -209,7 +220,8 @@ export interface LoginOutput {
     key?: string
     newAccount?: boolean
     verified?: boolean
-    banned?: boolean
+    banned?: boolean,
+    socketToken?: string
 }
 
 export interface UpdatePushTokenInput {
@@ -234,8 +246,8 @@ export interface ClientIDs {
     expo?: string
 }
 
-export interface APIOutput {
-    data?: any
+export interface APIOutput<T> {
+    data?: T
     message?: string
 }
 

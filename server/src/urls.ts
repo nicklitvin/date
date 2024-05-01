@@ -42,4 +42,7 @@ export const URLs = {
 
     // OAUTH
     googleOAuth: "https://www.googleapis.com/userinfo/v2/me",
+
+    // Websocket
+    websocket: "/ws"
 }

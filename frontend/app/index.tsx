@@ -11,10 +11,11 @@ import { Platform } from "react-native";
 import { sendRequest } from "../src/utils";
 import { URLs } from "../src/urls";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { ProfileViewEmbedMob } from "../src/pages/ProfileViewEmbed";
 import { noWifiText } from "../src/text";
 import { MyButton } from "../src/components/Button";
 import Loading from "./Loading";
+import { APIOutput, LoginOutput } from "../src/interfaces";
+import { SocketUser } from "../src/components/SocketUser";
 
 Notifications.setNotificationHandler({
     handleNotification: async () => ({
@@ -208,19 +209,31 @@ export function Index() {
         const input = {
             key: receivedData.loginKey
         }
-        const [profile, clientIDs] = await Promise.all([
-            retrieveOne(
-                () => sendRequest(URLs.getMyProfile, input),
-                (data : any) => receivedData.setProfile(data)
-            ),
+
+        const [_, clientIDs] = await Promise.all([
+            async () => {
+                try {
+                    const response = await sendRequest(URLs.autoLogin, input);
+                    const data : APIOutput<LoginOutput> = response.data.data;
+                    if (data.data?.socketToken) {
+                        globalState.setSocketUser(new SocketUser(data.data.socketToken, receivedData))
+                    }
+                } catch (err) {
+
+                }
+            },
             retrieveOne(
                 () => sendRequest(URLs.getClientIDs, null),
                 (data : any) => receivedData.setClientIDs(data)
             ),
             retrieveOne(
+                () => sendRequest(URLs.getMyProfile, input),
+                (data : any) => receivedData.setProfile(data)
+            ),
+            retrieveOne(
                 () => sendRequest(URLs.getAttributes, null),
                 (data: any) => receivedData.setAttributes(data)
-            )
+            ),
         ])
         if (!clientIDs) {
             setError(true);

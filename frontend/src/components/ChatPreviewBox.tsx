@@ -1,6 +1,7 @@
 import { globals } from "../globals";
 import { ChatPreview } from "../interfaces";
 import { StyledButton, StyledImage, StyledText, StyledView } from "../styledElements";
+import { makeBriefSummaryText } from "../utils";
 
 interface Props {
     chatPreview: ChatPreview
@@ -9,21 +10,10 @@ interface Props {
 
 export function ChatPreviewBox(props : Props) {
     const getBriefSummaryText = () => {
-        const lastMessage = props.chatPreview.message;
-        let returnedMessage : string;
-        if (lastMessage?.recepientID == props.chatPreview.profile.id) {
-            returnedMessage = `You: ${lastMessage.message}`
-        } else {
-            returnedMessage = `${lastMessage?.message}`
-        }
-
-        if (returnedMessage.length > globals.maxPreviewMessageLength) {
-            returnedMessage = returnedMessage.slice(0,globals.maxPreviewMessageLength) + "..."
-        }
-
-        return returnedMessage
+        const isMyMessage = props.chatPreview.message?.recepientID == props.chatPreview.profile.id;
+        return makeBriefSummaryText(props.chatPreview.message.message, isMyMessage)
     }
-
+    
     const isNewUnread = () => {
         const lastMessage = props.chatPreview.message;
 
