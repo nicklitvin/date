@@ -15,7 +15,7 @@ import { noWifiText } from "../src/text";
 import { MyButton } from "../src/components/Button";
 import Loading from "./Loading";
 import { APIOutput, LoginOutput } from "../src/interfaces";
-import { SocketUser } from "../src/components/SocketUser";
+import { SocketUser } from "../src/components/SocketManager";
 
 Notifications.setNotificationHandler({
     handleNotification: async () => ({

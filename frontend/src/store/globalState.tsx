@@ -1,6 +1,6 @@
 import { action, makeAutoObservable, observable } from "mobx";
 import { SwipeStatus } from "../interfaces";
-import { SocketUser } from "../components/SocketUser";
+import { SocketUser } from "../components/SocketManager";
 
 export class GlobalState {
     @observable public useHttp : boolean = true;
