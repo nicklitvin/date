@@ -163,7 +163,7 @@ export function Feed(props : Props) {
             <Animated.View style={{ opacity: opacity}}
             >
                 {
-                    (!savedSwipeStatus || !savedFeed || savedSwipeStatus.feedIndex == savedFeed.profiles.length) ? 
+                    (!savedSwipeStatus || !savedFeed || savedSwipeStatus.feedIndex == savedFeed.profiles?.length) ? 
                     <StyledView className="flex items-center mt-[250px] flex-col">
                         <StyledImage
                             className="w-[100px] h-[100px]"

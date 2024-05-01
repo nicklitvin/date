@@ -62,7 +62,7 @@ export function SignIn() {
             }
             try {
                 const response = await sendRequest(URLs.login, input);
-                const output = response.data.data as APIOutput<LoginOutput>;
+                const output = response.data as APIOutput<LoginOutput>;
                 if (output.data) await processLoginOutput(output.data);
             } catch (err) { 
                 console.log(err);

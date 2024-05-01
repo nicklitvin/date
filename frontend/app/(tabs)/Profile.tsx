@@ -24,6 +24,8 @@ export function Profile(props : Props) {
     const savedSubscription = receivedData.subscription;
     const [firstLoad, setFirstLoad] = useState<boolean>(true);
 
+    console.log(savedProfile);
+
     useEffect( () => {
         if (firstLoad) {
             setFirstLoad(false);

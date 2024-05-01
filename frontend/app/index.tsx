@@ -195,6 +195,7 @@ export function Index() {
     const retrieveOne = async (request : Function, set : Function) => {
         try {
             const response = await request();
+            
             if (response.data.data) {
                 set(response.data.data);
                 return true;
@@ -219,7 +220,7 @@ export function Index() {
                         globalState.setSocketUser(new SocketUser(data.data.socketToken, receivedData))
                     }
                 } catch (err) {
-
+                    console.log(err);
                 }
             },
             retrieveOne(

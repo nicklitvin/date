@@ -166,7 +166,7 @@ export class APIHandler {
                 }
                 const output = await handler.getNewMatches(input);
                 return output ? 
-                    res.status(200).json({ data: output } as APIOutput<NewMatchData[]>) : 
+                    res.status(200).json(output as APIOutput<NewMatchData[]>) : 
                     res.status(400).json()
             } catch (err) {
                 console.log(err);
@@ -188,7 +188,7 @@ export class APIHandler {
                 }
                 const output = await handler.getChatPreviews(input);
                 return output ? 
-                    res.status(200).json({ data: output } as APIOutput<ChatPreview[]>) : 
+                    res.status(200).json(output as APIOutput<ChatPreview[]>) : 
                     res.status(400).json()
             } catch (err) {
                 console.log(err);
@@ -211,7 +211,7 @@ export class APIHandler {
                 }
                 const output = await handler.makeSwipe(input);
                 return output ? 
-                    res.status(200).json({ data: output } as APIOutput<Swipe>) : 
+                    res.status(200).json(output as APIOutput<Swipe>) : 
                     res.status(400).json()
             } catch (err) {
                 console.log(err);
@@ -229,7 +229,7 @@ export class APIHandler {
     
                 const output = await handler.getSwipeFeed(body.userID);
                 return output ? 
-                    res.status(200).json({ data: output } as APIOutput<SwipeFeed>) : 
+                    res.status(200).json(output as APIOutput<SwipeFeed>) : 
                     res.status(400).json()
             } catch (err) {
                 console.log(err);
@@ -397,7 +397,7 @@ export class APIHandler {
     
                 const output = await handler.getSubscriptionCheckoutPage(body.userID);
                 return output ? 
-                    res.status(200).json({ data: output } as APIOutput<string>) : 
+                    res.status(200).json(output as APIOutput<string>) : 
                     res.status(400).json()
             } catch (err) {
                 console.log(err);
@@ -477,7 +477,7 @@ export class APIHandler {
     
                 const output = await handler.unlike(input);
                 return output ? 
-                    res.status(200).json({ data: output } as APIOutput<UnlikeOutput>) : 
+                    res.status(200).json(output as APIOutput<UnlikeOutput>) : 
                     res.status(400).json()
             } catch (err) {
                 console.log(err);
@@ -527,7 +527,7 @@ export class APIHandler {
 
                 const output = await handler.getStatsIfSubscribed(body.userID);
                 return output ? 
-                    res.status(200).json({ data: output } as APIOutput<UserSwipeStats>) : 
+                    res.status(200).json(output as APIOutput<UserSwipeStats>) : 
                     res.status(400).json()
                 
             } catch (err) {
@@ -596,7 +596,7 @@ export class APIHandler {
 
                 const output = await handler.loginWithToken(body);
                 return output ? 
-                    res.status(200).json({ data: output } as APIOutput<LoginOutput>) : 
+                    res.status(200).json(output as APIOutput<LoginOutput>) : 
                     res.status(400).json()
             } catch (err) {
                 console.log(err);

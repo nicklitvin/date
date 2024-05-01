@@ -1,4 +1,6 @@
 TODO
+change sendrequest to return api output to remove response.data.data
+
 test responses and app reactions
 notification receive, delete receiveDate when new
 toast error messages, install npx expo install react-native-reanimated react-native-safe-area-context react-native-gesture-handler
