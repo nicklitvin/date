@@ -82,12 +82,12 @@ export function AccountCreation(props : Props) {
                 mimetype: upload.image.mimetype
             }))
         };
-     
-        try {
-            await sendRequest(URLs.createUser, userInput);
-            if (!props.noRouter) router.push("(tabs)");
-        } catch (err) {
-            console.log(err);
+
+        const response = await sendRequest(URLs.createUser, userInput);
+        if (response.message) {
+            // toast notification
+        } else if (!props.noRouter) {
+            router.push("(tabs)")
         }
     }
 

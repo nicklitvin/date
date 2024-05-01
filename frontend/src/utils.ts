@@ -1,6 +1,7 @@
 import axios from "axios";
 import { globals } from "./globals";
 import { URLs } from "./urls";
+import { APIOutput } from "./interfaces";
 
 export function getChatTimestamp(date : Date, timezone : string) {
     let timestamp = date.toLocaleString(undefined, {
@@ -72,15 +73,22 @@ export function setCustomTimer(callback : () => any, seconds : number) : NodeJS.
     return newTimer;
 }
 
-export async function sendRequest(subURL : string, data : any) {
-    const print = true;
+export async function sendRequest(subURL : string, data : any) : Promise<APIOutput<any>> {
+    const print = false;
 
-    if (print) console.log("sending request to", subURL, "with data", data);
-    const response = await axios.post(URLs.server + subURL, data, {
-        signal: createTimeoutSignal(),
-    })
-    if (print) console.log("response from", subURL, response?.data?.data);
-    return response;
+    try {
+        if (print) console.log("sending request to", subURL, "with data", data);
+        const response = await axios.post(URLs.server + subURL, data, {
+            signal: createTimeoutSignal(),
+        })
+        const responseData = response.data as APIOutput<any>;
+        if (print) console.log("response from", subURL, responseData);
+        return responseData
+    } catch (err) {
+        return axios.isAxiosError(err) && err.response?.data.message ? 
+            {message : err.response?.data.message} : 
+            {message: "Error with request"}
+    }
 }
 
 export function makeBriefSummaryText(message : string, myMessage : boolean) {
