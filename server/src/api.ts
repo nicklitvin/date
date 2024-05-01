@@ -36,18 +36,20 @@ export class APIHandler {
             }
 
             ws.on("message", async (stream : string) => {
-                const returnPayload : SocketPayloadToClient = {
-                    inputProcessed: false
-                };
+                const returnPayload : SocketPayloadToClient = {};
 
                 try {   
                     const data : SocketPayloadToServer = JSON.parse(stream);
+
                     if (data.message) {
                         const output = await handler.sendMessage(data.message);
-                        returnPayload.inputProcessed = output.data != null;
+                        if (output.data) {
+                            returnPayload.payloadProcessedID = data.payloadID;
+                            returnPayload.message = output.data;
+                        }
                     } else if (data.readUpdate) {
                         const output = await handler.updateReadStatus(data.readUpdate);
-                        returnPayload.inputProcessed == output.data != null;
+                        if (output.data) returnPayload.payloadProcessedID = data.payloadID;
                     }
                 } catch (err) {
                     console.log(err);

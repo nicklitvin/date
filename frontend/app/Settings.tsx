@@ -89,7 +89,7 @@ export function Settings(props : Props) {
                 userID: receivedData.profile?.id!,
                 key: receivedData.loginKey
             }
-            const response = await sendRequest(URLs.getSettings, input);
+            const response = await sendRequest<any>(URLs.getSettings, input);
             setSettings(response.data.data);
         } catch (err) {
             console.log(err);
@@ -128,6 +128,7 @@ export function Settings(props : Props) {
     }
 
     const signOut = () => {
+        globalState.setSocketUser(null);
         receivedData.setProfile(null);
         if (!props.disableToggle)
             setRedirect(true);

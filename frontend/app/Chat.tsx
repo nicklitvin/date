@@ -3,7 +3,7 @@ import { MyTextInput } from "../src/components/TextInput";
 import { chatText, generalText } from "../src/text";
 import { useEffect, useRef, useState } from "react";
 import { useStore } from "../src/store/RootStore";
-import { GetChatInput, Message, MessageInput, PublicProfile, UserReportWithReportedID, SwipeInput, UnlikeInput, WithKey, ReadStatusInput, GetReadStatusInput, JustUserID } from "../src/interfaces";
+import { GetChatInput, Message, MessageInput, PublicProfile, UserReportWithReportedID, SwipeInput, UnlikeInput, WithKey, ReadStatusInput, GetReadStatusInput, JustUserID, APIOutput } from "../src/interfaces";
 import { globals } from "../src/globals";
 import { StyledButton, StyledImage, StyledScroll, StyledText, StyledView } from "../src/styledElements";
 import { testIDS } from "../src/testIDs";
@@ -15,6 +15,7 @@ import { NativeScrollEvent, NativeSyntheticEvent, ScrollView } from "react-nativ
 import { MyModal } from "../src/components/Modal";
 import { differenceInSeconds } from "date-fns";
 import { router, useLocalSearchParams } from "expo-router";
+import { randomUUID } from "expo-crypto";
 
 interface Props {
     userID?: string
@@ -76,51 +77,16 @@ export function Chat(props : Props) {
         }
     }, [firstLoad])
 
-    const updateRecepientReadStatus = async () => {
-        if (chat.length == 0 || chat.at(-1)?.userID == userID) return 
-        
-        try {
-            const input : WithKey<GetReadStatusInput> = {
-                userID: receivedData.profile?.id!,
-                readerID: userID
-            }
-            const response = await sendRequest(URLs.getReadStatus, input);
-            if (response.data.data == true) {
-                const copy : Message[] = [...chat].map( val => ({
-                    ...val,
-                    readStatus: true
-                }))
-                setChat(copy);
-            }
-        } catch (err) {
-            console.log(err);
-        }
-    }
-
     const updateMyReadStatus = async () => {
-        try {
-            const data : WithKey<ReadStatusInput> = {
-                userID: receivedData.profile?.id!,
-                key: receivedData.loginKey,
+        if (!globalState.socketUser || !receivedData.profile) return 
+
+        globalState.socketUser.sendData({
+            readUpdate: {
+                userID: receivedData.profile.id,
                 timestamp: new Date(),
                 toID: userID
             }
-            await sendRequest(URLs.sendReadStatus, data);
-
-            const index = receivedData.chatPreviews?.findIndex( val => val.profile.id == userID);
-            if (
-                receivedData.chatPreviews && 
-                index && 
-                receivedData.chatPreviews[index].message.userID == userID &&
-                receivedData.chatPreviews[index].message.readStatus == false
-            ) {
-                const copy = [...receivedData.chatPreviews];
-                copy[index].message.readStatus = true;
-                receivedData.setChatPreviews(copy)
-            }
-        } catch (err) {
-            console.log(err);
-        }
+        })
     }
 
     const deleteUser = () => {
@@ -157,8 +123,8 @@ export function Chat(props : Props) {
             const profileInput : JustUserID = {
                 userID: userID!
             }
-            const profileResponse = await sendRequest(URLs.getProfile, profileInput);
-            setProfile(profileResponse.data.data);    
+            const profileResponse = await sendRequest<PublicProfile>(URLs.getProfile, profileInput);
+            setProfile(profileResponse.data);    
         } catch (err) {
             console.log(err);
         }
@@ -172,9 +138,9 @@ export function Chat(props : Props) {
                 fromTime: new Date(),
                 withID: userID!
             }
-            const chatResponse = await sendRequest(URLs.getChat, chatInput);
-            const chatData = chatResponse.data.data as Message[];
-            const processedChatData = chatData.map( val => ({
+            const chatResponse = await sendRequest<Message[]>(URLs.getChat, chatInput);
+            if (!chatResponse.data) return 
+            const processedChatData = chatResponse.data.map( val => ({
                 ...val,
                 timestamp: new Date(val.timestamp)
             }));
@@ -185,39 +151,50 @@ export function Chat(props : Props) {
     }
 
     const sendMessage = async (sentMessage : string, removeID?: string) => {
+        if (!globalState.socketUser || !receivedData.profile || !profile) {
+            // toast message
+            return 
+        }
+
         const sendingID = String(currentID);
         setCurrentID(currentID + 1);
-
+        
         const sendingChat : Message = {
             id: sendingID,
             message: sentMessage,
             readStatus: false,
-            recepientID: profile!.id,
+            recepientID: profile.id,
             timestamp: new Date(),
-            userID: receivedData.profile?.id!
+            userID: receivedData.profile.id
         }
         setLoadingIDs(loadingIDs.concat(sendingID));
         setChat([sendingChat].concat(chat.filter( val => val.id != removeID)));
 
-        try {
-            const withKeyMessage : WithKey<Message> = {
-                ...sendingChat,
-                key: receivedData.loginKey
+        const payloadID = randomUUID();
+        globalState.socketUser.sendData({
+            payloadID: payloadID,
+            message: {
+                userID: receivedData.profile.id,
+                message: sentMessage,
+                recepientID: profile.id
             }
-            const response = await sendRequest(URLs.sendMessage, withKeyMessage);
-            const message = response.data.data as Message;
+        })
 
-            const copy = [...chat];
-            const index = chat.findIndex( val => val.id == sendingID);
-            copy[index] = message;
+        setCustomTimer( () => {
+            const message = globalState.socketUser?.wasMessageProcessed(payloadID);
+            if (message) {
+                const copy = [...chat];
+                const index = chat.findIndex( val => val.id == sendingID);
+                copy[index] = message;
+    
+                setSendingChats(sendingChats.filter( val => val.id != sendingID));
+                setUnsentChats(unsentChats.filter(val => val != removeID));
+            } else {
+                setUnsentChats(unsentChats.filter(val => val != removeID).concat(sendingID))
+            }
 
-            setSendingChats(sendingChats.filter( val => val.id != sendingID));
-            setUnsentChats(unsentChats.filter(val => val != removeID));
-
-        } catch (err) {
-            setUnsentChats(unsentChats.filter(val => val != removeID).concat(sendingID))
-        }
-        setLoadingIDs(loadingIDs.filter( val => val != sendingID))
+            setLoadingIDs(loadingIDs.filter( val => val != sendingID))
+        }, 1)
     }
 
     const handleScroll = async (event: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -229,49 +206,26 @@ export function Chat(props : Props) {
         if (!(isAtTop && canSend)) return 
         setChatRequestTime(new Date());
         
-        try {
-            let moreChats : Message[];
-            if (chat.length == 0) return
+        let moreChats : Message[];
+        if (chat.length == 0) return
 
-            const input : WithKey<GetChatInput> = {
-                userID: receivedData.profile?.id!,
-                key: receivedData.loginKey,
-                withID: profile!.id,
-                fromTime: new Date(chat.at(-1)!.timestamp.getTime() - 1)
-            }
+        const input : WithKey<GetChatInput> = {
+            userID: receivedData.profile?.id!,
+            key: receivedData.loginKey,
+            withID: profile!.id,
+            fromTime: new Date(chat.at(-1)!.timestamp.getTime() - 1)
+        }
 
-            const response = await sendRequest(URLs.getChat, input);
-            moreChats = response.data.data as Message[];
-            moreChats = moreChats.map( message => ({
-                ...message, 
+        const response : APIOutput<Message[]> = await sendRequest(URLs.getChat, input);
+
+        if (response.message) {
+            // toast message
+        } else if (response.data) {
+            moreChats = response.data.map( message => ({
+                ...message,
                 timestamp: new Date(message.timestamp)
             }))
-
             setChat(chat.concat(moreChats));
-        } catch (err) {
-        }
-    }
-
-    const loadNewMessages = async () => {
-        try {
-            const input : WithKey<GetChatInput> = {
-                userID: receivedData.profile?.id!,
-                fromTime: new Date(),
-                withID: userID,
-                key: receivedData.loginKey!
-            }
-            const chatResponse = await sendRequest(URLs.getChat, input);
-            const chatData = chatResponse.data.data as Message[];
-            const processedChatData = chatData.map( val => ({
-                ...val,
-                timestamp: new Date(val.timestamp)
-            }));
-            const newMessages = processedChatData.filter( 
-                val => val.timestamp.getTime() > chat[0]?.timestamp.getTime() ?? new Date(0).getTime()
-            )
-            setChat(newMessages.concat(chat));
-        } catch (err) {
-            console.log(err);
         }
     }
 
@@ -283,10 +237,13 @@ export function Chat(props : Props) {
                 key: receivedData.loginKey,
                 reportedID: profile!.id
             }
-            await sendRequest(URLs.reportUser, myReport);
-            deleteUser();
-            if (props.noAutoLoad) return
-            if (props.noRouter) router.push("Matches");
+            const response = await sendRequest(URLs.reportUser, myReport);
+            if (response.message) {
+                // toast message
+            } else {
+                deleteUser();
+                if (!props.noAutoLoad && props.noRouter) router.push("Matches");
+            }
         } catch (err) {
             console.log(err);
         }
@@ -300,11 +257,14 @@ export function Chat(props : Props) {
                 key: receivedData.loginKey,
                 withID: profile!.id
             }
-            await sendRequest(URLs.unlikeUser, unlike);
 
-            deleteUser();
-            if (props.noAutoLoad) return
-            if (!props.noRouter) router.push("Matches");
+            const response = await sendRequest(URLs.unlikeUser, unlike);
+            if (response.message) {
+                // toast message
+            } else {
+                deleteUser();
+                if (!props.noAutoLoad && props.noRouter) router.push("Matches");
+            }
         } catch (err) {
             console.log(err);
         }
@@ -336,7 +296,6 @@ export function Chat(props : Props) {
         />
         <StyledView className="w-full h-full">
             <StyledButton testID={testIDS.load} onPress={load}/>
-            <StyledButton testID={testIDS.loadNew} onPress={loadNewMessages}/>
             <PageHeader
                 imageSource={profile?.images[0]?.url}
                 title={profile?.name ?? ""}

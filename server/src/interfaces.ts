@@ -81,10 +81,11 @@ export interface WithEmail {
 export interface SocketPayloadToClient {
     message?: Message,
     match?: NewMatchData,
-    inputProcessed?: boolean
+    payloadProcessedID?: string
 }
 
 export interface SocketPayloadToServer {
+    payloadID?: string
     message?: MessageInput
     readUpdate?: ReadStatusInput
 }

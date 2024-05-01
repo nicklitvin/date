@@ -16,7 +16,7 @@ export class GlobalState {
     }
 
     @action
-    setSocketUser(input : SocketUser) { this.socketUser = input; }
+    setSocketUser(input : SocketUser|null) { this.socketUser = input; }
 
     @action
     setSwipeStatus(input : SwipeStatus) { this.swipeStatus = input; }

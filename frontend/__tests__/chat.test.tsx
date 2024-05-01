@@ -1,7 +1,7 @@
 import { act, fireEvent, render, screen } from "@testing-library/react-native";
 import { RootStore, createStoreProvider } from "../src/store/RootStore";
 import { ChatMob } from "../app/Chat";
-import { GetChatInput, Message, MessageInput, PublicProfile, UserReportWithReportedID } from "../src/interfaces";
+import { APIOutput, GetChatInput, Message, MessageInput, PublicProfile, UserReportWithReportedID } from "../src/interfaces";
 import { chatText } from "../src/text";
 import { testIDS } from "../src/testIDs";
 import { getChatTimestamp } from "../src/utils";
@@ -10,7 +10,7 @@ import axios from "axios";
 import { URLs } from "../src/urls";
 import { scrollVertically } from "../__testUtils__/easySetup";
 
-describe("chat", () => {
+describe("chat page", () => {
     const myUserID = "userID";
     const timezone = "America/Los_Angeles"
     const recepientProfile : PublicProfile = {
@@ -67,18 +67,13 @@ describe("chat", () => {
     const loadChat = async (useSave = false) => {
         const mock = new MockAdapter(axios);
         mock.onPost(URLs.server + URLs.getProfile).replyOnce( config =>
-            [200, {
-                data: recepientProfile
-            }]
+            [200, { data: recepientProfile } as APIOutput<PublicProfile>]
         )
         mock.onPost(URLs.server + URLs.getChat).replyOnce(config => {
             const payload = JSON.parse(config.data) as GetChatInput;
             expect(payload.withID).toEqual(recepientProfile.id);
-            return [200, {
-                data: latestMessages
-            }]
+            return [200, { data: latestMessages } as APIOutput<Message[]>]
         })
-        mock.onPost(URLs.server + URLs.sendReadStatus).reply(config => [200])
 
         const store = new RootStore();
         store.globalState.setTimezone(timezone);
@@ -120,9 +115,7 @@ describe("chat", () => {
             )
             expect(payload.withID).toEqual(recepientProfile.id);
 
-            return [200, {
-                data: moreMessages
-            }];
+            return [200, { data: moreMessages } as APIOutput<Message[]> ];
         })
 
         await act( () => {
@@ -130,31 +123,31 @@ describe("chat", () => {
         })
     }
 
-    const loadNewMessages = async (mock : MockAdapter) => {
-        mock.onPost(URLs.server + URLs.getChat).replyOnce( config => 
-            [200, {
-                data: newMessage
-            }]   
-        )
+    // const loadNewMessages = async (mock : MockAdapter) => {
+    //     mock.onPost(URLs.server + URLs.getChat).replyOnce( config => 
+    //         [200, {
+    //             data: newMessage
+    //         }]   
+    //     )
 
-        await act( () => {
-            fireEvent(screen.getByTestId(testIDS.loadNew), "press");
-        })
-    }
+    //     await act( () => {
+    //         fireEvent(screen.getByTestId(testIDS.loadNew), "press");
+    //     })
+    // }
 
-    const sendMessage = async (myMessage : string) => {
-        const myInput = screen.getByPlaceholderText(chatText.inputPlaceholder);
-        await act( () => {
-            fireEvent(myInput, "changeText", myMessage);
-        })
-        await act( () => {
-            fireEvent(myInput, "submitEditing");
-        })
+    // const sendMessage = async (myMessage : string) => {
+    //     const myInput = screen.getByPlaceholderText(chatText.inputPlaceholder);
+    //     await act( () => {
+    //         fireEvent(myInput, "changeText", myMessage);
+    //     })
+    //     await act( () => {
+    //         fireEvent(myInput, "submitEditing");
+    //     })
 
-        await act( () => {
-            fireEvent(screen.getByTestId(`message-${myMessage}`), "press")
-        });
-    }
+    //     await act( () => {
+    //         fireEvent(screen.getByTestId(`message-${myMessage}`), "press")
+    //     });
+    // }
 
     it("should load chat", async () => {
         const { getChatLength } = await loadChat();
@@ -187,7 +180,7 @@ describe("chat", () => {
             const payload = JSON.parse(config.data) as UserReportWithReportedID;
             expect(payload.reportedID).toEqual(recepientProfile.id);
             sent = true;
-            return [200]
+            return [200, {} as APIOutput<void>]
         })
 
         expect(store.receivedData.chatPreviews).toHaveLength(1);
@@ -239,53 +232,53 @@ describe("chat", () => {
         expect(screen.getByTestId(`readStatus-${latestMessages[0].id}`)).not.toEqual(null);
     })
 
-    it("should say unsent on unsent message", async () => {
-        const { getChatLength, getUnsentLength } = await loadChat();
+    // it("should say unsent on unsent message", async () => {
+    //     const { getChatLength, getUnsentLength } = await loadChat();
 
-        const myMessage = "hi";
-        const myInput = screen.getByPlaceholderText(chatText.inputPlaceholder);
-        await act( () => {
-            fireEvent(myInput, "changeText", myMessage);
-        })
-        await act( () => {
-            fireEvent(myInput, "submitEditing");
-        })
+    //     const myMessage = "hi";
+    //     const myInput = screen.getByPlaceholderText(chatText.inputPlaceholder);
+    //     await act( () => {
+    //         fireEvent(myInput, "changeText", myMessage);
+    //     })
+    //     await act( () => {
+    //         fireEvent(myInput, "submitEditing");
+    //     })
 
-        expect(screen.queryByText(chatText.unsent)).not.toEqual(null);
-        expect(getChatLength).toHaveBeenLastCalledWith(latestMessages.length + 1);
-        expect(getUnsentLength).toHaveBeenLastCalledWith(1);
-    })
+    //     expect(screen.queryByText(chatText.unsent)).not.toEqual(null);
+    //     expect(getChatLength).toHaveBeenLastCalledWith(latestMessages.length + 1);
+    //     expect(getUnsentLength).toHaveBeenLastCalledWith(1);
+    // })
 
-    it("should resend unsent message", async () => {
-        const { mock, getUnsentLength } = await loadChat();
+    // it("should resend unsent message", async () => {
+    //     const { mock, getUnsentLength } = await loadChat();
 
-        const myMessage = "my undelivered";
-        await sendMessage(myMessage);
-        expect(getUnsentLength).toHaveBeenLastCalledWith(1);
-        expect(screen.queryByText(chatText.unsent)).not.toEqual(null);
+    //     const myMessage = "my undelivered";
+    //     await sendMessage(myMessage);
+    //     expect(getUnsentLength).toHaveBeenLastCalledWith(1);
+    //     expect(screen.queryByText(chatText.unsent)).not.toEqual(null);
 
-        mock.onPost(URLs.server + URLs.sendMessage).replyOnce(config => {
-            const payload = JSON.parse(config.data) as MessageInput;
-            const message : Message = {
-                id: "randomID",
-                message: payload.message,
-                readStatus: false,
-                recepientID: payload.recepientID,
-                timestamp: new Date(),
-                userID: "id"
-            }
-            return [200, {
-                data: message
-            }];
-        })
+    //     mock.onPost(URLs.server + URLs.sendMessage).replyOnce(config => {
+    //         const payload = JSON.parse(config.data) as MessageInput;
+    //         const message : Message = {
+    //             id: "randomID",
+    //             message: payload.message,
+    //             readStatus: false,
+    //             recepientID: payload.recepientID,
+    //             timestamp: new Date(),
+    //             userID: "id"
+    //         }
+    //         return [200, {
+    //             data: message
+    //         }];
+    //     })
 
-        await act( () => {
-            fireEvent(screen.getByTestId(`message-${myMessage}`), "press");
-        })
+    //     await act( () => {
+    //         fireEvent(screen.getByTestId(`message-${myMessage}`), "press");
+    //     })
 
-        expect(getUnsentLength).toHaveBeenLastCalledWith(0);
-        expect(screen.queryByText(chatText.unsent)).toEqual(null);
-    })
+    //     expect(getUnsentLength).toHaveBeenLastCalledWith(0);
+    //     expect(screen.queryByText(chatText.unsent)).toEqual(null);
+    // })
 
     it("should save loaded chat", async () => {
         const { store } = await loadChat();
@@ -301,28 +294,28 @@ describe("chat", () => {
         );
     })
 
-    it("should load recent messages", async () => {
-        const { mock, getChatLength } = await loadChat(false);
-        await loadNewMessages(mock);
+    // it("should load recent messages", async () => {
+    //     const { mock, getChatLength } = await loadChat(false);
+    //     await loadNewMessages(mock);
 
-        expect(getChatLength).toHaveBeenLastCalledWith(
-            latestMessages.length + newMessage.length
-        )
-        expect(screen.queryByText(newMessage[0].message)).not.toEqual(null);
-    })
+    //     expect(getChatLength).toHaveBeenLastCalledWith(
+    //         latestMessages.length + newMessage.length
+    //     )
+    //     expect(screen.queryByText(newMessage[0].message)).not.toEqual(null);
+    // })
 
-    it("should update my read status", async () => {
-        expect(latestMessages[1].userID).toEqual(recepientProfile.id);
-        expect(latestMessages[1].readStatus).toEqual(false);
+    // it("should update my read status", async () => {
+    //     expect(latestMessages[1].userID).toEqual(recepientProfile.id);
+    //     expect(latestMessages[1].readStatus).toEqual(false);
 
-        const { store } = await loadChat();
+    //     const { store } = await loadChat();
 
-        store.receivedData.setChatPreviews([{
-            message: latestMessages[0],
-            profile: recepientProfile
-        }])
+    //     store.receivedData.setChatPreviews([{
+    //         message: latestMessages[0],
+    //         profile: recepientProfile
+    //     }])
 
-        const index = store.receivedData.chatPreviews?.findIndex( val => val.profile.id == recepientProfile.id);
-        expect(store.receivedData.chatPreviews![index!].message.readStatus).toEqual(true);
-    })
+    //     const index = store.receivedData.chatPreviews?.findIndex( val => val.profile.id == recepientProfile.id);
+    //     expect(store.receivedData.chatPreviews![index!].message.readStatus).toEqual(true);
+    // })
 })

@@ -73,7 +73,7 @@ export function setCustomTimer(callback : () => any, seconds : number) : NodeJS.
     return newTimer;
 }
 
-export async function sendRequest(subURL : string, data : any) : Promise<APIOutput<any>> {
+export async function sendRequest<T>(subURL : string, data : any) : Promise<APIOutput<T>> {
     const print = false;
 
     try {
@@ -81,7 +81,7 @@ export async function sendRequest(subURL : string, data : any) : Promise<APIOutp
         const response = await axios.post(URLs.server + subURL, data, {
             signal: createTimeoutSignal(),
         })
-        const responseData = response.data as APIOutput<any>;
+        const responseData = response.data as APIOutput<T>;
         if (print) console.log("response from", subURL, responseData);
         return responseData
     } catch (err) {
