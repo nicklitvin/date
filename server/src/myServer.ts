@@ -7,7 +7,7 @@ import { sampleContent } from "./globals";
 import { attributeList } from "./others";
 import fs from "fs/promises";
 import { sampleUsers } from "./sample";
-import { SocketServer } from "./socketServer";
+import expressWs from "express-ws";
 
 export class MyServer {
     public readonly port = 3000;
@@ -17,14 +17,13 @@ export class MyServer {
     private server;
 
     constructor({disableEmail = false}) {
-        this.app = express();
+        this.app = expressWs(express()).app;
         this.app.use(bodyParser.json());
 
         this.handler = new Handler({
             prisma: new PrismaClient(),
             disableEmail: disableEmail
         });
-        new SocketServer(this.app, this.handler);
         new APIHandler(this.app, this.handler);
         this.server = this.app.listen(this.port);
     }

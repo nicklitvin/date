@@ -974,7 +974,7 @@ describe("handler", () => {
         const email = "a";
         const create = await handler.login.createUser({email});
         const output = await handler.autoLogin(create.key);
-        expect(output.data).toEqual(create.key);
+        expect(output.data?.key).toEqual(create.key);
     })
 
     it("should not auto login with expired key", async () => {
@@ -1010,6 +1010,18 @@ describe("handler", () => {
         const output = await handler.loginWithToken({}, email);
         expect(output?.data?.newAccount).toEqual(true);
         expect(output?.data?.verified).toEqual(false);
+    })
+
+    it("should give onetimekey for socket on login and autologin", async () => {
+        const email = "a";
+        const output = await handler.loginWithToken({}, email);
+        
+        const user = await handler.login.getUserByEmail(email);
+        expect(user?.userID).not.toEqual(null);
+        expect(handler.socket.getUserIDFromKey(output.data?.socketToken!)).toEqual(user?.userID);
+
+        const autoOutput = await handler.autoLogin(output.data?.key!);
+        expect(handler.socket.getUserIDFromKey(autoOutput.data?.socketToken!)).toEqual(user?.userID);
     })
 
     it("should not give stats if not subscribed", async () => {

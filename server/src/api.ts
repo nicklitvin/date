@@ -1,13 +1,60 @@
 import express from "express";
 import { URLs } from "./urls";
-import { APIOutput, APIRequest, ClientIDs, ConfirmVerificationInput, DeleteImageInput, EditUserInput, GetChatInput, LoginInput, MessageInput, GetMatchesInput, NewVerificationInput, UserReportWithReportedID, SubscribeInput, SwipeInput, UnlikeInput, UpdatePushTokenInput, UploadImageInput, UserInputWithFiles, JustEmail, ReadStatusInput, GetReadStatusInput, JustUserID, UserInput, HandlerUserInput } from "./interfaces";
+import { APIOutput, APIRequest, ClientIDs, ConfirmVerificationInput, DeleteImageInput, EditUserInput, GetChatInput, LoginInput, MessageInput, GetMatchesInput, NewVerificationInput, UserReportWithReportedID, SubscribeInput, SwipeInput, UnlikeInput, UpdatePushTokenInput, UploadImageInput, UserInputWithFiles, JustEmail, ReadStatusInput, GetReadStatusInput, JustUserID, UserInput, HandlerUserInput, SocketPayloadToClient, SocketPayloadToServer } from "./interfaces";
 import { isAdmin } from "./others";
 import { Handler } from "./handler";
+import expressWs from "express-ws";
+import { WebSocket } from "ws";
 
 export class APIHandler {
-    constructor(app : express.Application, handler : Handler) {
+    constructor(app : expressWs.Application, handler : Handler) {
 
         app.get("/", (req,res) => res.json({message: "hi"} as APIOutput<void>));
+
+        app.ws("/ws", (ws : WebSocket, req) => {
+            try {
+                if (!req.url) return ws.close(401);
+
+                const url = new URL(req.url);
+                const token = url.searchParams.get("token");
+
+                if (!token) return ws.close(401);
+                const userID = handler.socket.getUserIDFromKey(token);
+
+                if (!userID) return ws.close(401);
+
+                if (userID) {
+                    handler.socket.addSocket({
+                        socket: ws,
+                        userID: userID
+                    })
+                }
+            } catch (err) {
+                return ws.close(500);
+            }
+
+            ws.on("message", async (stream : string) => {
+                const returnPayload : SocketPayloadToClient = {
+                    inputProcessed: false
+                };
+
+                try {   
+                    const data : SocketPayloadToServer = JSON.parse(stream);
+                    if (data.message) {
+                        const output = await handler.sendMessage(data.message);
+                        returnPayload.inputProcessed = output.data != null;
+                    } else if (data.readUpdate) {
+                        const output = await handler.updateReadStatus(data.readUpdate);
+                        returnPayload.inputProcessed == output.data != null;
+                    }
+                } catch (err) {
+                    console.log(err);
+                    return
+                } 
+
+                ws.send(JSON.stringify(returnPayload));
+            })
+        })
 
         // app.post(URLs.createUser, async (req, res) => {
         //     try {

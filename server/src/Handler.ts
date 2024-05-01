@@ -86,7 +86,8 @@ export class Handler {
             this.freeTrial.deleteAllFreeTrialUsedUsers(),
             this.verification.deleteAllVerifications(),
             this.login.deleteAllLogin(),
-            this.mail.clearVerificationCount()
+            this.mail.clearVerificationCount(),
+            this.socket.clearData()
         ])
     }
 
@@ -600,7 +601,8 @@ export class Handler {
                     data: {
                         key: userLogin.key,
                         newAccount: await this.user.getUserByEmail(email) == null,
-                        verified: verification?.verified ?? false
+                        verified: verification?.verified ?? false,
+                        socketToken: this.socket.generateOneTimeKey(userLogin.userID)
                     }
                 }
         } else {
@@ -613,13 +615,14 @@ export class Handler {
                 data: {
                     key: userLogin.key,
                     newAccount: true,
-                    verified: false
+                    verified: false,
+                    socketToken: this.socket.generateOneTimeKey(userLogin.userID)
                 }
             };
         }
     }
 
-    public async autoLogin(key : string) : Promise<APIOutput<string>> {
+    public async autoLogin(key : string) : Promise<APIOutput<LoginOutput>> {
         const userLogin = await this.login.getUserByKey(key);
 
         const verification = await this.verification.getVerificationByPersonalEmail(userLogin?.email!);
@@ -630,7 +633,10 @@ export class Handler {
         
         await this.login.updateExpiration(userLogin.email);
         return {
-            data: key
+            data: {
+                key: key,
+                socketToken: this.socket.generateOneTimeKey(userLogin.userID)
+            }
         };
     }
 

@@ -1,7 +1,15 @@
 TODO
+connect to websocket on user end
+test responses and app reactions
 notification receive, delete receiveDate when new
 toast error messages, install npx expo install react-native-reanimated react-native-safe-area-context react-native-gesture-handler
 isntall rsg paths for graph
+
+allow other users
+    verification as option
+    preference 
+    choose location
+
 
 Optional TODO
 announcement/errorlog implement

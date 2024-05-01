@@ -2,6 +2,7 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { RootStore, createStoreProvider} from '../src/store/RootStore';
 import { StyledView } from '../src/styledElements';
 import { Stack } from "expo-router";
+import { useEffect } from "react";
 
 export default function App() {
     const rootStore = new RootStore();
