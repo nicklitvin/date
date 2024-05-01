@@ -29,9 +29,9 @@ export class MyServer {
     }
 
     public async setupEnvironment({
-        loginUser = false,
-        verifyUser = false,
-        createUser = false,
+        loginUser = true,
+        verifyUser = true,
+        createUser = true,
         createSampleUsers = false,
         clearTables = false
     }) {

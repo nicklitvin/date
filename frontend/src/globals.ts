@@ -26,7 +26,6 @@ export const globals = {
     fadeDuration: 500,
     frequencies: ["Never", "Sometimes", "Often"],
     storageloginKey: "LoginKey",
-    chatRefreshSeconds: 30,
     urlTerms: "https://youtube.com",
 
     green: "#4A991A",

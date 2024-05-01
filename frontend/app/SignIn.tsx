@@ -6,12 +6,13 @@ import {signInText } from "../src/text";
 import { StyledButton, StyledImage, StyledText, StyledView } from "../src/styledElements";
 import { useStore } from "../src/store/RootStore";
 import * as Apple from "expo-apple-authentication";
-import { LoginInput, LoginOutput, WithKey } from "../src/interfaces";
+import { APIOutput, LoginInput, LoginOutput, WithKey } from "../src/interfaces";
 import { sendRequest } from "../src/utils";
 import { URLs } from "../src/urls";
 import { router } from "expo-router";
 import { Spacing } from "../src/components/Spacing";
 import { globals } from "../src/globals";
+import { SocketUser } from "../src/components/SocketManager";
 
 export function SignIn() {
     const { globalState, receivedData } = useStore();
@@ -45,6 +46,7 @@ export function SignIn() {
 
     const processLoginOutput = async (output : LoginOutput) => {
         receivedData.setLoginKey(output.key);
+        globalState.setSocketUser( new SocketUser(output.socketToken!, receivedData));
         setLoginOutput(output);
     }
 
@@ -60,7 +62,8 @@ export function SignIn() {
             }
             try {
                 const response = await sendRequest(URLs.login, input);
-                await processLoginOutput(response.data.data as LoginOutput);
+                const output = response.data.data as APIOutput<LoginOutput>;
+                if (output.data) await processLoginOutput(output.data);
             } catch (err) { 
                 console.log(err);
             }

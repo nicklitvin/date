@@ -42,27 +42,6 @@ export function Chat(props : Props) {
     const [loadingIDs, setLoadingIDs] = useState<string[]>([]);
     const [showModal, setShowModal] = useState<boolean>(false);
     const [firstLoad, setFirstLoad] = useState<boolean>(true);
-    const [seconds, setSeconds] = useState<number>(globals.chatRefreshSeconds);
-    const [timer, setTimer] = useState<NodeJS.Timeout|undefined>(undefined);
-
-    useEffect( () => {
-        if (props.returnSeconds) props.returnSeconds(seconds);
-        if (seconds == Math.floor(globals.chatRefreshSeconds / 2)) {
-            updateMyReadStatus();
-            updateRecepientReadStatus();
-        }
-
-        if (seconds == 0) {
-            loadNewMessages()
-            setSeconds(globals.chatRefreshSeconds);
-            return;
-        } else {
-            if (timer) clearTimeout(timer);
-            const newTimer = setCustomTimer( () => setSeconds(seconds - 1), 1)
-            setTimer(newTimer);
-            return
-        }
-    }, [seconds])
 
     useEffect( () => {
         if (props.getChatLength) props.getChatLength(chat.length);
@@ -305,7 +284,6 @@ export function Chat(props : Props) {
                 reportedID: profile!.id
             }
             await sendRequest(URLs.reportUser, myReport);
-            if (timer) clearTimeout(timer);
             deleteUser();
             if (props.noAutoLoad) return
             if (props.noRouter) router.push("Matches");
@@ -323,7 +301,6 @@ export function Chat(props : Props) {
                 withID: profile!.id
             }
             await sendRequest(URLs.unlikeUser, unlike);
-            if (timer) clearTimeout(timer);
 
             deleteUser();
             if (props.noAutoLoad) return

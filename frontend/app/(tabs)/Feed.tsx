@@ -43,7 +43,7 @@ export function Feed(props : Props) {
     }, [savedFeed])
 
     useEffect( () => {
-        if (savedSwipeStatus) {
+        if (savedFeed && savedSwipeStatus) {
             if (savedFeed && savedSwipeStatus.feedIndex == savedFeed.profiles.length && savedSwipeStatus.feedIndex > 0) {
                 loadMoreFeed();
             }
