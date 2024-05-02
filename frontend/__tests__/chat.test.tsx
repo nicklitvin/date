@@ -55,16 +55,14 @@ describe("chat page", () => {
         } 
     ]
 
-    const newMessage : Message[] = [
-        {
-            id: "id3",
-            message: "very new message",
-            readStatus: true,
-            recepientID: myUserID,
-            timestamp: new Date(Date.UTC(2000, 0, 1, 10, 0)),
-            userID: recepientProfile.id
-        }
-    ]
+    const newMessage : Message = {
+        id: "id3",
+        message: "very new message",
+        readStatus: true,
+        recepientID: myUserID,
+        timestamp: new Date(Date.UTC(2000, 0, 1, 10, 0)),
+        userID: recepientProfile.id
+    }
 
     const loadChat = async (useSave = false) => {
         const mock = new MockAdapter(axios);
@@ -84,6 +82,13 @@ describe("chat page", () => {
             testMode: true
         }))
         store.receivedData.setProfile(makePublicProfile());
+        store.receivedData.setChatPreviews([
+            {
+                message: latestMessages[0],
+                profile: recepientProfile
+            }
+        ])
+        store.receivedData.setNewMatches([]);
 
         if (useSave) {
             store.receivedData.addSavedChat(
@@ -135,9 +140,6 @@ describe("chat page", () => {
         await act( () => {
             fireEvent(myInput, "submitEditing");
         })
-        // await act( () => {
-        //     fireEvent(screen.getByTestId(`message-${myMessage}`), "press")
-        // });
     }
 
     it("should send message", async () => {
@@ -171,9 +173,27 @@ describe("chat page", () => {
         expect(screen.queryByText(chatText.delivered)).not.toEqual(null);
     })
 
-    // it("should receive new message", async () => {
+    it("should receive new message", async () => {
+        const { store } = await loadChat();
 
-    // })
+        await act( () => {
+            store.globalState.socketManager!.updateChatWithMessage(newMessage);
+        })
+
+        expect(store.receivedData.savedChats[recepientProfile.id]).toHaveLength(
+            latestMessages.length + 1
+        )
+        const preview = store.receivedData.chatPreviews!.find( val => val.profile.id == recepientProfile.id);
+        expect(preview?.message.id).toEqual(newMessage.id);
+    })
+
+    it("should resend message", async () => {
+
+    })
+
+    it("should not resend sent message", async () => {
+
+    })
 
     it("should load chat", async () => {
         await loadChat();
