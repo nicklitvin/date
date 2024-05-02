@@ -45,7 +45,8 @@ export function Feed(props : Props) {
     useEffect( () => {
         if (savedFeed && savedSwipeStatus) {
             if (savedFeed && savedSwipeStatus.feedIndex == savedFeed.profiles.length && savedSwipeStatus.feedIndex > 0) {
-                loadMoreFeed();
+                getFeed()
+                // loadMoreFeed();
             }
             scrollToTop();
         }
@@ -61,9 +62,13 @@ export function Feed(props : Props) {
                 key: receivedData.loginKey,
                 userID: receivedData.profile?.id!
             }
-            const response = await sendRequest(URLs.getFeed, input);
-            globalState.resetSwipeStatus();
-            receivedData.setSwipeFeed(response.data.data);
+            const response = await sendRequest<SwipeFeed>(URLs.getFeed, input);
+            if (response.message) {
+                // toast message
+            } else if (response.data) {
+                globalState.resetSwipeStatus();
+                receivedData.setSwipeFeed(response.data);
+            }
         } catch (err) {
             console.log(err);
         }
@@ -75,19 +80,19 @@ export function Feed(props : Props) {
         }
     };
 
-    const loadMoreFeed = async () => {
-        try {
-            const input : WithKey<JustUserID> = {
-                userID: receivedData.profile?.id!,
-                key: receivedData.loginKey
-            }
-            const response = await sendRequest(URLs.getFeed, input);
-            globalState.resetSwipeStatus();
-            receivedData.setSwipeFeed(response.data.data);
-        } catch (err) {
-            // console.log(err);
-        }
-    }
+    // const loadMoreFeed = async () => {
+    //     try {
+    //         const input : WithKey<JustUserID> = {
+    //             userID: receivedData.profile?.id!,
+    //             key: receivedData.loginKey
+    //         }
+    //         const response = await sendRequest(URLs.getFeed, input);
+    //         globalState.resetSwipeStatus();
+    //         receivedData.setSwipeFeed(response.data.data);
+    //     } catch (err) {
+    //         // console.log(err);
+    //     }
+    // }
 
     const afterSwipe = () => {
         const feedI = savedSwipeStatus!.feedIndex;
@@ -126,7 +131,8 @@ export function Feed(props : Props) {
     const refresh = () => {
         const func = async () => {
             receivedData.setSwipeFeed(null);
-            await loadMoreFeed();
+            await getFeed()
+            // await loadMoreFeed();
             setRefreshing(false);
         }
         func();

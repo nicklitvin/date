@@ -8,7 +8,7 @@ import { PublicProfile, SubscriptionData } from "../src/interfaces";
 import { RootStore, createStoreProvider } from "../src/store/RootStore";
 import { testIDS } from "../src/testIDs";
 
-describe("profile", () => {
+describe("profile page", () => {
     const profile : PublicProfile = {
         id: "a",
         age: 20,

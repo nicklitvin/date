@@ -24,8 +24,6 @@ export function Profile(props : Props) {
     const savedSubscription = receivedData.subscription;
     const [firstLoad, setFirstLoad] = useState<boolean>(true);
 
-    console.log(savedProfile);
-
     useEffect( () => {
         if (firstLoad) {
             setFirstLoad(false);
@@ -42,13 +40,13 @@ export function Profile(props : Props) {
             }
 
             if (!savedProfile) {
-                const profileResponse = await sendRequest(URLs.getMyProfile, input);
-                receivedData.setProfile(profileResponse.data.data);
+                const profileResponse = await sendRequest<PublicProfile>(URLs.getMyProfile, input);
+                if (profileResponse.data) receivedData.setProfile(profileResponse.data);
             }
 
             if (!savedSubscription) {
-                const subscriptionResponse = await sendRequest(URLs.getSubscription, input);
-                receivedData.setSubscription(subscriptionResponse.data.data);
+                const subscriptionResponse = await sendRequest<SubscriptionData>(URLs.getSubscription, input);
+                if (subscriptionResponse.data) receivedData.setSubscription(subscriptionResponse.data);
             }
         } catch (err) {
             console.log(err);
@@ -61,13 +59,16 @@ export function Profile(props : Props) {
                 userID: receivedData.profile?.id!,
                 key: receivedData.loginKey
             }
-            const response = await sendRequest(URLs.manageSubscription, input);
-            const url = response.data.data;
-            if (props.openLinkFunc) {
-                props.openLinkFunc(url)
-            } else {
-                await Linking.openURL(url);
+            const response = await sendRequest<string>(URLs.manageSubscription, input);
+
+            if (response.data) {
+                if (props.openLinkFunc) {
+                    props.openLinkFunc(response.data)
+                } else {
+                    await Linking.openURL(response.data);
+                }
             }
+            
         } catch (err) {
             console.log(err);
         }
@@ -92,13 +93,15 @@ export function Profile(props : Props) {
                 userID: receivedData.profile?.id!,
                 key: receivedData.loginKey
             }
-            const response = await sendRequest(URLs.getCheckoutPage,input);
-            const url = response.data.data;
-            if (props.openLinkFunc) {
-                props.openLinkFunc(url);
-            } else {
-                await Linking.openURL(url);
+            const response = await sendRequest<string>(URLs.getCheckoutPage,input);
+            if (response.data) {
+                if (props.openLinkFunc) {
+                    props.openLinkFunc(response.data);
+                } else {
+                    await Linking.openURL(response.data);
+                }
             }
+            
         } catch (err) {
             console.log(err)
         }

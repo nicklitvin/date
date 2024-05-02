@@ -89,8 +89,12 @@ export function Settings(props : Props) {
                 userID: receivedData.profile?.id!,
                 key: receivedData.loginKey
             }
-            const response = await sendRequest<any>(URLs.getSettings, input);
-            setSettings(response.data.data);
+            const response = await sendRequest<SettingData[]>(URLs.getSettings, input);
+            if (response.message) {
+                // toast message
+            } else if (response.data) {
+                setSettings(response.data);
+            }
         } catch (err) {
             console.log(err);
         }
@@ -117,7 +121,10 @@ export function Settings(props : Props) {
             const index = copy.findIndex(val => val.title == title);
             copy[index] = { title: title, value: value, display: copy[index].display };
             setSettings(copy);
-            await sendRequest(URLs.editUser, input);
+            const response = await sendRequest<void>(URLs.editUser, input);
+            if (response.message) {
+                // toast message
+            }
         } catch (err) {
             console.log(err);
             const copy = [...settings];
@@ -140,8 +147,12 @@ export function Settings(props : Props) {
                 userID: receivedData.profile?.id!,
                 key: receivedData.loginKey
             }
-            await sendRequest(URLs.deleteAccount, input);
-            signOut();
+            const response = await sendRequest(URLs.deleteAccount, input);
+            if (response.message) {
+                // toast message
+            } else {
+                signOut();
+            }
         } catch (err) {}
     }
 
