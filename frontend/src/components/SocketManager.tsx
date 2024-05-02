@@ -7,7 +7,7 @@ export class SocketManager {
     private ws : WebSocket|undefined;
     private received : ReceivedData;
 
-    private approvedMessages : Map<string, Message>;
+    public approvedMessages : Map<string, Message>;
 
     constructor(input : {
         socketToken?: string, 
@@ -26,7 +26,7 @@ export class SocketManager {
                     const data = JSON.parse(e.data) as SocketPayloadToClient;
                     if (data.payloadProcessedID) {
                         if (data.message) {
-                            this.approvedMessages.set(data.payloadProcessedID, data.message)
+                            this.approveMessage(data.payloadProcessedID, data.message);
                         }  
                     } else if (data.match) {
                         this.updateWithMatch(data.match);
@@ -52,6 +52,10 @@ export class SocketManager {
         } catch (err) {
 
         }
+    }
+
+    approveMessage(payloadID : string, message : Message) {
+        this.approvedMessages.set(payloadID, message);
     }
 
     updateChatWithMessage(message : Message) {

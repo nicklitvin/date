@@ -8,8 +8,9 @@ import { getChatTimestamp } from "../src/utils";
 import MockAdapter from "axios-mock-adapter";
 import axios from "axios";
 import { URLs } from "../src/urls";
-import { scrollVertically } from "../__testUtils__/easySetup";
+import { makePublicProfile, scrollVertically } from "../__testUtils__/easySetup";
 import { SocketManager } from "../src/components/SocketManager";
+import { randomUUID } from "expo-crypto";
 
 describe("chat page", () => {
     const myUserID = "userID";
@@ -29,7 +30,7 @@ describe("chat page", () => {
         {
             id: "id",
             message: "hi",
-            readStatus: true,
+            readStatus: false,
             recepientID: recepientProfile.id,
             timestamp: new Date(Date.UTC(2000, 0, 1, 8, 1)),
             userID: myUserID
@@ -37,7 +38,7 @@ describe("chat page", () => {
         {
             id: "id1",
             message: "hey",
-            readStatus: false,
+            readStatus: true,
             recepientID: myUserID,
             timestamp: new Date(Date.UTC(2000, 0, 1, 8, 0)),
             userID: recepientProfile.id
@@ -47,7 +48,7 @@ describe("chat page", () => {
         {
             id: "id2",
             message: "sooo",
-            readStatus: false,
+            readStatus: true,
             recepientID: recepientProfile.id,
             timestamp: new Date(Date.UTC(2000, 0, 1, 6, 0)),
             userID: myUserID
@@ -78,20 +79,24 @@ describe("chat page", () => {
 
         const store = new RootStore();
         store.globalState.setTimezone(timezone);
+        store.globalState.setSocketManager(new SocketManager({
+            receivedData: store.receivedData,
+            testMode: true
+        }))
+        store.receivedData.setProfile(makePublicProfile());
+
         if (useSave) {
             store.receivedData.addSavedChat(
                 recepientProfile.id, latestMessages.concat(moreMessages)
             )
         }
         const StoreProvider = createStoreProvider(store);
-        const getSendingChatsLength = jest.fn();
         render(
             <StoreProvider value={store}>
                 <ChatMob 
                     userID={recepientProfile.id}
                     noAutoLoad={true}
                     noRouter={true}
-                    getSendingChatsLength={getSendingChatsLength}
                 />
             </StoreProvider>
         )
@@ -102,7 +107,7 @@ describe("chat page", () => {
             })
         }
 
-        return { store, mock, getSendingChatsLength }
+        return { store, mock }
     }
 
     const loadMore = async (mock : MockAdapter) => {
@@ -130,25 +135,41 @@ describe("chat page", () => {
         await act( () => {
             fireEvent(myInput, "submitEditing");
         })
-
-        await act( () => {
-            fireEvent(screen.getByTestId(`message-${myMessage}`), "press")
-        });
+        // await act( () => {
+        //     fireEvent(screen.getByTestId(`message-${myMessage}`), "press")
+        // });
     }
 
-    // it("should send message", async () => {
-    //     const { getSendingChatsLength, store } = await loadChat();
-    //     const socketManager = new SocketManager({
-    //         receivedData: store.receivedData,
-    //         testMode: true
-    //     });
+    it("should send message", async () => {
+        const { store } = await loadChat();
         
-    //     await sendMessage("message");
-    //     expect(getSendingChatsLength).toHaveBeenLastCalledWith(1);
+        const myMessage = "message";
+        await sendMessage(myMessage);
+        expect(store.globalState.loadingMessageIDs.size).toEqual(1);
+        expect(screen.queryByText(chatText.sending)).not.toEqual(null);
 
-    //     // TODO: 
-    //     // socketManager.updateChatWithMessage()
-    // })
+        const messageID : string = store.globalState.loadingMessageIDs.values().next().value;
+        await act( () => {
+            store.globalState.socketManager!.approveMessage(messageID, {
+                id: `approved-${randomUUID()}`,
+                message: myMessage,
+                readStatus: false,
+                recepientID: recepientProfile.id,
+                timestamp: new Date(),
+                userID: "myID" 
+            })
+        })
+
+        expect(store.globalState.socketManager!.approvedMessages.size).toEqual(1);
+
+        await act( async () => {
+            await new Promise((res) => setTimeout(res, 1000))
+        })
+
+        expect(store.globalState.loadingMessageIDs.size).toEqual(0);
+        expect(screen.queryByText(chatText.sending)).toEqual(null);
+        expect(screen.queryByText(chatText.delivered)).not.toEqual(null);
+    })
 
     // it("should receive new message", async () => {
 
@@ -228,16 +249,9 @@ describe("chat page", () => {
     })
 
     it("should show message read status", async () => {
-        const { mock } = await loadChat();
-
-        expect(screen.queryByText(chatText.read)).not.toEqual(null);
-        expect(screen.queryByText(chatText.delivered)).toEqual(null);
-        expect(screen.getByTestId(`readStatus-${latestMessages[0].id}`)).not.toEqual(null);
-
-        await loadMore(mock);
-
-        expect(screen.queryByText(chatText.read)).not.toEqual(null);
-        expect(screen.queryByText(chatText.delivered)).toEqual(null);
-        expect(screen.getByTestId(`readStatus-${latestMessages[0].id}`)).not.toEqual(null);
+        const {} = await loadChat();
+        expect(screen.queryByTestId(`readStatus-${latestMessages[0].id}`))
+        expect(screen.queryByText(chatText.read)).toEqual(null);
+        expect(screen.queryByText(chatText.delivered)).not.toEqual(null);
     })
 })

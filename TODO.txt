@@ -1,7 +1,5 @@
 TODO
-chat messaging fix, unsent, loading
-
-test responses and app reactions
+receiving messages
 notification receive, delete receiveDate when new
 toast error messages, install npx expo install react-native-reanimated react-native-safe-area-context react-native-gesture-handler
 isntall rsg paths for graph

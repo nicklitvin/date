@@ -9,14 +9,36 @@ export class GlobalState {
     @observable public disableFade : boolean = false;
     @observable public expoPushToken : string|null = null;
     @observable public swipeStatus : SwipeStatus|null = null;
-    @observable public socketUser : SocketManager|null = null;
+    @observable public socketManager : SocketManager|null = null;
+    @observable public unsentMessageIDs : Set<string> = new Set();
+    @observable public loadingMessageIDs : Set<string> = new Set();
 
     constructor() {
         makeAutoObservable(this);
     }
 
     @action
-    setSocketManager(input : SocketManager|null) { this.socketUser = input; }
+    addUnsentMessageID(input : string) { this.unsentMessageIDs = new Set([...this.unsentMessageIDs, input]); }
+
+    @action
+    removeUnsentMessageID(input : string) {
+        const copy = new Set([...this.loadingMessageIDs]);
+        copy.delete(input);
+        this.unsentMessageIDs = copy;
+    }
+
+    @action
+    addLoadingMessageID(input : string) { this.loadingMessageIDs = new Set([...this.loadingMessageIDs, input])}
+
+    @action
+    removeLoadingMessageID(input : string) { 
+        const copy = new Set([...this.loadingMessageIDs]);
+        copy.delete(input);
+        this.loadingMessageIDs = copy;
+    }
+
+    @action
+    setSocketManager(input : SocketManager|null) { this.socketManager = input; }
 
     @action
     setSwipeStatus(input : SwipeStatus) { this.swipeStatus = input; }

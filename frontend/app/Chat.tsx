@@ -22,7 +22,6 @@ interface Props {
     userID?: string
     noAutoLoad?: boolean
     noRouter?: boolean
-    getSendingChatsLength?: (value : number) => any
 }
 
 export function Chat(props : Props) {
@@ -31,34 +30,30 @@ export function Chat(props : Props) {
 
     const { globalState, receivedData } = useStore();
     const chat = receivedData.savedChats[userID];
+    const unsentMessageIDs = globalState.unsentMessageIDs;
+    const loadingMessageIDs = globalState.loadingMessageIDs;
+
     const [profile, setProfile] = useState<PublicProfile|undefined>( 
         receivedData.newMatches?.find(val => val.profile.id == userID)?.profile ||
         receivedData.chatPreviews?.find(val => val.profile.id == userID)?.profile   
     )
 
-    const [lastSentChatID, setLastSentChatID] = useState<string>("");
+    const [lastSentChatID, setLastSentChatID] = useState<string|undefined>();
     const scrollRef = useRef<ScrollView>(null);
     const [chatRequestTime, setChatRequestTime] = useState<Date>(new Date(0));
-    const [unsentChats, setUnsentChats] = useState<string[]>([]);
-    const [loadingIDs, setLoadingIDs] = useState<string[]>([]);
     const [showModal, setShowModal] = useState<boolean>(false);
     const [firstLoad, setFirstLoad] = useState<boolean>(true);
 
     useEffect( () => {
         if (!chat) return
+
         for (const message of chat) {
-            if (!unsentChats.includes(message.id) && message.recepientID == profile?.id ) {
+            if (!unsentMessageIDs.has(message.id) && message.recepientID == userID) {
                 setLastSentChatID(message.id);
                 break;
             } 
         }
     }, [chat])
-
-    useEffect( () => {
-        if (props.getSendingChatsLength) {
-            props.getSendingChatsLength(loadingIDs.length)
-        }
-    }, [loadingIDs])
 
     useEffect( () => {
         if (firstLoad) {
@@ -73,9 +68,9 @@ export function Chat(props : Props) {
     }, [firstLoad])
 
     const updateMyReadStatus = async () => {
-        if (!globalState.socketUser || !receivedData.profile) return 
+        if (!globalState.socketManager || !receivedData.profile) return 
 
-        globalState.socketUser.sendData({
+        globalState.socketManager.sendData({
             readUpdate: {
                 userID: receivedData.profile.id,
                 timestamp: new Date(),
@@ -143,7 +138,7 @@ export function Chat(props : Props) {
     }
 
     const sendMessage = async (sentMessage : string, removeID?: string) => {
-        if (!globalState.socketUser || !receivedData.profile || !profile) {
+        if (!globalState.socketManager || !receivedData.profile || !profile) {
             // toast message
             return 
         }
@@ -157,14 +152,16 @@ export function Chat(props : Props) {
             timestamp: new Date(),
             userID: receivedData.profile.id
         }
-        setLoadingIDs(loadingIDs.concat(newMessageID));
-        setUnsentChats(unsentChats.filter( val => val != removeID));
+
+        globalState.addLoadingMessageID(newMessageID);
+        if (removeID) globalState.removeUnsentMessageID(removeID);
+
         receivedData.addSavedChat(
             userID, 
-            [sendingChat].concat(chat.filter(val => val.id != removeID))
+            [sendingChat].concat(receivedData.savedChats[userID])
         );
 
-        globalState.socketUser.sendData({
+        globalState.socketManager.sendData({
             payloadID: newMessageID,
             message: {
                 userID: receivedData.profile.id,
@@ -174,18 +171,18 @@ export function Chat(props : Props) {
         })
 
         setCustomTimer( () => {
-            if (!globalState.socketUser) return 
+            if (!globalState.socketManager) return 
 
-            const message = globalState.socketUser.wasMessageProcessed(newMessageID);
+            const message = globalState.socketManager.wasMessageProcessed(newMessageID);
             if (message) {
                 const copy = [...chat];
                 const index = chat.findIndex( val => val.id == newMessageID);
                 copy[index] = message;
                 receivedData.addSavedChat(userID, copy);
             } else {
-                setUnsentChats(unsentChats.concat(newMessageID))
+                globalState.addUnsentMessageID(newMessageID);
             }
-            setLoadingIDs(loadingIDs.filter( val => val != newMessageID))
+            globalState.removeLoadingMessageID(newMessageID);
         }, 1)
     }
 
@@ -332,8 +329,8 @@ export function Chat(props : Props) {
                                     <MyMessage
                                         text={message.message}
                                         invert={message.userID == profile?.id}
-                                        error={unsentChats.includes(message.id)}
-                                        onPress={unsentChats.includes(message.id) ? 
+                                        error={unsentMessageIDs.has(message.id)}
+                                        onPress={unsentMessageIDs.has(message.id) ? 
                                             () => sendMessage(message.message, message.id) :
                                             () => {}
                                         }
@@ -346,9 +343,9 @@ export function Chat(props : Props) {
                                             testID={`readStatus-${message.id}`}
                                         >
                                             {
-                                                unsentChats.includes(message.id) ? chatText.unsent :
+                                                unsentMessageIDs.has(message.id) ? chatText.unsent :
                                                 (
-                                                    loadingIDs.includes(message.id) ? chatText.sending : (
+                                                    loadingMessageIDs.has(message.id) ? chatText.sending : (
                                                         message.readStatus ? chatText.read : chatText.delivered
                                                     )
                                                 )
