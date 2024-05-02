@@ -2,34 +2,42 @@ import { Message, NewMatchData, SocketPayloadToClient, SocketPayloadToServer } f
 import { ReceivedData } from "../store/ReceivedData";
 import { URLs } from "../urls";
 
-export class SocketUser {
-    private ws : WebSocket;
+
+export class SocketManager {
+    private ws : WebSocket|undefined;
     private received : ReceivedData;
 
     private approvedMessages : Map<string, Message>;
 
-    constructor(socketToken: string, receivedData : ReceivedData) {
-        const ip = URLs.server.split("http://")[1];
-        this.ws = new WebSocket(`ws://${ip}${URLs.websocket}?token=${socketToken}`);
-        this.received = receivedData;
+    constructor(input : {
+        socketToken?: string, 
+        receivedData : ReceivedData,
+        testMode?: boolean
+    }) {
+        this.received = input.receivedData;
         this.approvedMessages = new Map();
-        
-        this.ws.onmessage = (e : MessageEvent<string>) => {
-            try {
-                const data = JSON.parse(e.data) as SocketPayloadToClient;
-                if (data.payloadProcessedID) {
-                    if (data.message) {
-                        this.approvedMessages.set(data.payloadProcessedID, data.message)
-                    }  
-                } else if (data.match) {
-                    this.updateWithMatch(data.match);
-                } else if (data.message) {
-                    this.updateChatWithMessage(data.message)
-                }
-            } catch (err) {
 
-            }
-        };
+        if (!input.testMode) {
+            const ip = URLs.server.split("http://")[1];
+            this.ws = new WebSocket(`ws://${ip}${URLs.websocket}?token=${input.socketToken}`);
+
+            this.ws.onmessage = (e : MessageEvent<string>) => {
+                try {
+                    const data = JSON.parse(e.data) as SocketPayloadToClient;
+                    if (data.payloadProcessedID) {
+                        if (data.message) {
+                            this.approvedMessages.set(data.payloadProcessedID, data.message)
+                        }  
+                    } else if (data.match) {
+                        this.updateWithMatch(data.match);
+                    } else if (data.message) {
+                        this.updateChatWithMessage(data.message)
+                    }
+                } catch (err) {
+    
+                }
+            };
+        }
     }
 
     close() {
@@ -40,7 +48,7 @@ export class SocketUser {
 
     sendData(data : SocketPayloadToServer) {
         try {
-            this.ws.send(JSON.stringify(data));
+            if (this.ws) this.ws.send(JSON.stringify(data));
         } catch (err) {
 
         }

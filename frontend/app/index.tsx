@@ -15,7 +15,7 @@ import { noWifiText } from "../src/text";
 import { MyButton } from "../src/components/Button";
 import Loading from "./Loading";
 import { APIOutput, LoginOutput } from "../src/interfaces";
-import { SocketUser } from "../src/components/SocketManager";
+import { SocketManager } from "../src/components/SocketManager";
 
 Notifications.setNotificationHandler({
     handleNotification: async () => ({
@@ -214,10 +214,12 @@ export function Index() {
         const [_, clientIDs] = await Promise.all([
             async () => {
                 try {
-                    const response = await sendRequest(URLs.autoLogin, input);
-                    const data : APIOutput<LoginOutput> = response.data.data;
-                    if (data.data?.socketToken) {
-                        globalState.setSocketUser(new SocketUser(data.data.socketToken, receivedData))
+                    const response = await sendRequest<LoginOutput>(URLs.autoLogin, input);
+                    if (response.data?.socketToken) {
+                        globalState.setSocketUser(new SocketManager({
+                            socketToken: response.data.socketToken, 
+                            receivedData
+                        }))
                     }
                 } catch (err) {
                     console.log(err);

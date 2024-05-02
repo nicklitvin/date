@@ -5,16 +5,6 @@ import { useEffect, useState } from "react";
 import { URLs } from "../../src/urls";
 
 export default function TabLayout() {
-    const [firstLoad, setFirstLoad] = useState<boolean>(true);
-    const [socket, setSocket] = useState<WebSocket>();
-    
-    // useEffect( () => {
-    //     if (firstLoad) {
-    //         setFirstLoad(false);
-    //         setSocket(new WebSocket(`${URLs.socketServer}?token=${}`))
-    //     }
-    // }, [firstLoad])
-
     type IconType = "Feed" | "Matches" | "Profile" | "Stats";
     const getIcon = (icon: IconType, focused : boolean) => {
         let image;

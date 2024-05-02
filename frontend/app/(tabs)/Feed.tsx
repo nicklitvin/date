@@ -46,7 +46,6 @@ export function Feed(props : Props) {
         if (savedFeed && savedSwipeStatus) {
             if (savedFeed && savedSwipeStatus.feedIndex == savedFeed.profiles.length && savedSwipeStatus.feedIndex > 0) {
                 getFeed()
-                // loadMoreFeed();
             }
             scrollToTop();
         }
@@ -79,20 +78,6 @@ export function Feed(props : Props) {
             scrollViewRef.current.scrollTo({ y: 0, animated: true });
         }
     };
-
-    // const loadMoreFeed = async () => {
-    //     try {
-    //         const input : WithKey<JustUserID> = {
-    //             userID: receivedData.profile?.id!,
-    //             key: receivedData.loginKey
-    //         }
-    //         const response = await sendRequest(URLs.getFeed, input);
-    //         globalState.resetSwipeStatus();
-    //         receivedData.setSwipeFeed(response.data.data);
-    //     } catch (err) {
-    //         // console.log(err);
-    //     }
-    // }
 
     const afterSwipe = () => {
         const feedI = savedSwipeStatus!.feedIndex;
@@ -132,7 +117,6 @@ export function Feed(props : Props) {
         const func = async () => {
             receivedData.setSwipeFeed(null);
             await getFeed()
-            // await loadMoreFeed();
             setRefreshing(false);
         }
         func();
