@@ -59,7 +59,7 @@ export function Matches(props : Props) {
                     timestamp: new Date(val.timestamp)
                 }))
                 if (loadMoreFromTime && newMatches) {
-                    receivedData.setNewMatches(processed.concat(newMatches))
+                    receivedData.setNewMatches(newMatches.concat(processed))
                 } else {
                     receivedData.setNewMatches(processed); 
                 }
@@ -88,7 +88,7 @@ export function Matches(props : Props) {
                     }
                 }))
                 if (loadFromTime && chatPreviews) {
-                    receivedData.setChatPreviews(processed.concat(chatPreviews))
+                    receivedData.setChatPreviews(chatPreviews.concat(processed))
                 } else {
                     receivedData.setChatPreviews(processed);
                 }

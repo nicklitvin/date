@@ -135,7 +135,7 @@ export function Settings(props : Props) {
     }
 
     const signOut = () => {
-        globalState.setSocketUser(null);
+        globalState.setSocketManager(null);
         receivedData.setProfile(null);
         if (!props.disableToggle)
             setRedirect(true);

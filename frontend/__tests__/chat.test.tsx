@@ -9,6 +9,7 @@ import MockAdapter from "axios-mock-adapter";
 import axios from "axios";
 import { URLs } from "../src/urls";
 import { scrollVertically } from "../__testUtils__/easySetup";
+import { SocketManager } from "../src/components/SocketManager";
 
 describe("chat page", () => {
     const myUserID = "userID";
@@ -83,16 +84,14 @@ describe("chat page", () => {
             )
         }
         const StoreProvider = createStoreProvider(store);
-        const getChatLength = jest.fn();
-        const getUnsentLength = jest.fn();
+        const getSendingChatsLength = jest.fn();
         render(
             <StoreProvider value={store}>
                 <ChatMob 
-                    getChatLength={getChatLength}
                     userID={recepientProfile.id}
                     noAutoLoad={true}
-                    getUnsentLength={getUnsentLength}
                     noRouter={true}
+                    getSendingChatsLength={getSendingChatsLength}
                 />
             </StoreProvider>
         )
@@ -103,7 +102,7 @@ describe("chat page", () => {
             })
         }
 
-        return { store, mock, getChatLength, getUnsentLength }
+        return { store, mock, getSendingChatsLength }
     }
 
     const loadMore = async (mock : MockAdapter) => {
@@ -123,58 +122,68 @@ describe("chat page", () => {
         })
     }
 
-    // const loadNewMessages = async (mock : MockAdapter) => {
-    //     mock.onPost(URLs.server + URLs.getChat).replyOnce( config => 
-    //         [200, {
-    //             data: newMessage
-    //         }]   
-    //     )
+    const sendMessage = async (myMessage : string) => {
+        const myInput = screen.getByPlaceholderText(chatText.inputPlaceholder);
+        await act( () => {
+            fireEvent(myInput, "changeText", myMessage);
+        })
+        await act( () => {
+            fireEvent(myInput, "submitEditing");
+        })
 
-    //     await act( () => {
-    //         fireEvent(screen.getByTestId(testIDS.loadNew), "press");
-    //     })
-    // }
+        await act( () => {
+            fireEvent(screen.getByTestId(`message-${myMessage}`), "press")
+        });
+    }
 
-    // const sendMessage = async (myMessage : string) => {
-    //     const myInput = screen.getByPlaceholderText(chatText.inputPlaceholder);
-    //     await act( () => {
-    //         fireEvent(myInput, "changeText", myMessage);
-    //     })
-    //     await act( () => {
-    //         fireEvent(myInput, "submitEditing");
-    //     })
-
-    //     await act( () => {
-    //         fireEvent(screen.getByTestId(`message-${myMessage}`), "press")
+    // it("should send message", async () => {
+    //     const { getSendingChatsLength, store } = await loadChat();
+    //     const socketManager = new SocketManager({
+    //         receivedData: store.receivedData,
+    //         testMode: true
     //     });
-    // }
+        
+    //     await sendMessage("message");
+    //     expect(getSendingChatsLength).toHaveBeenLastCalledWith(1);
+
+    //     // TODO: 
+    //     // socketManager.updateChatWithMessage()
+    // })
+
+    // it("should receive new message", async () => {
+
+    // })
 
     it("should load chat", async () => {
-        const { getChatLength } = await loadChat();
-
-        expect(screen.queryByText(recepientProfile.name)).not.toEqual(null);
-        expect(getChatLength).toHaveBeenLastCalledWith(latestMessages.length);
+        await loadChat();
+        expect(screen.queryByText(latestMessages[0].message)).not.toEqual(null);
     })
 
     it("should load older messages", async () => {
-        const { mock, getChatLength } = await loadChat();
-        expect(getChatLength).toHaveBeenLastCalledWith(latestMessages.length);
+        const { mock, store } = await loadChat();
+        expect(store.receivedData.savedChats[recepientProfile.id]).toHaveLength(
+            latestMessages.length
+        );
         await loadMore(mock);
-        expect(getChatLength).toHaveBeenLastCalledWith(latestMessages.length + 1);
+        expect(store.receivedData.savedChats[recepientProfile.id]).toHaveLength(
+            latestMessages.length + moreMessages.length
+        );
     })
 
-    it("should report user", async () => {
+    it("should report user from new matches and chat previews", async () => {
         let sent = false;
         const { mock, store } = await loadChat();
 
-        store.receivedData.setChatPreviews([{
-            message: latestMessages[0],
-            profile: recepientProfile
-        }])
-        store.receivedData.setNewMatches([{
-            profile: recepientProfile,
-            timestamp: new Date()
-        }])
+        await act( () => {
+            store.receivedData.setChatPreviews([{
+                message: latestMessages[0],
+                profile: recepientProfile
+            }])
+            store.receivedData.setNewMatches([{
+                profile: recepientProfile,
+                timestamp: new Date()
+            }])
+        })
 
         mock.onPost(URLs.server + URLs.reportUser).reply( config => {
             const payload = JSON.parse(config.data) as UserReportWithReportedID;
@@ -231,91 +240,4 @@ describe("chat page", () => {
         expect(screen.queryByText(chatText.delivered)).toEqual(null);
         expect(screen.getByTestId(`readStatus-${latestMessages[0].id}`)).not.toEqual(null);
     })
-
-    // it("should say unsent on unsent message", async () => {
-    //     const { getChatLength, getUnsentLength } = await loadChat();
-
-    //     const myMessage = "hi";
-    //     const myInput = screen.getByPlaceholderText(chatText.inputPlaceholder);
-    //     await act( () => {
-    //         fireEvent(myInput, "changeText", myMessage);
-    //     })
-    //     await act( () => {
-    //         fireEvent(myInput, "submitEditing");
-    //     })
-
-    //     expect(screen.queryByText(chatText.unsent)).not.toEqual(null);
-    //     expect(getChatLength).toHaveBeenLastCalledWith(latestMessages.length + 1);
-    //     expect(getUnsentLength).toHaveBeenLastCalledWith(1);
-    // })
-
-    // it("should resend unsent message", async () => {
-    //     const { mock, getUnsentLength } = await loadChat();
-
-    //     const myMessage = "my undelivered";
-    //     await sendMessage(myMessage);
-    //     expect(getUnsentLength).toHaveBeenLastCalledWith(1);
-    //     expect(screen.queryByText(chatText.unsent)).not.toEqual(null);
-
-    //     mock.onPost(URLs.server + URLs.sendMessage).replyOnce(config => {
-    //         const payload = JSON.parse(config.data) as MessageInput;
-    //         const message : Message = {
-    //             id: "randomID",
-    //             message: payload.message,
-    //             readStatus: false,
-    //             recepientID: payload.recepientID,
-    //             timestamp: new Date(),
-    //             userID: "id"
-    //         }
-    //         return [200, {
-    //             data: message
-    //         }];
-    //     })
-
-    //     await act( () => {
-    //         fireEvent(screen.getByTestId(`message-${myMessage}`), "press");
-    //     })
-
-    //     expect(getUnsentLength).toHaveBeenLastCalledWith(0);
-    //     expect(screen.queryByText(chatText.unsent)).toEqual(null);
-    // })
-
-    it("should save loaded chat", async () => {
-        const { store } = await loadChat();
-
-        expect(store.receivedData.savedChats[recepientProfile.id]).toHaveLength(latestMessages.length);
-    })
-
-    it("should load saved chat", async () => {
-        const { getChatLength } = await loadChat(true);
-        
-        expect(getChatLength).toHaveBeenLastCalledWith(
-            latestMessages.length + moreMessages.length
-        );
-    })
-
-    // it("should load recent messages", async () => {
-    //     const { mock, getChatLength } = await loadChat(false);
-    //     await loadNewMessages(mock);
-
-    //     expect(getChatLength).toHaveBeenLastCalledWith(
-    //         latestMessages.length + newMessage.length
-    //     )
-    //     expect(screen.queryByText(newMessage[0].message)).not.toEqual(null);
-    // })
-
-    // it("should update my read status", async () => {
-    //     expect(latestMessages[1].userID).toEqual(recepientProfile.id);
-    //     expect(latestMessages[1].readStatus).toEqual(false);
-
-    //     const { store } = await loadChat();
-
-    //     store.receivedData.setChatPreviews([{
-    //         message: latestMessages[0],
-    //         profile: recepientProfile
-    //     }])
-
-    //     const index = store.receivedData.chatPreviews?.findIndex( val => val.profile.id == recepientProfile.id);
-    //     expect(store.receivedData.chatPreviews![index!].message.readStatus).toEqual(true);
-    // })
 })

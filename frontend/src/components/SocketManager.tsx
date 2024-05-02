@@ -82,6 +82,15 @@ export class SocketManager {
                 ...newList
             ])
         }
+
+        if (this.received.savedChats[message.userID]) {
+            this.received.addSavedChat(message.userID, 
+                [
+                    message,
+                    ...this.received.savedChats[message.userID]
+                ]
+            )
+        }
     }
 
     updateWithMatch(match : NewMatchData) {

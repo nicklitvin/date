@@ -16,53 +16,49 @@ import { MyModal } from "../src/components/Modal";
 import { differenceInSeconds } from "date-fns";
 import { router, useLocalSearchParams } from "expo-router";
 import { randomUUID } from "expo-crypto";
+import Loading from "./Loading";
 
 interface Props {
     userID?: string
-    getChatLength?: (input : number) => void
     noAutoLoad?: boolean
-    getUnsentLength?: (input : number) => void
     noRouter?: boolean
+    getSendingChatsLength?: (value : number) => any
 }
 
 export function Chat(props : Props) {
     const userID : string|undefined = props.userID ?? String(useLocalSearchParams().userID);
-    const { globalState, receivedData } = useStore();
-
     if (!userID) router.back(); 
 
-    const [profile, setProfile] = useState<PublicProfile>();
-    const [chat, setChat] = useState<Message[]>(receivedData.savedChats[userID ?? ""] ?? []);
+    const { globalState, receivedData } = useStore();
+    const chat = receivedData.savedChats[userID];
+    const [profile, setProfile] = useState<PublicProfile|undefined>( 
+        receivedData.newMatches?.find(val => val.profile.id == userID)?.profile ||
+        receivedData.chatPreviews?.find(val => val.profile.id == userID)?.profile   
+    )
+
     const [lastSentChatID, setLastSentChatID] = useState<string>("");
     const scrollRef = useRef<ScrollView>(null);
     const [chatRequestTime, setChatRequestTime] = useState<Date>(new Date(0));
-    const [sendingChats, setSendingChats] = useState<Message[]>([]);
     const [unsentChats, setUnsentChats] = useState<string[]>([]);
-    const [currentID, setCurrentID] = useState<number>(0);
     const [loadingIDs, setLoadingIDs] = useState<string[]>([]);
     const [showModal, setShowModal] = useState<boolean>(false);
     const [firstLoad, setFirstLoad] = useState<boolean>(true);
 
     useEffect( () => {
-        if (props.getChatLength) props.getChatLength(chat.length);
-
+        if (!chat) return
         for (const message of chat) {
             if (!unsentChats.includes(message.id) && message.recepientID == profile?.id ) {
                 setLastSentChatID(message.id);
                 break;
             } 
         }
-
-        const savedChat = receivedData.savedChats[userID!];
-        if (!savedChat && chat.length > 0 || (savedChat && chat.length > savedChat.length)) {
-            receivedData.addSavedChat(userID!,chat)
-        }
-
-    }, [chat,profile])
+    }, [chat])
 
     useEffect( () => {
-        if (props.getUnsentLength) props.getUnsentLength(unsentChats.length)
-    }, [unsentChats])
+        if (props.getSendingChatsLength) {
+            props.getSendingChatsLength(loadingIDs.length)
+        }
+    }, [loadingIDs])
 
     useEffect( () => {
         if (firstLoad) {
@@ -103,18 +99,8 @@ export function Chat(props : Props) {
     }
 
     const load = async () => {
-        const newMatch = receivedData.newMatches && receivedData.newMatches.find(val => val.profile.id == userID)?.profile;
-        const existMatch = receivedData.chatPreviews && receivedData.chatPreviews.find(val => val.profile.id == userID)?.profile;
-
-        if (newMatch || existMatch) {
-            setProfile(newMatch || existMatch || undefined)
-        } else {
-            await getProfile();
-        }
-
-        if (!receivedData.savedChats[userID]) {
-            await getChat();
-        }
+        if (!chat) await getChat()
+        if (!profile) await getProfile();
     }
 
     const getProfile = async () => {
@@ -129,21 +115,28 @@ export function Chat(props : Props) {
         }
     }
 
-    const getChat = async () => {
+    const getChat = async (loadMoreFromTime?: Date) => {
         try {
             const chatInput : WithKey<GetChatInput> = {
                 userID: receivedData.profile?.id!,
                 key: receivedData.loginKey,
-                fromTime: new Date(),
+                fromTime: loadMoreFromTime || new Date(),
                 withID: userID!
             }
             const chatResponse = await sendRequest<Message[]>(URLs.getChat, chatInput);
-            if (!chatResponse.data) return 
-            const processedChatData = chatResponse.data.map( val => ({
-                ...val,
-                timestamp: new Date(val.timestamp)
-            }));
-            setChat(processedChatData);
+            if (chatResponse.message) {
+                // toast message
+            } else if (chatResponse.data) {
+                const processed = chatResponse.data.map( val => ({
+                    ...val,
+                    timestamp: new Date(val.timestamp)
+                }));
+                if (loadMoreFromTime) {
+                    receivedData.addSavedChat(userID, chat.concat(processed) )
+                } else {
+                    receivedData.addSavedChat(userID, processed);
+                }
+            }
         } catch (err) {
             console.log(err);
         }
@@ -155,23 +148,24 @@ export function Chat(props : Props) {
             return 
         }
 
-        const sendingID = String(currentID);
-        setCurrentID(currentID + 1);
-        
+        const newMessageID = `loading-${randomUUID()}`
         const sendingChat : Message = {
-            id: sendingID,
+            id: newMessageID,
             message: sentMessage,
             readStatus: false,
             recepientID: profile.id,
             timestamp: new Date(),
             userID: receivedData.profile.id
         }
-        setLoadingIDs(loadingIDs.concat(sendingID));
-        setChat([sendingChat].concat(chat.filter( val => val.id != removeID)));
+        setLoadingIDs(loadingIDs.concat(newMessageID));
+        setUnsentChats(unsentChats.filter( val => val != removeID));
+        receivedData.addSavedChat(
+            userID, 
+            [sendingChat].concat(chat.filter(val => val.id != removeID))
+        );
 
-        const payloadID = randomUUID();
         globalState.socketUser.sendData({
-            payloadID: payloadID,
+            payloadID: newMessageID,
             message: {
                 userID: receivedData.profile.id,
                 message: sentMessage,
@@ -180,19 +174,18 @@ export function Chat(props : Props) {
         })
 
         setCustomTimer( () => {
-            const message = globalState.socketUser?.wasMessageProcessed(payloadID);
+            if (!globalState.socketUser) return 
+
+            const message = globalState.socketUser.wasMessageProcessed(newMessageID);
             if (message) {
                 const copy = [...chat];
-                const index = chat.findIndex( val => val.id == sendingID);
+                const index = chat.findIndex( val => val.id == newMessageID);
                 copy[index] = message;
-    
-                setSendingChats(sendingChats.filter( val => val.id != sendingID));
-                setUnsentChats(unsentChats.filter(val => val != removeID));
+                receivedData.addSavedChat(userID, copy);
             } else {
-                setUnsentChats(unsentChats.filter(val => val != removeID).concat(sendingID))
+                setUnsentChats(unsentChats.concat(newMessageID))
             }
-
-            setLoadingIDs(loadingIDs.filter( val => val != sendingID))
+            setLoadingIDs(loadingIDs.filter( val => val != newMessageID))
         }, 1)
     }
 
@@ -202,30 +195,9 @@ export function Chat(props : Props) {
         const isAtTop = contentOffset.y <= scrollHeight * (1-globals.scrollAtPercentage);
         const canSend = differenceInSeconds(new Date(), chatRequestTime) > globals.apiRequestTimeout;
 
-        if (!(isAtTop && canSend)) return 
+        if (!(isAtTop && canSend && chat.length > 0)) return 
         setChatRequestTime(new Date());
-        
-        let moreChats : Message[];
-        if (chat.length == 0) return
-
-        const input : WithKey<GetChatInput> = {
-            userID: receivedData.profile?.id!,
-            key: receivedData.loginKey,
-            withID: profile!.id,
-            fromTime: new Date(chat.at(-1)!.timestamp.getTime() - 1)
-        }
-
-        const response : APIOutput<Message[]> = await sendRequest(URLs.getChat, input);
-
-        if (response.message) {
-            // toast message
-        } else if (response.data) {
-            moreChats = response.data.map( message => ({
-                ...message,
-                timestamp: new Date(message.timestamp)
-            }))
-            setChat(chat.concat(moreChats));
-        }
+        getChat(new Date(chat.at(-1)!.timestamp.getTime() - 1))
     }
 
     const reportUser = async () => {
@@ -269,6 +241,15 @@ export function Chat(props : Props) {
         }
     }
 
+
+    if (!chat || !profile) {
+        return (
+            <>
+                <StyledButton testID={testIDS.load} onPress={load}/>
+                <Loading/>
+            </>
+        )
+    }
     return (
         <StyledView className="w-full h-full bg-back">
         <MyModal
@@ -294,7 +275,6 @@ export function Chat(props : Props) {
             cancelButtonIndex={2}
         />
         <StyledView className="w-full h-full">
-            <StyledButton testID={testIDS.load} onPress={load}/>
             <PageHeader
                 imageSource={profile?.images[0]?.url}
                 title={profile?.name ?? ""}
