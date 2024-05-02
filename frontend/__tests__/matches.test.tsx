@@ -15,7 +15,8 @@ describe("matches", () => {
         makePublicProfile("id2"),
         makePublicProfile("id3"),
         makePublicProfile("id4"),
-        makePublicProfile("id5")
+        makePublicProfile("id5"),
+        makePublicProfile("newNotification"),
     ];
 
     const chatPreviews : ChatPreview[] = [
@@ -53,6 +54,11 @@ describe("matches", () => {
             timestamp: new Date(3)
         }
     ]
+
+    const notificationNewMatch : NewMatchData = {
+        profile: profiles[5],
+        timestamp: new Date()
+    }
 
     const load = async ( useSave = false ) => {
         const mock = new MockAdapter(axios);
@@ -121,30 +127,66 @@ describe("matches", () => {
         expect(store.receivedData.newMatches).toHaveLength(newMatches.length + moreNewMatches.length);
     })
 
-    // it("should load saved", async () => {
-    //     const { getChatPreviewLength, getNewMatchLength } = await load(true);
+    it("should add new match from socket manager", async () => {
+        const { store } = await load();
+        const socketManager = new SocketManager({
+            testMode: true,
+            receivedData: store.receivedData
+        })
 
-    //     expect(getChatPreviewLength).toHaveBeenLastCalledWith(
-    //         chatPreviews.length + moreChatPreviews.length
-    //     )
-    //     expect(getNewMatchLength).toHaveBeenLastCalledWith(
-    //         newMatches.length + moreNewMatches.length
-    //     )
-    // })
+        await act( () => {
+            socketManager.updateWithMatch(notificationNewMatch);
+        })
 
-    // it("should add new match from socket manager", async () => {
-    //     const { store, getNewMatchLength } = await load();
-    //     const socketManager = new SocketManager({
-    //         testMode: true,
-    //         receivedData: store.receivedData
-    //     })
+        expect(store.receivedData.newMatches).toHaveLength(newMatches.length + 1);
+        expect(store.receivedData.newMatches![0].profile.id).toEqual(notificationNewMatch.profile.id);
+    })
 
-    //     expect(getNewMatchLength).toHaveBeenLastCalledWith(newMatches.length);
+    it("should move new match to chat preview on message", async () => {
+        const { store } = await load();
+        const socketManager = new SocketManager({
+            testMode: true,
+            receivedData: store.receivedData
+        })
 
-    //     await act( () => {
-    //         socketManager.updateWithMatch(moreNewMatches[0]);
-    //     })
+        const notificationMessage : Message = {
+            id: "randomID",
+            message: "message",
+            readStatus: false,
+            recepientID: "random",
+            timestamp: new Date(),
+            userID: newMatches[0].profile.id
+        }
+        await act( () => {
+            socketManager.updateChatWithMessage(notificationMessage);
+        })
 
-    //     expect(getNewMatchLength).toHaveBeenLastCalledWith(newMatches.length + 1);
-    // })
+        expect(store.receivedData.newMatches).toHaveLength(newMatches.length - 1);
+        expect(store.receivedData.chatPreviews).toHaveLength(chatPreviews.length + 1);
+        expect(store.receivedData.chatPreviews![0].profile.id).toEqual(newMatches[0].profile.id);
+    })
+
+    it("should update chat preview with new message", async () => {
+        const { store } = await load();
+        const socketManager = new SocketManager({
+            testMode: true,
+            receivedData: store.receivedData
+        })
+
+        const notificationMessage : Message = {
+            id: "randomID",
+            message: "new notification message",
+            readStatus: false,
+            recepientID: "random",
+            timestamp: new Date(),
+            userID: chatPreviews[1].profile.id
+        }
+        await act( () => {
+            socketManager.updateChatWithMessage(notificationMessage);
+        })
+
+        expect(store.receivedData.chatPreviews).toHaveLength(chatPreviews.length + 1);
+        expect(store.receivedData.chatPreviews![0].message.userID).toEqual(notificationMessage.userID)
+        expect(store.receivedData.chatPreviews![0].message.message).toEqual(notificationMessage.message)
+    })
 })

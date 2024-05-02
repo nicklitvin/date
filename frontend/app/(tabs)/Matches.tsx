@@ -137,7 +137,7 @@ export function Matches(props : Props) {
             </>
         )
     }
-    
+
     return (
         <StyledView className="w-full h-full flex flex-col bg-back">
         <StyledScroll>
@@ -206,7 +206,7 @@ export function Matches(props : Props) {
                 <StyledView className="pb-2">
                     {chatPreviews.map( (match,index) => (
                         <StyledView 
-                            key={`match-${match.profile.id}`} 
+                            key={`match-${match.profile.id}-${match.message.id}`} 
                             className="px-5 py-2"
                         >
                             <ChatPreviewBox

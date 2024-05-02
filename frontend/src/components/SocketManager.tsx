@@ -57,28 +57,28 @@ export class SocketManager {
     updateChatWithMessage(message : Message) {
         if (!this.received.newMatches || !this.received.chatPreviews) return 
 
-        const newMatchIndex = this.received.newMatches.findIndex( val => [message.userID, message.recepientID].includes(val.profile.id));
+        const newMatchIndex = this.received.newMatches.findIndex(val => message.userID == val.profile.id)
+        const oldMatchIndex = this.received.chatPreviews.findIndex(val => message.userID == val.profile.id);
 
-        if (newMatchIndex) {
-            const newMatchData  = this.received.newMatches[newMatchIndex];
+        if (newMatchIndex > -1) {
+            const newMatchData = this.received.newMatches[newMatchIndex];
 
             const newMatchList = [...this.received.newMatches];
             newMatchList.splice(newMatchIndex, 1);
             this.received.setNewMatches(newMatchList);
 
             this.received.setChatPreviews([
-                { profile: newMatchData.profile, message: message }, 
-                ...this.received.chatPreviews]
-            )
-        } else {
-            const oldMatchIndex = this.received.chatPreviews.findIndex( val => [message.userID, message.recepientID].includes(val.profile.id))
+                { profile: newMatchData.profile, message: { ...message, timestamp: new Date(message.timestamp) } }, 
+                ...this.received.chatPreviews
+            ])
+        } else if (oldMatchIndex > -1) {
             const oldMatchData = this.received.chatPreviews[oldMatchIndex];
 
             const newList = [...this.received.chatPreviews]
             newList.slice(oldMatchIndex, 1);
 
             this.received.setChatPreviews([
-                { profile: oldMatchData.profile, message: message},
+                { profile: oldMatchData.profile, message: { ...message, timestamp: new Date(message.timestamp) }},
                 ...newList
             ])
         }
@@ -87,7 +87,10 @@ export class SocketManager {
     updateWithMatch(match : NewMatchData) {
         if (!this.received.newMatches) return 
 
-        const newMatchList = [...this.received.newMatches!, match];
+        const newMatchList : NewMatchData[] = [
+            { ...match, timestamp: new Date(match.timestamp)}, 
+            ...this.received.newMatches!
+        ];
         this.received.setNewMatches(newMatchList);
     }
 
