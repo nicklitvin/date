@@ -22,7 +22,6 @@ interface Props {
     getChatLength?: (input : number) => void
     noAutoLoad?: boolean
     getUnsentLength?: (input : number) => void
-    returnSeconds?: (input : number) => void
     noRouter?: boolean
 }
 

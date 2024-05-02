@@ -4,7 +4,7 @@ import axios from "axios";
 import { RootStore, createStoreProvider } from "../src/store/RootStore";
 import PreferencesMob from "../app/Preferences";
 import { testIDS } from "../src/testIDs";
-import { EditUserInput, Preferences } from "../src/interfaces";
+import { APIOutput, EditUserInput, Preferences } from "../src/interfaces";
 import { URLs } from "../src/urls";
 import { globals } from "../src/globals";
 import { generalText } from "../src/text";
@@ -18,7 +18,7 @@ describe("preferences", () => {
     const load = async (useSave = false) => {
         const mock = new MockAdapter(axios);
         mock.onPost(URLs.server + URLs.getPreferences).reply(config => 
-            [200, {data: initial}]
+            [200, {data: initial} as APIOutput<Preferences>]
         )
 
         const store = new RootStore();

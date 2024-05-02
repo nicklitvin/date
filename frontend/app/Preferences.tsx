@@ -64,11 +64,14 @@ export function PreferencePage(props : Props) {
                 userID: receivedData.profile?.id!,
                 key: receivedData.loginKey
             }
-            const response = await sendRequest(URLs.getPreferences, input);
-            const data = response.data.data;
-            receivedData.setPreferences(response.data.data);
-            setGenders(data.genderPreference);
-            setAgePreference(data.agePreference);
+            const response = await sendRequest<Preferences>(URLs.getPreferences, input);
+            if (response.message) {
+                // toast messsage
+            } else if (response.data) {
+                receivedData.setPreferences(response.data);
+                setGenders(response.data.genderPreference);
+                setAgePreference(response.data.agePreference);
+            }
         } catch (err) {
             console.log(err);
         }

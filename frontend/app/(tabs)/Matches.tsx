@@ -84,13 +84,16 @@ export function Matches(props : Props) {
                 userID: receivedData.profile?.id!
             }
     
-            const newMatchResponse = await sendRequest(URLs.getNewMatches, newMatchDataInput);
-            const data = newMatchResponse.data.data as NewMatchData[];
-            const processed : NewMatchData[] = data.map( val => ({
-                profile: val.profile,
-                timestamp: new Date(val.timestamp)
-            })) 
-            setNewMatches(processed);
+            const newMatchResponse = await sendRequest<NewMatchData[]>(URLs.getNewMatches, newMatchDataInput);
+            if (newMatchResponse.message) {
+                // toast message
+            } else if (newMatchResponse.data) {
+                const processed = newMatchResponse.data.map( val => ({
+                    profile: val.profile,
+                    timestamp: new Date(val.timestamp)
+                })) 
+                setNewMatches(processed);
+            }
         } catch (err) {
             console.log(err);
         }
@@ -103,16 +106,19 @@ export function Matches(props : Props) {
                 timestamp: new Date(),
                 userID: receivedData.profile?.id!
             }
-            const chatPreviewResponse = await sendRequest(URLs.getNewChatPreviews, newMatchDataInput);
-            const data = chatPreviewResponse.data.data as ChatPreview[];
-            const processed : ChatPreview[] = data.map( val => ({
-                profile: val.profile,
-                message: {
-                    ...val.message,
-                    timestamp: new Date(val.message.timestamp)
-                }
-            }))
-            setChatPreviews(processed);
+            const chatPreviewResponse = await sendRequest<ChatPreview[]>(URLs.getNewChatPreviews, newMatchDataInput);
+            if (chatPreviewResponse.message) {
+                // toast message
+            } else if (chatPreviewResponse.data) {
+                const processed : ChatPreview[] = chatPreviewResponse.data.map( val => ({
+                    profile: val.profile,
+                    message: {
+                        ...val.message,
+                        timestamp: new Date(val.message.timestamp)
+                    }
+                }))
+                setChatPreviews(processed);
+            }
         } catch (err) {
             console.log(err);
         }
@@ -128,20 +134,21 @@ export function Matches(props : Props) {
         setMatchRequestTime(new Date());
 
         try {
-            let receivedNewMatches : NewMatchData[] = [];
             const input : WithKey<GetMatchesInput> = {
                 userID: receivedData.profile?.id!,
                 timestamp: new Date(newMatches.at(-1)!.timestamp.getTime() - 1),
                 key: receivedData.loginKey
             }
-            const response = await sendRequest(URLs.getNewMatches, input);
-            receivedNewMatches = response.data.data;
-            receivedNewMatches = receivedNewMatches.map( val => ({
-                ...val,
-                timestamp: new Date(val.timestamp)
-            }))
-            
-            setNewMatches(newMatches.concat(receivedNewMatches));
+            const response = await sendRequest<NewMatchData[]>(URLs.getNewMatches, input);
+            if (response.message) {
+                // toast message
+            } else if (response.data) {
+                const receivedMatches = response.data.map( val => ({
+                    ...val,
+                    timestamp: new Date(val.timestamp)
+                }))
+                setNewMatches(newMatches.concat(receivedMatches));
+            }
         } catch (err) {
             console.log(err);
         }
