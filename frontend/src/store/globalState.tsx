@@ -22,7 +22,7 @@ export class GlobalState {
 
     @action
     removeUnsentMessageID(input : string) {
-        const copy = new Set([...this.loadingMessageIDs]);
+        const copy = new Set([...this.unsentMessageIDs]);
         copy.delete(input);
         this.unsentMessageIDs = copy;
     }

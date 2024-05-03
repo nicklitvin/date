@@ -187,12 +187,36 @@ describe("chat page", () => {
         expect(preview?.message.id).toEqual(newMessage.id);
     })
 
-    it("should resend message", async () => {
+    it("should not send sent messages", async () => {
+        const { store } = await loadChat();
 
+        await act( () => {
+            fireEvent(screen.getByTestId(`message-${latestMessages[0].message}`), "press")
+            fireEvent(screen.getByTestId(`message-${latestMessages[1].message}`), "press")
+        })
+
+        expect(store.globalState.loadingMessageIDs.size).toEqual(0);
+        expect(store.globalState.unsentMessageIDs.size).toEqual(0);
     })
 
-    it("should not resend sent message", async () => {
+    it("should resend unsent message", async () => {
+        const { store } = await loadChat();
 
+        const message = "new message";
+        await sendMessage(message);
+        await act( async () => {
+            await new Promise(res => setTimeout(res, 1000));
+        })
+
+        expect(store.globalState.loadingMessageIDs.size).toEqual(0);
+        expect(store.globalState.unsentMessageIDs.size).toEqual(1);
+
+        await act( () => {
+            fireEvent(screen.getByTestId(`message-${message}`),"press");
+        })
+
+        expect(store.globalState.loadingMessageIDs.size).toEqual(1);
+        expect(store.globalState.unsentMessageIDs.size).toEqual(0);
     })
 
     it("should load chat", async () => {
