@@ -15,7 +15,6 @@ export class APIHandler {
         app.ws("/ws", (ws : WebSocket, req) => {
             try {
                 const token = req.url.split("?token=")[1];
-                console.log(token);
 
                 if (!token) return ws.close(401);
 
@@ -26,7 +25,6 @@ export class APIHandler {
                         socket: ws,
                         userID: userID
                     })
-                    console.log("added socket");
                 } else {
                     return ws.close(401);
                 }
@@ -597,6 +595,20 @@ export class APIHandler {
                 const body = req.body as LoginInput;
 
                 const output = await handler.loginWithToken(body);
+                return output ? 
+                    res.status(200).json(output as APIOutput<LoginOutput>) : 
+                    res.status(400).json()
+            } catch (err) {
+                console.log(err);
+                return res.status(500).json();
+            }
+        })
+
+        app.post(URLs.autoLogin, async (req,res) => {
+            try {
+                const body = req.body as APIRequest<{}>;
+
+                const output = await handler.autoLogin(body.key);
                 return output ? 
                     res.status(200).json(output as APIOutput<LoginOutput>) : 
                     res.status(400).json()

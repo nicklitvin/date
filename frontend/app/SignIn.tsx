@@ -6,13 +6,13 @@ import {signInText } from "../src/text";
 import { StyledButton, StyledImage, StyledText, StyledView } from "../src/styledElements";
 import { useStore } from "../src/store/RootStore";
 import * as Apple from "expo-apple-authentication";
-import { APIOutput, LoginInput, LoginOutput, WithKey } from "../src/interfaces";
+import { APIOutput, LoginInput, LoginOutput, PublicProfile, WithKey } from "../src/interfaces";
 import { sendRequest } from "../src/utils";
 import { URLs } from "../src/urls";
 import { router } from "expo-router";
 import { Spacing } from "../src/components/Spacing";
 import { globals } from "../src/globals";
-import { SocketUser } from "../src/components/SocketManager";
+import { SocketManager } from "../src/components/SocketManager";
 
 export function SignIn() {
     const { globalState, receivedData } = useStore();
@@ -28,10 +28,10 @@ export function SignIn() {
 
     useEffect( () => {
         const func = async () => {
+            setFirstLoad(false);
             if (firstLoad) {
                 updateAppleAllow();
             }
-            setFirstLoad(false);
         }
         func();
     })
@@ -46,7 +46,10 @@ export function SignIn() {
 
     const processLoginOutput = async (output : LoginOutput) => {
         receivedData.setLoginKey(output.key);
-        globalState.setSocketUser( new SocketUser(output.socketToken!, receivedData));
+        globalState.setSocketManager( new SocketManager({
+            socketToken: output.socketToken,
+            receivedData
+        }))
         setLoginOutput(output);
     }
 
@@ -61,9 +64,12 @@ export function SignIn() {
                 expoPushToken: globalState.expoPushToken ?? undefined
             }
             try {
-                const response = await sendRequest(URLs.login, input);
-                const output = response.data as APIOutput<LoginOutput>;
-                if (output.data) await processLoginOutput(output.data);
+                const response = await sendRequest<LoginOutput>(URLs.login, input);
+                if (response.message) {
+                    // toast
+                } else if (response.data) {
+                    await processLoginOutput(response.data);
+                }
             } catch (err) { 
                 console.log(err);
             }
@@ -81,9 +87,13 @@ export function SignIn() {
                     const input : WithKey<{}> = {
                         key: loginOutput.key
                     }
-                    const response = await sendRequest(URLs.getMyProfile,input);
-                    receivedData.setProfile(response.data.data);
-                    return router.push("(tabs)")
+                    const response = await sendRequest<PublicProfile>(URLs.getMyProfile,input);
+                    if (response.message) {
+                        // toast
+                    } else if (response.data) {
+                        receivedData.setProfile(response.data);
+                        return router.push("(tabs)")
+                    }
                 } catch (err) {
                     console.log(err);
                 }
@@ -116,8 +126,12 @@ export function SignIn() {
                 expoPushToken: globalState.expoPushToken ?? undefined
             }
 
-            const response = await sendRequest(URLs.login, input);
-            await processLoginOutput(response.data);
+            const response = await sendRequest<LoginOutput>(URLs.login, input);
+            if (response.message) {
+                // toast
+            } else if (response.data) {
+                await processLoginOutput(response.data);
+            }
         } catch (err) {
             console.log(err);
         }

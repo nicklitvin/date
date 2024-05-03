@@ -14,7 +14,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { noWifiText } from "../src/text";
 import { MyButton } from "../src/components/Button";
 import Loading from "./Loading";
-import { APIOutput, LoginOutput } from "../src/interfaces";
+import { APIOutput, LoginOutput, WithKey } from "../src/interfaces";
 import { SocketManager } from "../src/components/SocketManager";
 
 Notifications.setNotificationHandler({
@@ -194,15 +194,33 @@ export function Index() {
 
     const retrieveOne = async (request : Function, set : Function) => {
         try {
-            const response = await request();
+            const response : APIOutput<any> = await request();
             
-            if (response.data.data) {
-                set(response.data.data);
+            if (response.message) {
+                // toast 
+                return false;
+            } else if (response.data) {
+                set(response.data);
                 return true;
-            }
+            } 
         } catch (err) {
             // setError(true);
             return false;
+        }
+    }
+
+    const tryConnectingSocketManager = async (input : WithKey<{}>) => {
+        try {
+            const response = await sendRequest<LoginOutput>(URLs.autoLogin, input);
+            console.log("socketmanager request",response)
+            if (response.data?.socketToken) {
+                globalState.setSocketManager(new SocketManager({
+                    socketToken: response.data.socketToken, 
+                    receivedData
+                }))
+            }
+        } catch (err) {
+            console.log(err);
         }
     }
 
@@ -211,24 +229,14 @@ export function Index() {
             key: receivedData.loginKey
         }
 
-        const [_, clientIDs] = await Promise.all([
-            async () => {
-                try {
-                    const response = await sendRequest<LoginOutput>(URLs.autoLogin, input);
-                    if (response.data?.socketToken) {
-                        globalState.setSocketUser(new SocketManager({
-                            socketToken: response.data.socketToken, 
-                            receivedData
-                        }))
-                    }
-                } catch (err) {
-                    console.log(err);
-                }
-            },
+        console.log("retrieving data");
+
+        const [clientIDs] = await Promise.all([
             retrieveOne(
                 () => sendRequest(URLs.getClientIDs, null),
                 (data : any) => receivedData.setClientIDs(data)
             ),
+            tryConnectingSocketManager(input),
             retrieveOne(
                 () => sendRequest(URLs.getMyProfile, input),
                 (data : any) => receivedData.setProfile(data)
@@ -312,7 +320,7 @@ export function Index() {
                 />
         }
     />
-    } else if (receivedData.profile) {
+    } else if (receivedData.profile && globalState.socketManager) {
         return <Redirect href="(tabs)"/>
     } else if (receivedData.clientIDs) {
         return <Redirect href="SignIn"/>
