@@ -1,8 +1,7 @@
 import { Tabs } from "expo-router";
 import { globals } from "../../src/globals";
 import { StyledImage } from "../../src/styledElements";
-import { useEffect, useState } from "react";
-import { URLs } from "../../src/urls";
+import Toast from "react-native-toast-message";
 
 export default function TabLayout() {
     type IconType = "Feed" | "Matches" | "Profile" | "Stats";
@@ -26,33 +25,36 @@ export default function TabLayout() {
     }
 
     return (
-        <Tabs screenOptions={{
-            headerShown: false,
-            tabBarActiveBackgroundColor: globals.light,
-            tabBarInactiveBackgroundColor: globals.light,
-            tabBarShowLabel: false
-        }}>
-            <Tabs.Screen name="index" options={{href: null}}/>
-            <Tabs.Screen name="Feed" 
-                options={{
-                    tabBarIcon: ({ focused }) => getIcon("Feed", focused)
-                }}
-            />
-            <Tabs.Screen name="Matches" 
-                options={{
-                    tabBarIcon: ({ focused }) => getIcon("Matches", focused)
-                }}
-            />
-            <Tabs.Screen name="Profile" 
-                options={{
-                    tabBarIcon: ({ focused }) => getIcon("Profile", focused)
-                }}
-            />
-            <Tabs.Screen name="Stats" 
-                options={{
-                    tabBarIcon: ({ focused }) => getIcon("Stats", focused)
-                }}
-            />
-        </Tabs>
+        <>
+            <Tabs screenOptions={{
+                headerShown: false,
+                tabBarActiveBackgroundColor: globals.light,
+                tabBarInactiveBackgroundColor: globals.light,
+                tabBarShowLabel: false
+            }}>
+                <Tabs.Screen name="index" options={{href: null}}/>
+                <Tabs.Screen name="Feed" 
+                    options={{
+                        tabBarIcon: ({ focused }) => getIcon("Feed", focused)
+                    }}
+                />
+                <Tabs.Screen name="Matches" 
+                    options={{
+                        tabBarIcon: ({ focused }) => getIcon("Matches", focused)
+                    }}
+                />
+                <Tabs.Screen name="Profile" 
+                    options={{
+                        tabBarIcon: ({ focused }) => getIcon("Profile", focused)
+                    }}
+                />
+                <Tabs.Screen name="Stats" 
+                    options={{
+                        tabBarIcon: ({ focused }) => getIcon("Stats", focused)
+                    }}
+                />
+            </Tabs>
+            <Toast/>
+        </>
     )
 }

@@ -46,7 +46,11 @@ export function Profile(props : Props) {
 
             if (!savedSubscription) {
                 const subscriptionResponse = await sendRequest<SubscriptionData>(URLs.getSubscription, input);
-                if (subscriptionResponse.data) receivedData.setSubscription(subscriptionResponse.data);
+                if (subscriptionResponse.data) receivedData.setSubscription({
+                    ...subscriptionResponse.data,
+                    endDate: new Date(subscriptionResponse.data.endDate!)
+
+                });
             }
         } catch (err) {
             console.log(err);

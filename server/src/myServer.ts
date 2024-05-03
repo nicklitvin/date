@@ -32,6 +32,7 @@ export class MyServer {
         loginUser = true,
         verifyUser = true,
         createUser = true,
+        addSubscription = true,
         createSampleUsers = false,
         clearTables = false
     }) {
@@ -96,6 +97,13 @@ export class MyServer {
             copy[7].images = [imageIDs[8]];
     
             await this.handler.createSample(copy);
+        }
+
+        if (addSubscription) {
+            this.handler.processSubscriptionPay({
+                userID: sampleContent.userID,
+                subscriptionID: "randomID"
+            })
         }
     }
 

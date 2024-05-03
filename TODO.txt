@@ -1,7 +1,6 @@
 TODO
 notification receive, delete receiveDate when new
-toast error messages, install npx expo install react-native-reanimated react-native-safe-area-context react-native-gesture-handler
-isntall rsg paths for graph
+reconnect socket if too long, when creating user
 
 allow other users
     verification as option

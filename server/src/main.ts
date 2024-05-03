@@ -8,6 +8,7 @@ server.setupEnvironment({
     createSampleUsers: false,
     createUser: true,
     loginUser: true,
-    verifyUser: true
+    verifyUser: true,
+    addSubscription: true,
 });
 console.log(`running server on port ${server.port}`)

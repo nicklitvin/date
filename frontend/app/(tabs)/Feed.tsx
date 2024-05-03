@@ -13,6 +13,7 @@ import { Link } from "expo-router";
 import { useStore } from "../../src/store/RootStore";
 import { testIDS } from "../../src/testIDs";
 import Loading from "../Loading";
+import Toast from "react-native-toast-message";
 
 interface Props {
     dontAutoLoad?: boolean
@@ -20,7 +21,7 @@ interface Props {
 
 export function Feed(props : Props) {
     const { globalState, receivedData } = useStore();
-    
+
     const savedFeed = receivedData.swipeFeed;
     const savedSwipeStatus = globalState.swipeStatus;
 
@@ -31,6 +32,11 @@ export function Feed(props : Props) {
     const [firstLoad, setFirstLoad] = useState<boolean>(true);
 
     useEffect( () => {
+        Toast.show({
+            type: "info",
+            text1: "hi"
+        })
+
         if (firstLoad) {
             setFirstLoad(false);
             if (props.dontAutoLoad) return

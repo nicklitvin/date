@@ -212,7 +212,6 @@ export function Index() {
     const tryConnectingSocketManager = async (input : WithKey<{}>) => {
         try {
             const response = await sendRequest<LoginOutput>(URLs.autoLogin, input);
-            console.log("socketmanager request",response)
             if (response.data?.socketToken) {
                 globalState.setSocketManager(new SocketManager({
                     socketToken: response.data.socketToken, 
@@ -228,8 +227,6 @@ export function Index() {
         const input = {
             key: receivedData.loginKey
         }
-
-        console.log("retrieving data");
 
         const [clientIDs] = await Promise.all([
             retrieveOne(

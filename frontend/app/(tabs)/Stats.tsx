@@ -52,9 +52,12 @@ export function Stats(props : Props) {
                 userID: receivedData.profile?.id!,
                 key: receivedData.loginKey
             }
-            const response = await sendRequest(URLs.getStats, input);
-            const data = response.data.data;
-            setStats(data);
+            const response = await sendRequest<UserSwipeStats>(URLs.getStats, input);
+            if (response.message) {
+                // toast
+            } else if (response.data) {
+                setStats(response.data);
+            }
         } catch (err) {
 
         }
@@ -66,13 +69,14 @@ export function Stats(props : Props) {
                 userID: receivedData.profile?.id!,
                 key: receivedData.loginKey
             }
-            const response = await sendRequest(URLs.getCheckoutPage, input);
-            const url = response.data.data;
-            if (props.openLinkFunc) {
-                props.openLinkFunc(url);
-            } else {
-                await Linking.openURL(url);
+            const response = await sendRequest<string>(URLs.getCheckoutPage, input);
+            if (response.message) {
+                // toast
+            } else if (response.data) {
+                if (props.openLinkFunc) props.openLinkFunc(response.data) 
+                else await Linking.openURL(response.data);
             }
+            
         } catch (err) {
             console.log(err)
         }
