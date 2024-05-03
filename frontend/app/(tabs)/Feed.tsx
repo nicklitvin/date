@@ -32,11 +32,6 @@ export function Feed(props : Props) {
     const [firstLoad, setFirstLoad] = useState<boolean>(true);
 
     useEffect( () => {
-        Toast.show({
-            type: "info",
-            text1: "hi"
-        })
-
         if (firstLoad) {
             setFirstLoad(false);
             if (props.dontAutoLoad) return

@@ -1,6 +1,7 @@
 import { PieChart } from "react-native-gifted-charts"
 import { StyledText, StyledView } from "../styledElements"
 import { globals } from "../globals"
+import { statsText } from "../text"
 
 interface Props {
     likes: number
@@ -10,6 +11,8 @@ interface Props {
 }
 
 export function MyDonut(props : Props) {
+    const isEmpty = props.likes + props.dislikes == 0;
+
     return (
         <StyledView className="flex w-full flex-row items-center">
             <PieChart
@@ -17,11 +20,11 @@ export function MyDonut(props : Props) {
                 donut
                 data={[
                     {
-                        value: props.likes,
+                        value: isEmpty ? 1 : props.likes,
                         color: globals.green   
                     },
                     {
-                        value: props.dislikes,
+                        value: isEmpty ? 1 : props.dislikes,
                         color: globals.red
                     }
                 ]}
@@ -34,7 +37,11 @@ export function MyDonut(props : Props) {
                     {`${props.dislikes} ${props.dislikeText}`}
                 </StyledText>
                 <StyledText className="text-base">
-                    {`Ratio: ${Math.round(props.likes/(props.likes+ props.dislikes) * 100)}%`}
+                    {
+                        isEmpty ?
+                        statsText.noRatio :
+                        `Ratio: ${Math.round(props.likes/(props.likes + props.dislikes) * 100)}%`
+                    }
                 </StyledText>
             </StyledView>
         </StyledView>

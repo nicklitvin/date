@@ -158,6 +158,7 @@ export const statsText = {
     dislikesReceived: "dislikes received",
     likesSent: "likes sent",
     dislikesSent: "dislikes sent",
+    noRatio: "No Ratio",
 }
 
 export const profileText = {

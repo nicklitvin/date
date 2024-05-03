@@ -4,6 +4,7 @@ import { globals } from "../globals"
 import { useState } from "react"
 import { addDays, addWeeks, differenceInDays } from "date-fns"
 import { getShortDate } from "../utils"
+import { statsText } from "../text"
 
 interface Props {
     likes: number[]
@@ -13,6 +14,8 @@ interface Props {
 }
 
 export function Weekly(props : Props) {
+    const unselectedDotSize = 8;
+    const selectedDotSize = 10;
     const [week, setWeek] = useState<number>(props.likes.length - 1);
 
     const updateWeek = (input : {index : number}) => {
@@ -27,13 +30,13 @@ export function Weekly(props : Props) {
                     value: val,
                     dataPointColor: globals.green,
                     index: index,
-                    dataPointRadius: week == index ? 15 : 10
+                    dataPointRadius: week == index ? selectedDotSize : unselectedDotSize
                 }))}
                 data2={props.dislikes.map( (val,index) => ({
                     value: val,
                     dataPointColor: globals.red,
                     index: index,
-                    dataPointRadius: week == index ? 15 : 10
+                    dataPointRadius: week == index ? selectedDotSize : unselectedDotSize
                 }))}
                 color1={globals.green}
                 color2={globals.red}
@@ -44,6 +47,7 @@ export function Weekly(props : Props) {
                 xAxisThickness={3}
                 yAxisThickness={3}
                 onPress={updateWeek}
+                
             />
             <StyledText className="text-xl">
                 {`${getShortDate(addWeeks(new Date(),-(props.likes.length - week)))} - ${getShortDate(addWeeks(new Date(),-(props.likes.length - 1 - week)))}`}
@@ -55,7 +59,11 @@ export function Weekly(props : Props) {
                 {`${props.dislikes[week]} ${props.dislikeText}`}
             </StyledText>
             <StyledText className="text-base">
-                {`Ratio: ${Math.round(props.likes[week]/(props.likes[week] + props.dislikes[week]) * 100)}%`}
+                {
+                    props.likes[week] + props.dislikes[week] == 0 ?
+                    statsText.noRatio : 
+                    `Ratio: ${Math.round(props.likes[week]/(props.likes[week] + props.dislikes[week]) * 100)}%`
+                }
             </StyledText>
         </StyledView>
     )

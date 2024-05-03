@@ -5,7 +5,7 @@ const server = new MyServer({
 });
 server.setupEnvironment({
     clearTables: true,
-    createSampleUsers: false,
+    createSampleUsers: true,
     createUser: true,
     loginUser: true,
     verifyUser: true,
