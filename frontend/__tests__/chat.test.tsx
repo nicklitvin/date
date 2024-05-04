@@ -38,7 +38,7 @@ describe("chat page", () => {
         {
             id: "id1",
             message: "hey",
-            readStatus: true,
+            readStatus: false,
             recepientID: myUserID,
             timestamp: new Date(Date.UTC(2000, 0, 1, 8, 0)),
             userID: recepientProfile.id
@@ -64,16 +64,23 @@ describe("chat page", () => {
         userID: recepientProfile.id
     }
 
-    const loadChat = async (useSave = false) => {
+    const loadChat = async (useSave = false, customMessage? : Message) => {
         const mock = new MockAdapter(axios);
         mock.onPost(URLs.server + URLs.getProfile).replyOnce( config =>
             [200, { data: recepientProfile } as APIOutput<PublicProfile>]
         )
-        mock.onPost(URLs.server + URLs.getChat).replyOnce(config => {
-            const payload = JSON.parse(config.data) as GetChatInput;
-            expect(payload.withID).toEqual(recepientProfile.id);
-            return [200, { data: latestMessages } as APIOutput<Message[]>]
-        })
+        if (customMessage) {
+            mock.onPost(URLs.server + URLs.getChat).replyOnce( config => {
+                return [200, { data: [customMessage] } as APIOutput<Message[]>]
+            })
+        } else {
+            mock.onPost(URLs.server + URLs.getChat).replyOnce(config => {
+                const payload = JSON.parse(config.data) as GetChatInput;
+                expect(payload.withID).toEqual(recepientProfile.id);
+                return [200, { data: latestMessages } as APIOutput<Message[]>]
+            })
+        }
+        
 
         const store = new RootStore();
         store.globalState.setTimezone(timezone);
@@ -82,12 +89,20 @@ describe("chat page", () => {
             testMode: true
         }))
         store.receivedData.setProfile(makePublicProfile());
-        store.receivedData.setChatPreviews([
-            {
-                message: latestMessages[0],
+        if (customMessage) {
+            store.receivedData.setChatPreviews([{
+                message: customMessage,
                 profile: recepientProfile
-            }
-        ])
+            }])
+        } else {
+            store.receivedData.setChatPreviews([
+                {
+                    message: latestMessages[0],
+                    profile: recepientProfile
+                }
+            ])
+        }
+        
         store.receivedData.setNewMatches([]);
 
         if (useSave) {
@@ -297,5 +312,19 @@ describe("chat page", () => {
         expect(screen.queryByTestId(`readStatus-${latestMessages[0].id}`))
         expect(screen.queryByText(chatText.read)).toEqual(null);
         expect(screen.queryByText(chatText.delivered)).not.toEqual(null);
+    })
+
+    it("should not update read status if latest message not user's", async () => {
+        const { store } = await loadChat();
+
+        expect(store.receivedData.chatPreviews![0].profile.id).toEqual(recepientProfile.id);
+        expect(store.receivedData.chatPreviews![0].message.readStatus).toEqual(false);
+    })
+
+    it("should udpate read status on open", async () => {
+        const { store } = await loadChat(false,newMessage);
+
+        expect(store.receivedData.chatPreviews![0].profile.id).toEqual(recepientProfile.id);
+        expect(store.receivedData.chatPreviews![0].message.readStatus).toEqual(true);
     })
 })
