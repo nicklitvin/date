@@ -1,4 +1,4 @@
-import { Message, NewMatchData, SocketPayloadToClient, SocketPayloadToServer } from "../interfaces";
+import { ChatPreview, Message, NewMatchData, SocketPayloadToClient, SocketPayloadToServer } from "../interfaces";
 import { ReceivedData } from "../store/ReceivedData";
 import { URLs } from "../urls";
 
@@ -81,10 +81,11 @@ export class SocketManager {
             const newList = [...this.received.chatPreviews]
             newList.slice(oldMatchIndex, 1);
 
-            this.received.setChatPreviews([
+            const updatedPreviews : ChatPreview[] = [
                 { profile: oldMatchData.profile, message: { ...message, timestamp: new Date(message.timestamp) }},
                 ...newList
-            ])
+            ];
+            this.received.setChatPreviews(updatedPreviews)
         }
 
         if (this.received.savedChats[message.userID]) {

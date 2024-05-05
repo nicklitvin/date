@@ -70,6 +70,15 @@ export function Chat(props : Props) {
     const updateMyReadStatus = async () => {
         if (!globalState.socketManager || !receivedData.profile) return 
 
+        if (receivedData.chatPreviews) {
+            const copy = [...receivedData.chatPreviews];
+            const index = copy.findIndex(val => val.profile.id == userID);
+            if (index > -1 && copy[index].message.userID == userID) {
+                copy[index].message.readStatus = true;
+                receivedData.setChatPreviews(copy);
+            }
+        }
+
         globalState.socketManager.sendData({
             readUpdate: {
                 userID: receivedData.profile.id,
@@ -249,6 +258,7 @@ export function Chat(props : Props) {
     }
     return (
         <StyledView className="w-full h-full bg-back">
+        <StyledButton testID={testIDS.load} onPress={updateMyReadStatus}/>
         <MyModal
             show={showModal}
             buttons={[

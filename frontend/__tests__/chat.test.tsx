@@ -58,29 +58,23 @@ describe("chat page", () => {
     const newMessage : Message = {
         id: "id3",
         message: "very new message",
-        readStatus: true,
+        readStatus: false,
         recepientID: myUserID,
         timestamp: new Date(Date.UTC(2000, 0, 1, 10, 0)),
         userID: recepientProfile.id
     }
 
-    const loadChat = async (useSave = false, customMessage? : Message) => {
+    const loadChat = async (useSave = false) => {
         const mock = new MockAdapter(axios);
         mock.onPost(URLs.server + URLs.getProfile).replyOnce( config =>
             [200, { data: recepientProfile } as APIOutput<PublicProfile>]
         )
-        if (customMessage) {
-            mock.onPost(URLs.server + URLs.getChat).replyOnce( config => {
-                return [200, { data: [customMessage] } as APIOutput<Message[]>]
-            })
-        } else {
-            mock.onPost(URLs.server + URLs.getChat).replyOnce(config => {
-                const payload = JSON.parse(config.data) as GetChatInput;
-                expect(payload.withID).toEqual(recepientProfile.id);
-                return [200, { data: latestMessages } as APIOutput<Message[]>]
-            })
-        }
         
+        mock.onPost(URLs.server + URLs.getChat).replyOnce(config => {
+            const payload = JSON.parse(config.data) as GetChatInput;
+            expect(payload.withID).toEqual(recepientProfile.id);
+            return [200, { data: latestMessages } as APIOutput<Message[]>]
+        })
 
         const store = new RootStore();
         store.globalState.setTimezone(timezone);
@@ -89,19 +83,12 @@ describe("chat page", () => {
             testMode: true
         }))
         store.receivedData.setProfile(makePublicProfile());
-        if (customMessage) {
-            store.receivedData.setChatPreviews([{
-                message: customMessage,
+        store.receivedData.setChatPreviews([
+            {
+                message: latestMessages[0],
                 profile: recepientProfile
-            }])
-        } else {
-            store.receivedData.setChatPreviews([
-                {
-                    message: latestMessages[0],
-                    profile: recepientProfile
-                }
-            ])
-        }
+            }
+        ])
         
         store.receivedData.setNewMatches([]);
 
@@ -321,10 +308,24 @@ describe("chat page", () => {
         expect(store.receivedData.chatPreviews![0].message.readStatus).toEqual(false);
     })
 
-    it("should udpate read status on open", async () => {
-        const { store } = await loadChat(false,newMessage);
+    it("should update read status on open", async () => {
+        const { store } = await loadChat(false);
 
-        expect(store.receivedData.chatPreviews![0].profile.id).toEqual(recepientProfile.id);
-        expect(store.receivedData.chatPreviews![0].message.readStatus).toEqual(true);
+        await act( () => {
+            store.globalState.socketManager?.updateChatWithMessage(newMessage);
+        })
+
+        const preview = store.receivedData.chatPreviews![0];
+        expect(preview.message.id).toEqual(newMessage.id);
+        expect(preview.message.userID).toEqual(recepientProfile.id);
+        expect(preview.message.readStatus).toEqual(false);
+
+        await act( () => {
+            fireEvent(screen.getByTestId(testIDS.load), "press");
+        })
+
+        const readPreview = store.receivedData.chatPreviews![0];
+        expect(readPreview.message.id).toEqual(newMessage.id);
+        expect(readPreview.message.readStatus).toEqual(true);
     })
 })
