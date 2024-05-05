@@ -6,18 +6,20 @@ import { EditUserInput, JustUserID, SettingData, UpdatePushTokenInput, WithKey }
 import { URLs } from "../src/urls";
 import { MyButton } from "../src/components/Button";
 import { useStore } from "../src/store/RootStore";
-import Toggle from "react-native-toggle-element"
+// import Toggle from "react-native-toggle-element"
 import { useEffect, useState } from "react";
 import { sendRequest } from "../src/utils";
 import { globals } from "../src/globals";
 import { Spacing } from "../src/components/Spacing";
 import { MyModal } from "../src/components/Modal";
 import { testIDS } from "../src/testIDs";
-import { Platform } from "react-native";
+import { Linking, Platform, Switch } from "react-native";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import Constants from "expo-constants";
 import { Redirect } from "expo-router";
+import Loading from "./Loading";
+import Toast from "react-native-toast-message";
 
 interface Props {
     disableToggle?: boolean
@@ -26,9 +28,9 @@ interface Props {
 
 export function Settings(props : Props) {
     const {globalState, receivedData} = useStore();
+    const settings = receivedData.settings;
 
     const [showModal, setShowModal] = useState<boolean>(false);
-    const [settings, setSettings] = useState<SettingData[]>(receivedData.settings ?? []);
     const [redirect, setRedirect] = useState<boolean>(false);
     const [firstLoad, setFirstLoad] = useState<boolean>(true);
 
@@ -36,17 +38,11 @@ export function Settings(props : Props) {
         if (firstLoad) {
             setFirstLoad(false);
             if (props.noAutoLoad) return
-            if (settings.length == 0) load();   
+            if (!settings) load();   
         }
     }, [firstLoad])
 
-    useEffect( () => {
-        if (settings) {
-            receivedData.setSettings(settings);
-        }
-    }, [settings])
-
-    const updatePushToken = async () => {
+    const updatePushToken = async (title : string) => {
         if (Platform.OS == "android") {
             Notifications.setNotificationChannelAsync("default", {
                 name: "default",
@@ -54,17 +50,15 @@ export function Settings(props : Props) {
             })
         }
 
-
         if (Device.isDevice) {
             const { status: existingStatus } = await Notifications.getPermissionsAsync();
-            let finalStatus = existingStatus;
             if (existingStatus !== 'granted') {
-                const { status } = await Notifications.requestPermissionsAsync();
-                finalStatus = status;
+                return Toast.show({
+                    text1: "Notifiactions disabled. Click to view settings.",
+                    onPress: () => Linking.openSettings()
+                })
             }
-            if (finalStatus !== 'granted') {
-                return;
-            }
+            changeToggleValue(title,true);
             const token = await Notifications.getExpoPushTokenAsync({
                 projectId: Constants.expoConfig?.extra?.eas.projectId,
             });
@@ -73,13 +67,13 @@ export function Settings(props : Props) {
                 expoPushToken: token.data,
                 key: receivedData.loginKey
             }
-            try {
-                await sendRequest(URLs.updatePushToken, input)
-            } catch (err) {
-                console.log(err);
+            const response = await sendRequest<void>(URLs.updatePushToken, input);
+            if (response.message) {
+                // toast message
+                changeToggleValue(title,false);
+            } else {
+                globalState.setExpoPushToken(token.data);
             }
-
-            globalState.setExpoPushToken(token.data);
         }
     }
 
@@ -93,44 +87,38 @@ export function Settings(props : Props) {
             if (response.message) {
                 // toast message
             } else if (response.data) {
-                setSettings(response.data);
+                receivedData.setSettings(response.data);
             }
         } catch (err) {
             console.log(err);
         }
     }
 
-    const changeSettingValue = async (title : string, value : boolean) => {
-        try {
-            if (!globalState.expoPushToken && title.includes("notification")) {
-                try {
-                    await updatePushToken();
-                } catch (err) {
-                    console.log(err);
-                    return
-                }
-            }
+    const changeToggleValue = (title : string, value : boolean) => {
+        if (!settings) return 
+        const copy = [...settings];
+        const index = copy.findIndex(val => val.title == title);
+        copy[index] = { title: title, value: value, display: copy[index].display };
+        receivedData.setSettings(copy);
+    }
 
-            const input : WithKey<EditUserInput> = {
-                userID: receivedData.profile?.id!,
-                key: receivedData.loginKey,
-                setting: title,
-                value: value
-            }
-            const copy = [...settings];
-            const index = copy.findIndex(val => val.title == title);
-            copy[index] = { title: title, value: value, display: copy[index].display };
-            setSettings(copy);
-            const response = await sendRequest<void>(URLs.editUser, input);
-            if (response.message) {
-                // toast message
-            }
-        } catch (err) {
-            console.log(err);
-            const copy = [...settings];
-            const index = copy.findIndex(val => val.title == title);
-            copy[index] = { title: title, value: !value, display: copy[index].display };
-            setSettings(copy);
+    const changeSettingValue = async (title : string, value : boolean) => {
+        console.log("changing value");
+        if (!globalState.expoPushToken && title.includes("notification") && value) {
+            return updatePushToken(title)
+        }
+
+        const input : WithKey<EditUserInput> = {
+            userID: receivedData.profile?.id!,
+            key: receivedData.loginKey,
+            setting: title,
+            value: value
+        }
+        changeToggleValue(title, value);
+        const response = await sendRequest<void>(URLs.editUser, input);
+        if (response.message) {
+            // toast message
+            changeToggleValue(title,!value)
         }
     }
 
@@ -157,9 +145,15 @@ export function Settings(props : Props) {
     }
 
     if (redirect) return <Redirect href="SignIn"/>
+    else if (!settings) return (
+        <>
+            <StyledButton testID={testIDS.load} onPress={load}/> 
+            <Loading /> 
+        </>
+    )
     return (
+        <>
         <StyledView className="w-full h-full bg-back">
-        <StyledButton testID={testIDS.load} onPress={load}/> 
         <MyModal
             show={showModal}
             buttons={[
@@ -184,32 +178,20 @@ export function Settings(props : Props) {
             />
             <Spacing size="lg"/>
             {settings.map( setting => (
-                <StyledView key={`setting-${setting.title}`}>
+                <StyledView key={`setting-${setting.title}`} >
                     <StyledView
                         className="flex flex-row w-full items-center px-5 pb-2"
                     >
                         <StyledText className="text-bold text-xl font-bold">
                              {setting.display}
-                         </StyledText>
-                         <StyledView className="flex-grow"/>
-                         <StyledButton
-                            testID={`toggle-${setting.title}`}
-                            onPress={props.disableToggle ? 
-                                () => changeSettingValue(setting.title, !setting.value) : 
-                                () => {}
-                            }
-                            className="border border-front rounded-full"
-                        >
-                            { props.disableToggle ? null : 
-                                <Toggle
-                                    value={setting.value}
-                                    onPress={ () => changeSettingValue(setting.title, !setting.value)}
-                                    thumbStyle={{backgroundColor: globals.light}}
-                                    thumbButton={{radius: 1000, height: 25, width: 25}}
-                                    trackBar={{width: 50, height: 25, activeBackgroundColor: globals.green, inActiveBackgroundColor: globals.red}}
-                                />
-                            }
-                        </StyledButton>
+                        </StyledText>
+                        <StyledView className="flex-grow"/>
+                        <Switch
+                            value={setting.value}
+                            onValueChange={ () => changeSettingValue(setting.title, !setting.value)}
+                            trackColor={{false: globals.dark, true: globals.dark}}
+                            thumbColor={setting.value ? globals.green : globals.red}
+                        />
                     </StyledView>
                 </StyledView>
             ))}
@@ -232,6 +214,9 @@ export function Settings(props : Props) {
             
         </StyledView>
         </StyledView>
+        <Toast/>
+        </>
+        
     )
 }   
 

@@ -957,6 +957,16 @@ describe("handler", () => {
         expect(await handler.login.getUserByKey(output?.data?.key as string)).not.toEqual(null);
     })
 
+    it("should update expo push token on login", async () => {
+        const email = "a";
+        const token = "token";
+
+        await handler.loginWithToken({expoPushToken: token}, email);
+        const login = await handler.login.getUserByEmail(email);
+        expect(login?.expoPushToken).toEqual(token);
+        
+    })
+
     it("should update key if existing entry", async () => {
         const email = "a";
 
@@ -1166,5 +1176,25 @@ describe("handler", () => {
         expect(user2Socket.payloads).toHaveLength(1);
         const payload : NewMatchData = JSON.parse(user2Socket.payloads[0]).match;
         expect(payload.profile.id).toEqual(user.id);
+    })
+
+    it("should enable notifications on create user if push token", async () => {
+        const requestUserInput = await validRequestUserInput();
+        const token = "a";
+        await handler.login.createUser({
+            email: requestUserInput.email,
+            expoPushToken: token
+        })
+        const user = await handler.createUser(requestUserInput,true);
+        expect(user.data?.notifications).toEqual(true);
+    })
+
+    it("should not enable notifications on create user if no token", async () => {
+        const requestUserInput = await validRequestUserInput();
+        await handler.login.createUser({
+            email: requestUserInput.email,
+        })
+        const user = await handler.createUser(requestUserInput,true);
+        expect(user.data?.notifications).toEqual(false);
     })
 })

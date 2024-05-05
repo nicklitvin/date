@@ -93,9 +93,10 @@ export class Handler {
 
     public async createUser(input : HandlerUserInput, ignoreVerification = this.ignoreVerification) : Promise<APIOutput<User>> 
     {
-        const [user, verification] = await Promise.all([
+        const [user, verification, login] = await Promise.all([
             this.user.getUserByEmail(input.email),
-            this.verification.getVerificationByPersonalEmail(input.email)
+            this.verification.getVerificationByPersonalEmail(input.email),
+            this.login.getUserByEmail(input.email)
         ])
         if (user) return { message: errorText.userAlreadyExists}
 
@@ -126,8 +127,9 @@ export class Handler {
                 alcohol: input.alcohol,
                 smoking: input.smoking,
             }
+            const enableNotifications = Boolean(login?.expoPushToken);
     
-            return { data: await this.user.createUser(userInput) };
+            return { data: await this.user.createUser(userInput, enableNotifications) };
         }
         return { message: errorText.userNotVerified };
     }
@@ -586,12 +588,12 @@ export class Handler {
         if (!email) return {message: errorText.invalidLoginToken};
 
         if (await this.login.getUserByEmail(email)) {
-            if (input.expoPushToken) {
-                await this.login.updateExpoToken(email, input.expoPushToken);
-            }
             const userLogin = await this.login.updateKey(email);
             const verification = await this.verification.getVerificationByPersonalEmail(email);
             const reportCount = await this.report.getReportCountForEmail(verification?.schoolEmail!);
+            if (input.expoPushToken) {
+                await this.login.updateExpoToken(userLogin.userID, input.expoPushToken);
+            }
 
             return reportCount >= miscConstants.maxReportCount ?
                 {

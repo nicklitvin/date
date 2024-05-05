@@ -266,13 +266,12 @@ export function Index() {
                 const { status } = await Notifications.requestPermissionsAsync();
                 finalStatus = status;
             }
-            if (finalStatus !== 'granted') {
-                return;
+            if (finalStatus == 'granted') {
+                const token = await Notifications.getExpoPushTokenAsync({
+                    projectId: Constants.expoConfig?.extra?.eas.projectId,
+                });
+                globalState.setExpoPushToken(token.data);
             }
-            const token = await Notifications.getExpoPushTokenAsync({
-                projectId: Constants.expoConfig?.extra?.eas.projectId,
-            });
-            globalState.setExpoPushToken(token.data);
         }
 
         if (globals.useSample) {

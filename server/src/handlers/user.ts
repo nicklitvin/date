@@ -27,11 +27,11 @@ export class UserHandler {
         }
     }
 
-    public async createUser(input : UserInput) : Promise<User> {
+    public async createUser(input : UserInput, notifications?: boolean) : Promise<User> {
         return this.prisma.user.create({
             data: {
                 ...input,
-                notifications: true,
+                notifications: notifications ?? false,
                 university: this.getUniversityFromEmail(input.email)!,
                 subscribeEnd: new Date(),
                 isSubscribed: false,

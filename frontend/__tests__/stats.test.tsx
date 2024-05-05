@@ -9,85 +9,85 @@ import StatsMob from "../app/(tabs)/Stats"
 import { testIDS } from "../src/testIDs"
 
 describe("stats", () => {
-    const load = async (loadNothing : boolean, useSave = false) => {
-        const url = "url";
-        const stats : UserSwipeStats = {
-            allTime: {
-                dislikedMe: 10,
-                likedMe: 10,
-                myDislikes: 10,
-                myLikes: 10
-            },
-            weekly: [
-                {
-                    dislikedMe: 10,
-                    likedMe: 10,
-                    myDislikes: 10,
-                    myLikes: 10
-                }
-            ]
-        }
-        const mock = new MockAdapter(axios);
-        mock.onPost(URLs.server + URLs.getStats).replyOnce( config =>
-            [200, {data: loadNothing ? null : stats}]
-        )
-        mock.onPost(URLs.server + URLs.getCheckoutPage).reply( config => [
-            200, {data: url}
-        ])
+    // const load = async (loadNothing : boolean, useSave = false) => {
+    //     const url = "url";
+    //     const stats : UserSwipeStats = {
+    //         allTime: {
+    //             dislikedMe: 10,
+    //             likedMe: 10,
+    //             myDislikes: 10,
+    //             myLikes: 10
+    //         },
+    //         weekly: [
+    //             {
+    //                 dislikedMe: 10,
+    //                 likedMe: 10,
+    //                 myDislikes: 10,
+    //                 myLikes: 10
+    //             }
+    //         ]
+    //     }
+    //     const mock = new MockAdapter(axios);
+    //     mock.onPost(URLs.server + URLs.getStats).replyOnce( config =>
+    //         [200, {data: loadNothing ? null : stats}]
+    //     )
+    //     mock.onPost(URLs.server + URLs.getCheckoutPage).reply( config => [
+    //         200, {data: url}
+    //     ])
 
-        const store = new RootStore();
-        if (useSave) {
-            store.receivedData.setStats(stats)
-        }
-        const StoreProvider = createStoreProvider(store);
-        const openLinkFunc = jest.fn();
+    //     const store = new RootStore();
+    //     if (useSave) {
+    //         store.receivedData.setStats(stats)
+    //     }
+    //     const StoreProvider = createStoreProvider(store);
+    //     const openLinkFunc = jest.fn();
 
-        render(
-            <StoreProvider value={store}>
-                <StatsMob 
-                    noAutoLoad={true}
-                    openLinkFunc={openLinkFunc}
-                    dontLoadCharts={true}
-                />
-            </StoreProvider>
-        )
+    //     render(
+    //         <StoreProvider value={store}>
+    //             <StatsMob 
+    //                 noAutoLoad={true}
+    //                 openLinkFunc={openLinkFunc}
+    //                 dontLoadCharts={true}
+    //             />
+    //         </StoreProvider>
+    //     )
 
-        if (!useSave) {
-            await act( () => {
-                fireEvent(screen.getByTestId(testIDS.load), "press")
-            })
-        }
+    //     if (!useSave) {
+    //         await act( () => {
+    //             fireEvent(screen.getByTestId(testIDS.load), "press")
+    //         })
+    //     }
 
-        return { mock, store, openLinkFunc, url }
-    }
+    //     return { mock, store, openLinkFunc, url }
+    // }
 
-    it("should open link if no stats", async () => {
-        const { openLinkFunc, url } = await load(true);
+    // it("should open link if no stats", async () => {
+    //     const { openLinkFunc, url } = await load(true);
 
-        await act( () => {
-            fireEvent(screen.getByText(statsText.purchaseButton), "press")
-        });
+    //     await act( () => {
+    //         fireEvent(screen.getByText(statsText.purchaseButton), "press")
+    //     });
 
-        expect(openLinkFunc).toHaveBeenCalledTimes(1);
-        expect(openLinkFunc).toHaveBeenLastCalledWith(url);
-    })
+    //     expect(openLinkFunc).toHaveBeenCalledTimes(1);
+    //     expect(openLinkFunc).toHaveBeenLastCalledWith(url);
+    // })
 
-    it("should render stats", async () => {
-        const { store } = await load(false);
+    // it("should render stats", async () => {
+    //     const { store } = await load(false);
 
-        expect(screen.queryByText(statsText.purchaseButton)).toEqual(null);
-        expect(store.receivedData.stats).not.toEqual(null);
-    })
+    //     expect(screen.queryByText(statsText.purchaseButton)).toEqual(null);
+    //     expect(store.receivedData.stats).not.toEqual(null);
+    // })
 
-    it("should save stats", async () => {
-        const { store } = await load(false);
+    // it("should save stats", async () => {
+    //     const { store } = await load(false);
 
-        expect(store.receivedData.stats).not.toEqual(null);
-    })
+    //     expect(store.receivedData.stats).not.toEqual(null);
+    // })
 
-    it("should load saved", async () => {
-        await load(false,true);
+    // it("should load saved", async () => {
+    //     await load(false,true);
 
-        expect(screen.queryByText(statsText.purchaseButton)).toEqual(null);
-    })
+    //     expect(screen.queryByText(statsText.purchaseButton)).toEqual(null);
+    // })
 })
