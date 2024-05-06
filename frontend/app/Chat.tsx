@@ -302,12 +302,7 @@ export function Chat(props : Props) {
                         newLine={true}
                     />  
                 </StyledView>
-                {
-                    chat.length == 0 ?
-                    <StyledText className="pb-[400px] items-center font-bold text-center text-xl">
-                        {chatText.sendFirst}
-                    </StyledText> : null
-                }
+
                 <StyledScroll 
                     onScroll={handleScroll}
                     testID={testIDS.chatScroll}
@@ -315,6 +310,12 @@ export function Chat(props : Props) {
                     className="flex-1"
                     ref={scrollRef}
                 >
+                    {
+                        chat.length == 0 ?
+                        <StyledText className="pt-[200px] items-center font-bold text-center text-xl">
+                            {chatText.sendFirst}
+                        </StyledText> : null
+                    }
                     <StyledView className="flex flex-col-reverse">
                         {chat.map( (message, index) => (
                             <StyledView 
