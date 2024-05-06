@@ -1067,6 +1067,18 @@ describe("handler", () => {
         expect(output.data).not.toEqual(null);
     })
 
+    it("should give stats after unsubscribing until expiration", async () => {
+        const user = await handler.user.createUser(createUserInput());
+
+        await handler.processSubscriptionPay({
+            userID: user.id,
+            subscriptionID: "randomID"
+        });
+        await handler.cancelSubscription(user.id);
+
+        expect(await handler.getStatsIfSubscribed(user.id)).not.toEqual(null);
+    })
+
     it("should update read status update if not match", async () => {
         const user = await handler.user.createUser(createUserInput("a@berkeley.edu"));
         const user2 = await handler.user.createUser(createUserInput("b@berkeley.edu"));

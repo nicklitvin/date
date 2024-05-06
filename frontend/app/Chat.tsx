@@ -100,6 +100,8 @@ export function Chat(props : Props) {
                 receivedData.chatPreviews.filter( val => val.profile.id != userID)
             );
         }
+
+        router.back();
     }
 
     const load = async () => {
@@ -211,12 +213,11 @@ export function Chat(props : Props) {
                 key: receivedData.loginKey,
                 reportedID: profile!.id
             }
-            const response = await sendRequest(URLs.reportUser, myReport);
+            const response = {} || await sendRequest(URLs.reportUser, myReport);
             if (response.message) {
                 // toast message
             } else {
                 deleteUser();
-                if (!props.noAutoLoad && props.noRouter) router.push("Matches");
             }
         } catch (err) {
             console.log(err);
@@ -232,18 +233,16 @@ export function Chat(props : Props) {
                 withID: profile!.id
             }
 
-            const response = await sendRequest(URLs.unlikeUser, unlike);
+            const response = {} || await sendRequest(URLs.unlikeUser, unlike);
             if (response.message) {
                 // toast message
             } else {
                 deleteUser();
-                if (!props.noAutoLoad && props.noRouter) router.push("Matches");
             }
         } catch (err) {
             console.log(err);
         }
     }
-
 
     if (!chat || !profile) {
         return (
