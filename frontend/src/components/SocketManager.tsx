@@ -26,12 +26,18 @@ export class SocketManager {
                     const data = JSON.parse(e.data) as SocketPayloadToClient;
                     if (data.payloadProcessedID) {
                         if (data.message) {
-                            this.approveMessage(data.payloadProcessedID, data.message);
+                            this.approveMessage(data.payloadProcessedID, {
+                                ...data.message,
+                                timestamp: new Date(data.message.timestamp)
+                            });
                         }  
                     } else if (data.match) {
                         this.updateWithMatch(data.match);
                     } else if (data.message) {
-                        this.updateChatWithMessage(data.message)
+                        this.updateChatWithMessage({
+                            ...data.message,
+                            timestamp: new Date(data.message.timestamp)
+                        })
                     }
                 } catch (err) {
     
@@ -61,9 +67,9 @@ export class SocketManager {
     updateChatWithMessage(message : Message) {
         if (!this.received.newMatches || !this.received.chatPreviews) return 
 
-        const newMatchIndex = this.received.newMatches.findIndex(val => message.userID == val.profile.id)
-        const oldMatchIndex = this.received.chatPreviews.findIndex(val => message.userID == val.profile.id);
-
+        const newMatchIndex = this.received.newMatches.findIndex(val => [message.userID, message.recepientID].includes(val.profile.id))
+        const oldMatchIndex = this.received.chatPreviews.findIndex(val => [message.userID, message.recepientID].includes(val.profile.id));
+        
         if (newMatchIndex > -1) {
             const newMatchData = this.received.newMatches[newMatchIndex];
 
@@ -79,12 +85,13 @@ export class SocketManager {
             const oldMatchData = this.received.chatPreviews[oldMatchIndex];
 
             const newList = [...this.received.chatPreviews]
-            newList.slice(oldMatchIndex, 1);
+            newList.splice(oldMatchIndex, 1);
 
             const updatedPreviews : ChatPreview[] = [
                 { profile: oldMatchData.profile, message: { ...message, timestamp: new Date(message.timestamp) }},
                 ...newList
             ];
+
             this.received.setChatPreviews(updatedPreviews)
         }
 

@@ -185,7 +185,7 @@ describe("matches", () => {
             socketManager.updateChatWithMessage(notificationMessage);
         })
 
-        expect(store.receivedData.chatPreviews).toHaveLength(chatPreviews.length + 1);
+        expect(store.receivedData.chatPreviews).toHaveLength(chatPreviews.length);
         expect(store.receivedData.chatPreviews![0].message.userID).toEqual(notificationMessage.userID)
         expect(store.receivedData.chatPreviews![0].message.message).toEqual(notificationMessage.message)
     })

@@ -151,6 +151,9 @@ describe("chat page", () => {
         await sendMessage(myMessage);
         expect(store.globalState.loadingMessageIDs.size).toEqual(1);
         expect(screen.queryByText(chatText.sending)).not.toEqual(null);
+        expect(store.receivedData.savedChats[recepientProfile.id].length).toEqual(
+            latestMessages.length + 1
+        )
 
         const messageID : string = store.globalState.loadingMessageIDs.values().next().value;
         await act( () => {
@@ -173,6 +176,13 @@ describe("chat page", () => {
         expect(store.globalState.loadingMessageIDs.size).toEqual(0);
         expect(screen.queryByText(chatText.sending)).toEqual(null);
         expect(screen.queryByText(chatText.delivered)).not.toEqual(null);
+        expect(store.receivedData.savedChats[recepientProfile.id].length).toEqual(
+            latestMessages.length + 1
+        );
+
+        const preview = store.receivedData.chatPreviews?.find(val => val.profile.id == recepientProfile.id);
+        expect(preview?.message.message).toEqual(myMessage);
+        expect(store.receivedData.chatPreviews?.length).toEqual(1);
     })
 
     it("should receive new message", async () => {

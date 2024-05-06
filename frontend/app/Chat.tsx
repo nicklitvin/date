@@ -184,10 +184,7 @@ export function Chat(props : Props) {
 
             const message = globalState.socketManager.wasMessageProcessed(newMessageID);
             if (message) {
-                const copy = [...chat];
-                const index = chat.findIndex( val => val.id == newMessageID);
-                copy[index] = message;
-                receivedData.addSavedChat(userID, copy);
+                globalState.socketManager.updateChatWithMessage(message);
             } else {
                 globalState.addUnsentMessageID(newMessageID);
             }
@@ -326,9 +323,9 @@ export function Chat(props : Props) {
                             >
                                 {
                                     (
-                                        index == chat.length - 1 || 
-                                        message.timestamp.getTime() - chat[index + 1].timestamp.getTime() >
-                                        globals.timeBeforeChatTimestamp
+                                        index == receivedData.savedChats[userID].length - 1 || 
+                                        message.timestamp.getTime() - receivedData.savedChats[userID][index + 1].timestamp.getTime() >
+                                        globals.timeBeforeChatTimestamp 
                                     ) ? 
                                     <StyledText className="text-sm text-center m-1">
                                         {getChatTimestamp(message.timestamp, globalState.timeZone!)}
