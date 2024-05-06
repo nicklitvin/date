@@ -96,6 +96,19 @@ describe("swipe", () => {
         expect(stats.weekly[2].dislikedMe).toEqual(1);
     })
 
+    it("should not show old swipes in stats", async () => {
+        await Promise.all([
+            funcs.createSwipe(createSwipeInput("Like",userID), new Date(0)),
+            funcs.createSwipe(createSwipeInput("Like",userID))
+        ])
+
+        const stats = await funcs.getUserSwipeStats(userID);
+        expect(stats.allTime.myLikes).toEqual(2);
+        expect(stats.weekly[0].myLikes).toEqual(1);
+        expect(stats.weekly.at(-1)!.myLikes).toEqual(0);
+
+    })
+
     it("should get all matches", async () => {
         const userID_3 = "userID_3";
 

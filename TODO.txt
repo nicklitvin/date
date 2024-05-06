@@ -1,5 +1,4 @@
 TODO
-stats show 4 weeks ago even though its been ages ago
 notification receive, delete receiveDate when new
 reconnect socket if too long, when creating user
 can stil give stats if user unsuscribed til end of month

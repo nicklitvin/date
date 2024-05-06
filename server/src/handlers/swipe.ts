@@ -103,6 +103,13 @@ export class SwipeHandler {
         return { myLikes, myDislikes, likedMe, dislikedMe}
     }
 
+    /**
+     * Weekly stats are in reverse order, 1st element represents last week, 2nd represents 
+     * week before that
+     * 
+     * @param userID 
+     * @returns 
+     */
     public async getUserSwipeStats(userID : string) : Promise<UserSwipeStats> {
         const weekStart = startOfWeek(new Date());
 

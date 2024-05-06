@@ -128,8 +128,8 @@ export function Stats(props : Props) {
                         {statsText.weeklyReceived}
                     </StyledText>
                     <Weekly
-                        likes={stats.weekly.map( val => val.likedMe)}
-                        dislikes={stats.weekly.map( val => val.dislikedMe)}
+                        likes={stats.weekly.map( val => val.likedMe).reverse()}
+                        dislikes={stats.weekly.map( val => val.dislikedMe).reverse()}
                         likeText={statsText.likesReceived}
                         dislikeText={statsText.dislikesReceived}
                     />
@@ -138,8 +138,8 @@ export function Stats(props : Props) {
                         {statsText.weeklySent}
                     </StyledText>
                     <Weekly
-                        likes={stats.weekly.map( val => val.myLikes)}
-                        dislikes={stats.weekly.map( val => val.myDislikes)}
+                        likes={stats.weekly.map( val => val.myLikes).reverse()}
+                        dislikes={stats.weekly.map( val => val.myDislikes).reverse()}
                         likeText={statsText.likesSent}
                         dislikeText={statsText.dislikesSent}
                     />
