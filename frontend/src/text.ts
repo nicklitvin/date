@@ -16,6 +16,9 @@ export const chatText = {
     modalReport: "Report User",
     modalUnlike: "Unmatch User",
     sendFirst: "Send the first message :)",
+
+    errorCannotGetChat: "Error",
+    errorCannotSend: "Cannot send message",
 }
 
 export const matchesText = {

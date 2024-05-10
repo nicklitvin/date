@@ -2,6 +2,7 @@ import { Tabs } from "expo-router";
 import { globals } from "../../src/globals";
 import { StyledImage } from "../../src/styledElements";
 import Toast from "react-native-toast-message";
+import { toastConfig } from "../../src/components/Toast";
 
 export default function TabLayout() {
     type IconType = "Feed" | "Matches" | "Profile" | "Stats";
@@ -54,7 +55,7 @@ export default function TabLayout() {
                     }}
                 />
             </Tabs>
-            <Toast/>
+            <Toast config={toastConfig}/>
         </>
     )
 }

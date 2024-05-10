@@ -17,6 +17,7 @@ import { differenceInSeconds } from "date-fns";
 import { router, useLocalSearchParams } from "expo-router";
 import { randomUUID } from "expo-crypto";
 import Loading from "./Loading";
+import Toast from "react-native-toast-message";
 
 interface Props {
     userID?: string
@@ -101,7 +102,7 @@ export function Chat(props : Props) {
             );
         }
 
-        router.back();
+        if (!props.noRouter) router.back();
     }
 
     const load = async () => {
@@ -131,7 +132,10 @@ export function Chat(props : Props) {
             }
             const chatResponse = await sendRequest<Message[]>(URLs.getChat, chatInput);
             if (chatResponse.message) {
-                // toast message
+                Toast.show({
+                    text1: chatText.errorCannotGetChat,
+                    text2: chatResponse.message
+                })
             } else if (chatResponse.data) {
                 const processed = chatResponse.data.map( val => ({
                     ...val,
@@ -150,7 +154,10 @@ export function Chat(props : Props) {
 
     const sendMessage = async (sentMessage : string, removeID?: string) => {
         if (!globalState.socketManager || !receivedData.profile || !profile) {
-            // toast message
+            Toast.show({
+                type: "error",
+                text1: chatText.errorCannotSend
+            })
             return 
         }
 
@@ -213,9 +220,12 @@ export function Chat(props : Props) {
                 key: receivedData.loginKey,
                 reportedID: profile!.id
             }
-            const response = {} || await sendRequest(URLs.reportUser, myReport);
+            const response = await sendRequest(URLs.reportUser, myReport);
             if (response.message) {
-                // toast message
+                Toast.show({
+                    type: "error",
+                    text1: response.message
+                })
             } else {
                 deleteUser();
             }
@@ -235,7 +245,10 @@ export function Chat(props : Props) {
 
             const response = {} || await sendRequest(URLs.unlikeUser, unlike);
             if (response.message) {
-                // toast message
+                Toast.show({
+                    type: "error",
+                    text1: response.message
+                })
             } else {
                 deleteUser();
             }

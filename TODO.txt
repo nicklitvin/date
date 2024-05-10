@@ -1,15 +1,13 @@
 TODO
-cancel subscription not working
 add toast messages
+cancel subscription not working
 notification receive, delete receiveDate when new
 reconnect socket if too long, when creating user
-can stil give stats if user unsuscribed til end of month
 
 allow other users
     verification as option
     preference 
     choose location
-
 
 Optional TODO
 announcement/errorlog implement

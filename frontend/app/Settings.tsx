@@ -69,7 +69,10 @@ export function Settings(props : Props) {
             }
             const response = await sendRequest<void>(URLs.updatePushToken, input);
             if (response.message) {
-                // toast message
+                Toast.show({
+                    text1: response.message,
+                    type: "error"
+                })
                 changeToggleValue(title,false);
             } else {
                 globalState.setExpoPushToken(token.data);
@@ -85,7 +88,10 @@ export function Settings(props : Props) {
             }
             const response = await sendRequest<SettingData[]>(URLs.getSettings, input);
             if (response.message) {
-                // toast message
+                Toast.show({
+                    type: "error",
+                    text1: response.message
+                })
             } else if (response.data) {
                 receivedData.setSettings(response.data);
             }
@@ -117,7 +123,10 @@ export function Settings(props : Props) {
         changeToggleValue(title, value);
         const response = await sendRequest<void>(URLs.editUser, input);
         if (response.message) {
-            // toast message
+            Toast.show({
+                type: "error",
+                text1: response.message
+            })
             changeToggleValue(title,!value)
         }
     }
@@ -137,7 +146,10 @@ export function Settings(props : Props) {
             }
             const response = await sendRequest(URLs.deleteAccount, input);
             if (response.message) {
-                // toast message
+                Toast.show({
+                    type: "error",
+                    text1: response.message,
+                })
             } else {
                 signOut();
             }

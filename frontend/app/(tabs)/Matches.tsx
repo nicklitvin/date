@@ -14,6 +14,7 @@ import { sendRequest } from "../../src/utils";
 import { useStore } from "../../src/store/RootStore";
 import { Link, router } from "expo-router";
 import Loading from "../Loading";
+import Toast from "react-native-toast-message";
 
 interface Props {
     noAutoLoad?: boolean
@@ -52,7 +53,10 @@ export function Matches(props : Props) {
     
             const newMatchResponse = await sendRequest<NewMatchData[]>(URLs.getNewMatches, newMatchDataInput);
             if (newMatchResponse.message) {
-                // toast message
+                Toast.show({
+                    type: "error",
+                    text1: newMatchResponse.message,
+                })
             } else if (newMatchResponse.data) {
                 const processed = newMatchResponse.data.map( val => ({
                     profile: val.profile,
@@ -78,7 +82,10 @@ export function Matches(props : Props) {
             }
             const chatPreviewResponse = await sendRequest<ChatPreview[]>(URLs.getNewChatPreviews, newMatchDataInput);
             if (chatPreviewResponse.message) {
-                // toast message
+                Toast.show({
+                    type: "error",
+                    text1: chatPreviewResponse.message,
+                })
             } else if (chatPreviewResponse.data) {
                 const processed : ChatPreview[] = chatPreviewResponse.data.map( val => ({
                     profile: val.profile,

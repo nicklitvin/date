@@ -13,6 +13,7 @@ import { testIDS } from "../../src/testIDs";
 import { useEffect, useState } from "react";
 import { MyDonut } from "../../src/components/Donut";
 import { Weekly } from "../../src/components/Weekly";
+import Toast from "react-native-toast-message";
 
 interface Props {
     noAutoLoad?: boolean
@@ -47,7 +48,10 @@ export function Stats(props : Props) {
             }
             const response = await sendRequest<UserSwipeStats>(URLs.getStats, input);
             if (response.message) {
-                // toast
+                Toast.show({
+                    type: "error",
+                    text1: response.message,
+                })
             } else if (response.data) {
                 setStats(response.data);
             }
@@ -64,7 +68,10 @@ export function Stats(props : Props) {
             }
             const response = await sendRequest<string>(URLs.getCheckoutPage, input);
             if (response.message) {
-                // toast
+                Toast.show({
+                    type: "error",
+                    text1: response.message,
+                })
             } else if (response.data) {
                 if (props.openLinkFunc) props.openLinkFunc(response.data) 
                 else await Linking.openURL(response.data);

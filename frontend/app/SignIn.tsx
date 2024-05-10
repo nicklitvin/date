@@ -13,6 +13,7 @@ import { router } from "expo-router";
 import { Spacing } from "../src/components/Spacing";
 import { globals } from "../src/globals";
 import { SocketManager } from "../src/components/SocketManager";
+import Toast from "react-native-toast-message";
 
 export function SignIn() {
     const { globalState, receivedData } = useStore();
@@ -66,7 +67,10 @@ export function SignIn() {
             try {
                 const response = await sendRequest<LoginOutput>(URLs.login, input);
                 if (response.message) {
-                    // toast
+                    Toast.show({
+                        type: "error",
+                        text1: response.message,
+                    })    
                 } else if (response.data) {
                     await processLoginOutput(response.data);
                 }
@@ -89,7 +93,10 @@ export function SignIn() {
                     }
                     const response = await sendRequest<PublicProfile>(URLs.getMyProfile,input);
                     if (response.message) {
-                        // toast
+                        Toast.show({
+                            type: "error",
+                            text1: response.message,
+                        })
                     } else if (response.data) {
                         receivedData.setProfile(response.data);
                         return router.push("(tabs)")
@@ -128,7 +135,10 @@ export function SignIn() {
 
             const response = await sendRequest<LoginOutput>(URLs.login, input);
             if (response.message) {
-                // toast
+                Toast.show({
+                    type: "error",
+                    text1: response.message,
+                })
             } else if (response.data) {
                 await processLoginOutput(response.data);
             }

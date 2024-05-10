@@ -195,14 +195,12 @@ export function Index() {
     const retrieveOne = async (request : Function, set : Function) => {
         try {
             const response : APIOutput<any> = await request();
-            
-            if (response.message) {
-                // toast 
-                return false;
-            } else if (response.data) {
+            if (response.data) {
                 set(response.data);
                 return true;
-            } 
+            } else {
+                return false;
+            }
         } catch (err) {
             // setError(true);
             return false;

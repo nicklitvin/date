@@ -64,7 +64,10 @@ export function Feed(props : Props) {
             }
             const response = await sendRequest<SwipeFeed>(URLs.getFeed, input);
             if (response.message) {
-                // toast message
+                Toast.show({
+                    type: "error",
+                    text1: response.message,
+                })
             } else if (response.data) {
                 globalState.resetSwipeStatus();
                 receivedData.setSwipeFeed(response.data);
