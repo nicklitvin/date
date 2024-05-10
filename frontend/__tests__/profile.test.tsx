@@ -7,6 +7,8 @@ import { profileText } from "../src/text";
 import { PublicProfile, SubscriptionData } from "../src/interfaces";
 import { RootStore, createStoreProvider } from "../src/store/RootStore";
 import { testIDS } from "../src/testIDs";
+import { addMinutes } from "date-fns";
+import { getShortDate } from "../src/utils";
 
 describe("profile page", () => {
     const profile : PublicProfile = {
@@ -24,27 +26,33 @@ describe("profile page", () => {
         smoking: "Often"
     }
 
-    const subscriptionData : SubscriptionData = {
+    const subscribed : SubscriptionData = {
         subscribed: true,
         endDate: new Date(),
         ID: "id"
     }
 
-    const notSubscribedData : SubscriptionData = {
+    const notSubscribed : SubscriptionData = {
         subscribed: false,
+    }
+
+    const expiringSubscription : SubscriptionData = {
+        subscribed: false,
+        endDate: addMinutes(new Date(), 1),
+        ID: undefined
     }
 
     const cancelURL = "cancelURL";
     const manageURL = "manageURL";
     const checkoutURL = "checkoutURL";
 
-    const load = async (subscribed : boolean, useSave = false) => {
+    const load = async (subscriptionData : SubscriptionData, useSave = false) => {
         const mock = new MockAdapter(axios);
         mock.onPost(URLs.server + URLs.getMyProfile).reply( config => 
             [200, {data: profile}]    
         )
         mock.onPost(URLs.server + URLs.getSubscription).reply( config => 
-            [200, {data: subscribed ? subscriptionData : notSubscribedData} ]
+            [200, {data: subscriptionData} ]
         )
         mock.onPost(URLs.server + URLs.cancelSubscription).reply(config => 
             [200, {data: cancelURL}]
@@ -62,9 +70,7 @@ describe("profile page", () => {
 
         if (useSave) {
             store.receivedData.setProfile(profile);
-            store.receivedData.setSubscription(
-                subscribed ? subscriptionData : notSubscribedData
-            )
+            store.receivedData.setSubscription(subscriptionData);
         }
 
         render(
@@ -86,7 +92,7 @@ describe("profile page", () => {
     }
 
     it("should render subscribed view", async () => {
-        const { store, openLinkFunc } = await load(true);
+        const { store, openLinkFunc } = await load(subscribed);
 
         expect(store.receivedData.subscription?.subscribed).toEqual(true);
 
@@ -99,7 +105,7 @@ describe("profile page", () => {
     })
 
     it("should show not subscribed view", async () => {
-        const { openLinkFunc } = await load(false);
+        const { openLinkFunc } = await load(notSubscribed);
 
         await act( () => {
             fireEvent(screen.getByText(profileText.purchasePremium), "press")
@@ -108,8 +114,21 @@ describe("profile page", () => {
         expect(openLinkFunc).toHaveBeenLastCalledWith(checkoutURL);
     })
 
+    it("should show subscription expiring view", async () => {
+        const { openLinkFunc } = await load(expiringSubscription);
+
+        expect(screen.queryByText(`Subscription is expiring on ${getShortDate(expiringSubscription.endDate!, "PST")}`)).not.toEqual(null);
+
+        await act( () => {
+            fireEvent(screen.getByText(profileText.purchasePremium), "press")
+        });
+
+        expect(openLinkFunc).toHaveBeenLastCalledWith(checkoutURL);
+
+    })
+
     it("should load saved data", async () => {
-        await load(true, true);
+        await load(subscribed, true);
 
         expect(screen.queryByText(profileText.cancelSubscription)).not.toEqual(null);
     })

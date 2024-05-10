@@ -111,6 +111,64 @@ export function Profile(props : Props) {
         }
     }
 
+    const makeSubscriptionContent = () => {
+        if (!savedSubscription) return 
+
+        if (savedSubscription.subscribed) {
+            return (
+                <StyledView className="flex flex-col w-full pt-5 items-center">
+                    <StyledText className="font-bold text-xl">
+                        {profileText.subscriptionStatus}
+                    </StyledText>
+                    <StyledText className="text-xl">
+                        {`Next payment of $6.99 on ${getShortDate(
+                            savedSubscription.endDate!, globalState.timeZone
+                        )}`}
+                    </StyledText>
+                    <StyledView className="w-full flex items-center pt-3">
+                        <MyButton
+                            text={profileText.managePayment}
+                            onPressFunction={managePayment}
+                        />
+                    </StyledView>
+                    <StyledView className="w-full flex items-center pt-3">
+                        <MyButton
+                            text={profileText.cancelSubscription}
+                            onPressFunction={cancelSubscription}
+                            danger={true}
+                        />
+                    </StyledView>
+                </StyledView>
+            )
+        } else if (savedSubscription.endDate && savedSubscription.endDate.getTime() > new Date().getTime()) {
+            return (
+                <StyledView className="w-full pt-3 flex items-center">
+                    <StyledText className="font-bold text-xl">
+                        {profileText.subscriptionStatus}
+                    </StyledText>
+                    <StyledText className="text-xl">
+                        {`Subscription is expiring on ${getShortDate(
+                            savedSubscription.endDate, globalState.timeZone
+                        )}`}
+                    </StyledText>
+                    <MyButton
+                        text={profileText.purchasePremium}
+                        onPressFunction={getCheckoutPage}
+                    />
+                </StyledView>
+            )
+        } else {
+            return (
+                <StyledView className="w-full pt-3 flex items-center">
+                    <MyButton
+                        text={profileText.purchasePremium}
+                        onPressFunction={getCheckoutPage}
+                    />
+                </StyledView>
+            )
+        }
+    }
+
     if ( (!savedProfile || !savedSubscription) && !props.dontAutoLoad) {
         return <Loading/>   
     }
@@ -152,38 +210,7 @@ export function Profile(props : Props) {
                         onPressFunction={() => router.navigate("/EditProfile")}
                     />
                 </StyledView>
-                {
-                    savedSubscription?.subscribed ? 
-                    <StyledView className="flex flex-col w-full pt-5 items-center">
-                        <StyledText className="font-bold text-xl">
-                            {profileText.subscriptionStatus}
-                        </StyledText>
-                        <StyledText className="text-xl">
-                            {`Next payment of $6.99 on ${getShortDate(
-                                savedSubscription.endDate!, globalState.timeZone
-                            )}`}
-                        </StyledText>
-                        <StyledView className="w-full flex items-center pt-3">
-                            <MyButton
-                                text={profileText.managePayment}
-                                onPressFunction={managePayment}
-                            />
-                        </StyledView>
-                        <StyledView className="w-full flex items-center pt-3">
-                            <MyButton
-                                text={profileText.cancelSubscription}
-                                onPressFunction={cancelSubscription}
-                                danger={true}
-                            />
-                        </StyledView>
-                    </StyledView> :
-                    <StyledView className="w-full pt-3 flex items-center">
-                        <MyButton
-                            text={profileText.purchasePremium}
-                            onPressFunction={getCheckoutPage}
-                        />
-                    </StyledView>
-                }
+                {makeSubscriptionContent()}
             </StyledView>
         </StyledView>
     )
