@@ -1,4 +1,5 @@
 TODO
+test notification send from server
 notification receive, delete receiveDate when new
 reconnect socket if too long, when creating user
 

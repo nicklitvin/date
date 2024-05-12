@@ -20,6 +20,7 @@ export class NotificationHandler {
 
     public async newMessage(input : MessageNotificationInput) {
         try {
+            console.log("sending message notification");
             return await this.client.sendPushNotificationsAsync([
                 {
                     to: input.recepientPushToken,

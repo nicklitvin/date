@@ -39,6 +39,7 @@ export const URLs = {
     // ADMIN
     deleteEverything: "/deleteEverything",
     createSample: "/createSample",
+    ip: "http://10.0.0.245:3000",
 
     // OAUTH
     googleOAuth: "https://www.googleapis.com/userinfo/v2/me",

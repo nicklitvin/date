@@ -13,8 +13,8 @@ export class MyServer {
     public readonly port = 3000;
 
     private app;
-    private handler : Handler;
     private server;
+    public handler : Handler;
 
     constructor({disableEmail = false}) {
         this.app = expressWs(express()).app;
@@ -22,7 +22,8 @@ export class MyServer {
 
         this.handler = new Handler({
             prisma: new PrismaClient(),
-            disableEmail: disableEmail
+            disableEmail: disableEmail,
+            disableNotifications: false,
         });
         new APIHandler(this.app, this.handler);
         this.server = this.app.listen(this.port);
@@ -34,10 +35,18 @@ export class MyServer {
         createUser = true,
         addSubscription = true,
         createSampleUsers = false,
-        clearTables = false
+        clearTables = false,
+        clearInteractionEntries = false
     }) {
         if (clearTables) {
             await this.handler.deleteEverything();
+        }
+
+        if (clearInteractionEntries) {
+            await Promise.all([
+                this.handler.swipe.deleteAllSwipes(),
+                this.handler.message.deleteAllMessages()
+            ])
         }
 
         if (loginUser) {

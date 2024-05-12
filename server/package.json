@@ -3,10 +3,14 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "start": "npx ts-node ./src/main.ts --no-network-family-autoselection",
+    "start": "ts-node ./src/main.ts --no-network-family-autoselection",
     "test": "jest --runInBand --use-mocks=true --testPathIgnorePatterns",
     "test-real": "jest --runInBand",
-    "test-single": "jest --use-mocks=true --testPathIgnorePatterns -t"
+    "test-single": "jest --use-mocks=true --testPathIgnorePatterns -t",
+
+    "ping": "ts-node ./src/adminAPI.ts -p",
+    "match": "ts-node ./src/adminAPI.ts -l",
+    "message": "ts-node ./src/adminAPI.ts -m message"
   },
   "keywords": [],
   "author": "",
@@ -41,7 +45,8 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3",
     "verify-apple-id-token": "^3.1.2",
-    "ws": "^8.16.0"
+    "ws": "^8.16.0",
+    "yargs": "^17.7.2"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",

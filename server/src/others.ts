@@ -12,7 +12,7 @@ export const allowedAttributeEdits : string[] = [
 ];
 
 export function isAdmin(key : string) {
-    return process.env.ADMIN_KEY! == key;
+    return process.env.ADMIN_API_KEY! == key;
 }
 
 export const attributeList : Record<AttributeType, string[]>= {

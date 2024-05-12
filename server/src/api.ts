@@ -209,10 +209,10 @@ export class APIHandler {
                     action: body.action,
                     swipedUserID: body.swipedUserID
                 }
-                const output = await handler.makeSwipe(input);
+                const output : APIOutput<Swipe> = await handler.makeSwipe(input);
                 return output ? 
-                    res.status(200).json(output as APIOutput<Swipe>) : 
-                    res.status(400).json()
+                    res.status(200).json(output) : 
+                    res.status(400).json(output)
             } catch (err) {
                 console.log(err);
                 return res.status(500).json();
