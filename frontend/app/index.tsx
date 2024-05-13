@@ -16,34 +16,12 @@ import { MyButton } from "../src/components/Button";
 import Loading from "./Loading";
 import { APIOutput, LoginOutput, WithKey } from "../src/interfaces";
 import { SocketManager } from "../src/components/SocketManager";
-import * as TaskManager from "expo-task-manager";
-
-TaskManager.defineTask(globals.backgroundTask, ({ data, error, executionInfo }) => {
-    console.log("notification", data, error, executionInfo);
-})
-
-Notifications.registerTaskAsync(globals.backgroundTask);
-
-Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-      shouldShowAlert: true,
-      shouldPlaySound: false,
-      shouldSetBadge: false,
-    }),
-});
 
 export function Index() {
     const [loading, setLoading] = useState<boolean>(true);
     const { globalState, receivedData } = useStore();
     const [error, setError] = useState<boolean>(false);
     const [firstLoad, setFirstLoad] = useState<boolean>(true);
-
-    useEffect( () => {
-        const subscription = Notifications.addNotificationReceivedListener( notification => 
-            console.log(notification)
-        );
-        return () => subscription.remove();
-    }, [])
 
     const setSampleData = () => {
         receivedData.setProfile({

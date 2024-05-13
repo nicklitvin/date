@@ -74,7 +74,7 @@ export function setCustomTimer(callback : () => any, seconds : number) : NodeJS.
 }
 
 export async function sendRequest<T>(subURL : string, data : any) : Promise<APIOutput<T>> {
-    const print = false;
+    const print = true;
 
     try {
         if (print) console.log("sending request to", subURL, "with data", data);

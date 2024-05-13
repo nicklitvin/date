@@ -48,23 +48,21 @@ async function main() {
             console.log(err);
         }
     } else if (match) {
-        const payload1 : APIRequest<SwipeInput> = {
-            key: process.env.ADMIN_API_KEY!,
-            userID: sampleUsers[0].id,
-            action: "Like",
-            swipedUserID: sampleContent.userID
-        }
-        const payload2 : SwipeInput & {key : string} = {
+        const payload1 : SwipeInput & {key : string} = {
             key: process.env.ADMIN_API_KEY!,
             userID: sampleContent.userID,
             action: "Like",
             swipedUserID: sampleUsers[0].id
         }
+        const payload2 : APIRequest<SwipeInput> = {
+            key: process.env.ADMIN_API_KEY!,
+            userID: sampleUsers[0].id,
+            action: "Like",
+            swipedUserID: sampleContent.userID
+        }
         try {
-            const [one,two] = await Promise.all([
-                axios.post(URLs.ip + URLs.makeSwipe, payload1),
-                axios.post(URLs.ip + URLs.makeSwipe, payload2),
-            ])
+            const one = await axios.post(URLs.ip + URLs.makeSwipe, payload1);
+            const two = await axios.post(URLs.ip + URLs.makeSwipe, payload2);
             if (one.data?.message) console.log(one.data.message);
             if (two.data?.message) console.log(two.data.message);
             console.log("completed");

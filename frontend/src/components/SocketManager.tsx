@@ -6,6 +6,7 @@ import { URLs } from "../urls";
 export class SocketManager {
     private ws : WebSocket|undefined;
     private received : ReceivedData;
+    private connectURL : string|undefined;
 
     public approvedMessages : Map<string, Message>;
 
@@ -19,31 +20,38 @@ export class SocketManager {
 
         if (!input.testMode) {
             const ip = URLs.server.split("http://")[1];
-            this.ws = new WebSocket(`ws://${ip}${URLs.websocket}?token=${input.socketToken}`);
+            this.connectURL = `ws://${ip}${URLs.websocket}?token=${input.socketToken}`;
+            this.connect();
+        }
+    }
 
-            this.ws.onmessage = (e : MessageEvent<string>) => {
-                try {
-                    const data = JSON.parse(e.data) as SocketPayloadToClient;
-                    if (data.payloadProcessedID) {
-                        if (data.message) {
-                            this.approveMessage(data.payloadProcessedID, {
-                                ...data.message,
-                                timestamp: new Date(data.message.timestamp)
-                            });
-                        }  
-                    } else if (data.match) {
-                        this.updateWithMatch(data.match);
-                    } else if (data.message) {
-                        this.updateChatWithMessage({
+    connect() {
+        if (!this.connectURL) return 
+        
+        this.ws = new WebSocket(this.connectURL);
+
+        this.ws.onmessage = (e : MessageEvent<string>) => {
+            try {
+                const data = JSON.parse(e.data) as SocketPayloadToClient;
+                if (data.payloadProcessedID) {
+                    if (data.message) {
+                        this.approveMessage(data.payloadProcessedID, {
                             ...data.message,
                             timestamp: new Date(data.message.timestamp)
-                        })
-                    }
-                } catch (err) {
-    
+                        });
+                    }  
+                } else if (data.match) {
+                    this.updateWithMatch(data.match);
+                } else if (data.message) {
+                    this.updateChatWithMessage({
+                        ...data.message,
+                        timestamp: new Date(data.message.timestamp)
+                    })
                 }
-            };
-        }
+            } catch (err) {
+
+            }
+        };
     }
 
     close() {

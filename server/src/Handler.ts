@@ -15,7 +15,7 @@ import { addYears } from "date-fns";
 import { allowedAttributeEdits, attributeList } from "./others";
 import { LoginHandler } from "./handlers/login";
 import { NotificationHandler } from "./handlers/notification";
-import { eloConstants, errorText, miscConstants, sampleContent, userRestrictions, userSettings } from "./globals";
+import { displayText, eloConstants, errorText, miscConstants, sampleContent, userRestrictions, userSettings } from "./globals";
 import { GmailHandler } from "./handlers/mail";
 import { ImageHandler, MailHandler, PaymentHandler } from "./abstracts";
 import { SocketHandler } from "./handlers/socket";
@@ -187,17 +187,34 @@ export class Handler {
             })),
         ])
 
-        if (input.action == "Like" && reverseSwipe && reverseSwipe.action == "Like" && 
-            this.socket.isUserConnected(input.swipedUserID)
-        ) {
-            const profile = await this.user.convertUserToPublicProfile(user);
-            this.socket.sendUserMessage(input.swipedUserID, {
-                match: {
-                    profile: profile,
-                    timestamp: new Date()
+        if (input.action == "Like" && reverseSwipe && reverseSwipe.action == "Like") {
+            console.log("new match");
+
+            if (this.socket.isUserConnected(input.userID)) {
+                this.socket.sendUserMessage(input.userID, {
+                    match: {
+                        profile: await this.user.convertUserToPublicProfile(swipedUser),
+                        timestamp: new Date()
+                    }
+                })
+            }
+            if (this.socket.isUserConnected(swipedUser.id)) {
+                this.socket.sendUserMessage(input.swipedUserID, {
+                    match: {
+                        profile: await this.user.convertUserToPublicProfile(user),
+                        timestamp: new Date()
+                    }
+                })
+            }
+
+            if (!this.disableNotifications) {
+                const recepientLogin = await this.login.getUserByEmail(swipedUser.email);
+                if (recepientLogin?.expoPushToken) {
+                    console.log("sending notif");
+                    await this.notification.newMatch(recepientLogin?.expoPushToken);
                 }
-            })
-        }
+            }
+        } 
 
         return { data: swipe };
     }

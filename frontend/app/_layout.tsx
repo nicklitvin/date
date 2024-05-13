@@ -2,6 +2,15 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { RootStore, createStoreProvider} from '../src/store/RootStore';
 import { StyledView } from '../src/styledElements';
 import { Stack } from "expo-router";
+import * as Notifications from "expo-notifications";
+
+Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: true,
+    }),
+});
 
 export default function App() {
     const rootStore = new RootStore();

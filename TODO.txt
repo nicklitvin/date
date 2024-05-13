@@ -1,7 +1,9 @@
 TODO
-test notification send from server
-notification receive, delete receiveDate when new
+dont send notification if disabled, if channel disabled in setting should reflect in app
+separate new match and message notifications
+limit reports per day
 reconnect socket if too long, when creating user
+add text to bottom of image in public view 1/2 images
 
 allow other users
     verification as option

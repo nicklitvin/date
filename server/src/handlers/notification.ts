@@ -1,12 +1,12 @@
 import { Message } from "@prisma/client";
 import { Expo } from "expo-server-sdk";
 import { NewMatchData, ReadReceiptNotificationInput } from "../interfaces";
-import { miscConstants } from "../globals";
+import { displayText, miscConstants } from "../globals";
 
 interface MessageNotificationInput {
-    message: Message
     fromName: string
-    recepientPushToken: string
+    recepientPushToken: string,
+    message: Message
 }
 
 export class NotificationHandler {
@@ -20,53 +20,37 @@ export class NotificationHandler {
 
     public async newMessage(input : MessageNotificationInput) {
         try {
-            console.log("sending message notification");
-            return await this.client.sendPushNotificationsAsync([
+            const receipts =  await this.client.sendPushNotificationsAsync([
                 {
                     to: input.recepientPushToken,
                     channelId: miscConstants.notificationChannel,
                     priority: "default",
                     title: input.fromName,
                     body: input.message.message,
-                    data: input.message
                 }
             ])
+            return receipts;
         } catch (err) {
             console.log(err);
             return null;
         }
     }
 
-    // public async readReceipt(input : ReadReceiptNotificationInput) {
-    //     try {
-    //         return await this.client.sendPushNotificationsAsync([
-    //             {
-    //                 to: input.toPushToken,
-    //                 channelId: miscConstants.notificationChannel,
-    //                 priority: "normal",
-    //             }
-    //         ])
-    //     } catch (err) {
-    //         console.log(err);
-    //         return null;
-    //     }
-    // }
-
-    // public async newMatch(input : MatchNotificationInput) {
-    //     try {
-    //         return await this.client.sendPushNotificationsAsync([
-    //             {
-    //                 to: input.recepientPushToken,
-    //                 channelId: globals.notificationChannel,
-    //                 priority: "default",
-    //                 title: globals.newMatchNotificationTItle,
-    //                 body: globals.newMatchNotificationMessage,
-    //                 data: input.match,
-    //             }
-    //         ])
-    //     } catch (err) {
-    //         console.log(err);
-    //         return null;
-    //     }
-    // }
+    public async newMatch(pushToken : string) {
+        try {
+            const receipts = await this.client.sendPushNotificationsAsync([
+                {
+                    to: pushToken,
+                    channelId: miscConstants.notificationChannel,
+                    priority: "default",
+                    title: displayText.newMatchNotificationTitle,
+                    body: displayText.newMatchNotificationMessage,
+                }
+            ])
+            return receipts;
+        } catch (err) {
+            console.log(err);
+            return null;
+        }
+    }
 }

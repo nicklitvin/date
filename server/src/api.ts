@@ -9,7 +9,6 @@ import { Message, Swipe } from "@prisma/client";
 
 export class APIHandler {
     constructor(app : expressWs.Application, handler : Handler) {
-
         app.get("/", (req,res) => res.json({message: "hi"} as APIOutput<void>));
 
         app.ws("/ws", (ws : WebSocket, req) => {
