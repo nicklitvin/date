@@ -307,12 +307,14 @@ export class Handler {
         if (!(user && reportedUser && eduEmail)) return { message: errorText.notValidUser }
         if (user.id == reportedUser.id) return { message: errorText.cannotReportSelf }
 
-        const [existingReport, reportCount] = await Promise.all([
+        const [existingReport, reportCount, reportsMade] = await Promise.all([
             this.report.getReportByUsers(user.id, eduEmail),
-            this.report.getReportCountForEmail(eduEmail)
+            this.report.getReportCountForEmail(eduEmail),
+            this.report.getReportsMadeCountForToday(user.id)
         ])
 
         if (existingReport) return { message : errorText.cannotReportAgain };
+        if (reportsMade >= miscConstants.maxReportsPerDay) return { message: errorText.tooManyReportsToday}
 
         const swipe = await this.swipe.getSwipeByUsers(user.id, reportedUser.id);
 

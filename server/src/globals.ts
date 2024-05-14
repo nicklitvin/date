@@ -65,6 +65,7 @@ export const miscConstants = {
     verificationExpireMinutes: 5,
     keyExpirationWeeks: 10,
     notificationChannel: "default",
+    maxReportsPerDay: 3,
 }
 
 export const userSettings = {
@@ -118,4 +119,5 @@ export const errorText = {
     cannotGetSettings: "Cannot get user settings",
     cannotGetPreferences: "Cannot get user preferences",
     cannotUpdatePushToken: "Cannot update notification token",
+    tooManyReportsToday: "Maximum reports per day reached",
 }

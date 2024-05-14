@@ -1,9 +1,9 @@
 import { afterEach, describe, expect, it } from "@jest/globals";
 import { handler } from "../jest.setup";
 import { Message, User } from "@prisma/client";
-import { ChatPreview, NewMatchData } from "../src/interfaces";
+import { ChatPreview, NewMatchData, UserReportInput } from "../src/interfaces";
 import { randomUUID } from "crypto";
-import { createUserInput, createUsersForSwipeFeed, getImageDetails, makeMessageInputWithOneRandom, makeMessageInputWithRandoms, makeMockWebSocket, makeTwoUsers, makeTwoUsersAndMatch, makeVerificationInput, matchUsers, validRequestUserInput } from "../__testUtils__/easySetup";
+import { createReportInput, createUserInput, createUsersForSwipeFeed, getImageDetails, makeMessageInputWithOneRandom, makeMessageInputWithRandoms, makeMockWebSocket, makeTwoUsers, makeTwoUsersAndMatch, makeVerificationInput, matchUsers, validRequestUserInput } from "../__testUtils__/easySetup";
 import { addMinutes, addWeeks, addYears } from "date-fns";
 import { errorText, miscConstants, sampleContent, userRestrictions } from "../src/globals";
 
@@ -1210,5 +1210,25 @@ describe("handler", () => {
         const user = await handler.createUser(requestUserInput,true);
         expect(user.data?.notifyOnMatch).toEqual(false);
         expect(user.data?.notifyOnMessage).toEqual(false);
+    })
+
+    it("should not report if max per day is reached", async () => {
+        const user = await handler.user.createUser(createUserInput());
+        const random = await handler.user.createUser(createUserInput("random@berkeley.edu"));
+
+        await Promise.all(Array.from({length: miscConstants.maxReportsPerDay}, () => randomUUID()).map(
+            val => handler.report.makeReport({
+                userID: user.id,
+                reportedEmail: val
+            })
+        ))
+
+        expect(await handler.report.getReportCount()).toEqual(miscConstants.maxReportsPerDay);
+
+        const output = await handler.reportUser({
+            userID: user.id,
+            reportedID: random.id
+        }, "eduEmail");
+        expect(output.message).toEqual(errorText.tooManyReportsToday);
     })
 })
