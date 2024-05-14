@@ -6,6 +6,7 @@ import { Handler } from "./handler";
 import expressWs from "express-ws";
 import { WebSocket } from "ws";
 import { Message, Swipe } from "@prisma/client";
+import { errorText } from "./globals";
 
 export class APIHandler {
     constructor(app : expressWs.Application, handler : Handler) {
@@ -80,7 +81,9 @@ export class APIHandler {
                     smoking: body.smoking
                 }
                 const output = await handler.createUser(input);
-                return output ? res.status(200).json() : res.status(400).json();
+                return output.message ? 
+                    res.status(400).json(output as APIOutput<any>) : 
+                    res.status(200).json();
             } catch (err) {
                 console.log(err);
                 return res.status(500).json();
@@ -101,7 +104,9 @@ export class APIHandler {
                     recepientID: body.recepientID
                 }
                 const output = await handler.sendMessage(input);
-                return output ? res.status(200).json() : res.status(400).json()
+                return output.message ? 
+                    res.status(400).json(output as APIOutput<any>) : 
+                    res.status(200).json();
             } catch (err) {
                 console.log(err);
                 return res.status(500).json();
@@ -124,7 +129,7 @@ export class APIHandler {
                 const output = await handler.message.getChat(input);
                 return output ? 
                     res.status(200).json({data: output} as APIOutput<Message[]>) : 
-                    res.status(400).json()
+                    res.status(400).json({message: errorText.cannotGetChat } as APIOutput<any>)
             } catch (err) {
                 console.log(err);
                 return res.status(500).json();
@@ -144,7 +149,9 @@ export class APIHandler {
                     reportedID: body.reportedID
                 }
                 const output = await handler.reportUser(input);
-                return output ? res.status(200).json() : res.status(400).json()
+                return output.message ? 
+                    res.status(400).json(output as APIOutput<any>) : 
+                    res.status(200).json();
             } catch (err) {
                 console.log(err);
                 return res.status(500).json();
@@ -166,7 +173,7 @@ export class APIHandler {
                 const output = await handler.getNewMatches(input);
                 return output ? 
                     res.status(200).json(output as APIOutput<NewMatchData[]>) : 
-                    res.status(400).json()
+                    res.status(400).json({message: errorText.cannotGetNewMatches} as APIOutput<any>)
             } catch (err) {
                 console.log(err);
                 return res.status(500).json();
@@ -188,7 +195,7 @@ export class APIHandler {
                 const output = await handler.getChatPreviews(input);
                 return output ? 
                     res.status(200).json(output as APIOutput<ChatPreview[]>) : 
-                    res.status(400).json()
+                    res.status(400).json({message: errorText.cannotGetChatPreviews} as APIOutput<any>)
             } catch (err) {
                 console.log(err);
                 return res.status(500).json();
@@ -208,10 +215,10 @@ export class APIHandler {
                     action: body.action,
                     swipedUserID: body.swipedUserID
                 }
-                const output : APIOutput<Swipe> = await handler.makeSwipe(input);
-                return output ? 
-                    res.status(200).json(output) : 
-                    res.status(400).json(output)
+                const output = await handler.makeSwipe(input);
+                return output.message ? 
+                    res.status(400).json(output as APIOutput<any>) : 
+                    res.status(200).json(output as APIOutput<Swipe>);
             } catch (err) {
                 console.log(err);
                 return res.status(500).json();
@@ -227,9 +234,9 @@ export class APIHandler {
                 if (!(isAdmin(body.key) || userID || userID == body.userID)) return res.status(401).json();
     
                 const output = await handler.getSwipeFeed(body.userID);
-                return output ? 
-                    res.status(200).json(output as APIOutput<SwipeFeed>) : 
-                    res.status(400).json()
+                return output.message ? 
+                    res.status(400).json(output as APIOutput<any>) : 
+                    res.status(200).json(output);
             } catch (err) {
                 console.log(err);
                 return res.status(500).json();
@@ -249,7 +256,9 @@ export class APIHandler {
                     email: user.email
                 }
                 const output = await handler.getVerificationCode(input);
-                return output ? res.status(200).json() : res.status(400).json()
+                return output.message ? 
+                    res.status(400).json(output as APIOutput<any>) :
+                    res.status(200).json();
             } catch (err) {
                 console.log(err);
                 return res.status(500).json();
@@ -271,9 +280,9 @@ export class APIHandler {
                 }
                 const output = await handler.verifyUserWithCode(input);
                 
-                return output ? 
-                    res.status(200).json() : 
-                    res.status(400).json()
+                return output.message ?
+                    res.status(400).json({message : errorText.cannotVerifyUser} as APIOutput<any>) :
+                    res.status(200).json()
             } catch (err) {
                 console.log(err);
                 return res.status(500).json();
@@ -292,7 +301,9 @@ export class APIHandler {
                 if (!verification) return res.status(401).json();
 
                 const output = await handler.regenerateVerificationCode(verification.schoolEmail);
-                return output ? res.status(200).json() : res.status(400).json()
+                return output ? 
+                    res.status(200).json() : 
+                    res.status(400).json({ message: errorText.cannotSendVerificationCode} as APIOutput<any>)
             } catch (err) {
                 console.log(err);
                 return res.status(500).json();
@@ -313,9 +324,9 @@ export class APIHandler {
                 }
                 const output = await handler.uploadImage(input);
                 const publicProfile = await handler.user.getPublicProfile(body.userID)
-                return output ? 
-                    res.status(200).json({ data: publicProfile?.images }) : 
-                    res.status(400).json()
+                return output.message ? 
+                    res.status(400).json(output as APIOutput<any>) : 
+                    res.status(200).json({ data: publicProfile?.images } as APIOutput<any>)
             } catch (err) {
                 console.log(err);
                 return res.status(500).json();
@@ -336,9 +347,9 @@ export class APIHandler {
                 }
                 const output = await handler.deleteImage(input);
                 const publicProfile = await handler.user.getPublicProfile(body.userID)
-                return output ? 
-                    res.status(200).json({ data: publicProfile?.images }) : 
-                    res.status(400).json()
+                return output.message ? 
+                    res.status(400).json(output as APIOutput<any>) : 
+                    res.status(200).json({ data: publicProfile?.images } as APIOutput<any>) 
             } catch (err) {
                 console.log(err);
                 return res.status(500).json();
@@ -359,7 +370,9 @@ export class APIHandler {
                     value: body.value
                 }
                 const output = await handler.changeImageOrder(input);
-                return output ? res.status(200).json() : res.status(400).json()
+                return output.message ? 
+                    res.status(400).json(output as APIOutput<any>) :
+                    res.status(200).json() 
             } catch (err) {
                 console.log(err);
                 return res.status(500).json();
@@ -380,7 +393,9 @@ export class APIHandler {
                     value: body.value,
                 }
                 const output = await handler.editUser(input);
-                return output.message ?  res.status(400).json(output) : res.status(200).json();
+                return output.message ?  
+                    res.status(400).json(output as APIOutput<any>) : 
+                    res.status(200).json();
             } catch (err) {
                 console.log(err);
                 return res.status(500).json();
@@ -395,9 +410,9 @@ export class APIHandler {
                 if (!(isAdmin(body.key) || body.userID || body.userID == body.userID)) return res.status(401).json();
     
                 const output = await handler.getSubscriptionCheckoutPage(body.userID);
-                return output ? 
-                    res.status(200).json(output as APIOutput<string>) : 
-                    res.status(400).json()
+                return output.message ?
+                    res.status(400).json(output as APIOutput<any>) :
+                    res.status(200).json(output as APIOutput<string>) 
             } catch (err) {
                 console.log(err);
                 return res.status(500).json();
@@ -411,7 +426,9 @@ export class APIHandler {
                     req.body
                 ) as SubscribeInput;
                 const output = await handler.processSubscriptionPay(input);
-                return output ? res.status(200).json() : res.status(400).json()
+                return output ? 
+                    res.status(200).json() : 
+                    res.status(400).json()
             } catch (err) {
                 console.log(err);
                 return res.status(500).json();
@@ -427,7 +444,9 @@ export class APIHandler {
                 if (!(isAdmin(body.key) || userID || userID == body.userID)) return res.status(401).json();
     
                 const output = await handler.cancelSubscription(body.userID);
-                return output ? res.status(200).json() : res.status(400).json()
+                return output.message ? 
+                    res.status(400).json(output as APIOutput<any>) :
+                    res.status(200).json()
             } catch (err) {
                 console.log(err);
                 return res.status(500).json();
@@ -454,7 +473,9 @@ export class APIHandler {
                 if (!(isAdmin(body.key) || userID || userID == body.userID)) return res.status(401).json();
     
                 const output = await handler.deleteUser(body.userID);
-                return output ? res.status(200).json() : res.status(400).json()
+                return output.message ? 
+                    res.status(400).json(output as APIOutput<any>) : 
+                    res.status(200).json()
             } catch (err) {
                 console.log(err);
                 return res.status(500).json();
@@ -475,9 +496,9 @@ export class APIHandler {
                 }
     
                 const output = await handler.unlike(input);
-                return output ? 
-                    res.status(200).json(output as APIOutput<UnlikeOutput>) : 
-                    res.status(400).json()
+                return output.message ?
+                    res.status(400).json(output as APIOutput<any>) : 
+                    res.status(200).json(output as APIOutput<UnlikeOutput>)
             } catch (err) {
                 console.log(err);
                 return res.status(500).json();
@@ -491,7 +512,7 @@ export class APIHandler {
                 const output = await handler.user.getPublicProfile(body.userID);
                 return output ? 
                     res.status(200).json({ data: output } as APIOutput<PublicProfile>) : 
-                    res.status(400).json()
+                    res.status(400).json({ message : errorText.cannotGetPublicProfile} as APIOutput<any>)
             } catch (err) {
                 console.log(err);
                 return res.status(500).json();
@@ -509,7 +530,7 @@ export class APIHandler {
                 const output = await handler.user.getPublicProfile(userID);
                 return output ?
                     res.status(200).json({ data: output } as APIOutput<PublicProfile>) : 
-                    res.status(400).json()
+                    res.status(400).json({ message: errorText.cannotGetPublicProfile} as APIOutput<any>)
 
             } catch (err) {
                 return res.status(500).json();
@@ -525,9 +546,9 @@ export class APIHandler {
                 if (!(isAdmin(body.key) || userID || userID == body.userID)) return res.status(401).json();
 
                 const output = await handler.getStatsIfSubscribed(body.userID);
-                return output ? 
-                    res.status(200).json(output as APIOutput<UserSwipeStats>) : 
-                    res.status(400).json()
+                return output.message ?
+                    res.status(400).json(output as APIOutput<any>) :  
+                    res.status(200).json(output as APIOutput<UserSwipeStats>) 
                 
             } catch (err) {
                 console.log(err);
@@ -546,7 +567,7 @@ export class APIHandler {
                 const output = await handler.user.getSubscriptionData(body.userID);
                 return output ? 
                     res.status(200).json({ data: output } as APIOutput<SubscriptionData|null>) : 
-                    res.status(400).json()
+                    res.status(400).json({ message: errorText.cannotGetSubscription} as APIOutput<any>)
             } catch (err) {
                 console.log(err);
                 return res.status(500).json();
@@ -564,7 +585,7 @@ export class APIHandler {
                 const output = await handler.user.getSettings(body.userID);
                 return output ? 
                     res.status(200).json({ data: output } as APIOutput<SettingData[]|null>) : 
-                    res.status(400).json()
+                    res.status(400).json({ message: errorText.cannotGetSettings } as APIOutput<any>) 
             } catch (err) {
                 console.log(err);
                 return res.status(500).json();
@@ -582,7 +603,7 @@ export class APIHandler {
                 const output = await handler.user.getPreferences(body.userID);
                 return output ? 
                     res.status(200).json({ data: output } as APIOutput<Preferences|null>) : 
-                    res.status(400).json()
+                    res.status(400).json({ message: errorText.cannotGetPreferences } as APIOutput<any>)
             } catch (err) {
                 console.log(err);
                 return res.status(500).json();
@@ -594,9 +615,9 @@ export class APIHandler {
                 const body = req.body as LoginInput;
 
                 const output = await handler.loginWithToken(body);
-                return output ? 
-                    res.status(200).json(output as APIOutput<LoginOutput>) : 
-                    res.status(400).json()
+                return output.message ? 
+                    res.status(400).json(output as APIOutput<any>) : 
+                    res.status(200).json(output as APIOutput<LoginOutput>)
             } catch (err) {
                 console.log(err);
                 return res.status(500).json();
@@ -608,9 +629,9 @@ export class APIHandler {
                 const body = req.body as APIRequest<{}>;
 
                 const output = await handler.autoLogin(body.key);
-                return output ? 
-                    res.status(200).json(output as APIOutput<LoginOutput>) : 
-                    res.status(400).json()
+                return output.message ? 
+                    res.status(400).json(output as APIOutput<any>) : 
+                    res.status(200).json(output as APIOutput<LoginOutput>)
             } catch (err) {
                 console.log(err);
                 return res.status(500).json();
@@ -626,7 +647,9 @@ export class APIHandler {
                 if (!(isAdmin(body.key) || userID || userID == body.userID)) return res.status(401).json();
     
                 const output = await handler.login.updateExpoToken(body.userID,body.expoPushToken);
-                return output ? res.status(200).json() : res.status(400).json()
+                return output ? 
+                    res.status(200).json() : 
+                    res.status(400).json({ message: errorText.cannotUpdatePushToken } as APIOutput<any>)
             } catch (err) {
                 console.log(err);
                 return res.status(500).json();
@@ -638,22 +661,6 @@ export class APIHandler {
                 return res.status(200).json(
                     { data: await handler.attribute.getAttributes() } as APIOutput<any>
                 );
-            } catch (err) {
-                console.log(err);
-                return res.status(500).json();
-            }
-        })
-
-        app.post(URLs.deleteEverything, async (req,res) => {
-            try {
-                const body = req.body as APIRequest<void>;
-                if (!body.key) return res.status(400).json();
-
-                if (isAdmin(body.key)) {
-                    await handler.deleteEverything();
-                    return res.status(200).json();
-                }
-                return res.status(401).json();
             } catch (err) {
                 console.log(err);
                 return res.status(500).json();
@@ -674,49 +681,67 @@ export class APIHandler {
             }
         })
 
-        app.post(URLs.sendReadStatus, async (req,res) => {
+        // ADMIN-ONLY
+
+        app.post(URLs.deleteEverything, async (req,res) => {
             try {
-                const body = req.body as APIRequest<ReadStatusInput>;
+                const body = req.body as APIRequest<void>;
                 if (!body.key) return res.status(400).json();
 
-                const userID = await handler.login.getUserIDByKey(body.key);
-                if (!(isAdmin(body.key) || userID || userID == body.userID)) return res.status(401).json();
-
-                const output = await handler.updateReadStatus({
-                    timestamp: new Date(body.timestamp),
-                    userID: body.userID,
-                    toID: body.toID
-                })
-    
-                return output != null ? res.status(200).json() : res.status(400).json()
-
+                if (isAdmin(body.key)) {
+                    await handler.deleteEverything();
+                    return res.status(200).json();
+                }
+                return res.status(401).json();
             } catch (err) {
                 console.log(err);
                 return res.status(500).json();
             }
         })
 
-        app.post(URLs.getReadStatus, async (req,res) => {
-            try {
-                const body = req.body as APIRequest<GetReadStatusInput>;
-                if (!body.key) return res.status(400).json();
+        // app.post(URLs.sendReadStatus, async (req,res) => {
+        //     try {
+        //         const body = req.body as APIRequest<ReadStatusInput>;
+        //         if (!body.key) return res.status(400).json();
 
-                const userID = await handler.login.getUserIDByKey(body.key);
-                if (!(isAdmin(body.key) || userID || userID == body.userID)) return res.status(401).json();
+        //         const userID = await handler.login.getUserIDByKey(body.key);
+        //         if (!(isAdmin(body.key) || userID || userID == body.userID)) return res.status(401).json();
 
-                const output = await handler.getReadStatus({
-                    userID: body.userID,
-                    readerID: body.readerID
-                })
+        //         const output = await handler.updateReadStatus({
+        //             timestamp: new Date(body.timestamp),
+        //             userID: body.userID,
+        //             toID: body.toID
+        //         })
     
-                return output ? 
-                    res.status(200).json({ data: output }) : 
-                    res.status(400).json()
+        //         return output != null ? res.status(200).json() : res.status(400).json()
 
-            } catch (err) {
-                console.log(err);
-                return res.status(500).json();
-            }
-        })
+        //     } catch (err) {
+        //         console.log(err);
+        //         return res.status(500).json();
+        //     }
+        // })
+
+        // app.post(URLs.getReadStatus, async (req,res) => {
+        //     try {
+        //         const body = req.body as APIRequest<GetReadStatusInput>;
+        //         if (!body.key) return res.status(400).json();
+
+        //         const userID = await handler.login.getUserIDByKey(body.key);
+        //         if (!(isAdmin(body.key) || userID || userID == body.userID)) return res.status(401).json();
+
+        //         const output = await handler.getReadStatus({
+        //             userID: body.userID,
+        //             readerID: body.readerID
+        //         })
+    
+        //         return output ? 
+        //             res.status(200).json({ data: output }) : 
+        //             res.status(400).json()
+
+        //     } catch (err) {
+        //         console.log(err);
+        //         return res.status(500).json();
+        //     }
+        // })
     }
 }
