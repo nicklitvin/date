@@ -188,8 +188,6 @@ export class Handler {
         ])
 
         if (input.action == "Like" && reverseSwipe && reverseSwipe.action == "Like") {
-            console.log("new match");
-
             if (this.socket.isUserConnected(input.userID)) {
                 this.socket.sendUserMessage(input.userID, {
                     match: {
@@ -207,7 +205,7 @@ export class Handler {
                 })
             }
 
-            if (!this.disableNotifications) {
+            if (!this.disableNotifications && swipedUser.notifyOnMatch) {
                 const recepientLogin = await this.login.getUserByEmail(swipedUser.email);
                 if (recepientLogin?.expoPushToken) {
                     console.log("sending notif");
@@ -243,7 +241,7 @@ export class Handler {
                     message: message
                 })
             }
-            if (!this.disableNotifications) {
+            if (!this.disableNotifications && recepient.notifyOnMessage) {
                 const recepientLogin = await this.login.getUserByEmail(recepient.email);
                 if (recepientLogin?.expoPushToken) {
                     await this.notification.newMessage({

@@ -24,15 +24,22 @@ const argv = yargs
         describe: "ping",
         type: "boolean"
     })
+    .option("clear", {
+        alias: "c",
+        describe: "clears interactions",
+        type: "boolean"
+    })
     .help()
     .alias('help', 'h')
-    .argv as { message?: string; match?: boolean, ping?: boolean };
+    .argv as { message?: string; match?: boolean, ping?: boolean, clear?: boolean };
 
-const { message, match, ping } = argv;
+const { message, match, ping, clear } = argv;
 
 async function main() {
     if (ping) {
         console.log("ping")
+    } else if (clear) {
+        
     } else if (message) {
         const payload : APIRequest<MessageInput> = {
             key: process.env.ADMIN_API_KEY!,

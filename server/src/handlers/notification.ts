@@ -1,6 +1,5 @@
 import { Message } from "@prisma/client";
 import { Expo } from "expo-server-sdk";
-import { NewMatchData, ReadReceiptNotificationInput } from "../interfaces";
 import { displayText, miscConstants } from "../globals";
 
 interface MessageNotificationInput {

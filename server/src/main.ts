@@ -3,7 +3,18 @@ import { MyServer } from "./myServer";
 export const server = new MyServer({
     disableEmail: true
 });
-server.setupEnvironment({
+
+const resetEverything = {
+    clearTables: true,
+    createSampleUsers: true,
+    createUser: true,
+    loginUser: true,
+    verifyUser: true,
+    addSubscription: true,
+    clearInteractionEntries: true
+}
+
+const resetInteractions = {
     clearTables: false,
     createSampleUsers: false,
     createUser: false,
@@ -11,5 +22,7 @@ server.setupEnvironment({
     verifyUser: false,
     addSubscription: false,
     clearInteractionEntries: true
-});
+}
+
+server.setupEnvironment(resetInteractions);
 console.log(`running server on port ${server.port}`)

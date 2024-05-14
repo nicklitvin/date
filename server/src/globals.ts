@@ -48,7 +48,8 @@ export const sampleContent = {
 }
 
 export const displayText = {
-    notification: "Notifications",
+    notificationMatch: "New Match Notifications",
+    notificationMessage: "Message Notifications",
     newMatchNotificationTitle: "New Match!",
     newMatchNotificationMessage: "Check out who it is",
     appName: "Lovedu",
@@ -67,7 +68,8 @@ export const miscConstants = {
 }
 
 export const userSettings = {
-    notification: "notifications",
+    notifyOnMessage: "notifyOnMessage",
+    notifyOnMatch: "notifyOnMatch",
     image: "images",
 }
 

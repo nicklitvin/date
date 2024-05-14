@@ -330,8 +330,7 @@ describe("user", () => {
         await funcs.createUser(input);
 
         const output = await funcs.getSettings(input.id);
-        expect(output).toHaveLength(1);
-        expect(output![0].title).toEqual(userSettings.notification);
+        expect(output).toHaveLength(2);
     })
 
     it("should get subscription data", async () => {

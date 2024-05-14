@@ -380,7 +380,7 @@ export class APIHandler {
                     value: body.value,
                 }
                 const output = await handler.editUser(input);
-                return output ?  res.status(200).json() : res.status(400).json()
+                return output.message ?  res.status(400).json(output) : res.status(200).json();
             } catch (err) {
                 console.log(err);
                 return res.status(500).json();

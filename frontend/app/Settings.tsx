@@ -109,8 +109,8 @@ export function Settings(props : Props) {
     }
 
     const changeSettingValue = async (title : string, value : boolean) => {
-        console.log("changing value");
-        if (!globalState.expoPushToken && title.includes("notification") && value) {
+        if (!globalState.expoPushToken && title.toLowerCase().includes("notify") && value) {
+            console.log("nofas");
             return updatePushToken(title)
         }
 
@@ -192,7 +192,7 @@ export function Settings(props : Props) {
             {settings.map( setting => (
                 <StyledView key={`setting-${setting.title}`} >
                     <StyledView
-                        className="flex flex-row w-full items-center px-5 pb-2"
+                        className="flex flex-row w-full items-center px-5 pb-3"
                     >
                         <StyledText className="text-bold text-xl font-bold">
                              {setting.display}

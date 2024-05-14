@@ -41,7 +41,8 @@ model User {
     description     String
     alcohol         Usage
     smoking         Usage
-    notifications   Boolean
+    notifyOnMessage   Boolean
+    notifyOnMatch     Boolean
     university      String
     subscribeEnd    DateTime
     isSubscribed    Boolean

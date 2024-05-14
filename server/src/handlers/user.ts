@@ -31,7 +31,8 @@ export class UserHandler {
         return this.prisma.user.create({
             data: {
                 ...input,
-                notifications: notifications ?? false,
+                notifyOnMatch: notifications ?? false,
+                notifyOnMessage: notifications ?? false,
                 university: this.getUniversityFromEmail(input.email)!,
                 subscribeEnd: new Date(),
                 isSubscribed: false,
@@ -276,9 +277,14 @@ export class UserHandler {
 
         return [
             {
-                display: displayText.notification,
-                title: userSettings.notification,
-                value: data.notifications
+                display: displayText.notificationMatch,
+                title: userSettings.notifyOnMatch,
+                value: data.notifyOnMatch
+            }, 
+            {
+                display: displayText.notificationMessage,
+                title: userSettings.notifyOnMessage,
+                value: data.notifyOnMessage
             }
         ]
     }

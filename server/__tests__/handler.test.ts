@@ -1198,7 +1198,8 @@ describe("handler", () => {
             expoPushToken: token
         })
         const user = await handler.createUser(requestUserInput,true);
-        expect(user.data?.notifications).toEqual(true);
+        expect(user.data?.notifyOnMatch).toEqual(true);
+        expect(user.data?.notifyOnMessage).toEqual(true);
     })
 
     it("should not enable notifications on create user if no token", async () => {
@@ -1207,6 +1208,7 @@ describe("handler", () => {
             email: requestUserInput.email,
         })
         const user = await handler.createUser(requestUserInput,true);
-        expect(user.data?.notifications).toEqual(false);
+        expect(user.data?.notifyOnMatch).toEqual(false);
+        expect(user.data?.notifyOnMessage).toEqual(false);
     })
 })

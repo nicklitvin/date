@@ -2,7 +2,8 @@ import { AttributeType } from "@prisma/client";
 
 export const allowedAttributeEdits : string[] = [
     "genderInterest", 
-    "notifications", 
+    "notifyOnMatch",
+    "notifyOnMessage", 
     "description", 
     "ageInterest",
     "attributes",
