@@ -1,4 +1,4 @@
-import { ChatPreview, Message, NewMatchData, SocketPayloadToClient, SocketPayloadToServer } from "../interfaces";
+import { ChatPreview, Message, NewMatchData, ReadStatusInput, SocketPayloadToClient, SocketPayloadToServer } from "../interfaces";
 import { ReceivedData } from "../store/ReceivedData";
 import { URLs } from "../urls";
 
@@ -41,11 +41,19 @@ export class SocketManager {
                         });
                     }  
                 } else if (data.match) {
-                    this.updateWithMatch(data.match);
+                    this.updateWithMatch({
+                        ...data.match,
+                        timestamp: new Date(data.match.timestamp)
+                    });
                 } else if (data.message) {
                     this.updateChatWithMessage({
                         ...data.message,
                         timestamp: new Date(data.message.timestamp)
+                    })
+                } else if (data.readUpdate) {
+                    this.updateReadStatus({
+                        ...data.readUpdate,
+                        timestamp: new Date(data.readUpdate.timestamp)
                     })
                 }
             } catch (err) {
@@ -117,7 +125,7 @@ export class SocketManager {
         if (!this.received.newMatches) return 
 
         const newMatchList : NewMatchData[] = [
-            { ...match, timestamp: new Date(match.timestamp)}, 
+            match,
             ...this.received.newMatches!
         ];
         this.received.setNewMatches(newMatchList);
@@ -127,5 +135,22 @@ export class SocketManager {
         const message = this.approvedMessages.get(id);
         this.approvedMessages.delete(id);
         return message;
+    }
+
+    updateReadStatus(input : ReadStatusInput) {
+        const messages = this.received.savedChats[input.userID];
+        if (messages) {
+            const copy : Message[] = JSON.parse(JSON.stringify(messages));
+            for (const message of copy) {
+                message.timestamp = new Date(message.timestamp);
+            }
+            for (const message of copy) {
+                if (message.recepientID == input.userID && message.timestamp.getTime() < input.timestamp.getTime()) {
+                    message.readStatus = true;
+                }
+                if (message.timestamp.getTime() > input.timestamp.getTime()) break;
+            }
+            this.received.addSavedChat(input.userID, copy);
+        }
     }
 }

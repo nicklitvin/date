@@ -702,16 +702,19 @@ export class Handler {
             this.swipe.getSwipeByUsers(input.toID, input.userID)
         ])
 
-        if (user && recepient && userOpinion?.action == "Like" && 
-            recepientOpinion?.action == "Like"
-        ) {
-            return {
+        if (user && recepient && userOpinion?.action == "Like" && recepientOpinion?.action == "Like") {
+            const output : APIOutput<number> = {
                 data: await this.message.updateReadStatus({
                     userID: input.userID,
                     toID: input.toID,
                     timestamp: input.timestamp
                 })        
-            }   
+            }  
+            if (this.socket.isUserConnected(recepient.id)) {
+                this.socket.sendUserMessage(recepient.id, {
+                    readUpdate: input
+                })
+            } 
         }
         return { message: errorText.cannotUpdateReadStatus};
     }

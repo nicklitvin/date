@@ -46,7 +46,7 @@ export function Chat(props : Props) {
     const [firstLoad, setFirstLoad] = useState<boolean>(true);
 
     useEffect( () => {
-        if (!chat) return
+        if (!chat || !globalState.socketManager || !receivedData.profile) return
 
         for (const message of chat) {
             if (!unsentMessageIDs.has(message.id) && message.recepientID == userID) {
@@ -54,7 +54,9 @@ export function Chat(props : Props) {
                 break;
             } 
         }
-    }, [chat])
+        if (chat.length > 0 && chat[0].userID == userID) updateMyReadStatus();
+        
+    }, [chat, profile, globalState.socketManager])
 
     useEffect( () => {
         if (firstLoad) {

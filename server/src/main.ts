@@ -24,5 +24,5 @@ const resetInteractions = {
     clearInteractionEntries: true
 }
 
-server.setupEnvironment(resetInteractions);
+server.setupEnvironment(resetEverything);
 console.log(`running server on port ${server.port}`)

@@ -2,7 +2,7 @@ import { act, fireEvent, render, screen } from "@testing-library/react-native";
 import { RootStore, createStoreProvider } from "../src/store/RootStore";
 import { ChatMob } from "../app/Chat";
 import { APIOutput, GetChatInput, Message, MessageInput, PublicProfile, UserReportWithReportedID } from "../src/interfaces";
-import { chatText } from "../src/text";
+import { chatText, generalText } from "../src/text";
 import { testIDS } from "../src/testIDs";
 import { getChatTimestamp } from "../src/utils";
 import MockAdapter from "axios-mock-adapter";
@@ -328,14 +328,22 @@ describe("chat page", () => {
         const preview = store.receivedData.chatPreviews![0];
         expect(preview.message.id).toEqual(newMessage.id);
         expect(preview.message.userID).toEqual(recepientProfile.id);
-        expect(preview.message.readStatus).toEqual(false);
+        expect(preview.message.readStatus).toEqual(true);
+    })
+
+    it("should update recepients read status", async () => {
+        const { store } = await loadChat(false);
+
+        expect(screen.queryByText(chatText.delivered)).not.toEqual(null);
 
         await act( () => {
-            fireEvent(screen.getByTestId(testIDS.load), "press");
+            store.globalState.socketManager?.updateReadStatus({
+                userID: recepientProfile.id,
+                toID: "me",
+                timestamp: new Date()
+            })
         })
 
-        const readPreview = store.receivedData.chatPreviews![0];
-        expect(readPreview.message.id).toEqual(newMessage.id);
-        expect(readPreview.message.readStatus).toEqual(true);
+        expect(screen.queryByText(chatText.read)).not.toEqual(null);
     })
 })

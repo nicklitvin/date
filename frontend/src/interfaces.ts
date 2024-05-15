@@ -40,6 +40,7 @@ export enum Opinion {
 export interface SocketPayloadToClient {
     message?: Message,
     match?: NewMatchData,
+    readUpdate?: ReadStatusInput
     payloadProcessedID?: string
 }
 

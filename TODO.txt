@@ -1,7 +1,6 @@
 TODO
 add text to bottom of image in public view 1/2 images
 reconnect socket if too long, when creating user
-send read status with socket
 
 allow other users
     verification as option
