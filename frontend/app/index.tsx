@@ -24,6 +24,7 @@ export function Index() {
     const [firstLoad, setFirstLoad] = useState<boolean>(true);
 
     const setSampleData = () => {
+        globalState.resetSwipeStatus();
         receivedData.setProfile({
             name: "Michael",
             age: 21,
@@ -307,7 +308,7 @@ export function Index() {
                 />
         }
     />
-    } else if (receivedData.profile && globalState.socketManager) {
+    } else if (receivedData.profile && (globalState.socketManager || globals.useSample)) {
         return <Redirect href="(tabs)"/>
     } else if (receivedData.clientIDs) {
         return <Redirect href="SignIn"/>

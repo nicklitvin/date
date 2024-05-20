@@ -2,13 +2,13 @@ import { useEffect, useState } from "react"
 import { StyledButton, StyledImage, StyledView } from "../styledElements";
 import { Dimensions } from "react-native";
 import { MyButton } from "./Button";
-import { Action } from "../types";
 import { testIDS } from "../testIDs";
+import classNames from "classnames";
 
 interface Props {
     imageURLs: string[]
     swipable?: boolean
-    swipeFunction?: (opinion : Action) => any
+    swipeFunction?: (opinion : any) => any
 }
 
 export function PictureSeries(props : Props) {
@@ -18,7 +18,7 @@ export function PictureSeries(props : Props) {
     const height = width * 4/3;
 
     return (
-        <StyledView className="w-full ">
+        <StyledView className="w-full">
             <StyledImage
                 style={{width: width, height: height}}
                 source={props.imageURLs[index]}
@@ -31,12 +31,27 @@ export function PictureSeries(props : Props) {
                 className="left-1/2 w-1/2 h-full absolute"
                 onPress={ () => setIndex( (index + 1 + props.imageURLs.length) % props.imageURLs.length )}
             />
+            <StyledView 
+                className="bottom-0 absolute w-full h-20 flex justify-center items-center flex-row"
+            >
+                {
+                    props.imageURLs.map( (val,picIndex) => 
+                        <StyledView
+                            key={`${val}-${picIndex}`}
+                            className={classNames(
+                                picIndex == index ? "bg-back opacity-80" : "opacity-80 bg-front",
+                                "w-3 h-3 rounded-full mx-2"
+                            )}
+                        />
+                    )   
+                }
+            </StyledView>
             {
                 props.swipable ?
                 <>
                     <StyledButton 
                         className="bottom-0 right-0 absolute" 
-                        onPress={() => props.swipeFunction!("Like")}
+                        onPress={() => props.swipeFunction!("Like")}    
                         testID={testIDS.swipeLike}
                         key={testIDS.swipeLike}
                     >
