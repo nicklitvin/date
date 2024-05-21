@@ -20,6 +20,11 @@ enum Opinion {
 enum AttributeType {
     Fitness
     Music
+    Food
+    Movies
+    Indoor
+    Outdoor
+    Personality
 }
 
 enum Usage {

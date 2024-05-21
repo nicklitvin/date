@@ -1,7 +1,6 @@
 TODO
 add refresh to profile/stats page
 reconnect socket if too long, when creating user
-add attributes
 
 allow other users
     verification as option
@@ -17,6 +16,10 @@ server catch errors write to client errors
 show swipes from users not in user's interest
 undo like/dislike, distance pref
 add major, school year
+premium 
+    more likes/swipes per day
+    image rating based on likes/dislikes
+    improved elo
 
 NOTES
 to make prisma client autofill:
@@ -31,12 +34,4 @@ select * from "<table>"
 build android development
 eas build --profile development --platform android
 
-premium 
-    better filters?
-    more likes/day?
-    stats
-    improved elo
-    matches count
 
-if ever try catch error, send post to server with message
-Make different user authentication rules list of functions that must pass
