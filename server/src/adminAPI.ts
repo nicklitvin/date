@@ -36,6 +36,7 @@ const argv = yargs
 const { message, match, ping, clear } = argv;
 
 async function main() {
+    const baseURL = `http://${URLs.ip}:${URLs.port}`;
     if (ping) {
         console.log("ping")
     } else if (clear) {
@@ -48,7 +49,7 @@ async function main() {
             recepientID: sampleContent.userID
         }
         try {
-            const response = await axios.post(URLs.ip + URLs.sendMessage, payload);
+            const response = await axios.post(baseURL + URLs.sendMessage, payload);
             if (response.data?.message) console.log(response.data.message);
             console.log("complete");
         } catch (err) {
@@ -68,8 +69,8 @@ async function main() {
             swipedUserID: sampleContent.userID
         }
         try {
-            const one = await axios.post(URLs.ip + URLs.makeSwipe, payload1);
-            const two = await axios.post(URLs.ip + URLs.makeSwipe, payload2);
+            const one = await axios.post(baseURL + URLs.makeSwipe, payload1);
+            const two = await axios.post(baseURL + URLs.makeSwipe, payload2);
             if (one.data?.message) console.log(one.data.message);
             if (two.data?.message) console.log(two.data.message);
             console.log("completed");

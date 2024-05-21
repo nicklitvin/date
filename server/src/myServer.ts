@@ -8,10 +8,9 @@ import { attributeList } from "./others";
 import fs from "fs/promises";
 import { sampleUsers } from "./sample";
 import expressWs from "express-ws";
+import { URLs } from "./urls";
 
 export class MyServer {
-    public readonly port = 3000;
-
     private app;
     private server;
     public handler : Handler;
@@ -26,7 +25,7 @@ export class MyServer {
             disableNotifications: false,
         });
         new APIHandler(this.app, this.handler);
-        this.server = this.app.listen(this.port);
+        this.server = this.app.listen(URLs.port);
     }
 
     public async setupEnvironment({
@@ -109,7 +108,7 @@ export class MyServer {
         }
 
         if (addSubscription) {
-            this.handler.processSubscriptionPay({
+            await this.handler.processSubscriptionPay({
                 userID: sampleContent.userID,
                 subscriptionID: "randomID"
             })

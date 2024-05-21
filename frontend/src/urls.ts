@@ -1,5 +1,5 @@
 export const URLs = {
-    server: "http://192.168.86.28:3000",
+    server: "http://192.168.75.157:3000",
     createUser: "/createUser",
     sendMessage: "/sendMessage",
     getChat: "/getChat",
@@ -33,5 +33,6 @@ export const URLs = {
     getClientIDs: "/getClientIDs",
     sendReadStatus: "/sendReadStatus",
     getReadStatus: "/getReadStatus",
-    websocket: "/ws"
+    websocket: "/ws",
+    getPremiumPage: "/getPremiumPage",
 }

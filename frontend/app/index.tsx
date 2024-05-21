@@ -261,7 +261,6 @@ export function Index() {
                 const token = await Notifications.getExpoPushTokenAsync({
                     projectId: Constants.expoConfig?.extra?.eas.projectId,
                 });
-                console.log("token",token)
                 globalState.setExpoPushToken(token.data);
             }
         }

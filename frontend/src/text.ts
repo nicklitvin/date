@@ -174,6 +174,8 @@ export const profileText = {
     purchasePremium: "Purchase Premium",
     freeTier: "Free Tier",
     premiumTier: "Premium Tier",
+    subscriptionCanceledtext1: "Success",
+    subscriptionCanceledtext2: "Subscription canceled"
 }
 
 export const settingsText = {

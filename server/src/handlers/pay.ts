@@ -2,6 +2,7 @@ import Stripe from "stripe";
 import { PaymentExtractOutput } from "../interfaces";
 import { miscConstants } from "../globals";
 import { PaymentHandler } from "../abstracts";
+import { URLs } from "../urls";
 
 export class StripePaymentHandler extends PaymentHandler {
     private stripe : Stripe;
@@ -26,8 +27,8 @@ export class StripePaymentHandler extends PaymentHandler {
                 }
             ],
             
-            success_url: process.env.SUCCESS_RETURN_URL!,
-            cancel_url: `${process.env.CANCEL_RETURN_URL!}${userID}`,
+            success_url: `http://${URLs.ip}:${URLs.port + 1}/success`,
+            cancel_url: `http://${URLs.ip}:${URLs.port + 1}/premium?userID=${userID}`,
             allow_promotion_codes: true,
             metadata: {
                 userID: userID

@@ -10,9 +10,8 @@ export async function GET(req : NextRequest) {
     try {
         const userID = req.nextUrl.searchParams.get("userID");
 
-        if (typeof(userID) != "string" || !userID) return NextResponse.json(
-            { message: "Invalid UserID"} as APIOutput, {status: 400}
-        )
+        if (typeof(userID) != "string" || !userID) 
+            return NextResponse.json({ message: "Invalid UserID" } as APIOutput, {status: 400})
         const url = process.env.SERVER_URL! + "/getCheckoutPage";
         const payload = {
             key: process.env.ADMIN_API_KEY!,

@@ -681,6 +681,17 @@ export class APIHandler {
             }
         })
 
+        app.post(URLs.getPremiumPage, async (req, res) => {
+            try {   
+                const body = req.body as JustUserID;
+                const url = `http://${URLs.ip}:${URLs.port + 1}/premium?userID=${body.userID}`
+                return res.status(200).json({data: url} as APIOutput<string>)
+            } catch (err) {
+                console.log(err);
+                return res.status(500).json();
+            }
+        })
+
         // ADMIN-ONLY
 
         app.post(URLs.deleteEverything, async (req,res) => {
@@ -698,50 +709,5 @@ export class APIHandler {
                 return res.status(500).json();
             }
         })
-
-        // app.post(URLs.sendReadStatus, async (req,res) => {
-        //     try {
-        //         const body = req.body as APIRequest<ReadStatusInput>;
-        //         if (!body.key) return res.status(400).json();
-
-        //         const userID = await handler.login.getUserIDByKey(body.key);
-        //         if (!(isAdmin(body.key) || userID || userID == body.userID)) return res.status(401).json();
-
-        //         const output = await handler.updateReadStatus({
-        //             timestamp: new Date(body.timestamp),
-        //             userID: body.userID,
-        //             toID: body.toID
-        //         })
-    
-        //         return output != null ? res.status(200).json() : res.status(400).json()
-
-        //     } catch (err) {
-        //         console.log(err);
-        //         return res.status(500).json();
-        //     }
-        // })
-
-        // app.post(URLs.getReadStatus, async (req,res) => {
-        //     try {
-        //         const body = req.body as APIRequest<GetReadStatusInput>;
-        //         if (!body.key) return res.status(400).json();
-
-        //         const userID = await handler.login.getUserIDByKey(body.key);
-        //         if (!(isAdmin(body.key) || userID || userID == body.userID)) return res.status(401).json();
-
-        //         const output = await handler.getReadStatus({
-        //             userID: body.userID,
-        //             readerID: body.readerID
-        //         })
-    
-        //         return output ? 
-        //             res.status(200).json({ data: output }) : 
-        //             res.status(400).json()
-
-        //     } catch (err) {
-        //         console.log(err);
-        //         return res.status(500).json();
-        //     }
-        // })
     }
 }

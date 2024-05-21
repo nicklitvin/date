@@ -126,7 +126,6 @@ export function Feed(props : Props) {
         func();
     }
 
-    console.log(savedFeed, savedSwipeStatus);
     if (!savedFeed && !props.dontAutoLoad) return <Loading />
     return (
         <StyledView className="w-full h-full bg-back">

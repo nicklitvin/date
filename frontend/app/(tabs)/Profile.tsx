@@ -12,6 +12,7 @@ import { Link, router } from "expo-router";
 import { testIDS } from "../../src/testIDs";
 import { useEffect, useState } from "react";
 import Loading from "../Loading";
+import Toast from "react-native-toast-message";
 
 interface Props {
     openLinkFunc?: (input : string) => any
@@ -85,7 +86,24 @@ export function Profile(props : Props) {
                 userID: receivedData.profile?.id!,
                 key: receivedData.loginKey
             }
-            await sendRequest(URLs.cancelSubscription, input);
+            const response = await sendRequest(URLs.cancelSubscription, input);
+            if (response.message) {
+                Toast.show({
+                    type: "error",
+                    text1: response.message,
+                })
+            } else {
+                receivedData.setSubscription({
+                    ...receivedData.subscription,
+                    subscribed: false,
+                })
+                Toast.show({
+                    type: "success",
+                    text1: profileText.subscriptionCanceledtext1,
+                    text2: profileText.subscriptionCanceledtext2,
+                })
+            }
+            console.log(response);
         } catch (err) {
             console.log(err)
         }
@@ -93,11 +111,10 @@ export function Profile(props : Props) {
 
     const getCheckoutPage = async () => {
         try {
-            const input : WithKey<JustUserID> = {
+            const input : JustUserID = {
                 userID: receivedData.profile?.id!,
-                key: receivedData.loginKey
             }
-            const response = await sendRequest<string>(URLs.getCheckoutPage,input);
+            const response = await sendRequest<string>(URLs.getPremiumPage,input);
             if (response.data) {
                 if (props.openLinkFunc) {
                     props.openLinkFunc(response.data);
@@ -147,14 +164,16 @@ export function Profile(props : Props) {
                         {profileText.subscriptionStatus}
                     </StyledText>
                     <StyledText className="text-xl">
-                        {`Subscription is expiring on ${getShortDate(
+                        {`Premium is expiring on ${getShortDate(
                             savedSubscription.endDate, globalState.timeZone
                         )}`}
                     </StyledText>
-                    <MyButton
-                        text={profileText.purchasePremium}
-                        onPressFunction={getCheckoutPage}
-                    />
+                    <StyledView className="w-full flex items-center pt-3">
+                        <MyButton
+                            text={profileText.purchasePremium}
+                            onPressFunction={getCheckoutPage}
+                        />
+                    </StyledView>
                 </StyledView>
             )
         } else {
@@ -196,7 +215,15 @@ export function Profile(props : Props) {
                     {`${savedProfile?.name}, ${savedProfile?.age}`}
                 </StyledText>
                 <StyledText className="text-xl">
-                    {savedSubscription?.subscribed ? profileText.premiumTier : profileText.freeTier}
+                    {
+                        (savedSubscription?.subscribed || 
+                            (
+                                savedSubscription?.endDate &&
+                                savedSubscription?.endDate?.getTime() > new Date().getTime() 
+                            ) 
+                        ) ? 
+                        profileText.premiumTier : 
+                        profileText.freeTier}
                 </StyledText>
                 <StyledView className="w-full pt-3 flex items-center">
                     <MyButton

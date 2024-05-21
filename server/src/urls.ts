@@ -32,6 +32,7 @@ export const URLs = {
     getMyProfile: "/getMyProfile",
     sendReadStatus: "/sendReadStatus",
     getReadStatus: "/getReadStatus",
+    getPremiumPage: "/getPremiumPage",
 
     // STRIPE
     webhook: "/webhook",
@@ -39,7 +40,8 @@ export const URLs = {
     // ADMIN
     deleteEverything: "/deleteEverything",
     createSample: "/createSample",
-    ip: "http://192.168.86.28:3000",
+    ip: "192.168.75.157",
+    port: 3000,
 
     // OAUTH
     googleOAuth: "https://www.googleapis.com/userinfo/v2/me",

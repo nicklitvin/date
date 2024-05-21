@@ -20,9 +20,9 @@ const resetInteractions = {
     createUser: false,
     loginUser: false,
     verifyUser: false,
-    addSubscription: false,
-    clearInteractionEntries: true
+    addSubscription: true,
+    clearInteractionEntries: true,
 }
 
-server.setupEnvironment(resetEverything);
-console.log(`running server on port ${server.port}`)
+server.setupEnvironment(resetInteractions);
+console.log("server is running");

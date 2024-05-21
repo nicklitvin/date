@@ -1,4 +1,6 @@
 TODO
+hide api key from web to server
+premium purchase doesnt update profile page
 reconnect socket if too long, when creating user
 
 allow other users
