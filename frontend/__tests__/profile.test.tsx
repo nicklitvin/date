@@ -44,7 +44,7 @@ describe("profile page", () => {
 
     const cancelURL = "cancelURL";
     const manageURL = "manageURL";
-    const checkoutURL = "checkoutURL";
+    const premiumURL = "premiumURL";
 
     const load = async (subscriptionData : SubscriptionData, useSave = false) => {
         const mock = new MockAdapter(axios);
@@ -60,8 +60,8 @@ describe("profile page", () => {
         mock.onPost(URLs.server + URLs.manageSubscription).reply(config => 
             [200, {data: manageURL}]
         )
-        mock.onPost(URLs.server + URLs.getCheckoutPage).reply(config => 
-            [200, {data: checkoutURL}]
+        mock.onPost(URLs.server + URLs.getPremiumPage).reply(config => 
+            [200, {data: premiumURL}]
         )
 
         const store = new RootStore();
@@ -111,19 +111,19 @@ describe("profile page", () => {
             fireEvent(screen.getByText(profileText.purchasePremium), "press")
         });
 
-        expect(openLinkFunc).toHaveBeenLastCalledWith(checkoutURL);
+        expect(openLinkFunc).toHaveBeenLastCalledWith(premiumURL);
     })
 
     it("should show subscription expiring view", async () => {
         const { openLinkFunc } = await load(expiringSubscription);
 
-        expect(screen.queryByText(`Subscription is expiring on ${getShortDate(expiringSubscription.endDate!, "PST")}`)).not.toEqual(null);
+        expect(screen.queryByText(`Premium is expiring on ${getShortDate(expiringSubscription.endDate!, "PST")}`)).not.toEqual(null);
 
         await act( () => {
             fireEvent(screen.getByText(profileText.purchasePremium), "press")
         });
 
-        expect(openLinkFunc).toHaveBeenLastCalledWith(checkoutURL);
+        expect(openLinkFunc).toHaveBeenLastCalledWith(premiumURL);
 
     })
 

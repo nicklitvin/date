@@ -715,6 +715,7 @@ export class Handler {
                     readUpdate: input
                 })
             } 
+            return output;
         }
         return { message: errorText.cannotUpdateReadStatus};
     }

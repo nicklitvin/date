@@ -1,7 +1,6 @@
 TODO
 hide api key from web to server
 add refresh to profile/stats page
-fix tests
 reconnect socket if too long, when creating user
 
 allow other users
