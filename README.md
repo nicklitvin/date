@@ -40,8 +40,6 @@ SECRET_ACCESS_KEY="<for AWS S3 image storage>"
 STRIPE_API_KEY="<for creating Stripe checkout sessions>"
 STRIPE_WEBHOOK="<for processing Stripe payments>"
 PREMIUM_PRICE_ID="<id of premium subscription item>"
-CANCEL_RETURN_URL="<url redirect for canceled payment>"
-SUCCESS_RETURN_URL="<url redirect for good payment>"
 STRIPE_PAY_PORTAL="<url for managing subscription status>"
 
 ADMIN_API_KEY="<key for accessing admin-only functions on server>"

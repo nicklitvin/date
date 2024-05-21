@@ -419,18 +419,19 @@ export class APIHandler {
             }
         })
 
-        app.post(URLs.webhook, async (req,res) => {
+        app.post(URLs.webhook, express.raw({type: 'application/json'}), async (req,res) => {
             try {
-                const input = await handler.pay.extractDataFromPayment(
-                    req.headers["Stripe-Signature"] as string,
+                const data = await handler.pay.extractDataFromPayment(
+                    req.headers["stripe-signature"],
                     req.body
-                ) as SubscribeInput;
-                const output = await handler.processSubscriptionPay(input);
-                return output ? 
-                    res.status(200).json() : 
-                    res.status(400).json()
+                );
+                if (data) {
+                    const output = await handler.processSubscriptionPay(data);
+                    return output.message ? res.status(400).json(output) : res.status(200).json(); 
+                } else {
+                    return res.status(200).json();
+                }
             } catch (err) {
-                console.log(err);
                 return res.status(500).json();
             }
         })

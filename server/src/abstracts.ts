@@ -29,6 +29,6 @@ export abstract class ImageHandler {
 
 export abstract class PaymentHandler {
     abstract createSubscriptionSessionURL(userID : string, email : string, freeTrial: boolean) : Promise<string>
-    abstract extractDataFromPayment(signature : string, body : any) : Promise<PaymentExtractOutput|null> 
+    abstract extractDataFromPayment(signature : any, body : any) : Promise<PaymentExtractOutput|null> 
     abstract cancelSubscription(subscriptionID: string) : Promise<boolean>
 }

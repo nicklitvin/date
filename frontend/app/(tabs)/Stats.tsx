@@ -48,10 +48,10 @@ export function Stats(props : Props) {
             }
             const response = await sendRequest<UserSwipeStats>(URLs.getStats, input);
             if (response.message) {
-                Toast.show({
-                    type: "error",
-                    text1: response.message,
-                })
+                // Toast.show({
+                //     type: "error",
+                //     text1: response.message,
+                // })
             } else if (response.data) {
                 setStats(response.data);
             }

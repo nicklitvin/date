@@ -40,16 +40,11 @@ export class StripePaymentHandler extends PaymentHandler {
         return session.url as string;
     }
 
-    public async extractDataFromPayment(signature : string, body : any) : 
+    public async extractDataFromPayment(signature : any, body : any) : 
         Promise<PaymentExtractOutput|null> 
     {
         try {
-            // const body = await request.text();
-            // const signature = request.headers.get("Stripe-Signature") as string;
-            const event = this.stripe.webhooks.constructEvent(body,signature,
-                process.env.STRIPE_WEBHOOK!    
-            );
-    
+            const event = this.stripe.webhooks.constructEvent(body,signature, process.env.STRIPE_WEBHOOK!);
             if (event.type == "checkout.session.completed") {
                 const session = event.data.object;
                 return {
@@ -59,6 +54,7 @@ export class StripePaymentHandler extends PaymentHandler {
             }
             return null;
         } catch (err) {
+            console.log(err);
             return null;
         }
     }

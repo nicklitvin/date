@@ -417,7 +417,7 @@ export class Handler {
         const user = await this.user.getUserByID(input.userID);
         if (!user) return { message: errorText.notValidUser };
 
-        await this.user.updateSubscriptionAfterPay(input.userID, input.subscriptionID)
+        const after =await this.user.updateSubscriptionAfterPay(input.userID, input.subscriptionID);
         const output = await this.user.updateElo(input.userID, this.user.getEloChange({
             action: EloAction.Subscribe,
             eloDiff: eloConstants.start - user.elo,

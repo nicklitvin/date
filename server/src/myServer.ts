@@ -2,7 +2,6 @@ import { PrismaClient } from "@prisma/client";
 import express from "express";
 import { Handler } from "./handler";
 import { APIHandler } from "./api";
-import bodyParser from "body-parser";
 import { sampleContent } from "./globals";
 import { attributeList } from "./others";
 import fs from "fs/promises";
@@ -17,7 +16,10 @@ export class MyServer {
 
     constructor({disableEmail = false}) {
         this.app = expressWs(express()).app;
-        this.app.use(bodyParser.json());
+        this.app.use( (req,res,next) => {
+            if (req.originalUrl == "/webhook") next();
+            else express.json()(req,res,next);
+        })
 
         this.handler = new Handler({
             prisma: new PrismaClient(),

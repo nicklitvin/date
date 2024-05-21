@@ -20,7 +20,7 @@ const resetInteractions = {
     createUser: false,
     loginUser: false,
     verifyUser: false,
-    addSubscription: true,
+    addSubscription: false,
     clearInteractionEntries: true,
 }
 
