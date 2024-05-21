@@ -9,6 +9,16 @@ import { sampleUsers } from "./sample";
 import expressWs from "express-ws";
 import { URLs } from "./urls";
 
+export interface EnvironmentSetup {
+    loginUser: boolean,
+    verifyUser: boolean,
+    createUser : boolean,
+    addSubscription : boolean,
+    createSampleUsers : boolean,
+    clearTables : boolean,
+    clearInteractionEntries : boolean
+}
+
 export class MyServer {
     private app;
     private server;
@@ -38,7 +48,7 @@ export class MyServer {
         createSampleUsers = false,
         clearTables = false,
         clearInteractionEntries = false
-    }) {
+    } : EnvironmentSetup) {
         if (clearTables) {
             await this.handler.deleteEverything();
         }

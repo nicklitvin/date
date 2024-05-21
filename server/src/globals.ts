@@ -59,7 +59,7 @@ export const miscConstants = {
     usersLoadedInPreview : 10,
     messagesLoadedInChat: 10,
     maxReportCount: 10,
-    freeTrialDays: 7,
+    freeTrialDays: 0,
     usersInSwipeFeed: 10,
     verificationCodeLength: 4,
     verificationExpireMinutes: 5,

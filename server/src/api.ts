@@ -1,7 +1,7 @@
 import express from "express";
 import { URLs } from "./urls";
 import { APIOutput, APIRequest, ClientIDs, ConfirmVerificationInput, DeleteImageInput, EditUserInput, GetChatInput, LoginInput, MessageInput, GetMatchesInput, NewVerificationInput, UserReportWithReportedID, SubscribeInput, SwipeInput, UnlikeInput, UpdatePushTokenInput, UploadImageInput, UserInputWithFiles, JustEmail, ReadStatusInput, GetReadStatusInput, JustUserID, UserInput, HandlerUserInput, SocketPayloadToClient, SocketPayloadToServer, UnlikeOutput, NewMatchData, ChatPreview, SwipeFeed, PublicProfile, UserSwipeStats, SubscriptionData, SettingData, Preferences, LoginOutput } from "./interfaces";
-import { isAdmin } from "./others";
+import { isAdmin, isWebCheckoutKey } from "./others";
 import { Handler } from "./handler";
 import expressWs from "express-ws";
 import { WebSocket } from "ws";
@@ -407,7 +407,9 @@ export class APIHandler {
                 const body = req.body as APIRequest<JustUserID>;
                 if (!body.key) return res.status(400).json();
     
-                if (!(isAdmin(body.key) || body.userID || body.userID == body.userID)) return res.status(401).json();
+                if (!(isWebCheckoutKey(body.key) && body.userID && body.userID == body.userID)) return res.status(401).json({
+                    message: "Unauthorized"
+                } as APIOutput<string>);
     
                 const output = await handler.getSubscriptionCheckoutPage(body.userID);
                 return output.message ?

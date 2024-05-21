@@ -1,7 +1,7 @@
 TODO
-hide api key from web to server
 add refresh to profile/stats page
 reconnect socket if too long, when creating user
+add attributes
 
 allow other users
     verification as option
