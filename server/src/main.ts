@@ -34,5 +34,5 @@ const setups : {[key : string] : EnvironmentSetup} = {
     }
 }
 
-server.setupEnvironment(setups.resetEverything);
+server.setupEnvironment(setups.resetInteractions);
 console.log("server is running");

@@ -18,6 +18,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { randomUUID } from "expo-crypto";
 import Loading from "./Loading";
 import Toast from "react-native-toast-message";
+import { toastConfig } from "../src/components/Toast";
 
 interface Props {
     userID?: string
@@ -174,7 +175,10 @@ export function Chat(props : Props) {
         }
 
         globalState.addLoadingMessageID(newMessageID);
-        if (removeID) globalState.removeUnsentMessageID(removeID);
+        if (removeID) {
+            globalState.removeUnsentMessageID(removeID);
+            receivedData.deleteMessageFromChat(userID, removeID);
+        }
 
         receivedData.addSavedChat(
             userID, 
@@ -245,7 +249,7 @@ export function Chat(props : Props) {
                 withID: profile!.id
             }
 
-            const response = {} || await sendRequest(URLs.unlikeUser, unlike);
+            const response = await sendRequest(URLs.unlikeUser, unlike);
             if (response.message) {
                 Toast.show({
                     type: "error",
@@ -381,6 +385,7 @@ export function Chat(props : Props) {
                 </StyledScroll>
             </StyledView>
         </StyledView>
+        <Toast config={toastConfig}/>
         </StyledView>
     )
 }

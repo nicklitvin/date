@@ -40,13 +40,27 @@ export class ReceivedData {
     setNewMatches(input : NewMatchData[]|null) { this.newMatches = input; }
 
     @action
-    addSavedChat(userID : string, chat : Message[]) { 
-        this.savedChats[userID] = chat
+    addSavedChat(userID : string, chat : Message[]) {
+        const chats = {...this.savedChats};
+        chats[userID] = chat;
+        this.savedChats = chats;
     }
 
     @action
     deleteSavedChat(userID : string) {
-        delete this.savedChats[userID]
+        const chats = {...this.savedChats};
+        delete chats[userID] 
+        this.savedChats = chats;
+    }
+
+    @action
+    deleteMessageFromChat(withID : string, messageID : string) {
+        const chatCopy = [...this.savedChats[withID]];
+        const newCopy = chatCopy.filter( val => val.id != messageID);
+
+        const chats = {...this.savedChats};
+        chats[withID] = newCopy;
+        this.savedChats = chats;
     }
 
     @action

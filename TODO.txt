@@ -1,5 +1,4 @@
 TODO
-stats should send not premium variable with object to differ from loading and no stats
 reconnect socket if too long, when creating user
 
 allow other users

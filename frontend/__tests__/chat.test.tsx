@@ -222,6 +222,7 @@ describe("chat page", () => {
 
         expect(store.globalState.loadingMessageIDs.size).toEqual(0);
         expect(store.globalState.unsentMessageIDs.size).toEqual(1);
+        expect(store.receivedData.savedChats[recepientProfile.id]).toHaveLength(latestMessages.length + 1);
 
         await act( () => {
             fireEvent(screen.getByTestId(`message-${message}`),"press");
@@ -229,6 +230,7 @@ describe("chat page", () => {
 
         expect(store.globalState.loadingMessageIDs.size).toEqual(1);
         expect(store.globalState.unsentMessageIDs.size).toEqual(0);
+        expect(store.receivedData.savedChats[recepientProfile.id]).toHaveLength(latestMessages.length + 1);
     })
 
     it("should load chat", async () => {

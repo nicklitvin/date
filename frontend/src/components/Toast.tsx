@@ -9,6 +9,7 @@ const makeToast = (props : any, toastType : ToastType) => (
         style={{
             borderRadius: 25,
             backgroundColor: globals.light,
+            // borderColor: globals.red
             borderColor: toastType == "Success" ? globals.green : globals.red
         }}
         text1Style={{
