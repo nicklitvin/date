@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import { testIDS } from "../../src/testIDs";
 import { PageHeader } from "../../src/components/PageHeader";
 import { URLs } from "../../src/urls";
-import { NativeScrollEvent, NativeSyntheticEvent, ScrollView } from "react-native";
+import { NativeScrollEvent, NativeSyntheticEvent, RefreshControl, ScrollView } from "react-native";
 import { globals } from "../../src/globals";
 import { differenceInSeconds } from "date-fns";
 import { sendRequest } from "../../src/utils";
@@ -30,6 +30,7 @@ export function Matches(props : Props) {
     const [matchRequestTime, setMatchRequestTime] = useState<Date>(new Date(0));
     const [previewRequestTime, setPreviewRequestTime] = useState<Date>(new Date(0));
     const [firstLoad, setFirstLoad] = useState<boolean>(true);
+    const [refreshing, setRefreshing] = useState<boolean>(false);
 
     useEffect( () => {
         if (firstLoad) {
@@ -136,6 +137,13 @@ export function Matches(props : Props) {
         getChatPreviews(mostRecentTime);
     }
 
+    const refresh = async () => {
+        receivedData.setNewMatches(null);
+        receivedData.setChatPreviews(null);
+        await load()
+        setRefreshing(false);
+    }
+
     if (!newMatches || !chatPreviews) {
         return (
             <>
@@ -147,7 +155,14 @@ export function Matches(props : Props) {
 
     return (
         <StyledView className="w-full h-full flex flex-col bg-back">
-        <StyledScroll>
+        <StyledScroll
+            refreshControl={
+                <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={refresh}    
+                />
+            }
+        >
             <PageHeader
                 title={matchesText.pageTitle}
                 imageType="Matches"

@@ -25,7 +25,7 @@ export class ReceivedData {
     setProfile(input : PublicProfile|null) { this.profile = input; }
 
     @action
-    setSubscription(input : SubscriptionData) {this.subscription = input; }
+    setSubscription(input : SubscriptionData|null) {this.subscription = input; }
 
     @action
     setChatPreviews(input : ChatPreview[]|null) { this.chatPreviews = input; }

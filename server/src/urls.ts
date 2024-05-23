@@ -40,7 +40,9 @@ export const URLs = {
     // ADMIN
     deleteEverything: "/deleteEverything",
     createSample: "/createSample",
-    ip: "192.168.75.157",
+    clearInteractions: "/clearInteractions",
+    purchasePremium: "/purchasePremium",
+    ip: "10.5.50.70",
     port: 3000,
 
     // OAUTH

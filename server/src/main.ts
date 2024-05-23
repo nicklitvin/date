@@ -4,7 +4,7 @@ export const server = new MyServer({
     disableEmail: true
 });
 
-const setups : Record<string,EnvironmentSetup> = {
+const setups : {[key : string] : EnvironmentSetup} = {
     resetEverything: {
         clearTables: true,
         createSampleUsers: true,
@@ -34,5 +34,5 @@ const setups : Record<string,EnvironmentSetup> = {
     }
 }
 
-server.setupEnvironment(setups.createUserOnly);
+server.setupEnvironment(setups.resetEverything);
 console.log("server is running");

@@ -1,10 +1,10 @@
 import { observer } from "mobx-react-lite";
 import { PageHeader } from "../../src/components/PageHeader";
 import { profileText } from "../../src/text";
-import { StyledButton, StyledImage, StyledText, StyledView } from "../../src/styledElements";
+import { StyledButton, StyledImage, StyledScroll, StyledText, StyledView } from "../../src/styledElements";
 import { MyButton } from "../../src/components/Button";
 import { URLs } from "../../src/urls";
-import { Linking } from "react-native";
+import { Linking, RefreshControl } from "react-native";
 import { JustUserID, PublicProfile, SubscriptionData, WithKey } from "../../src/interfaces";
 import { getShortDate, sendRequest } from "../../src/utils";
 import { useStore } from "../../src/store/RootStore";
@@ -24,6 +24,7 @@ export function Profile(props : Props) {
     const savedProfile = receivedData.profile;
     const savedSubscription = receivedData.subscription;
     const [firstLoad, setFirstLoad] = useState<boolean>(true);
+    const [refreshing, setRefreshing] = useState<boolean>(false);
 
     useEffect( () => {
         if (firstLoad) {
@@ -33,20 +34,22 @@ export function Profile(props : Props) {
         }
     }, [firstLoad])
 
-    const load = async () => {
+    const load = async (refresh = false) => {
         try {
             const input : WithKey<JustUserID> = {
                 userID: receivedData.profile?.id!,
                 key: receivedData.loginKey
             }
 
-            if (!savedProfile) {
+            if (refresh || !savedProfile) {
                 const profileResponse = await sendRequest<PublicProfile>(URLs.getMyProfile, input);
                 if (profileResponse.data) receivedData.setProfile(profileResponse.data);
             }
+            
 
-            if (!savedSubscription) {
+            if (refresh || !savedSubscription) {
                 const subscriptionResponse = await sendRequest<SubscriptionData>(URLs.getSubscription, input);
+                console.log(subscriptionResponse);
                 if (subscriptionResponse.data) receivedData.setSubscription({
                     ...subscriptionResponse.data,
                     endDate: new Date(subscriptionResponse.data.endDate!)
@@ -103,7 +106,6 @@ export function Profile(props : Props) {
                     text2: profileText.subscriptionCanceledtext2,
                 })
             }
-            console.log(response);
         } catch (err) {
             console.log(err)
         }
@@ -188,12 +190,26 @@ export function Profile(props : Props) {
         }
     }
 
+    const refresh = async () => {
+        receivedData.setSubscription(null);
+        await load(true)
+        setRefreshing(false);
+    }
+
     if ( (!savedProfile || !savedSubscription) && !props.dontAutoLoad) {
         return <Loading/>   
     }
     return (
         <StyledView className="bg-back w-full h-full">
-            <StyledButton testID={testIDS.load} onPress={load}/>
+        <StyledScroll
+            refreshControl={
+                <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={refresh}    
+                />
+            }
+        >
+            <StyledButton testID={testIDS.load} onPress={() => load()}/>
             <PageHeader
                 title={profileText.pageTitle}
                 imageType="Profile"
@@ -239,6 +255,7 @@ export function Profile(props : Props) {
                 </StyledView>
                 {makeSubscriptionContent()}
             </StyledView>
+        </StyledScroll>
         </StyledView>
     )
 }

@@ -10,7 +10,9 @@
 
     "ping": "ts-node ./src/adminAPI.ts -p",
     "match": "ts-node ./src/adminAPI.ts -l",
-    "message": "ts-node ./src/adminAPI.ts -m message"
+    "message": "ts-node ./src/adminAPI.ts -m message",
+    "premium": "ts-node ./src/adminAPI.ts -b",
+    "clear": "ts-node ./src/adminAPI.ts -c"
   },
   "keywords": [],
   "author": "",
