@@ -5,7 +5,7 @@ import { StyledButton, StyledScroll, StyledText, StyledView } from "../../src/st
 import { PageHeader } from "../../src/components/PageHeader";
 import { MyButton } from "../../src/components/Button";
 import { URLs } from "../../src/urls";
-import { Linking } from "react-native";
+import { Linking, RefreshControl } from "react-native";
 import { sendRequest } from "../../src/utils";
 import { Spacing } from "../../src/components/Spacing";
 import { useStore } from "../../src/store/RootStore";
@@ -14,6 +14,7 @@ import { useEffect, useState } from "react";
 import { MyDonut } from "../../src/components/Donut";
 import { Weekly } from "../../src/components/Weekly";
 import Toast from "react-native-toast-message";
+import Loading from "../Loading";
 
 interface Props {
     noAutoLoad?: boolean
@@ -22,9 +23,11 @@ interface Props {
 }
 
 export function Stats(props : Props) {
-    const { receivedData } = useStore();    
-    const [stats, setStats] = useState<UserSwipeStats|null>(receivedData.stats);
+    const { receivedData } = useStore();   
+    const stats = receivedData.stats; 
     const [firstLoad, setFirstLoad] = useState<boolean>(true);
+    const [refreshing, setRefreshing] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(true);
 
     useEffect( () => {
         if (firstLoad) {
@@ -34,12 +37,6 @@ export function Stats(props : Props) {
         }
     }, [firstLoad])
 
-    useEffect( () => {
-        if (stats && !receivedData.stats) {
-            receivedData.setStats(stats);
-        }
-    }, [stats])
-
     const load = async () => {
         try {
             const input : WithKey<JustUserID> = {
@@ -48,13 +45,12 @@ export function Stats(props : Props) {
             }
             const response = await sendRequest<UserSwipeStats>(URLs.getStats, input);
             if (response.message) {
-                // Toast.show({
-                //     type: "error",
-                //     text1: response.message,
-                // })
+                // nothing
             } else if (response.data) {
-                setStats(response.data);
+                receivedData.setStats(response.data);
             }
+
+            setLoading(false);
         } catch (err) {
 
         }
@@ -80,6 +76,13 @@ export function Stats(props : Props) {
         } catch (err) {
             console.log(err)
         }
+    }
+
+    const refresh = async () => {
+        setLoading(true);
+        receivedData.setStats(null);
+        await load()
+        setRefreshing(false);
     }
     
     let content;
@@ -156,10 +159,19 @@ export function Stats(props : Props) {
         )
     }
 
-    return (
+    if (loading && !props.noAutoLoad) {
+        return <Loading />
+    } else return (
         <StyledView className="w-full h-full bg-back">
             <StyledButton testID={testIDS.load} onPress={load}/>
-            <StyledScroll>
+            <StyledScroll
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={refresh}    
+                    />
+                }
+            >
                 <PageHeader
                     title={statsText.pageTitle}
                     imageType="Stats"
