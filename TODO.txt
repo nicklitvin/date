@@ -1,5 +1,4 @@
 TODO
-smoking/alc change continue to save button
 reconnect socket if too long, when creating user
 
 allow other users

@@ -69,7 +69,7 @@ export function Alcohol() {
                     onPressFunction={() => {
                         if (frequency) changeAlcohol()
                     }}
-                    text={generalText.continue}
+                    text={generalText.saveChanges}
                 />
             }
         />
