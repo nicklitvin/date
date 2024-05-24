@@ -39,9 +39,9 @@ export function Matches(props : Props) {
         }
     }, [firstLoad])
 
-    const load = async () => {
-        if (!receivedData.newMatches) await getNewMatches();
-        if (!receivedData.chatPreviews) await getChatPreviews();
+    const load = async (refresh = false) => {
+        if (refresh || !receivedData.newMatches) await getNewMatches();
+        if (refresh || !receivedData.chatPreviews) await getChatPreviews();
     }
 
     const getNewMatches = async (loadMoreFromTime? : Date) => {
@@ -138,16 +138,14 @@ export function Matches(props : Props) {
     }
 
     const refresh = async () => {
-        receivedData.setNewMatches(null);
-        receivedData.setChatPreviews(null);
-        await load()
+        await load(true)
         setRefreshing(false);
     }
 
     if (!newMatches || !chatPreviews) {
         return (
             <>
-                <StyledButton testID={testIDS.load} onPress={load} />
+                <StyledButton testID={testIDS.load} onPress={() => load()} />
                 <Loading />
             </>
         )

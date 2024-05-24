@@ -49,7 +49,6 @@ export function Profile(props : Props) {
 
             if (refresh || !savedSubscription) {
                 const subscriptionResponse = await sendRequest<SubscriptionData>(URLs.getSubscription, input);
-                console.log(subscriptionResponse);
                 if (subscriptionResponse.data) receivedData.setSubscription({
                     ...subscriptionResponse.data,
                     endDate: new Date(subscriptionResponse.data.endDate!)
@@ -191,7 +190,6 @@ export function Profile(props : Props) {
     }
 
     const refresh = async () => {
-        receivedData.setSubscription(null);
         await load(true)
         setRefreshing(false);
     }

@@ -27,7 +27,6 @@ export function Stats(props : Props) {
     const stats = receivedData.stats; 
     const [firstLoad, setFirstLoad] = useState<boolean>(true);
     const [refreshing, setRefreshing] = useState<boolean>(false);
-    const [loading, setLoading] = useState<boolean>(true);
 
     useEffect( () => {
         if (firstLoad) {
@@ -49,8 +48,6 @@ export function Stats(props : Props) {
             } else if (response.data) {
                 receivedData.setStats(response.data);
             }
-
-            setLoading(false);
         } catch (err) {
 
         }
@@ -79,8 +76,6 @@ export function Stats(props : Props) {
     }
 
     const refresh = async () => {
-        setLoading(true);
-        receivedData.setStats(null);
         await load()
         setRefreshing(false);
     }
@@ -159,7 +154,7 @@ export function Stats(props : Props) {
         )
     }
 
-    if (loading && !props.noAutoLoad) {
+    if (!stats && !props.noAutoLoad) {
         return <Loading />
     } else return (
         <StyledView className="w-full h-full bg-back">

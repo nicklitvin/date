@@ -35,12 +35,12 @@ export function Feed(props : Props) {
         if (firstLoad) {
             setFirstLoad(false);
             if (props.dontAutoLoad) return
-            if (!savedFeed) load();
+            if (!savedFeed) getFeed();
         }
     }, [firstLoad])
 
     useEffect( () => {
-        if (!firstLoad && !savedFeed && !props.dontAutoLoad) load();
+        if (!firstLoad && !savedFeed && !props.dontAutoLoad) getFeed();
     }, [savedFeed])
 
     useEffect( () => {
@@ -51,10 +51,6 @@ export function Feed(props : Props) {
             scrollToTop();
         }
     }, [savedSwipeStatus])
-
-    const load = async () => {
-        await getFeed();
-    }
 
     const getFeed = async () => {
         try {
@@ -119,7 +115,7 @@ export function Feed(props : Props) {
 
     const refresh = () => {
         const func = async () => {
-            receivedData.setSwipeFeed(null);
+            // receivedData.setSwipeFeed(null);
             await getFeed()
             setRefreshing(false);
         }
@@ -129,7 +125,7 @@ export function Feed(props : Props) {
     if (!savedFeed && !props.dontAutoLoad) return <Loading />
     return (
         <StyledView className="w-full h-full bg-back">
-        <StyledButton testID={testIDS.load} onPress={load}/>
+        <StyledButton testID={testIDS.load} onPress={getFeed}/>
         <StyledScroll 
             showsVerticalScrollIndicator={false} 
             ref={scrollViewRef}
