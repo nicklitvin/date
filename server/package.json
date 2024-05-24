@@ -3,7 +3,11 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "start": "ts-node ./src/main.ts --no-network-family-autoselection",
+    "start": "ts-node ./src/main.ts",
+    "reset": "ts-node ./src/main.ts -r",
+    "single": "ts-node ./src/main.ts -s",
+    "construct": "ts-node ./src/main.ts -c",
+
     "test": "jest --runInBand --use-mocks=true --testPathIgnorePatterns",
     "test-real": "jest --runInBand",
     "test-single": "jest --use-mocks=true --testPathIgnorePatterns -t",

@@ -40,31 +40,31 @@ export class MyServer {
         this.server = this.app.listen(URLs.port);
     }
 
-    public async setupEnvironment({
-        loginUser = true,
-        verifyUser = true,
-        createUser = true,
-        addSubscription = true,
-        createSampleUsers = false,
-        clearTables = false,
-        clearInteractionEntries = false
-    } : EnvironmentSetup) {
-        if (clearTables) {
+    public async setupEnvironment(input : EnvironmentSetup = {
+        loginUser: false,
+        verifyUser: false,
+        createUser: false,
+        addSubscription: false,
+        createSampleUsers: false,
+        clearTables: false,
+        clearInteractionEntries: false
+    }) {
+        if (input.clearTables) {
             await this.handler.deleteEverything();
         }
 
-        if (clearInteractionEntries) {
+        if (input.clearInteractionEntries) {
             await Promise.all([
                 this.handler.swipe.deleteAllSwipes(),
                 this.handler.message.deleteAllMessages()
             ])
         }
 
-        if (loginUser) {
+        if (input.loginUser) {
             await this.handler.loginWithToken({},sampleContent.email);
         }
 
-        if (verifyUser) {
+        if (input.verifyUser) {
             await this.handler.getVerificationCode({
                 email: sampleContent.email, 
                 schoolEmail: sampleContent.eduEmail
@@ -76,7 +76,7 @@ export class MyServer {
             })
         }
         
-        if (createUser) {
+        if (input.createUser) {
             const fileString = (await fs.readFile("./__testUtils__/images/michael1.jpg")).toString("base64");
             await this.handler.createUser({
                 ageInterest: [18,30],
@@ -97,7 +97,7 @@ export class MyServer {
             })
         }
 
-        if (createSampleUsers) {
+        if (input.createSampleUsers) {
             const images = ["keanu1.jpg","keanu2.jpg","leo1.jpg","scarlett1.jpg","cate1.jpg","morgan1.jpg","anne1.jpg","samuel1.jpg","jennifer1.jpg",];
             const buffers = await Promise.all(images.map(val => fs.readFile(`__testUtils__/images/${val}`)));
     
@@ -119,7 +119,7 @@ export class MyServer {
             await this.handler.createSample(copy);
         }
 
-        if (addSubscription) {
+        if (input.addSubscription) {
             await this.handler.processSubscriptionPay({
                 userID: sampleContent.userID,
                 subscriptionID: "randomID"

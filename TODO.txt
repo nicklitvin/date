@@ -1,4 +1,5 @@
 TODO
+dont redirect to loading when refreshing again
 reconnect socket if too long, when creating user
 
 allow other users

@@ -19,11 +19,6 @@ const argv = yargs
         describe: 'Will make match',
         type: "boolean",
     })
-    .option('ping', {
-        alias: "p",
-        describe: "ping",
-        type: "boolean"
-    })
     .option("clear", {
         alias: "c",
         describe: "clears interactions",
@@ -38,16 +33,14 @@ const argv = yargs
     .alias('help', 'h')
     .argv as { message?: string; match?: boolean, ping?: boolean, clear?: boolean, premium?: boolean };
 
-const { message, match, ping, clear, premium } = argv;
-
 async function main() {
     const baseURL = `http://${URLs.ip}:${URLs.port}`;
 
-    if (ping) {
+    if (argv.ping) {
         console.log("ping")
     }
     
-    if (clear) {
+    if (argv.clear) {
         try {
             const payload : APIRequest<{}> = {
                 key: process.env.ADMIN_API_KEY!
@@ -60,10 +53,10 @@ async function main() {
         }
     } 
     
-    if (message) {
+    if (argv.message) {
         const payload : APIRequest<MessageInput> = {
             key: process.env.ADMIN_API_KEY!,
-            message: message,
+            message: argv.message,
             userID: sampleUsers[0].id,
             recepientID: sampleContent.userID
         }
@@ -76,7 +69,7 @@ async function main() {
         }
     }
     
-    if (match) {
+    if (argv.match) {
         const payload1 : SwipeInput & {key : string} = {
             key: process.env.ADMIN_API_KEY!,
             userID: sampleContent.userID,
@@ -100,7 +93,7 @@ async function main() {
         }
     } 
 
-    if (premium) {
+    if (argv.premium) {
         try {
             const payload : APIRequest<JustUserID> = {
                 key: process.env.ADMIN_API_KEY!,
