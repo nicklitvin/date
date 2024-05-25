@@ -84,15 +84,21 @@ export function Chat(props : Props) {
     }, [scrollOnKeyboard])
 
     useEffect( () => {
-        if (firstLoad) {
-            setFirstLoad(false);
-            if (!props.noAutoLoad) {
-                load();
-                scrollRef.current?.scrollToEnd({animated: false});
-                setInitialLoad(false);
+        const func = async () => {
+            if (firstLoad) {
+                setFirstLoad(false);
+                if (!props.noAutoLoad) {
+                    await load();
+                    await new Promise( res => setTimeout( () => {
+                        scrollRef.current?.scrollToEnd({animated: false});
+                        res(null);                        
+                    }, 5))
+                    setInitialLoad(false);
+                }
+                updateMyReadStatus();
             }
-            updateMyReadStatus();
         }
+        func()
     }, [firstLoad])
 
     const updateMyReadStatus = async () => {

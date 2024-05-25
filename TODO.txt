@@ -1,4 +1,6 @@
 TODO
+on load more messages, i want the content to load above it, scroll is auto to top
+
 reconnect socket if too long, when creating user
 some errors with sendrequest ts types, where const response =
 fix scroll to load more messages 
