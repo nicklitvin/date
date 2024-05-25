@@ -11,7 +11,7 @@ import { getChatTimestamp, sendRequest, setCustomTimer } from "../src/utils";
 import { PageHeader } from "../src/components/PageHeader";
 import { MyMessage } from "../src/components/Message";
 import { URLs } from "../src/urls";
-import { NativeScrollEvent, NativeSyntheticEvent, ScrollView } from "react-native";
+import { Keyboard, NativeScrollEvent, NativeSyntheticEvent, ScrollView } from "react-native";
 import { MyModal } from "../src/components/Modal";
 import { differenceInSeconds } from "date-fns";
 import { router, useLocalSearchParams } from "expo-router";
@@ -48,6 +48,9 @@ export function Chat(props : Props) {
     const [firstLoad, setFirstLoad] = useState<boolean>(true);
     const [initialLoad, setInitialLoad] = useState<boolean>(true);
 
+    const [keyboardInView, setKeyboardInView] = useState<boolean>(false);
+    const [scrollOnKeyboard, setScrollOnKeyboard] = useState<boolean>();
+
     useEffect( () => {
         if (!chat || !globalState.socketManager || !receivedData.profile) return
 
@@ -62,9 +65,27 @@ export function Chat(props : Props) {
     }, [chat, profile, globalState.socketManager])
 
     useEffect( () => {
+        const onKeyboardShow = Keyboard.addListener("keyboardDidShow", () => {
+            if (scrollOnKeyboard && scrollRef.current) {
+                scrollRef.current.scrollToEnd({ animated: true });
+            }
+            setKeyboardInView(true);
+        })
+
+        const onKeyboardHide = Keyboard.addListener("keyboardDidHide", () => {
+            setKeyboardInView(false);
+        })
+
+        
+        return () => {
+            onKeyboardHide.remove();
+            onKeyboardShow.remove();
+        }
+    }, [scrollOnKeyboard])
+
+    useEffect( () => {
         if (firstLoad) {
             setFirstLoad(false);
-
             if (!props.noAutoLoad) {
                 load();
                 scrollRef.current?.scrollToEnd({animated: false});
@@ -129,7 +150,6 @@ export function Chat(props : Props) {
     }
 
     const getChat = async (loadMoreFromTime?: Date) => {
-        console.log("get chat");
         try {
             const chatInput : WithKey<GetChatInput> = {
                 userID: receivedData.profile?.id!,
@@ -140,6 +160,7 @@ export function Chat(props : Props) {
             const chatResponse = await sendRequest<Message[]>(URLs.getChat, chatInput);
             if (chatResponse.message) {
                 Toast.show({
+                    type: "error",
                     text1: chatText.errorCannotGetChat,
                     text2: chatResponse.message
                 })
@@ -216,12 +237,19 @@ export function Chat(props : Props) {
         const { contentOffset, layoutMeasurement, contentSize } = event.nativeEvent;
         const scrollHeight = contentSize.height - layoutMeasurement.height;
 
-        const isAtTop = contentOffset.y <= scrollHeight * (1-globals.scrollAtPercentage);
+        if (!keyboardInView && contentOffset.y > scrollHeight - globals.pixelsTilScrollEdge) {
+            setScrollOnKeyboard(true);            
+        } else {
+            setScrollOnKeyboard(false);
+        }
+
+        const isAtTop = contentOffset.y < globals.pixelsTilScrollEdge;
         const canSend = differenceInSeconds(new Date(), chatRequestTime) > globals.apiRequestTimeout;
 
-        if (!(isAtTop && canSend && !initialLoad && chat.length > 0)) return 
-        setChatRequestTime(new Date());
-        getChat(new Date(chat.at(-1)!.timestamp.getTime() - 1))
+        if (isAtTop && canSend && !initialLoad && chat.length > 0) {
+            setChatRequestTime(new Date());
+            getChat(new Date(chat.at(-1)!.timestamp.getTime() - 1))    
+        }
     }
 
     const reportUser = async () => {

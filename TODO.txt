@@ -1,11 +1,11 @@
 TODO
 reconnect socket if too long, when creating user
 some errors with sendrequest ts types, where const response =
-chat keyboard moves content above
 fix scroll to load more messages 
 verify if user receives socket message, if not, build up bulk send
 small border between page header and content
 disable sent message change on press if not unsent
+getChat, add isTop property so no more loading
 
 make verification optional
 see self/others/all email accounts
