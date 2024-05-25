@@ -19,6 +19,7 @@ import { randomUUID } from "expo-crypto";
 import Loading from "./Loading";
 import Toast from "react-native-toast-message";
 import { toastConfig } from "../src/components/Toast";
+import classNames from "classnames";
 
 interface Props {
     userID?: string
@@ -45,6 +46,7 @@ export function Chat(props : Props) {
     const [chatRequestTime, setChatRequestTime] = useState<Date>(new Date(0));
     const [showModal, setShowModal] = useState<boolean>(false);
     const [firstLoad, setFirstLoad] = useState<boolean>(true);
+    const [initialLoad, setInitialLoad] = useState<boolean>(true);
 
     useEffect( () => {
         if (!chat || !globalState.socketManager || !receivedData.profile) return
@@ -65,7 +67,8 @@ export function Chat(props : Props) {
 
             if (!props.noAutoLoad) {
                 load();
-                scrollRef.current?.scrollToEnd({animated: true});
+                scrollRef.current?.scrollToEnd({animated: false});
+                setInitialLoad(false);
             }
             updateMyReadStatus();
         }
@@ -126,6 +129,7 @@ export function Chat(props : Props) {
     }
 
     const getChat = async (loadMoreFromTime?: Date) => {
+        console.log("get chat");
         try {
             const chatInput : WithKey<GetChatInput> = {
                 userID: receivedData.profile?.id!,
@@ -211,10 +215,11 @@ export function Chat(props : Props) {
     const handleScroll = async (event: NativeSyntheticEvent<NativeScrollEvent>) => {
         const { contentOffset, layoutMeasurement, contentSize } = event.nativeEvent;
         const scrollHeight = contentSize.height - layoutMeasurement.height;
+
         const isAtTop = contentOffset.y <= scrollHeight * (1-globals.scrollAtPercentage);
         const canSend = differenceInSeconds(new Date(), chatRequestTime) > globals.apiRequestTimeout;
 
-        if (!(isAtTop && canSend && chat.length > 0)) return 
+        if (!(isAtTop && canSend && !initialLoad && chat.length > 0)) return 
         setChatRequestTime(new Date());
         getChat(new Date(chat.at(-1)!.timestamp.getTime() - 1))
     }
@@ -326,7 +331,10 @@ export function Chat(props : Props) {
                     onScroll={handleScroll}
                     testID={testIDS.chatScroll}
                     showsVerticalScrollIndicator={false}
-                    className="flex-1"
+                    className={classNames(
+                        initialLoad ? "opacity-0" : "opacity-100",
+                        "flex-1"
+                    )}
                     ref={scrollRef}
                 >
                     {

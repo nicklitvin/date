@@ -57,7 +57,7 @@ export const displayText = {
 
 export const miscConstants = {
     usersLoadedInPreview : 10,
-    messagesLoadedInChat: 10,
+    messagesLoadedInChat: 20,
     maxReportCount: 10,
     freeTrialDays: 0,
     usersInSwipeFeed: 10,

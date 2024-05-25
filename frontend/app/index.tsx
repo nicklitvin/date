@@ -142,6 +142,14 @@ export function Index() {
                 }
             }
         ])
+        receivedData.addSavedChat("goat", Array.from({ length : 20}, (_,index) => ({
+            id: String(Math.random()),
+            message: String(Math.random()),
+            readStatus: true,
+            recepientID: "id",
+            userID: "goat",
+            timestamp: new Date()
+        })))
         receivedData.setSwipeFeed({
             profiles: [
                 {

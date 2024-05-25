@@ -1,5 +1,5 @@
 export const globals = {
-    useSample: false,
+    useSample: true,
 
     genders: ["Male", "Female"],
     minAge: 18,
@@ -24,6 +24,7 @@ export const globals = {
     apiRequestTimeout: 2,
     resendVerificationTimeout: 10,
     fadeDuration: 500,
+    scrollOnKeyboardPixels: 50,
     frequencies: ["Never", "Sometimes", "Often"],
     storageloginKey: "LoginKey",
     urlTerms: "https://youtube.com",
