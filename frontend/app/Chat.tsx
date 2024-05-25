@@ -202,6 +202,7 @@ export function Chat(props : Props) {
                 globalState.socketManager.updateChatWithMessage(message);
             } else {
                 globalState.addUnsentMessageID(newMessageID);
+                globalState.socketManager.reconnect();
             }
             globalState.removeLoadingMessageID(newMessageID);
         }, 1)

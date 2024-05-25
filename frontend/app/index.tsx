@@ -206,7 +206,8 @@ export function Index() {
             if (response.data?.socketToken) {
                 globalState.setSocketManager(new SocketManager({
                     socketToken: response.data.socketToken, 
-                    receivedData
+                    receivedData,
+                    key: response.data.key
                 }))
             }
         } catch (err) {

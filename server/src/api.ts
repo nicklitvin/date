@@ -60,6 +60,10 @@ export class APIHandler {
 
                 ws.send(JSON.stringify(returnPayload));
             })
+
+            ws.on("close", async (code, reason) => {
+                console.log("socket terminated by user", code, reason);
+            })
         })
 
         app.post(URLs.createUser, async (req, res) => {

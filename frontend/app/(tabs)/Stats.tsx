@@ -154,7 +154,7 @@ export function Stats(props : Props) {
         )
     }
 
-    if (!stats && !props.noAutoLoad) {
+    if (!stats && !props.noAutoLoad && firstLoad) {
         return <Loading />
     } else return (
         <StyledView className="w-full h-full bg-back">

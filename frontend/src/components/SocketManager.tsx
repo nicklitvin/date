@@ -1,34 +1,38 @@
-import { ChatPreview, Message, NewMatchData, ReadStatusInput, SocketPayloadToClient, SocketPayloadToServer } from "../interfaces";
+import { APIOutput, ChatPreview, LoginOutput, Message, NewMatchData, ReadStatusInput, SocketPayloadToClient, SocketPayloadToServer, WithKey } from "../interfaces";
 import { ReceivedData } from "../store/ReceivedData";
 import { URLs } from "../urls";
+import { sendRequest } from "../utils";
 
 
 export class SocketManager {
     private ws : WebSocket|undefined;
     private received : ReceivedData;
-    private connectURL : string|undefined;
+    private loginKey : string|undefined;
 
     public approvedMessages : Map<string, Message>;
 
     constructor(input : {
         socketToken?: string, 
         receivedData : ReceivedData,
-        testMode?: boolean
+        testMode?: boolean,
+        key?: string
     }) {
         this.received = input.receivedData;
         this.approvedMessages = new Map();
+        this.loginKey = input.key;
 
-        if (!input.testMode) {
-            const ip = URLs.server.split("http://")[1];
-            this.connectURL = `ws://${ip}${URLs.websocket}?token=${input.socketToken}`;
-            this.connect();
+        if (!input.testMode && input.socketToken) {
+            this.connect(this.createConnectURL(input.socketToken));
         }
     }
 
-    connect() {
-        if (!this.connectURL) return 
-        
-        this.ws = new WebSocket(this.connectURL);
+    createConnectURL(socketToken : string) {
+        return `ws://${URLs.server.split("http://")[1]}${URLs.websocket}?token=${socketToken}`
+    }
+
+    connect(url : string) {
+        console.log("connecting to server");
+        this.ws = new WebSocket(url);
 
         this.ws.onmessage = (e : MessageEvent<string>) => {
             try {
@@ -60,13 +64,30 @@ export class SocketManager {
 
             }
         };
-    }
 
-    close() {
-        if (this.ws) {
-            this.ws.close();
+        this.ws.onclose = (event : CloseEvent) => {
+            console.log("socket closed by server",event, "status of connection", this.ws?.readyState);
+            delete this.ws;
         }
     }
+
+    async reconnect() {
+        // if (this.ws) this.close();
+
+        const input : WithKey<{}> = {
+            key: this.loginKey
+        }
+        const response = await sendRequest<LoginOutput>(URLs.autoLogin, input);
+        if (response.data && response.data.key) {
+            this.connect(this.createConnectURL(response.data.key));
+        }
+    }
+
+    // close() {
+    //     console.log("closing connection if one and deleting")
+    //     if (this.ws) this.ws.close(1000);
+    //     delete this.ws;
+    // }
 
     sendData(data : SocketPayloadToServer) {
         try {
@@ -153,4 +174,6 @@ export class SocketManager {
             this.received.addSavedChat(input.userID, copy);
         }
     }
+
+
 }
