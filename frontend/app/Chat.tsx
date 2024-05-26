@@ -50,6 +50,7 @@ export function Chat(props : Props) {
 
     const [keyboardInView, setKeyboardInView] = useState<boolean>(false);
     const [scrollOnKeyboard, setScrollOnKeyboard] = useState<boolean>();
+    // const [chatLength, setChatLength] = useState<number>(false);
 
     useEffect( () => {
         if (!chat || !globalState.socketManager || !receivedData.profile) return
@@ -210,6 +211,16 @@ export function Chat(props : Props) {
             globalState.removeUnsentMessageID(removeID);
             receivedData.deleteMessageFromChat(userID, removeID);
         }
+
+        new Promise( res => {
+            setTimeout( () => {
+                if (!scrollOnKeyboard && scrollRef.current) {
+                    scrollRef.current.scrollToEnd({ animated: true });
+                }
+                res(null);
+            }, 100)
+        })
+        
 
         receivedData.addSavedChat(
             userID, 
