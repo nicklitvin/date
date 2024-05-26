@@ -48,9 +48,7 @@ export function Chat(props : Props) {
     const [firstLoad, setFirstLoad] = useState<boolean>(true);
     const [initialLoad, setInitialLoad] = useState<boolean>(true);
 
-    const [keyboardInView, setKeyboardInView] = useState<boolean>(false);
-    const [scrollOnKeyboard, setScrollOnKeyboard] = useState<boolean>();
-    // const [chatLength, setChatLength] = useState<number>(false);
+    const [scrollWhenNextToBottom, setscrollWhenNextToBottom] = useState<boolean>();
 
     useEffect( () => {
         if (!chat || !globalState.socketManager || !receivedData.profile) return
@@ -67,20 +65,13 @@ export function Chat(props : Props) {
 
     useEffect( () => {
         const onKeyboardShow = Keyboard.addListener("keyboardDidShow", () => {
-            if (scrollOnKeyboard) scrollToEnd();
-            setKeyboardInView(true);
+            if (scrollWhenNextToBottom) scrollToEnd();
         })
 
-        const onKeyboardHide = Keyboard.addListener("keyboardDidHide", () => {
-            setKeyboardInView(false);
-        })
-
-        
         return () => {
-            onKeyboardHide.remove();
             onKeyboardShow.remove();
         }
-    }, [scrollOnKeyboard])
+    }, [scrollWhenNextToBottom])
 
     useEffect( () => {
         const func = async () => {
@@ -91,7 +82,7 @@ export function Chat(props : Props) {
                     await new Promise( res => setTimeout( () => {
                         scrollToEnd();
                         res(null);                        
-                    }, 5))
+                    }, globals.scrollAfterChatOpenMS))
                     setInitialLoad(false);
                 }
                 updateMyReadStatus();
@@ -218,9 +209,9 @@ export function Chat(props : Props) {
 
         new Promise( res => {
             setTimeout( () => {
-                if (scrollOnKeyboard) scrollToEnd();
+                if (scrollWhenNextToBottom) scrollToEnd();
                 res(null);
-            }, 10)
+            }, globals.scrollAfterMessageSentMS)
         })
         
 
@@ -246,7 +237,7 @@ export function Chat(props : Props) {
                 globalState.socketManager.updateChatWithMessage(message);
             } else {
                 globalState.addUnsentMessageID(newMessageID);
-                if (scrollOnKeyboard) scrollToEnd();
+                if (scrollWhenNextToBottom) scrollToEnd();
             }
             globalState.removeLoadingMessageID(newMessageID);
         }, 1);
@@ -257,9 +248,9 @@ export function Chat(props : Props) {
         const scrollHeight = contentSize.height - layoutMeasurement.height;
 
         if (contentOffset.y > scrollHeight - globals.pixelsTilScrollEdge) {
-            setScrollOnKeyboard(true);            
+            setscrollWhenNextToBottom(true);            
         } else {
-            setScrollOnKeyboard(false);
+            setscrollWhenNextToBottom(false);
         }
 
         const isAtTop = contentOffset.y == 0;

@@ -27,6 +27,9 @@ export const globals = {
     storageloginKey: "LoginKey",
     urlTerms: "https://youtube.com",
     pixelsTilScrollEdge: 100,
+    scrollAfterChatOpenMS: 5,
+    scrollAfterMessageSentMS: 5,
+    timeToConnectSocketMS: 100, 
 
     green: "#4A991A",
     red: "#B81515",

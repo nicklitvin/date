@@ -1,3 +1,4 @@
+import { globals } from "../globals";
 import { APIOutput, ChatPreview, LoginOutput, Message, NewMatchData, ReadStatusInput, SocketPayloadToClient, SocketPayloadToServer, WithKey } from "../interfaces";
 import { ReceivedData } from "../store/ReceivedData";
 import { URLs } from "../urls";
@@ -92,7 +93,7 @@ export class SocketManager {
                     setTimeout( () => {
                         if (this.ws) this.ws.send(JSON.stringify(data));
                         res(null);
-                    }, 100)
+                    }, globals.timeToConnectSocketMS)
                 })
             }
         } catch (err) {

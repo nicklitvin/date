@@ -282,10 +282,6 @@ export function Index() {
         }
     }
 
-    // useEffect( () => {
-    //     console.log("useEffect",receivedData.profile, globalState.socketManager)
-    // }, [receivedData.profile, globalState.socketManager])
-
     useEffect( () => {
         const func = async () => {
             setFirstLoad(false);

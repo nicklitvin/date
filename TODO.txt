@@ -1,9 +1,10 @@
 TODO
-some errors with sendrequest ts types, where const response =
-verify if user receives socket message, if not, build up bulk send
+make constants global variables
 small border between page header and content
+some errors with sendrequest ts types, where const response =
 disable sent message change on press if not unsent
-getChat, add isTop property so no more loading
+verify if user receives socket message, if not, build up bulk send
+can only connect one socket per session
 
 make verification optional
 see self/others/all email accounts
