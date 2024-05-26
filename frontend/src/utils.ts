@@ -74,7 +74,7 @@ export function setCustomTimer(callback : () => any, seconds : number) : NodeJS.
 }
 
 export async function sendRequest<T>(subURL : string, data : any) : Promise<APIOutput<T>> {
-    const print = false;
+    const print = true;
 
     try {
         if (print) console.log("sending request to", subURL, "with data", data);
@@ -85,9 +85,13 @@ export async function sendRequest<T>(subURL : string, data : any) : Promise<APIO
         if (print) console.log("response from", subURL, responseData);
         return responseData
     } catch (err) {
-        return axios.isAxiosError(err) && err.response?.data.message ? 
-            {message : err.response?.data.message} : 
-            {message: "Error with request"}
+        if (axios.isAxiosError(err)) {
+            if (print) console.log("axios error", err.response?.data?.message, err.response?.status);
+
+            return {message : err.response?.data.message}
+        } else {
+            return {message: "Error with request"}
+        }  
     }
 }
 

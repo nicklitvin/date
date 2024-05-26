@@ -218,7 +218,7 @@ export function Chat(props : Props) {
                     scrollRef.current.scrollToEnd({ animated: true });
                 }
                 res(null);
-            }, 100)
+            }, globals.apiRequestTimeout)
         })
         
 
@@ -260,7 +260,8 @@ export function Chat(props : Props) {
             setScrollOnKeyboard(false);
         }
 
-        const isAtTop = contentOffset.y < globals.pixelsTilScrollEdge;
+        const isAtTop = contentOffset.y == 0;
+        // const isAtTop = contentOffset.y < globals.pixelsTilScrollEdge;
         const canSend = differenceInSeconds(new Date(), chatRequestTime) > globals.apiRequestTimeout;
 
         if (isAtTop && canSend && !initialLoad && chat.length > 0) {

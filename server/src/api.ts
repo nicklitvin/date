@@ -19,8 +19,9 @@ export class APIHandler {
         app.ws("/ws", (ws : WebSocket, req) => {
             try {
                 const token = req.url.split("?token=")[1];
+                console.log("received token",token);
 
-                if (!token) return ws.close(401);
+                if (!token) return ws.close(1008, "Unauthorized");
 
                 const userID = handler.socket.getUserIDFromKey(token);
 
@@ -29,12 +30,13 @@ export class APIHandler {
                         socket: ws,
                         userID: userID
                     })
+                    console.log("connecting socket");
                 } else {
-                    return ws.close(401);
+                    return ws.close(1008, "Unauthorized");
                 }
             } catch (err) {
                 console.log(err);
-                return ws.close(500);
+                return ws.close(1011, "Internal Server Error");
             }
 
             ws.on("message", async (stream : string) => {
@@ -63,6 +65,10 @@ export class APIHandler {
 
             ws.on("close", async (code, reason) => {
                 console.log("socket terminated by user", code, reason);
+            })
+
+            ws.on("error", async (err) => {
+                console.log(err);
             })
         })
 
@@ -533,6 +539,7 @@ export class APIHandler {
         app.post(URLs.getMyProfile, async (req,res) => {
             try {
                 const body : APIRequest<{}> = req.body;
+
                 if (!body.key) return res.status(400).json();
 
                 const userID = await handler.login.getUserIDByKey(body.key);

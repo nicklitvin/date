@@ -223,27 +223,24 @@ export function Index() {
         }
     }
 
-    const retrieveData = async () => {
-        const input = {
-            key: receivedData.loginKey
-        }
-
-        const [clientIDs] = await Promise.all([
+    const retrieveData = async (key : string|null) => {
+        const output = await Promise.all([
             retrieveOne(
                 () => sendRequest(URLs.getClientIDs, null),
                 (data : any) => receivedData.setClientIDs(data)
-            ),
-            tryConnectingSocketManager(input),
-            retrieveOne(
-                () => sendRequest(URLs.getMyProfile, input),
-                (data : any) => receivedData.setProfile(data)
             ),
             retrieveOne(
                 () => sendRequest(URLs.getAttributes, null),
                 (data: any) => receivedData.setAttributes(data)
             ),
-        ])
-        if (!clientIDs) {
+            key ? tryConnectingSocketManager({ key: key } as WithKey<{}>) : null,
+            key ? retrieveOne(
+                () => sendRequest(URLs.getMyProfile, {key: key} as WithKey<{}>),
+                (data : any) => receivedData.setProfile(data)
+            ) : null,
+        ]);
+
+        if (!output[0]) {
             setError(true);
         }
     }
@@ -278,12 +275,16 @@ export function Index() {
             setSampleData();
         } else {
             try {
-                await retrieveData()
+                await retrieveData(key)
             } catch (err) {
                 console.log(err);
             }
         }
     }
+
+    // useEffect( () => {
+    //     console.log("useEffect",receivedData.profile, globalState.socketManager)
+    // }, [receivedData.profile, globalState.socketManager])
 
     useEffect( () => {
         const func = async () => {

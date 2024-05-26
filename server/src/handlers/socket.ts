@@ -37,6 +37,7 @@ export class SocketHandler {
             ttl: ttl,
             key: oneTimeKey
         });
+        console.log("generating one time key", userID, oneTimeKey);
         return oneTimeKey;
     }
 

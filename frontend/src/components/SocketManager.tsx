@@ -31,7 +31,7 @@ export class SocketManager {
     }
 
     connect(url : string) {
-        console.log("connecting to server");
+        console.log("connecting to server",url);
         this.ws = new WebSocket(url);
 
         this.ws.onmessage = (e : MessageEvent<string>) => {
@@ -78,8 +78,8 @@ export class SocketManager {
             key: this.loginKey
         }
         const response = await sendRequest<LoginOutput>(URLs.autoLogin, input);
-        if (response.data && response.data.key) {
-            this.connect(this.createConnectURL(response.data.key));
+        if (response.data && response.data.socketToken) {
+            this.connect(this.createConnectURL(response.data.socketToken));
         }
     }
 
