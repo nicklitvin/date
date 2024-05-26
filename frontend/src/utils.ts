@@ -87,10 +87,13 @@ export async function sendRequest<T>(subURL : string, data : any) : Promise<APIO
     } catch (err) {
         if (axios.isAxiosError(err)) {
             if (print) console.log("axios error", err.response?.data?.message, err.response?.status);
+            
 
-            return {message : err.response?.data.message}
+            return err.response?.data.message ? 
+                {message : err.response?.data.message} :
+                {message : "Error with request"}
         } else {
-            return {message: "Error with request"}
+            return {message: "Unexpected error"}
         }  
     }
 }
