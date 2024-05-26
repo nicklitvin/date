@@ -67,9 +67,7 @@ export function Chat(props : Props) {
 
     useEffect( () => {
         const onKeyboardShow = Keyboard.addListener("keyboardDidShow", () => {
-            if (scrollOnKeyboard && scrollRef.current) {
-                scrollRef.current.scrollToEnd({ animated: true });
-            }
+            if (scrollOnKeyboard) scrollToEnd();
             setKeyboardInView(true);
         })
 
@@ -91,7 +89,7 @@ export function Chat(props : Props) {
                 if (!props.noAutoLoad) {
                     await load();
                     await new Promise( res => setTimeout( () => {
-                        scrollRef.current?.scrollToEnd({animated: false});
+                        scrollToEnd();
                         res(null);                        
                     }, 5))
                     setInitialLoad(false);
@@ -187,6 +185,12 @@ export function Chat(props : Props) {
         }
     }
 
+    const scrollToEnd = () => {
+        if (scrollRef.current) {
+            scrollRef.current.scrollToEnd({ animated: true });
+        }
+    }
+
     const sendMessage = async (sentMessage : string, removeID?: string) => {
         if (!globalState.socketManager || !receivedData.profile || !profile) {
             Toast.show({
@@ -214,11 +218,9 @@ export function Chat(props : Props) {
 
         new Promise( res => {
             setTimeout( () => {
-                if (!scrollOnKeyboard && scrollRef.current) {
-                    scrollRef.current.scrollToEnd({ animated: true });
-                }
+                if (scrollOnKeyboard) scrollToEnd();
                 res(null);
-            }, globals.apiRequestTimeout)
+            }, 10)
         })
         
 
@@ -227,7 +229,7 @@ export function Chat(props : Props) {
             [sendingChat].concat(receivedData.savedChats[userID])
         );
 
-        globalState.socketManager.sendData({
+        await globalState.socketManager.sendData({
             payloadID: newMessageID,
             message: {
                 userID: receivedData.profile.id,
@@ -244,24 +246,23 @@ export function Chat(props : Props) {
                 globalState.socketManager.updateChatWithMessage(message);
             } else {
                 globalState.addUnsentMessageID(newMessageID);
-                globalState.socketManager.reconnect();
+                if (scrollOnKeyboard) scrollToEnd();
             }
             globalState.removeLoadingMessageID(newMessageID);
-        }, 1)
+        }, 1);
     }
 
     const handleScroll = async (event: NativeSyntheticEvent<NativeScrollEvent>) => {
         const { contentOffset, layoutMeasurement, contentSize } = event.nativeEvent;
         const scrollHeight = contentSize.height - layoutMeasurement.height;
 
-        if (!keyboardInView && contentOffset.y > scrollHeight - globals.pixelsTilScrollEdge) {
+        if (contentOffset.y > scrollHeight - globals.pixelsTilScrollEdge) {
             setScrollOnKeyboard(true);            
         } else {
             setScrollOnKeyboard(false);
         }
 
         const isAtTop = contentOffset.y == 0;
-        // const isAtTop = contentOffset.y < globals.pixelsTilScrollEdge;
         const canSend = differenceInSeconds(new Date(), chatRequestTime) > globals.apiRequestTimeout;
 
         if (isAtTop && canSend && !initialLoad && chat.length > 0) {

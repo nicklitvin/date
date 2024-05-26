@@ -31,7 +31,7 @@ export class SocketManager {
     }
 
     connect(url : string) {
-        console.log("connecting to server",url);
+        // console.log("connecting to server",url);
         this.ws = new WebSocket(url);
 
         this.ws.onmessage = (e : MessageEvent<string>) => {
@@ -66,14 +66,12 @@ export class SocketManager {
         };
 
         this.ws.onclose = (event : CloseEvent) => {
-            console.log("socket closed by server",event, "status of connection", this.ws?.readyState);
+            // console.log("socket closed by server",event, "status of connection", this.ws?.readyState);
             delete this.ws;
         }
     }
 
     async reconnect() {
-        // if (this.ws) this.close();
-
         const input : WithKey<{}> = {
             key: this.loginKey
         }
@@ -83,15 +81,20 @@ export class SocketManager {
         }
     }
 
-    // close() {
-    //     console.log("closing connection if one and deleting")
-    //     if (this.ws) this.ws.close(1000);
-    //     delete this.ws;
-    // }
-
-    sendData(data : SocketPayloadToServer) {
+     async sendData(data : SocketPayloadToServer) {
         try {
-            if (this.ws) this.ws.send(JSON.stringify(data));
+            if (this.ws) {
+                this.ws.send(JSON.stringify(data));
+            } else {
+                await this.reconnect();
+
+                new Promise( res => {
+                    setTimeout( () => {
+                        if (this.ws) this.ws.send(JSON.stringify(data));
+                        res(null);
+                    }, 100)
+                })
+            }
         } catch (err) {
 
         }

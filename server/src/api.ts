@@ -43,6 +43,7 @@ export class APIHandler {
                 const returnPayload : SocketPayloadToClient = {};
 
                 try {   
+                    console.log("message received");
                     const data : SocketPayloadToServer = JSON.parse(stream);
 
                     if (data.message) {
@@ -59,6 +60,8 @@ export class APIHandler {
                     console.log(err);
                     return
                 } 
+
+                console.log("returning payload", returnPayload);
 
                 ws.send(JSON.stringify(returnPayload));
             })

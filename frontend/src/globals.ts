@@ -20,7 +20,7 @@ export const globals = {
     pictureHeight: 136,
     pictureWidth: 102,
     maxPictureSize: 1024*1024*1,
-    apiRequestTimeout: 1,
+    apiRequestTimeout: 2,
     resendVerificationTimeout: 10,
     fadeDuration: 500,
     frequencies: ["Never", "Sometimes", "Often"],
