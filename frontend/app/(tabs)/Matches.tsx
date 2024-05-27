@@ -109,7 +109,7 @@ export function Matches(props : Props) {
     const handleMatchScroll = async (event: NativeSyntheticEvent<NativeScrollEvent>) => {
         const { contentOffset, layoutMeasurement, contentSize } = event.nativeEvent;
         const scrollWidth = contentSize.width - layoutMeasurement.width;
-        const isAtRight = contentOffset.x >= scrollWidth * globals.scrollAtPercentage;
+        const isAtRight = contentOffset.x >= scrollWidth - globals.pixelsTilScrollEdge;
         const canSend = differenceInSeconds(new Date(), matchRequestTime) > globals.apiRequestTimeout;
         
         if (!(isAtRight && canSend)) return  
@@ -125,7 +125,7 @@ export function Matches(props : Props) {
     const handleChatsScroll = async (event: NativeSyntheticEvent<NativeScrollEvent>) => {
         const { contentOffset, layoutMeasurement, contentSize } = event.nativeEvent;
         const scrollHeight = contentSize.height - layoutMeasurement.height;
-        const isAtBottom = contentOffset.y >= scrollHeight * globals.scrollAtPercentage;
+        const isAtBottom = contentOffset.y >= scrollHeight - globals.pixelsTilScrollEdge;
         const canSend = differenceInSeconds(new Date(), previewRequestTime) > globals.apiRequestTimeout;
         
         if (!(isAtBottom && canSend)) return
