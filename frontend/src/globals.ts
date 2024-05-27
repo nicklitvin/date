@@ -1,5 +1,5 @@
 export const globals = {
-    useSample: true,
+    useSample: false,
 
     genders: ["Male", "Female"],
     minAge: 18,

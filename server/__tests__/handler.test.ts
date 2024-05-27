@@ -244,7 +244,7 @@ describe("handler", () => {
             userID: user.id,
             reportedID: user.id
         });
-        expect(output.message).toEqual(errorText.notValidUser);
+        expect(output.message).toEqual(errorText.cannotReportSelf);
     })
 
     it("should not report twice", async () => {

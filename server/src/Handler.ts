@@ -296,20 +296,20 @@ export class Handler {
         return { data: result};
     }
 
-    public async reportUser(input : UserReportWithReportedID, customEduEmail?: string) : Promise<APIOutput<UserReport>> {
+    public async reportUser(input : UserReportWithReportedID, customEmail?: string) : Promise<APIOutput<UserReport>> {
         const [user, reportedUser] = await Promise.all([
             this.user.getUserByID(input.userID),
             this.user.getUserByID(input.reportedID),
         ])
 
-        const eduEmail = customEduEmail ?? (await this.verification.getVerificationByPersonalEmail(reportedUser?.email!))?.schoolEmail;
+        const reportingEmail = customEmail || reportedUser?.email;
 
-        if (!(user && reportedUser && eduEmail)) return { message: errorText.notValidUser }
+        if (!(user && reportedUser && reportingEmail)) return { message: errorText.notValidUser }
         if (user.id == reportedUser.id) return { message: errorText.cannotReportSelf }
 
         const [existingReport, reportCount, reportsMade] = await Promise.all([
-            this.report.getReportByUsers(user.id, eduEmail),
-            this.report.getReportCountForEmail(eduEmail),
+            this.report.getReportByUsers(user.id, reportingEmail),
+            this.report.getReportCountForEmail(reportingEmail),
             this.report.getReportsMadeCountForToday(user.id)
         ])
 
@@ -321,7 +321,7 @@ export class Handler {
         const [report] = await Promise.all([
             this.report.makeReport({
                 userID: input.userID,
-                reportedEmail: eduEmail
+                reportedEmail: reportingEmail
             }),
             swipe ? this.swipe.updateSwipe(swipe.id, "Dislike") : 
                 this.swipe.createSwipe({

@@ -10,6 +10,7 @@ import { Spacing } from "../components/Spacing";
 import { MyButton } from "../components/Button";
 import { createTimeoutSignal, sendRequest } from "../utils";
 import { Frequency } from "../components/Frequency";
+import Toast from "react-native-toast-message";
 
 interface Props {
     isInSwipeFeed: boolean
@@ -34,7 +35,13 @@ export function ProfileViewEmbed(props : Props) {
                 key: props.loginKey
             }
             if (!props.ignoreRequest) {
-                await sendRequest(URLs.makeSwipe, input);
+                const response = await sendRequest<{}>(URLs.makeSwipe, input);
+                if (response.message) {
+                    return Toast.show({
+                        type: "error",
+                        text1: response.message
+                    })
+                }
             }
 
             if (props.afterSwipe) props.afterSwipe();
@@ -51,9 +58,14 @@ export function ProfileViewEmbed(props : Props) {
                 key: props.loginKey
             }
             if (!props.ignoreRequest) {
-                await axios.post(URLs.server + URLs.reportUser, myReport, {
-                    signal: createTimeoutSignal()
-                })
+                const response = await sendRequest<{}>(URLs.reportUser, myReport);
+                if (response.message) {
+                    Toast.show({
+                        type: "error",
+                        text1: response.message
+                    })
+                    return
+                } 
             }
             if (props.afterSwipe) props.afterSwipe()
         } catch (err) {

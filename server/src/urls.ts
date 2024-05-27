@@ -42,7 +42,7 @@ export const URLs = {
     createSample: "/createSample",
     clearInteractions: "/clearInteractions",
     purchasePremium: "/purchasePremium",
-    ip: "10.5.50.230",
+    ip: "10.0.0.245",
     port: 3000,
 
     // OAUTH

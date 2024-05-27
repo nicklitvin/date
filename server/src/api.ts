@@ -19,7 +19,7 @@ export class APIHandler {
         app.ws("/ws", (ws : WebSocket, req) => {
             try {
                 const token = req.url.split("?token=")[1];
-                console.log("received token",token);
+                // console.log("received token",token);
 
                 if (!token) return ws.close(1008, "Unauthorized");
 
@@ -43,7 +43,6 @@ export class APIHandler {
                 const returnPayload : SocketPayloadToClient = {};
 
                 try {   
-                    console.log("message received");
                     const data : SocketPayloadToServer = JSON.parse(stream);
 
                     if (data.message) {
@@ -61,13 +60,13 @@ export class APIHandler {
                     return
                 } 
 
-                console.log("returning payload", returnPayload);
+                // console.log("returning payload", returnPayload);
 
                 ws.send(JSON.stringify(returnPayload));
             })
 
             ws.on("close", async (code, reason) => {
-                console.log("socket terminated by user", code, reason);
+                // console.log("socket terminated by user", code, reason);
             })
 
             ws.on("error", async (err) => {
