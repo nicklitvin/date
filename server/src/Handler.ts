@@ -1,4 +1,4 @@
-import { AttributeType, Message, Prisma, PrismaClient, Swipe, User, UserReport, Verification } from "@prisma/client";
+import { Announcement, AnnouncementViewed, AttributeType, Message, Prisma, PrismaClient, Swipe, User, UserReport, Verification } from "@prisma/client";
 import { AnnouncementHandler } from "./handlers/announcement";
 import { AttributeHandler } from "./handlers/attribute";
 import { ErrorLogHandler } from "./handlers/errorlog";
@@ -8,7 +8,7 @@ import { SwipeHandler } from "./handlers/swipe";
 import { MessageHandler } from "./handlers/message";
 import { ReportHandler } from "./handlers/report";
 import { StripePaymentHandler } from "./handlers/pay";
-import { AttributeValueInput, ChatPreview, ConfirmVerificationInput, DeleteImageInput, EditUserInput, EloAction, GetMatchesInput, LoginInput, LoginOutput, MessageInput, NewMatchData,NewVerificationInput, UserReportWithReportedID, SubscribeInput, SubscriptionData, SwipeFeed, SwipeInput, UnlikeInput, UnlikeOutput, UploadImageInput, UserInput, UserSwipeStats, JustEmail, ReadStatusInput, GetReadStatusInput, HandlerUserInput, APIOutput } from "./interfaces";
+import { AttributeValueInput, ChatPreview, ConfirmVerificationInput, DeleteImageInput, EditUserInput, EloAction, GetMatchesInput, LoginInput, LoginOutput, MessageInput, NewMatchData,NewVerificationInput, UserReportWithReportedID, SubscribeInput, SubscriptionData, SwipeFeed, SwipeInput, UnlikeInput, UnlikeOutput, UploadImageInput, UserInput, UserSwipeStats, JustEmail, ReadStatusInput, GetReadStatusInput, HandlerUserInput, APIOutput, ViewAnnouncementInput } from "./interfaces";
 import { FreeTrialHandler } from "./handlers/freetrial";
 import { VerificationHandler } from "./handlers/verification";
 import { addYears } from "date-fns";
@@ -76,6 +76,7 @@ export class Handler {
     public async deleteEverything() {
         await Promise.all([
             this.announcement.deleteAllAnouncements(),
+            this.announcement.deleteAnnouncementViews(),
             this.attribute.deleteAllAttributes(),
             this.errorLog.deleteAllErrorLogs(),
             this.user.deleteAllUsers(),
@@ -739,5 +740,33 @@ export class Handler {
             }
         } 
         return { message: errorText.cannotGetReadStatus }
+    }
+
+    public async viewAnnouncement(input : ViewAnnouncementInput) : Promise<APIOutput<AnnouncementViewed>>{
+        const [user, announcement] = await Promise.all([
+            this.user.getUserByID(input.userID),
+            this.announcement.getAnnouncementByID(input.announcementID)
+        ]);
+
+        if (!user) return { message: errorText.notValidUser }
+        if (!announcement) return { message: errorText.notValidAnnouncement }
+        
+        return { data: await this.announcement.viewAnnouncement(input) }
+    }
+
+    public async getNewAnnouncements(userID?: string) : Promise<APIOutput<Announcement[]>> {
+        const [current, viewed] = await Promise.all([
+            this.announcement.getCurrentAnnouncements(),
+            userID ? this.announcement.getViewedAnnouncements(userID) : []
+        ])
+
+        const viewedIDs = new Set(viewed.map( val => val.announcementID));
+        const result : Announcement[] = [];
+
+        for (const announcement of current) {
+            if (!viewedIDs.has(announcement.id)) result.push(announcement)
+        }
+
+        return { data: result }
     }
 }

@@ -4,9 +4,11 @@ import { handler } from "../jest.setup";
 
 describe("announcement", () => {
     afterEach( async () => {
-        await handler.announcement.deleteAllAnouncements()
+        Promise.all([
+            handler.announcement.deleteAllAnouncements(),
+            handler.announcement.deleteAnnouncementViews()
+        ])
     })
-
     
     const funcs = handler.announcement;
 
@@ -99,5 +101,32 @@ describe("announcement", () => {
         
         const after = await funcs.getAllAnnouncements();
         expect(after.length).toEqual(0);        
+    })
+
+    it("should view announcement", async () => {
+        const [a1, a2, a3] = await Promise.all([
+            funcs.makeAnnouncement(before),
+            funcs.makeAnnouncement(current),
+            funcs.makeAnnouncement(current),
+        ])
+
+        const userID = "a";
+        expect(await funcs.getViewedAnnouncements(userID)).toHaveLength(0);
+
+        await funcs.viewAnnouncement({
+            userID: userID,
+            announcementID: a2.id
+        });
+
+        expect(await funcs.getViewedAnnouncements(userID)).toHaveLength(1);
+    })
+
+    it("should delete announcement views", async () => {
+        await Promise.all([
+            funcs.viewAnnouncement({userID: "a", announcementID: "b"}),
+            funcs.viewAnnouncement({userID: "a", announcementID: "b"}),
+            funcs.viewAnnouncement({userID: "a", announcementID: "b"}),
+        ]);
+        expect(await funcs.deleteAnnouncementViews()).toEqual(3);
     })
 })

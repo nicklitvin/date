@@ -1,6 +1,9 @@
 TODO
+frontend announcement pages
+make adminAPI send something other than message? through cli
 can only connect one socket per session
 verify if user receives socket message, if not, build up bulk send
+remove match thru websocket?
 make verification optional
 see self/others/all email accounts
 request gps location
@@ -33,4 +36,15 @@ select * from "<table>"
 build android development
 eas build --profile development --platform android
 
+
+duplicate connections allowed
+keep array of connections, send to each one
+
+one connection allowed
+on new connection, disable old one and keep it from reconnecting
+
+message send to client and recorded on server
+if received, client sends payloaprocessedid back
+server receives id and removes it from queue
+if not received and more than x seconds passed
 

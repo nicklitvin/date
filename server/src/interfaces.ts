@@ -308,3 +308,8 @@ export interface GetReadStatusInput {
 export interface JustUserID {
     userID: string
 }
+
+export interface ViewAnnouncementInput {
+    userID: string,
+    announcementID: string
+}

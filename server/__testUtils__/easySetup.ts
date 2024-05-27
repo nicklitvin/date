@@ -1,10 +1,10 @@
 import { Opinion } from "@prisma/client";
-import { ImageUploadWithString, ImageUploadInput, MessageInput, NewVerificationInput, SwipeInput, UserInput, UserInputWithFiles, UserReportInput, JustEmail, HandlerUserInput } from "../src/interfaces";
+import { ImageUploadWithString, ImageUploadInput, MessageInput, NewVerificationInput, SwipeInput, UserInput, UserInputWithFiles, UserReportInput, JustEmail, HandlerUserInput, AnnouncementInput } from "../src/interfaces";
 import fs from "fs/promises";
 import { randomUUID } from "crypto";
 import mime from "mime-types";
 import { handler } from "../jest.setup";
-import { addYears } from "date-fns";
+import { addMinutes, addYears } from "date-fns";
 import { userRestrictions } from "../src/globals";
 
 const imageFilePath = "./__testUtils__/goodImage.jpg";
@@ -213,5 +213,14 @@ export function makeMockWebSocket() : any {
     return {
         send: (payload : string) => payloads.push(payload),
         payloads: payloads
+    }
+}
+
+export function makeAnnouncementInput() : AnnouncementInput {
+    return {
+        title: randomUUID(),
+        message: randomUUID(),
+        startTime: addMinutes(new Date(), -1),
+        endTime: addMinutes(new Date(), 1)
     }
 }

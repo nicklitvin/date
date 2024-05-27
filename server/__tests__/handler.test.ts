@@ -3,7 +3,7 @@ import { handler } from "../jest.setup";
 import { Message, User } from "@prisma/client";
 import { ChatPreview, NewMatchData, UserReportInput } from "../src/interfaces";
 import { randomUUID } from "crypto";
-import { createReportInput, createUserInput, createUsersForSwipeFeed, getImageDetails, makeMessageInputWithOneRandom, makeMessageInputWithRandoms, makeMockWebSocket, makeTwoUsers, makeTwoUsersAndMatch, makeVerificationInput, matchUsers, validRequestUserInput } from "../__testUtils__/easySetup";
+import { createReportInput, createUserInput, createUsersForSwipeFeed, getImageDetails, makeAnnouncementInput, makeMessageInputWithOneRandom, makeMessageInputWithRandoms, makeMockWebSocket, makeTwoUsers, makeTwoUsersAndMatch, makeVerificationInput, matchUsers, validRequestUserInput } from "../__testUtils__/easySetup";
 import { addMinutes, addWeeks, addYears } from "date-fns";
 import { errorText, miscConstants, sampleContent, userRestrictions } from "../src/globals";
 
@@ -1230,5 +1230,63 @@ describe("handler", () => {
             reportedID: random.id
         }, "eduEmail");
         expect(output.message).toEqual(errorText.tooManyReportsToday);
+    })
+
+    it("should not view announcement from nonuser", async () => {
+        const announcement = await handler.announcement.makeAnnouncement(makeAnnouncementInput());
+
+        const output = await handler.viewAnnouncement({
+            announcementID: announcement.id,
+            userID: "random"
+        })
+        expect(output.message).toEqual(errorText.notValidUser);
+    })
+
+    it("should not view nonannouncement from user", async () => {
+        const user = await handler.user.createUser(createUserInput("a@berkeley.edu"));
+
+        const output = await handler.viewAnnouncement({
+            announcementID: "random",
+            userID: user.id
+        })
+        expect(output.message).toEqual(errorText.notValidAnnouncement);
+    })
+
+    it("should view announcement from user", async () => {
+        const [user, announcement] = await Promise.all([
+            handler.user.createUser(createUserInput("a@berkeley.edu")), 
+            handler.announcement.makeAnnouncement(makeAnnouncementInput()),
+        ]);
+
+        const output = await handler.viewAnnouncement({
+            announcementID: announcement.id,
+            userID: user.id
+        })
+        expect(output.data).not.toEqual(null);
+    })
+
+    it("should get all current announcemnets", async () => {
+        const [a1, a2] = await Promise.all([
+            handler.announcement.makeAnnouncement(makeAnnouncementInput()),
+            handler.announcement.makeAnnouncement(makeAnnouncementInput()),
+        ])
+        const output = await handler.getNewAnnouncements();
+        expect(output.data).toHaveLength(2);
+    })
+
+    it("should get nonviewed announcements", async () => {
+        const [a1, a2, user] = await Promise.all([
+            handler.announcement.makeAnnouncement(makeAnnouncementInput()),
+            handler.announcement.makeAnnouncement(makeAnnouncementInput()),
+            handler.user.createUser(createUserInput("a@berkeley.edu")), 
+        ])
+        await handler.viewAnnouncement({
+            announcementID: a1.id,
+            userID: user.id
+        })
+
+        const output = await handler.getNewAnnouncements(user.id);
+        expect(output.data).toHaveLength(1);
+        expect(output.data![0].id).toEqual(a2.id)
     })
 })

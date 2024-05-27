@@ -1,6 +1,6 @@
 import express from "express";
 import { URLs } from "./urls";
-import { APIOutput, APIRequest, ClientIDs, ConfirmVerificationInput, DeleteImageInput, EditUserInput, GetChatInput, LoginInput, MessageInput, GetMatchesInput, NewVerificationInput, UserReportWithReportedID, SubscribeInput, SwipeInput, UnlikeInput, UpdatePushTokenInput, UploadImageInput, UserInputWithFiles, JustEmail, ReadStatusInput, GetReadStatusInput, JustUserID, UserInput, HandlerUserInput, SocketPayloadToClient, SocketPayloadToServer, UnlikeOutput, NewMatchData, ChatPreview, SwipeFeed, PublicProfile, UserSwipeStats, SubscriptionData, SettingData, Preferences, LoginOutput } from "./interfaces";
+import { APIOutput, APIRequest, ClientIDs, ConfirmVerificationInput, DeleteImageInput, EditUserInput, GetChatInput, LoginInput, MessageInput, GetMatchesInput, NewVerificationInput, UserReportWithReportedID, SubscribeInput, SwipeInput, UnlikeInput, UpdatePushTokenInput, UploadImageInput, UserInputWithFiles, JustEmail, ReadStatusInput, GetReadStatusInput, JustUserID, UserInput, HandlerUserInput, SocketPayloadToClient, SocketPayloadToServer, UnlikeOutput, NewMatchData, ChatPreview, SwipeFeed, PublicProfile, UserSwipeStats, SubscriptionData, SettingData, Preferences, LoginOutput, ViewAnnouncementInput, AnnouncementInput } from "./interfaces";
 import { isAdmin, isWebCheckoutKey } from "./others";
 import { Handler } from "./handler";
 import expressWs from "express-ws";
@@ -66,6 +66,7 @@ export class APIHandler {
             })
 
             ws.on("close", async (code, reason) => {
+                handler.socket.removeSocket(ws);
                 // console.log("socket terminated by user", code, reason);
             })
 
@@ -712,6 +713,24 @@ export class APIHandler {
             }
         })
 
+        app.post(URLs.getAnnouncements, async (req,res) => {
+            try {
+                const body = req.body as APIRequest<ViewAnnouncementInput>;
+                if (!body.key) return res.status(400).json();
+
+                const userID = await handler.login.getUserIDByKey(body.key);
+                if (!(isAdmin(body.key) || userID)) return res.status(401).json(this.unauthorized);
+
+                const output = await handler.viewAnnouncement(body);
+                return output.message ?
+                    res.status(400).json(output as APIOutput<any>) :
+                    res.status(200).json()
+            } catch (err) {
+                console.log(err);
+                return res.status(500).json();
+            }
+        })
+
         // ADMIN-ONLY
 
         app.post(URLs.deleteEverything, async (req,res) => {
@@ -760,6 +779,25 @@ export class APIHandler {
                         userID: body.userID,
                         subscriptionID: "random"
                     })
+                    return res.status(200).json();
+                }
+                return res.status(401).json(this.unauthorized);
+                
+            } catch (err) {
+                console.log(err);
+                return res.status(500).json(err);
+            }
+        })
+
+        app.post(URLs.makeAnnouncement, async (req,res) => {
+            try {
+                const body = req.body as APIRequest<AnnouncementInput>;
+                if (!body.key) return res.status(400).json();
+
+                if (isAdmin(body.key)) {
+                    body.endTime = new Date(body.endTime);
+                    body.startTime = new Date(body.startTime);
+                    await handler.announcement.makeAnnouncement(body)
                     return res.status(200).json();
                 }
                 return res.status(401).json(this.unauthorized);

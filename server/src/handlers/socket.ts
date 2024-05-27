@@ -15,7 +15,7 @@ export class SocketHandler {
     private connectedSockets : Map<string, {
         socket: WebSocket,
         ttl: Date,
-        userID: string
+        userID: string,
     }>;
     private oneTimeKeys : Map<string, {
         userID: string,
@@ -60,7 +60,7 @@ export class SocketHandler {
         this.connectedSockets.set(input.userID, {
             socket: input.socket,
             ttl: ttl,
-            userID: input.userID
+            userID: input.userID,
         })
     }
 

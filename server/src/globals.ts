@@ -123,4 +123,5 @@ export const errorText = {
     cannotGetPreferences: "Cannot get user preferences",
     cannotUpdatePushToken: "Cannot update notification token",
     tooManyReportsToday: "Maximum reports per day reached",
+    notValidAnnouncement: "Not a valid announcement",
 }

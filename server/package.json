@@ -12,11 +12,11 @@
     "test-real": "jest --runInBand",
     "test-single": "jest --use-mocks=true --testPathIgnorePatterns -t",
 
-    "ping": "ts-node ./src/adminAPI.ts -p",
     "match": "ts-node ./src/adminAPI.ts -l",
     "message": "ts-node ./src/adminAPI.ts -m message",
     "premium": "ts-node ./src/adminAPI.ts -b",
-    "clear": "ts-node ./src/adminAPI.ts -c"
+    "clear": "ts-node ./src/adminAPI.ts -c",
+    "announcement": "ts-node ./src/adminAPI.ts -a"
   },
   "keywords": [],
   "author": "",

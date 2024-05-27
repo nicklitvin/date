@@ -3,8 +3,9 @@ import { sampleContent } from "./globals";
 import { sampleUsers } from "./sample";
 import axios from "axios";
 import { URLs } from "./urls";
-import { APIRequest, JustUserID, MessageInput, SwipeInput } from "./interfaces";
+import { AnnouncementInput, APIRequest, JustUserID, MessageInput, SwipeInput } from "./interfaces";
 import dotenv from "dotenv";
+import { addHours } from "date-fns";
 
 dotenv.config();
 
@@ -29,9 +30,14 @@ const argv = yargs
         describe: "purchase premium",
         type: "boolean"
     })
+    .option("announcement", {
+        alias: "a",
+        describe: "make announcement",
+        type: "boolean"
+    })
     .help()
     .alias('help', 'h')
-    .argv as { message?: string; match?: boolean, ping?: boolean, clear?: boolean, premium?: boolean };
+    .argv as { message?: string; match?: boolean, ping?: boolean, clear?: boolean, premium?: boolean, announcement?: boolean};
 
 async function main() {
     const baseURL = `http://${URLs.ip}:${URLs.port}`;
@@ -102,6 +108,23 @@ async function main() {
             const response = await axios.post(baseURL + URLs.purchasePremium, payload);
             if (response.data?.message) console.log(response.data.message);
             console.log("completed premium");
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+    if (argv.announcement) {
+        try {   
+            const payload : APIRequest<AnnouncementInput> = {
+                key: process.env.ADMIN_API_KEY!,
+                title: "announcement title",
+                message: "announcement message",
+                startTime: new Date(),
+                endTime: addHours(new Date(), 1)
+            }
+            const response = await axios.post(baseURL + URLs.makeAnnouncement, payload);
+            if (response.data?.message) console.log(response.data.message);
+            console.log("completed announcement");
         } catch (err) {
             console.log(err);
         }

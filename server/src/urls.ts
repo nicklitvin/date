@@ -33,6 +33,7 @@ export const URLs = {
     sendReadStatus: "/sendReadStatus",
     getReadStatus: "/getReadStatus",
     getPremiumPage: "/getPremiumPage",
+    getAnnouncements: "/getAnnouncements",
 
     // STRIPE
     webhook: "/webhook",
@@ -42,6 +43,7 @@ export const URLs = {
     createSample: "/createSample",
     clearInteractions: "/clearInteractions",
     purchasePremium: "/purchasePremium",
+    makeAnnouncement: "/makeAnnouncement",
     ip: "10.0.0.245",
     port: 3000,
 
