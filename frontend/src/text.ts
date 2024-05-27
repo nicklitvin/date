@@ -136,6 +136,9 @@ export const editProfileText = {
     editImages: "Edit Images",
     editAttributes: "Edit Attributes",
     editOther: "Other",
+
+    cannotUploadImage: "Cannot upload picture",
+    cannotDeleteImage: "Cannot delete picture",
 }
 
 export const preferencesText = {

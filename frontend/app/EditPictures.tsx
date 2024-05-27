@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { MySimplePage } from "../src/components/SimplePage"
-import { DeleteImageInput, EditUserInput, ImageWithURI, PublicProfile, UploadImageInput, WithKey } from "../src/interfaces";
-import { pictureText } from "../src/text"
+import { DeleteImageInput, EditUserInput, ImageWithURI, PublicProfile, UploadImageInput, ViewableImage, WithKey } from "../src/interfaces";
+import { editProfileText, pictureText } from "../src/text"
 import { StyledText, StyledView } from "../src/styledElements";
 import { globals } from "../src/globals";
 import * as FileSystem from "expo-file-system";
@@ -15,6 +15,7 @@ import { Redirect, router } from "expo-router";
 import { URLs } from "../src/urls";
 import { createTimeoutSignal, sendRequest } from "../src/utils";
 import { observer } from "mobx-react-lite";
+import Toast from "react-native-toast-message";
 
 
 export function EditPictures() {
@@ -98,11 +99,18 @@ export function EditPictures() {
                     mimetype: newUpload.image.mimetype
                 }
             }
-            const response = await sendRequest(URLs.uploadImage, input);
-            setProfile({
-                ...profile!,
-                images: response.data.data
-            });
+            const response = await sendRequest<ViewableImage[]>(URLs.uploadImage, input);
+            if (response.message) {
+                Toast.show({
+                    type: "error",
+                    text1: editProfileText.cannotUploadImage
+                })
+            } else if (response.data) {
+                setProfile({
+                    ...profile!,
+                    images: response.data
+                });
+            }
         } catch (err) {
             console.log(err);
             return
@@ -116,12 +124,19 @@ export function EditPictures() {
                 key: receivedData.loginKey,
                 imageID: uri
             };
-            const response = await sendRequest(URLs.deleteImage, input);
+            const response = await sendRequest<ViewableImage[]>(URLs.deleteImage, input);
             if (switchURI == uri) setSwitchURI(null);
-            setProfile({
-                ...profile!,
-                images: response.data.data
-            });
+            if (response.message) {
+                Toast.show({
+                    type: "error",
+                    text1: editProfileText.cannotDeleteImage
+                })
+            } else if (response.data) {
+                setProfile({
+                    ...profile!,
+                    images: response.data
+                });
+            }
         } catch (err) {
             console.log(err);
         }

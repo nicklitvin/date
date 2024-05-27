@@ -1,6 +1,4 @@
 TODO
-make constants global variables
-small border between page header and content
 some errors with sendrequest ts types, where const response =
 disable sent message change on press if not unsent
 verify if user receives socket message, if not, build up bulk send
