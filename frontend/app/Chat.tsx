@@ -83,10 +83,10 @@ export function Chat(props : Props) {
                         scrollToEnd();
                         res(null);                        
                     }, globals.scrollAfterChatOpenMS))
-                    setInitialLoad(false);
                 }
                 updateMyReadStatus();
             }
+            setInitialLoad(false);
         }
         func()
     }, [firstLoad])
@@ -255,7 +255,6 @@ export function Chat(props : Props) {
 
         const isAtTop = contentOffset.y == 0;
         const canSend = differenceInSeconds(new Date(), chatRequestTime) > globals.apiRequestTimeout;
-
         if (isAtTop && canSend && !initialLoad && chat.length > 0) {
             setChatRequestTime(new Date());
             getChat(new Date(chat.at(-1)!.timestamp.getTime() - 1))    
