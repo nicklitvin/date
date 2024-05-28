@@ -11,11 +11,15 @@ import { Redirect, router } from "expo-router";
 import { EditUserInput, PublicProfile, WithKey } from "../src/interfaces";
 import { sendRequest } from "../src/utils";
 import { URLs } from "../src/urls";
+import Loading from "./Loading";
 
 export function Alcohol() {    
     const { receivedData } = useStore();
     const [profile, setProfile] = useState<PublicProfile|null>(receivedData.profile);
-    if (!profile) return <Redirect href="Error"/>
+    if (!profile) {
+        router.replace("Error");
+        return <Loading />
+    }
 
     const [frequency, setFrequency] = useState<string|undefined>(profile.alcohol);
 

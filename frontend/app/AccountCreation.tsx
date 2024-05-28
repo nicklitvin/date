@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { generalText } from "../src/text";
 import { globals } from "../src/globals";
-import { ImageWithURI, PublicProfile, UserInputWithFiles, WithKey } from "../src/interfaces";
+import { APIOutput, ImageWithURI, PublicProfile, UserInputWithFiles, WithKey } from "../src/interfaces";
 import { observer } from "mobx-react-lite";
 import { useStore } from "../src/store/RootStore";
 import { AccountCreationType } from "../src/types";
@@ -92,7 +92,7 @@ export function AccountCreation(props : Props) {
         } else if (response.data) {
             receivedData.setProfile(response.data);
             if (!props.noRouter) {
-                router.push("(tabs)")
+                router.replace("(tabs)")
             }
         } else {
             return Toast.show({

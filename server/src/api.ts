@@ -120,7 +120,7 @@ export class APIHandler {
                 const output = await handler.createUser(input);
                 if (output.data) {
                     const publicOutput = await handler.user.convertUserToPublicProfile(output.data);
-                    return res.status(200).json(publicOutput);
+                    return res.status(200).json({data: publicOutput} as APIOutput<PublicProfile>);
                 } else {
                     return res.status(400).json(output as APIOutput<any>)
                 }

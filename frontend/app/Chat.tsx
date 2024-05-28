@@ -431,7 +431,6 @@ export function Chat(props : Props) {
                 </StyledScroll>
             </StyledView>
         </StyledView>
-        <Toast config={toastConfig}/>
         </StyledView>
     )
 }

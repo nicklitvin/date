@@ -26,13 +26,19 @@ const argv = yargs
         describe: "Deleting everything",
         type: "boolean"
     })
+    .option("custom", {
+        alias: "u",
+        describe: "custom configuration",
+        type: "boolean"
+    })
     .help()
     .alias('help', 'h')
     .argv as { 
         reset? : boolean, 
         single? : boolean, 
         construct? : boolean,
-        delete?: boolean
+        delete?: boolean,
+        custom?: boolean
     };
 
 let command : EnvironmentSetup|undefined;
@@ -76,6 +82,16 @@ if (argv.reset) {
         createUser: false,
         loginUser: false,
         verifyUser: false
+    }
+} else if (argv.custom) {
+    command = {
+        clearTables: true,
+        addSubscription: false,
+        clearInteractionEntries: false,
+        createSampleUsers: false,
+        createUser: false,
+        loginUser: true,
+        verifyUser: true
     }
 }
 

@@ -17,7 +17,7 @@ import Loading from "./Loading";
 import { Announcement, APIOutput, JustUserID, LoginOutput, PublicProfile, WithKey } from "../src/interfaces";
 import { SocketManager } from "../src/components/SocketManager";
 import { Announcements } from "./Announcements";
-import { sampleAnnouncements, sampleChatPreviews, sampleClientIDs, sampleNewMatches, sampleProfile, sampleSavedChat, sampleSettings, sampleStats, sampleSubscribed, sampleSwipeFeed } from "../src/sample";
+import { sampleChatPreviews, sampleClientIDs, sampleNewMatches, sampleProfile, sampleSavedChat, sampleSettings, sampleStats, sampleSubscribed, sampleSwipeFeed } from "../src/sample";
 
 export function Index() {
     const [loading, setLoading] = useState<boolean>(true);

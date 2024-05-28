@@ -19,7 +19,6 @@ import Constants from "expo-constants";
 import { useNavigation } from "expo-router";
 import Loading from "./Loading";
 import Toast from "react-native-toast-message";
-import { toastConfig } from "../src/components/Toast";
 
 interface Props {
     disableToggle?: boolean
@@ -33,7 +32,7 @@ export function Settings(props : Props) {
     const [showModal, setShowModal] = useState<boolean>(false);
     const [firstLoad, setFirstLoad] = useState<boolean>(true);
 
-    const navigation = useNavigation();
+    const navigation = props.noAutoLoad ? null : useNavigation();
 
     useEffect( () => {
         if (firstLoad) {
@@ -134,7 +133,7 @@ export function Settings(props : Props) {
     const signOut = () => {
         globalState.setSocketManager(null);
         receivedData.setProfile(null);
-        if (!props.disableToggle) {
+        if (navigation) {
             navigation.reset({
                 index: 0,
                 routes: [{
@@ -231,7 +230,6 @@ export function Settings(props : Props) {
             
         </StyledView>
         </StyledView>
-        <Toast config={toastConfig}/>
         </>
         
     )

@@ -21,7 +21,7 @@ import Toast from "react-native-toast-message";
 export function EditPictures() {
     const { receivedData } = useStore();
     const [profile, setProfile] = useState<PublicProfile|null>(receivedData.profile);
-    if (!profile) router.push("Error");
+    if (!profile) router.replace("Error");
 
     const [switchURI, setSwitchURI] = useState<string|null>(null);
     const [showError, setShowError] = useState<boolean>(false);

@@ -8,7 +8,8 @@ import { Spacing } from "../src/components/Spacing";
 import { MyButton } from "../src/components/Button";
 import { Frequency } from "../src/components/Frequency";
 import { useStore } from "../src/store/RootStore";
-import { Redirect, useLocalSearchParams } from "expo-router";
+import { Redirect, router, useLocalSearchParams } from "expo-router";
+import Loading from "./Loading";
 
 export function ProfileView() {
     const { receivedData } = useStore();
@@ -22,7 +23,10 @@ export function ProfileView() {
 
     profile = myProfile || newMatch || chatPreview;
 
-    if (!profile) return <Redirect href="Error"/>
+    if (!profile) {
+        router.replace("Error");
+        return <Loading />
+    }
 
     const imageURLs = profile.images.map(val => val.url);
 

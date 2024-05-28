@@ -15,7 +15,7 @@ import { observer } from "mobx-react-lite";
 export function EditSmoking() {   
     const { receivedData } = useStore();
     const [profile, setProfile] = useState<PublicProfile|null>(receivedData.profile);
-    if (!profile) router.push("Error");
+    if (!profile) router.replace("Error");
 
     const [frequency, setFrequency] = useState<string|undefined>(profile?.smoking); 
     useEffect( () => {

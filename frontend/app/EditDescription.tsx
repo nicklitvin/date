@@ -18,7 +18,7 @@ export function EditDescription() {
         if (profile) {
             receivedData.setProfile(profile);
         } else {
-            router.push("Error");
+            router.replace("Error");
         }
     }, [profile])
 

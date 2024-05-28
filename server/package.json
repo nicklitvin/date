@@ -8,6 +8,7 @@
     "single": "ts-node ./src/main.ts -s",
     "construct": "ts-node ./src/main.ts -c",
     "delete": "ts-node ./src/main.ts -d",
+    "custom": "ts-node ./src/main.ts -u",
 
     "test": "jest --runInBand --use-mocks=true --testPathIgnorePatterns",
     "test-real": "jest --runInBand",
