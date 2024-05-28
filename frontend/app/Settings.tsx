@@ -54,7 +54,7 @@ export function Settings(props : Props) {
             const { status: existingStatus } = await Notifications.getPermissionsAsync();
             if (existingStatus !== 'granted') {
                 return Toast.show({
-                    text1: "Notifiactions disabled. Click to view settings.",
+                    props: {text: "Notifiactions disabled. Click me to view settings."},
                     onPress: () => Linking.openSettings()
                 })
             }
@@ -70,7 +70,7 @@ export function Settings(props : Props) {
             const response = await sendRequest<void>(URLs.updatePushToken, input);
             if (response.message) {
                 Toast.show({
-                    text1: response.message,
+                    props: {text: response.message},
                     type: "error"
                 })
                 changeToggleValue(title,false);
@@ -90,7 +90,7 @@ export function Settings(props : Props) {
             if (response.message) {
                 Toast.show({
                     type: "error",
-                    text1: response.message
+                    props: {text: response.message}
                 })
             } else if (response.data) {
                 receivedData.setSettings(response.data);
@@ -124,7 +124,7 @@ export function Settings(props : Props) {
         if (response.message) {
             Toast.show({
                 type: "error",
-                text1: response.message
+                props: {text: response.message}
             })
             changeToggleValue(title,!value)
         }
@@ -153,7 +153,7 @@ export function Settings(props : Props) {
             if (response.message) {
                 Toast.show({
                     type: "error",
-                    text1: response.message,
+                    props: {text: response.message},
                 })
             } else {
                 signOut();

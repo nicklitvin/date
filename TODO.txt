@@ -1,5 +1,4 @@
 TODO
-change back history after sign out, delete account
 fix toast notification to be like react hot toast
     add toast to account creation where error
     

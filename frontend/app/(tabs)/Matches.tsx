@@ -56,7 +56,7 @@ export function Matches(props : Props) {
             if (newMatchResponse.message) {
                 Toast.show({
                     type: "error",
-                    text1: newMatchResponse.message,
+                    props: {text: newMatchResponse.message },
                 })
             } else if (newMatchResponse.data) {
                 const processed = newMatchResponse.data.map( val => ({
@@ -85,7 +85,7 @@ export function Matches(props : Props) {
             if (chatPreviewResponse.message) {
                 Toast.show({
                     type: "error",
-                    text1: chatPreviewResponse.message,
+                    props: {text: chatPreviewResponse.message}
                 })
             } else if (chatPreviewResponse.data) {
                 const processed : ChatPreview[] = chatPreviewResponse.data.map( val => ({

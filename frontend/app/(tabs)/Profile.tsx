@@ -92,7 +92,7 @@ export function Profile(props : Props) {
             if (response.message) {
                 Toast.show({
                     type: "error",
-                    text1: response.message,
+                    props: {text: response.message},
                 })
             } else {
                 receivedData.setSubscription({
@@ -101,8 +101,7 @@ export function Profile(props : Props) {
                 })
                 Toast.show({
                     type: "success",
-                    text1: profileText.subscriptionCanceledtext1,
-                    text2: profileText.subscriptionCanceledtext2,
+                    props: {text: profileText.subscriptionCanceled}
                 })
             }
         } catch (err) {

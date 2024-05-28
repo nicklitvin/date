@@ -103,7 +103,7 @@ export function EditPictures() {
             if (response.message) {
                 Toast.show({
                     type: "error",
-                    text1: editProfileText.cannotUploadImage
+                    props: {text : editProfileText.cannotUploadImage}
                 })
             } else if (response.data) {
                 setProfile({
@@ -129,7 +129,7 @@ export function EditPictures() {
             if (response.message) {
                 Toast.show({
                     type: "error",
-                    text1: editProfileText.cannotDeleteImage
+                    props: {text : editProfileText.cannotDeleteImage}
                 })
             } else if (response.data) {
                 setProfile({

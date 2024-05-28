@@ -39,7 +39,7 @@ export function ProfileViewEmbed(props : Props) {
                 if (response.message) {
                     return Toast.show({
                         type: "error",
-                        text1: response.message
+                        props: {text: response.message}
                     })
                 }
             }
@@ -62,7 +62,7 @@ export function ProfileViewEmbed(props : Props) {
                 if (response.message) {
                     Toast.show({
                         type: "error",
-                        text1: response.message
+                        props: {text: response.message}
                     })
                     return
                 } 

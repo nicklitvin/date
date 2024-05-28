@@ -15,6 +15,7 @@ export const globals = {
     settingAlcohol: "alcohol",
     settingSmoking: "smoking",
     maxPreviewMessageLength: 20,
+    maxNotificationLength: 30,
     maxNameLength: 16,
     acceptableFileTypes: ["image/jpeg", "image/png"],
     pictureHeight: 136,

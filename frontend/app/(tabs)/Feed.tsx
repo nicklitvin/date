@@ -2,7 +2,7 @@ import { observer } from "mobx-react-lite";
 import { PageHeader } from "../../src/components/PageHeader";
 import { StyledButton, StyledImage, StyledScroll, StyledText, StyledView } from "../../src/styledElements";
 import { feedText } from "../../src/text";
-import { JustUserID, PublicProfile, SwipeFeed, SwipeStatus, WithKey } from "../../src/interfaces";
+import { JustUserID, SwipeFeed, WithKey } from "../../src/interfaces";
 import { useEffect, useRef, useState } from "react";
 import { ProfileViewEmbedMob } from "../../src/pages/ProfileViewEmbed";
 import { URLs } from "../../src/urls";
@@ -14,6 +14,7 @@ import { useStore } from "../../src/store/RootStore";
 import { testIDS } from "../../src/testIDs";
 import Loading from "../Loading";
 import Toast from "react-native-toast-message";
+import { MyToastProps } from "../../src/components/Toast";
 
 interface Props {
     dontAutoLoad?: boolean
@@ -62,7 +63,7 @@ export function Feed(props : Props) {
             if (response.message) {
                 Toast.show({
                     type: "error",
-                    text1: response.message,
+                    props: {text: response.message},
                 })
             } else if (response.data) {
                 globalState.resetSwipeStatus();
@@ -115,7 +116,6 @@ export function Feed(props : Props) {
 
     const refresh = () => {
         const func = async () => {
-            // receivedData.setSwipeFeed(null);
             await getFeed()
             setRefreshing(false);
         }

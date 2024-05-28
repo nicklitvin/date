@@ -69,7 +69,7 @@ export function PreferencePage(props : Props) {
             if (response.message) {
                 Toast.show({
                     type: "error",
-                    text1: response.message
+                    props: {text: response.message}
                 })
             } else if (response.data) {
                 receivedData.setPreferences(response.data);

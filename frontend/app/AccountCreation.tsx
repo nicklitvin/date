@@ -87,17 +87,15 @@ export function AccountCreation(props : Props) {
         if (response.message) {
             Toast.show({
                 type: "error",
-                text1: response.message
+                props: {text: response.message}
             })
         } else if (response.data) {
             receivedData.setProfile(response.data);
-            if (!props.noRouter) {
-                router.replace("(tabs)")
-            }
+            if (!props.noRouter) router.replace("(tabs)")
         } else {
             return Toast.show({
                 type: "error",
-                text1: "Unknown Errpr"
+                props: { text: generalText.unknownError }
             })
         }
     }

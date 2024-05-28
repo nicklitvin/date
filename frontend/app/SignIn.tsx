@@ -69,7 +69,7 @@ export function SignIn() {
                 if (response.message) {
                     Toast.show({
                         type: "error",
-                        text1: response.message,
+                        props: {text: response.message},
                     })    
                 } else if (response.data) {
                     await processLoginOutput(response.data);
@@ -95,7 +95,7 @@ export function SignIn() {
                     if (response.message) {
                         Toast.show({
                             type: "error",
-                            text1: response.message,
+                            props: {text: response.message},
                         })
                     } else if (response.data) {
                         receivedData.setProfile(response.data);
@@ -137,7 +137,7 @@ export function SignIn() {
             if (response.message) {
                 Toast.show({
                     type: "error",
-                    text1: response.message,
+                    props: {text: response.message},
                 })
             } else if (response.data) {
                 await processLoginOutput(response.data);

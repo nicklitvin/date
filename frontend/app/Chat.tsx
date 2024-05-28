@@ -157,8 +157,7 @@ export function Chat(props : Props) {
             if (chatResponse.message) {
                 Toast.show({
                     type: "error",
-                    text1: chatText.errorCannotGetChat,
-                    text2: chatResponse.message
+                    props: { text : chatResponse.message }
                 })
             } else if (chatResponse.data) {
                 const processed = chatResponse.data.map( val => ({
@@ -186,7 +185,7 @@ export function Chat(props : Props) {
         if (!globalState.socketManager || !receivedData.profile || !profile) {
             Toast.show({
                 type: "error",
-                text1: chatText.errorCannotSend
+                props: { text : chatText.errorCannotSend }
             })
             return 
         }
@@ -273,7 +272,7 @@ export function Chat(props : Props) {
             if (response.message) {
                 Toast.show({
                     type: "error",
-                    text1: response.message
+                    props: {text: response.message}
                 })
             } else {
                 deleteUser();
@@ -296,7 +295,7 @@ export function Chat(props : Props) {
             if (response.message) {
                 Toast.show({
                     type: "error",
-                    text1: response.message
+                    props: {text: response.message}
                 })
             } else {
                 deleteUser();

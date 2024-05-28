@@ -63,7 +63,7 @@ export function Stats(props : Props) {
             if (response.message) {
                 Toast.show({
                     type: "error",
-                    text1: response.message,
+                    props: {text: response.message},
                 })
             } else if (response.data) {
                 if (props.openLinkFunc) props.openLinkFunc(response.data) 

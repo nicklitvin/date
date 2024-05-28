@@ -16,8 +16,6 @@ export const chatText = {
     modalReport: "Report User",
     modalUnlike: "Unmatch User",
     sendFirst: "Send the first message :)",
-
-    errorCannotGetChat: "Error",
     errorCannotSend: "Cannot send message",
 }
 
@@ -75,6 +73,7 @@ export const generalText = {
     saveChanges: "Save Changes",
     cancel: "Cancel",
     saved: "Saved",
+    unknownError: "Unknown Error",
 }
 
 export const genderPreferenceText = {
@@ -177,8 +176,7 @@ export const profileText = {
     purchasePremium: "Purchase Premium",
     freeTier: "Free Tier",
     premiumTier: "Premium Tier",
-    subscriptionCanceledtext1: "Success",
-    subscriptionCanceledtext2: "Subscription canceled"
+    subscriptionCanceled: "Subscription canceled"
 }
 
 export const settingsText = {
