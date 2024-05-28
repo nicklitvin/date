@@ -1,5 +1,5 @@
 import { act, fireEvent, render, screen } from "@testing-library/react-native";
-import { SwipeFeed } from "../src/interfaces";
+import { APIOutput, SwipeFeed } from "../src/interfaces";
 import { makePublicProfile } from "../__testUtils__/easySetup";
 import { testIDS } from "../src/testIDs";
 import MockAdapter from "axios-mock-adapter";
@@ -33,7 +33,9 @@ describe("feed", () => {
             [200, {data: feed}]
         )
         mock.onPost(URLs.server + URLs.makeSwipe).reply( config => 
-            [200]
+            [200, {data: {
+                doesNot: "matter"
+            }} as APIOutput<any>]
         )
 
         const store = new RootStore();

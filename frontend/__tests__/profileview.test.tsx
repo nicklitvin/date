@@ -6,7 +6,7 @@ import { profileViewText } from "../src/text";
 import MockAdapter from "axios-mock-adapter";
 import axios from "axios";
 import { URLs } from "../src/urls";
-import { SwipeInput } from "../src/interfaces";
+import { APIOutput, SwipeInput } from "../src/interfaces";
 
 describe("profileview", () => {
     it("should render not swipe version", async () => {
@@ -48,7 +48,9 @@ describe("profileview", () => {
             expect(payload.action).toEqual("Like");
             expect(payload.swipedUserID).toEqual(profile.id);
             swipeMade = true;
-            return [200]
+            return [200, {data: {
+                doesNot: "matter"
+            } as APIOutput<any>}]
         })
 
         const afterSwipeFn = jest.fn();
