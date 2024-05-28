@@ -35,6 +35,14 @@ export enum Opinion {
     Dislike
 }
 
+export interface Announcement {
+    id: string,
+    startTime: Date,
+    endTime: Date,
+    title: string,
+    message: string
+}
+
 // SERVER-COPIES
 
 export interface SocketPayloadToClient {
@@ -266,4 +274,9 @@ export interface GetReadStatusInput {
 
 export interface JustUserID {
     userID: string
+}
+
+export interface ViewAnnouncementInput {
+    userID: string,
+    announcementID: string
 }

@@ -129,4 +129,22 @@ describe("announcement", () => {
         ]);
         expect(await funcs.deleteAnnouncementViews()).toEqual(3);
     })
+
+    it("should delete expired entries", async () => {
+        const [a1, a2, a3] = await Promise.all([
+            funcs.makeAnnouncement(before),
+            funcs.makeAnnouncement(current),
+            funcs.makeAnnouncement(after),
+        ]);
+
+        await Promise.all([
+            funcs.viewAnnouncement({userID: "a", announcementID: a1.id}),
+            funcs.viewAnnouncement({userID: "a", announcementID: a2.id}),
+            funcs.viewAnnouncement({userID: "a", announcementID: a3.id}),
+        ])
+
+        const output = await funcs.deleteExpiredAnnouncementsAndViews();
+        expect(output.announcements).toEqual(1);
+        expect(output.views).toEqual(1);
+    })
 })

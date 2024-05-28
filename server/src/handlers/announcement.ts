@@ -10,6 +10,8 @@ export class AnnouncementHandler {
     }
 
     public async makeAnnouncement(input : AnnouncementInput) : Promise<Announcement> {
+        await this.deleteExpiredAnnouncementsAndViews()
+
         return await this.prisma.announcement.create({
             data: {
                 ...input,
@@ -82,5 +84,36 @@ export class AnnouncementHandler {
                 id: id
             }
         })
+    }
+
+    public async deleteExpiredAnnouncementsAndViews() {
+        const expired = await this.prisma.announcement.findMany({
+            where: {
+                endTime: {
+                    lt: new Date()
+                }
+            }
+        }).then( vals => vals.map( val => val.id));
+
+        const deletedAnnouncements = await this.prisma.announcement.deleteMany({
+            where: {
+                endTime: {
+                    lt: new Date()
+                }
+            }
+        })
+
+        const deletedViews = await this.prisma.announcementViewed.deleteMany({
+            where: {
+                announcementID: {
+                    in: expired
+                }
+            }
+        })
+
+        return {
+            announcements: deletedAnnouncements.count,
+            views: deletedViews.count
+        }
     }
 }

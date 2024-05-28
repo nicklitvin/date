@@ -1,6 +1,7 @@
 TODO
-frontend announcement pages
 make adminAPI send something other than message? through cli
+fix toast notification to be like react hot toast
+funny ok announcement page
 can only connect one socket per session
 verify if user receives socket message, if not, build up bulk send
 remove match thru websocket?
@@ -35,7 +36,6 @@ select * from "<table>"
 
 build android development
 eas build --profile development --platform android
-
 
 duplicate connections allowed
 keep array of connections, send to each one

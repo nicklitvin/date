@@ -1,5 +1,4 @@
 export const URLs = {
-    server: "http://10.0.0.245:3000",
     createUser: "/createUser",
     sendMessage: "/sendMessage",
     getChat: "/getChat",
@@ -21,7 +20,6 @@ export const URLs = {
     deleteAccount: "/deleteAccount",
     unlikeUser: "/unlikeUser",
     getProfile: "/getProfile",
-    getMyProfile: "/getMyProfile",
     getStats: "/getStats",
     getSubscription: "/getSubscription",
     getSettings: "/getSettings",
@@ -31,8 +29,13 @@ export const URLs = {
     updatePushToken: "/updatePushToken",
     getAttributes: "/getAttributes",
     getClientIDs: "/getClientIDs",
+    getMyProfile: "/getMyProfile",
     sendReadStatus: "/sendReadStatus",
     getReadStatus: "/getReadStatus",
-    websocket: "/ws",
     getPremiumPage: "/getPremiumPage",
+    getAnnouncements: "/getAnnouncements",
+    viewAnnouncement: "/viewAnnouncement",
+    websocket: "/ws",
+
+    server: "http://192.168.86.47:3000",
 }

@@ -14,14 +14,17 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { noWifiText } from "../src/text";
 import { MyButton } from "../src/components/Button";
 import Loading from "./Loading";
-import { APIOutput, LoginOutput, WithKey } from "../src/interfaces";
+import { Announcement, APIOutput, JustUserID, LoginOutput, PublicProfile, WithKey } from "../src/interfaces";
 import { SocketManager } from "../src/components/SocketManager";
+import { addHours, addMinutes } from "date-fns";
+import { Announcements } from "./Announcements";
 
 export function Index() {
     const [loading, setLoading] = useState<boolean>(true);
     const { globalState, receivedData } = useStore();
     const [error, setError] = useState<boolean>(false);
     const [firstLoad, setFirstLoad] = useState<boolean>(true);
+    const [askedForAnnouncements, setAskedForAnnouncements] = useState<boolean>(false);
 
     const setSampleData = () => {
         globalState.resetSwipeStatus();
@@ -191,6 +194,22 @@ export function Index() {
             ],
             likedMeIDs: []
         })
+        receivedData.setAnnouncements([
+            {
+                id: "qwejqwle",
+                startTime: addHours(new Date(), -1),
+                endTime: addHours(new Date(), 1),
+                message: "this is a short message",
+                title: "Title"
+            }, 
+            {
+                id: "qwejqwlweqe",
+                startTime: addHours(new Date(), -1),
+                endTime: addHours(new Date(), 1),
+                message: "this is a very long message and it might be worth to have some kind of splits in the text such as with the new line character so that it is not just a huge and massive block of text",
+                title: "Title 2"
+            }
+        ])
     }
 
     const retrieveOne = async (request : Function, set : Function) => {
@@ -198,7 +217,7 @@ export function Index() {
             const response : APIOutput<any> = await request();
             if (response.data) {
                 set(response.data);
-                return true;
+                return response.data;
             } else {
                 return false;
             }
@@ -240,8 +259,26 @@ export function Index() {
             ) : null,
         ]);
 
+        const profile : PublicProfile = output[3];
+        if (profile?.id) {
+            await getAnnouncements();
+        }
+
         if (!output[0]) {
             setError(true);
+        }
+    }
+
+    const getAnnouncements = async () => {
+        if (!receivedData.profile?.id) return 
+
+        const input : WithKey<JustUserID> = {
+            key: receivedData.loginKey,
+            userID: receivedData.profile.id
+        }
+        const response = await sendRequest<Announcement[]>(URLs.getAnnouncements, input);
+        if (response.data) {
+            receivedData.setAnnouncements(response.data);
         }
     }
 
@@ -300,7 +337,9 @@ export function Index() {
         setLoading(false);
     }
 
-    if (loading) {
+    if (receivedData.announcements && receivedData.announcements.length > 0) {
+        return <Announcements />
+    } else if (loading) {
         return <Loading/>
     } else if (error) {
         return <MySimplePage

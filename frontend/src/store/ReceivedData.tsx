@@ -1,5 +1,5 @@
 import { action, makeAutoObservable, observable } from "mobx";
-import { Attributes, ChatPreview, ClientIDs, LoginOutput, Message, NewMatchData, Preferences, PublicProfile, SettingData, SubscriptionData, SwipeFeed, SwipeStatus, UserSwipeStats } from "../interfaces";
+import { Announcement, Attributes, ChatPreview, ClientIDs, LoginOutput, Message, NewMatchData, Preferences, PublicProfile, SettingData, SubscriptionData, SwipeFeed, SwipeStatus, UserSwipeStats } from "../interfaces";
 import { globals } from "../globals";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -16,10 +16,14 @@ export class ReceivedData {
     @observable public clientIDs : ClientIDs|null = null;
     @observable public loginKey : string|undefined = undefined;
     @observable public attributes : Attributes = {};
+    @observable public announcements : Announcement[]|null = null;
 
     constructor() {
         makeAutoObservable(this);
     }
+
+    @action
+    setAnnouncements(input : Announcement[]|null) { this.announcements = input; }
 
     @action
     setProfile(input : PublicProfile|null) { this.profile = input; }

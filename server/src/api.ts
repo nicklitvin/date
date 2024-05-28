@@ -715,6 +715,24 @@ export class APIHandler {
 
         app.post(URLs.getAnnouncements, async (req,res) => {
             try {
+                const body = req.body as APIRequest<JustUserID>;
+                if (!body.key) return res.status(400).json();
+
+                const userID = await handler.login.getUserIDByKey(body.key);
+                if (!(isAdmin(body.key) || userID)) return res.status(401).json(this.unauthorized);
+
+                const output = await handler.getNewAnnouncements(userID);
+                return output.message ?
+                    res.status(400).json(output as APIOutput<any>) :
+                    res.status(200).json(output as APIOutput<any>)
+            } catch (err) {
+                console.log(err);
+                return res.status(500).json();
+            }
+        })
+
+        app.post(URLs.viewAnnouncement, async (req,res) => {
+            try {
                 const body = req.body as APIRequest<ViewAnnouncementInput>;
                 if (!body.key) return res.status(400).json();
 
@@ -795,9 +813,12 @@ export class APIHandler {
                 if (!body.key) return res.status(400).json();
 
                 if (isAdmin(body.key)) {
-                    body.endTime = new Date(body.endTime);
-                    body.startTime = new Date(body.startTime);
-                    await handler.announcement.makeAnnouncement(body)
+                    await handler.announcement.makeAnnouncement({
+                        title: body.title,
+                        startTime: new Date(body.startTime),
+                        endTime: new Date(body.endTime),
+                        message: body.message
+                    })
                     return res.status(200).json();
                 }
                 return res.status(401).json(this.unauthorized);

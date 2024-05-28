@@ -34,6 +34,8 @@ export const URLs = {
     getReadStatus: "/getReadStatus",
     getPremiumPage: "/getPremiumPage",
     getAnnouncements: "/getAnnouncements",
+    viewAnnouncement: "/viewAnnouncement",
+    websocket: "/ws",
 
     // STRIPE
     webhook: "/webhook",
@@ -44,12 +46,9 @@ export const URLs = {
     clearInteractions: "/clearInteractions",
     purchasePremium: "/purchasePremium",
     makeAnnouncement: "/makeAnnouncement",
-    ip: "10.0.0.245",
+    ip: "192.168.86.47",
     port: 3000,
 
     // OAUTH
     googleOAuth: "https://www.googleapis.com/userinfo/v2/me",
-
-    // Websocket
-    websocket: "/ws"
 }
