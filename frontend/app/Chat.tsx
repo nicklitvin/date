@@ -125,7 +125,7 @@ export function Chat(props : Props) {
             );
         }
 
-        if (!props.noRouter) router.back();
+        if (!props.noRouter) router.replace("Matches");
     }
 
     const load = async () => {

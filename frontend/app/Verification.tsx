@@ -70,7 +70,7 @@ export function Verification(props : Props) {
                 code: Number(code)
             }
             await sendRequest(URLs.verifyUser, input);
-            if (!props.noRouter) router.push("AccountCreation");
+            if (!props.noRouter) router.replace("AccountCreation");
         } catch (err) {
             console.log(err);
         }

@@ -17,7 +17,7 @@ import Loading from "./Loading";
 import { Announcement, APIOutput, JustUserID, LoginOutput, PublicProfile, WithKey } from "../src/interfaces";
 import { SocketManager } from "../src/components/SocketManager";
 import { Announcements } from "./Announcements";
-import { sampleAnnouncements, sampleChatPreviews, sampleNewMatches, sampleProfile, sampleSavedChat, sampleStats, sampleSubscribed, sampleSwipeFeed } from "../src/sample";
+import { sampleAnnouncements, sampleChatPreviews, sampleClientIDs, sampleNewMatches, sampleProfile, sampleSavedChat, sampleSettings, sampleStats, sampleSubscribed, sampleSwipeFeed } from "../src/sample";
 
 export function Index() {
     const [loading, setLoading] = useState<boolean>(true);
@@ -34,7 +34,9 @@ export function Index() {
         receivedData.setChatPreviews(sampleChatPreviews);
         receivedData.addSavedChat("goat", sampleSavedChat);
         receivedData.setSwipeFeed(sampleSwipeFeed);
-        receivedData.setAnnouncements(sampleAnnouncements);
+        // receivedData.setAnnouncements(sampleAnnouncements);
+        receivedData.setSettings(sampleSettings);
+        receivedData.setClientIDs(sampleClientIDs);
     }
 
     const retrieveOne = async (request : Function, set : Function) => {

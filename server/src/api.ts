@@ -679,8 +679,10 @@ export class APIHandler {
 
         app.post(URLs.getAttributes, async (_,res) => {
             try {
+                const output = await handler.attribute.getAttributes();
+                console.log(output);
                 return res.status(200).json(
-                    { data: await handler.attribute.getAttributes() } as APIOutput<any>
+                    { data: output } as APIOutput<any>
                 );
             } catch (err) {
                 console.log(err);

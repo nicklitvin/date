@@ -6,7 +6,6 @@ import { EditUserInput, JustUserID, SettingData, UpdatePushTokenInput, WithKey }
 import { URLs } from "../src/urls";
 import { MyButton } from "../src/components/Button";
 import { useStore } from "../src/store/RootStore";
-// import Toggle from "react-native-toggle-element"
 import { useEffect, useState } from "react";
 import { sendRequest } from "../src/utils";
 import { globals } from "../src/globals";
@@ -17,9 +16,10 @@ import { Linking, Platform, Switch } from "react-native";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import Constants from "expo-constants";
-import { Redirect } from "expo-router";
+import { useNavigation } from "expo-router";
 import Loading from "./Loading";
 import Toast from "react-native-toast-message";
+import { toastConfig } from "../src/components/Toast";
 
 interface Props {
     disableToggle?: boolean
@@ -31,8 +31,9 @@ export function Settings(props : Props) {
     const settings = receivedData.settings;
 
     const [showModal, setShowModal] = useState<boolean>(false);
-    const [redirect, setRedirect] = useState<boolean>(false);
     const [firstLoad, setFirstLoad] = useState<boolean>(true);
+
+    const navigation = useNavigation();
 
     useEffect( () => {
         if (firstLoad) {
@@ -110,7 +111,6 @@ export function Settings(props : Props) {
 
     const changeSettingValue = async (title : string, value : boolean) => {
         if (!globalState.expoPushToken && title.toLowerCase().includes("notify") && value) {
-            console.log("nofas");
             return updatePushToken(title)
         }
 
@@ -134,8 +134,14 @@ export function Settings(props : Props) {
     const signOut = () => {
         globalState.setSocketManager(null);
         receivedData.setProfile(null);
-        if (!props.disableToggle)
-            setRedirect(true);
+        if (!props.disableToggle) {
+            navigation.reset({
+                index: 0,
+                routes: [{
+                    name: "SignIn" as never
+                }]
+            })
+        }
     }
 
     const deleteAccount = async () => {
@@ -156,8 +162,7 @@ export function Settings(props : Props) {
         } catch (err) {}
     }
 
-    if (redirect) return <Redirect href="SignIn"/>
-    else if (!settings) return (
+    if (!settings) return (
         <>
             <StyledButton testID={testIDS.load} onPress={load}/> 
             <Loading /> 
@@ -226,7 +231,7 @@ export function Settings(props : Props) {
             
         </StyledView>
         </StyledView>
-        <Toast/>
+        <Toast config={toastConfig}/>
         </>
         
     )

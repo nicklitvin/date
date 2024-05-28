@@ -7,6 +7,7 @@
     "reset": "ts-node ./src/main.ts -r",
     "single": "ts-node ./src/main.ts -s",
     "construct": "ts-node ./src/main.ts -c",
+    "delete": "ts-node ./src/main.ts -d",
 
     "test": "jest --runInBand --use-mocks=true --testPathIgnorePatterns",
     "test-real": "jest --runInBand",
@@ -17,7 +18,7 @@
     "premium": "ts-node ./src/adminAPI.ts -b",
     "clear": "ts-node ./src/adminAPI.ts -c",
     "announcement": "ts-node ./src/adminAPI.ts -a",
-    "keanu": "ts-node ./src/adminAPI.ts -k"
+    "attributes": "ts-node ./src/adminAPI.ts -g"
   },
   "keywords": [],
   "author": "",

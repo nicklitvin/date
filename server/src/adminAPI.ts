@@ -35,6 +35,16 @@ const argv = yargs
         describe: "make announcement",
         type: "boolean"
     })
+    .option("attributes", {
+        alias: "g",
+        describe: "get attributes",
+        type: "boolean"
+    })
+    .option("delete", {
+        alias: "d",
+        describe: "deletes tables",
+        type: "boolean"
+    })
     .help()
     .alias('help', 'h')
     .argv as { 
@@ -43,14 +53,13 @@ const argv = yargs
         clear?: boolean, 
         premium?: boolean, 
         announcement?: boolean, 
-        keanu?: boolean
+        attributes?: boolean,
+        delete?: boolean
     };
 
 async function main() {
     const baseURL = `http://${URLs.ip}:${URLs.port}`;
     
-    console.log(argv);
-
     if (argv.clear) {
         try {
             const payload : APIRequest<{}> = {
@@ -130,6 +139,28 @@ async function main() {
             const response = await axios.post(baseURL + URLs.makeAnnouncement, payload);
             if (response.data?.message) console.log(response.data.message);
             console.log("completed announcement");
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+    if (argv.attributes) {
+        try {
+            const response = await axios.post(baseURL + URLs.getAttributes, null);
+            console.log(response.data);
+            console.log("completed attributes");
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+    if (argv.delete) {
+        try {   
+            const payload : APIRequest<{}> = {
+                key: process.env.ADMIN_API_KEY!
+            }
+            await axios.post(baseURL + URLs.deleteEverything, payload);
+            console.log("completed deleted")
         } catch (err) {
             console.log(err);
         }

@@ -1,4 +1,6 @@
 TODO
+change back history after sign out, delete account
+
 fix toast notification to be like react hot toast
 can only connect one socket per session
 verify if user receives socket message, if not, build up bulk send

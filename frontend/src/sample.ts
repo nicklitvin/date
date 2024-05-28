@@ -1,5 +1,5 @@
 import { addHours } from "date-fns";
-import { Announcement, ChatPreview, Message, NewMatchData, PublicProfile, SubscriptionData, SwipeFeed, UserSwipeStats } from "./interfaces";
+import { Announcement, ChatPreview, ClientIDs, Message, NewMatchData, PublicProfile, SettingData, SubscriptionData, SwipeFeed, UserSwipeStats } from "./interfaces";
 
 export const sampleProfile : PublicProfile = {
     name: "Michael",
@@ -189,3 +189,17 @@ export const sampleAnnouncements : Announcement[] = [
         title: "Title 2"
     }
 ]
+
+export const sampleSettings : SettingData[] = [
+    {
+        title: "Title",
+        display: "Display",
+        value: true
+    }
+]
+
+export const sampleClientIDs : ClientIDs = {
+    android: "sample",
+    expo: "sample",
+    ios: "sample"
+}

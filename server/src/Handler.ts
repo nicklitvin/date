@@ -666,6 +666,9 @@ export class Handler {
             this.swipe.createSample(),
             this.message.createSample(),
         ])
+    }
+
+    public async resetAttributes() : Promise<void> {
         const formattedList = Object.entries(attributeList).flatMap(([key, values]) =>
             values.map(value => [key, value])
         );
@@ -674,6 +677,7 @@ export class Handler {
             type: key as AttributeType,
             value: value
         }));
+        console.log(formattedListWithObjects);
 
         await Promise.all([
             formattedListWithObjects.map( val => this.attribute.addAttribute(val))
