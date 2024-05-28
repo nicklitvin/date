@@ -37,15 +37,20 @@ const argv = yargs
     })
     .help()
     .alias('help', 'h')
-    .argv as { message?: string; match?: boolean, ping?: boolean, clear?: boolean, premium?: boolean, announcement?: boolean};
+    .argv as { 
+        message?: string, 
+        match?: boolean, 
+        clear?: boolean, 
+        premium?: boolean, 
+        announcement?: boolean, 
+        keanu?: boolean
+    };
 
 async function main() {
     const baseURL = `http://${URLs.ip}:${URLs.port}`;
-
-    if (argv.ping) {
-        console.log("ping")
-    }
     
+    console.log(argv);
+
     if (argv.clear) {
         try {
             const payload : APIRequest<{}> = {

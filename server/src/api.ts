@@ -66,8 +66,8 @@ export class APIHandler {
             })
 
             ws.on("close", async (code, reason) => {
+                console.log("disconnecting socket", code, reason);
                 handler.socket.removeSocket(ws);
-                // console.log("socket terminated by user", code, reason);
             })
 
             ws.on("error", async (err) => {

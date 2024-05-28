@@ -13,10 +13,11 @@
     "test-single": "jest --use-mocks=true --testPathIgnorePatterns -t",
 
     "match": "ts-node ./src/adminAPI.ts -l",
-    "message": "ts-node ./src/adminAPI.ts -m message",
+    "message": "ts-node ./src/adminAPI.ts -m",
     "premium": "ts-node ./src/adminAPI.ts -b",
     "clear": "ts-node ./src/adminAPI.ts -c",
-    "announcement": "ts-node ./src/adminAPI.ts -a"
+    "announcement": "ts-node ./src/adminAPI.ts -a",
+    "keanu": "ts-node ./src/adminAPI.ts -k"
   },
   "keywords": [],
   "author": "",

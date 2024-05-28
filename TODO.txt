@@ -1,5 +1,4 @@
 TODO
-make adminAPI send something other than message? through cli
 fix toast notification to be like react hot toast
 funny ok announcement page
 can only connect one socket per session
