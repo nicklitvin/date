@@ -6,6 +6,7 @@ import { URLs } from "../src/urls";
 import { ViewAnnouncementInput, WithKey } from "../src/interfaces";
 import { MyButton } from "../src/components/Button";
 import Loading from "./Loading";
+import { announcementText, generalText } from "../src/text";
 
 interface Props {
 
@@ -14,6 +15,7 @@ interface Props {
 export function Announcements(props : Props) {
     const { receivedData } = useStore()
     const [index, setIndex] = useState<number>(0);
+    const [text, setText] = useState<string[]>([]);
 
     const viewAnnouncement = async () => {
         if (!receivedData.profile?.id || !receivedData.announcements) return
@@ -35,6 +37,15 @@ export function Announcements(props : Props) {
         }
     }, [index])
 
+    useEffect( () => {
+        if (receivedData.announcements) {
+            setText(receivedData.announcements.map( _ => {
+                const index = Math.floor(Math.random() * announcementText.length);
+                return announcementText[index];
+            }))
+        }
+    }, [receivedData.announcements])
+
     if (!receivedData.announcements || index >= receivedData.announcements.length) return <Loading/>
     return (
         <MySimplePage
@@ -42,7 +53,7 @@ export function Announcements(props : Props) {
             subtitle={receivedData.announcements[index].message}
             content={
                 <MyButton
-                    text="Continue"
+                    text={index < text.length ? text[index] : generalText.continue}
                     onPressFunction={viewAnnouncement}
                 />
             }

@@ -222,3 +222,12 @@ export const reportedText = {
     pageTitle: "You have been banned!",
     pageSubtitle: "Your account has been suspended from this platform for not complying with our guidelines. If you believe this ban is unjustified, contact customer support."
 }
+
+export const announcementText = [
+    "Sure. Whatever",
+    "Got it! So boring",
+    "Alright. Fine",
+    "Sorry, don't care",
+    "But did I ask?",
+    "Don't care, skip!",
+]
