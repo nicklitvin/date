@@ -49,13 +49,14 @@ export class MyServer {
         clearTables: false,
         clearInteractionEntries: false
     }) {
+        // clear tables must be first
+        if (input.clearTables) {
+            await this.handler.deleteEverything();
+        }
+
         const attributes = await this.handler.attribute.getAttributes();
         if (Object.keys(attributes).length == 0) {
             await this.handler.resetAttributes();
-        }
-
-        if (input.clearTables) {
-            await this.handler.deleteEverything();
         }
 
         if (input.clearInteractionEntries) {

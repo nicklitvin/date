@@ -13,6 +13,26 @@ export class APIHandler {
         message: "Unauthorized"
     }
 
+    private serverError : APIOutput<{}> = {
+        message: "Internal Server Error"
+    }
+
+    private isAdminOrValidUser(input : {
+        adminKey? : string, 
+        actualUserID? : string,
+        claimedUserID?: string
+    }) : boolean {
+        if (input.adminKey && isAdmin(input.adminKey)) return true;
+
+        if (
+            input.actualUserID && 
+            input.claimedUserID && 
+            input.actualUserID == input.claimedUserID
+        ) return true
+
+        return false;
+    }
+
     constructor(app : expressWs.Application, handler : Handler) {
         app.get("/", (req,res) => res.json({message: "hi"} as APIOutput<void>));
 
@@ -98,12 +118,15 @@ export class APIHandler {
                     smoking: body.smoking
                 }
                 const output = await handler.createUser(input);
-                return output.message ? 
-                    res.status(400).json(output as APIOutput<any>) : 
-                    res.status(200).json();
+                if (output.data) {
+                    const publicOutput = await handler.user.convertUserToPublicProfile(output.data);
+                    return res.status(200).json(publicOutput);
+                } else {
+                    return res.status(400).json(output as APIOutput<any>)
+                }
             } catch (err) {
                 console.log(err);
-                return res.status(500).json();
+                return res.status(500).json(this.serverError);
             }
         })
     
@@ -113,7 +136,9 @@ export class APIHandler {
                 if (!body.key) return res.status(400).json();
 
                 const userID = await handler.login.getUserIDByKey(body.key);
-                if (!(isAdmin(body.key) || userID || userID == body.userID)) return res.status(401).json(this.unauthorized);
+                if (!this.isAdminOrValidUser({ adminKey: body.key, actualUserID: userID, claimedUserID: body.userID})) {
+                    return res.status(401).json(this.unauthorized);
+                }
     
                 const input : MessageInput = {
                     userID: body.userID,
@@ -126,7 +151,7 @@ export class APIHandler {
                     res.status(200).json();
             } catch (err) {
                 console.log(err);
-                return res.status(500).json();
+                return res.status(500).json(this.serverError);
             }
         })
     
@@ -136,7 +161,9 @@ export class APIHandler {
                 if (!body.key) return res.status(400).json();
                 
                 const userID = await handler.login.getUserIDByKey(body.key);
-                if (!(isAdmin(body.key) || userID || userID == body.userID)) return res.status(401).json(this.unauthorized);
+                if (!this.isAdminOrValidUser({ adminKey: body.key, actualUserID: userID, claimedUserID: body.userID})) {
+                    return res.status(401).json(this.unauthorized);
+                }
     
                 const input : GetChatInput = {
                     userID: body.userID,
@@ -149,7 +176,7 @@ export class APIHandler {
                     res.status(400).json({message: errorText.cannotGetChat } as APIOutput<any>)
             } catch (err) {
                 console.log(err);
-                return res.status(500).json();
+                return res.status(500).json(this.serverError);
             }
         })
 
@@ -159,7 +186,9 @@ export class APIHandler {
                 if (!body.key) return res.status(400).json();
     
                 const userID = await handler.login.getUserIDByKey(body.key);
-                if (!(isAdmin(body.key) || userID || userID == body.userID)) return res.status(401).json(this.unauthorized);
+                if (!this.isAdminOrValidUser({ adminKey: body.key, actualUserID: userID, claimedUserID: body.userID})) {
+                    return res.status(401).json(this.unauthorized);
+                }
     
                 const input : UserReportWithReportedID = {
                     userID: body.userID,
@@ -171,7 +200,7 @@ export class APIHandler {
                     res.status(200).json();
             } catch (err) {
                 console.log(err);
-                return res.status(500).json();
+                return res.status(500).json(this.serverError);
             }
         })
 
@@ -181,7 +210,9 @@ export class APIHandler {
                 if (!body.key) return res.status(400).json();
     
                 const userID = await handler.login.getUserIDByKey(body.key);
-                if (!(isAdmin(body.key) || userID || userID == body.userID)) return res.status(401).json(this.unauthorized);
+                if (!this.isAdminOrValidUser({ adminKey: body.key, actualUserID: userID, claimedUserID: body.userID})) {
+                    return res.status(401).json(this.unauthorized);
+                }
     
                 const input : GetMatchesInput = {
                     userID: body.userID,
@@ -193,7 +224,7 @@ export class APIHandler {
                     res.status(400).json({message: errorText.cannotGetNewMatches} as APIOutput<any>)
             } catch (err) {
                 console.log(err);
-                return res.status(500).json();
+                return res.status(500).json(this.serverError);
             }
         })
 
@@ -203,7 +234,9 @@ export class APIHandler {
                 if (!body.key) return res.status(400).json();
     
                 const userID = await handler.login.getUserIDByKey(body.key);
-                if (!(isAdmin(body.key) || userID || userID == body.userID)) return res.status(401).json(this.unauthorized);
+                if (!this.isAdminOrValidUser({ adminKey: body.key, actualUserID: userID, claimedUserID: body.userID})) {
+                    return res.status(401).json(this.unauthorized);
+                }
                 
                 const input : GetMatchesInput = {
                     userID: body.userID,
@@ -215,7 +248,7 @@ export class APIHandler {
                     res.status(400).json({message: errorText.cannotGetChatPreviews} as APIOutput<any>)
             } catch (err) {
                 console.log(err);
-                return res.status(500).json();
+                return res.status(500).json(this.serverError);
             }
         })
 
@@ -225,7 +258,9 @@ export class APIHandler {
                 if (!body.key) return res.status(400).json();
                 
                 const userID = await handler.login.getUserIDByKey(body.key);
-                if (!(isAdmin(body.key) || userID || userID == body.userID)) return res.status(401).json(this.unauthorized);
+                if (!this.isAdminOrValidUser({ adminKey: body.key, actualUserID: userID, claimedUserID: body.userID})) {
+                    return res.status(401).json(this.unauthorized);
+                }
     
                 const input : SwipeInput = {
                     userID: body.userID,
@@ -238,7 +273,7 @@ export class APIHandler {
                     res.status(200).json(output as APIOutput<Swipe>);
             } catch (err) {
                 console.log(err);
-                return res.status(500).json();
+                return res.status(500).json(this.serverError);
             }
         })
 
@@ -248,7 +283,9 @@ export class APIHandler {
                 if (!body.key) return res.status(400).json();
                 
                 const userID = await handler.login.getUserIDByKey(body.key);
-                if (!(isAdmin(body.key) || userID || userID == body.userID)) return res.status(401).json(this.unauthorized);
+                if (!this.isAdminOrValidUser({ adminKey: body.key, actualUserID: userID, claimedUserID: body.userID})) {
+                    return res.status(401).json(this.unauthorized);
+                }
     
                 const output = await handler.getSwipeFeed(body.userID);
                 return output.message ? 
@@ -256,7 +293,7 @@ export class APIHandler {
                     res.status(200).json(output);
             } catch (err) {
                 console.log(err);
-                return res.status(500).json();
+                return res.status(500).json(this.serverError);
             }
         })
 
@@ -278,7 +315,7 @@ export class APIHandler {
                     res.status(200).json();
             } catch (err) {
                 console.log(err);
-                return res.status(500).json();
+                return res.status(500).json(this.serverError);
             }
         })
 
@@ -302,7 +339,7 @@ export class APIHandler {
                     res.status(200).json()
             } catch (err) {
                 console.log(err);
-                return res.status(500).json();
+                return res.status(500).json(this.serverError);
             }
         })
 
@@ -323,7 +360,7 @@ export class APIHandler {
                     res.status(400).json({ message: errorText.cannotSendVerificationCode} as APIOutput<any>)
             } catch (err) {
                 console.log(err);
-                return res.status(500).json();
+                return res.status(500).json(this.serverError);
             }
         })
 
@@ -333,7 +370,9 @@ export class APIHandler {
                 if (!body.key) return res.status(400).json();
     
                 const userID = await handler.login.getUserIDByKey(body.key);
-                if (!(isAdmin(body.key) || userID || userID == body.userID)) return res.status(401).json(this.unauthorized);
+                if (!this.isAdminOrValidUser({ adminKey: body.key, actualUserID: userID, claimedUserID: body.userID})) {
+                    return res.status(401).json(this.unauthorized);
+                }
     
                 const input : UploadImageInput = {
                     userID: body.userID,
@@ -346,7 +385,7 @@ export class APIHandler {
                     res.status(200).json({ data: publicProfile?.images } as APIOutput<any>)
             } catch (err) {
                 console.log(err);
-                return res.status(500).json();
+                return res.status(500).json(this.serverError);
             }
         })
 
@@ -356,7 +395,9 @@ export class APIHandler {
                 if (!body.key) return res.status(400).json();
     
                 const userID = await handler.login.getUserIDByKey(body.key);
-                if (!(isAdmin(body.key) || userID || userID == body.userID)) return res.status(401).json(this.unauthorized);
+                if (!this.isAdminOrValidUser({ adminKey: body.key, actualUserID: userID, claimedUserID: body.userID})) {
+                    return res.status(401).json(this.unauthorized);
+                }
     
                 const input : DeleteImageInput = {
                     userID: body.userID,
@@ -369,7 +410,7 @@ export class APIHandler {
                     res.status(200).json({ data: publicProfile?.images } as APIOutput<any>) 
             } catch (err) {
                 console.log(err);
-                return res.status(500).json();
+                return res.status(500).json(this.serverError);
             }
         })
 
@@ -379,7 +420,9 @@ export class APIHandler {
                 if (!body.key) return res.status(400).json();
     
                 const userID = await handler.login.getUserIDByKey(body.key);
-                if (!(isAdmin(body.key) || userID || userID == body.userID)) return res.status(401).json(this.unauthorized);
+                if (!this.isAdminOrValidUser({ adminKey: body.key, actualUserID: userID, claimedUserID: body.userID})) {
+                    return res.status(401).json(this.unauthorized);
+                }
     
                 const input : EditUserInput = {
                     userID: body.userID,
@@ -392,7 +435,7 @@ export class APIHandler {
                     res.status(200).json() 
             } catch (err) {
                 console.log(err);
-                return res.status(500).json();
+                return res.status(500).json(this.serverError);
             }
         })
 
@@ -402,7 +445,9 @@ export class APIHandler {
                 if (!body.key) return res.status(400).json();
     
                 const userID = await handler.login.getUserIDByKey(body.key);
-                if (!(isAdmin(body.key) || userID || userID == body.userID)) return res.status(401).json(this.unauthorized);
+                if (!this.isAdminOrValidUser({ adminKey: body.key, actualUserID: userID, claimedUserID: body.userID})) {
+                    return res.status(401).json(this.unauthorized);
+                }
     
                 const input : EditUserInput = {
                     userID: body.userID,
@@ -415,7 +460,7 @@ export class APIHandler {
                     res.status(200).json();
             } catch (err) {
                 console.log(err);
-                return res.status(500).json();
+                return res.status(500).json(this.serverError);
             }
         })
 
@@ -434,7 +479,7 @@ export class APIHandler {
                     res.status(200).json(output as APIOutput<string>) 
             } catch (err) {
                 console.log(err);
-                return res.status(500).json();
+                return res.status(500).json(this.serverError);
             }
         })
 
@@ -451,7 +496,7 @@ export class APIHandler {
                     return res.status(200).json();
                 }
             } catch (err) {
-                return res.status(500).json();
+                return res.status(500).json(this.serverError);
             }
         })
 
@@ -461,7 +506,9 @@ export class APIHandler {
                 if (!body.key) return res.status(400).json();
     
                 const userID = await handler.login.getUserIDByKey(body.key);
-                if (!(isAdmin(body.key) || userID || userID == body.userID)) return res.status(401).json(this.unauthorized);
+                if (!this.isAdminOrValidUser({ adminKey: body.key, actualUserID: userID, claimedUserID: body.userID})) {
+                    return res.status(401).json(this.unauthorized);
+                }
     
                 const output = await handler.cancelSubscription(body.userID);
                 return output.message ? 
@@ -469,7 +516,7 @@ export class APIHandler {
                     res.status(200).json()
             } catch (err) {
                 console.log(err);
-                return res.status(500).json();
+                return res.status(500).json(this.serverError);
             }
         })
 
@@ -480,7 +527,7 @@ export class APIHandler {
                 })
             } catch (err) {
                 console.log(err);
-                return res.status(500).json();
+                return res.status(500).json(this.serverError);
             }
         })
 
@@ -490,7 +537,9 @@ export class APIHandler {
                 if (!body.key) return res.status(400).json();
     
                 const userID = await handler.login.getUserIDByKey(body.key);
-                if (!(isAdmin(body.key) || userID || userID == body.userID)) return res.status(401).json(this.unauthorized);
+                if (!this.isAdminOrValidUser({ adminKey: body.key, actualUserID: userID, claimedUserID: body.userID})) {
+                    return res.status(401).json(this.unauthorized);
+                }
     
                 const output = await handler.deleteUser(body.userID);
                 return output.message ? 
@@ -498,7 +547,7 @@ export class APIHandler {
                     res.status(200).json()
             } catch (err) {
                 console.log(err);
-                return res.status(500).json();
+                return res.status(500).json(this.serverError);
             }
         }) 
 
@@ -508,7 +557,9 @@ export class APIHandler {
                 if (!body.key) return res.status(400).json();
                 
                 const userID = await handler.login.getUserIDByKey(body.key);
-                if (!(isAdmin(body.key) || userID || userID == body.userID)) return res.status(401).json(this.unauthorized);
+                if (!this.isAdminOrValidUser({ adminKey: body.key, actualUserID: userID, claimedUserID: body.userID})) {
+                    return res.status(401).json(this.unauthorized);
+                }
 
                 const input : UnlikeInput = {
                     userID: body.userID,
@@ -521,7 +572,7 @@ export class APIHandler {
                     res.status(200).json(output as APIOutput<UnlikeOutput>)
             } catch (err) {
                 console.log(err);
-                return res.status(500).json();
+                return res.status(500).json(this.serverError);
             }
         })
 
@@ -535,7 +586,7 @@ export class APIHandler {
                     res.status(400).json({ message : errorText.cannotGetPublicProfile} as APIOutput<any>)
             } catch (err) {
                 console.log(err);
-                return res.status(500).json();
+                return res.status(500).json(this.serverError);
             }
         })
 
@@ -554,7 +605,7 @@ export class APIHandler {
                     res.status(400).json({ message: errorText.cannotGetPublicProfile} as APIOutput<any>)
 
             } catch (err) {
-                return res.status(500).json();
+                return res.status(500).json(this.serverError);
             }
         })
 
@@ -564,7 +615,9 @@ export class APIHandler {
                 if (!body.key) return res.status(400).json();
 
                 const userID = await handler.login.getUserIDByKey(body.key);
-                if (!(isAdmin(body.key) || userID || userID == body.userID)) return res.status(401).json(this.unauthorized);
+                if (!this.isAdminOrValidUser({ adminKey: body.key, actualUserID: userID, claimedUserID: body.userID})) {
+                    return res.status(401).json(this.unauthorized);
+                }
 
                 const output = await handler.getStatsIfSubscribed(body.userID);
                 return output.message ?
@@ -573,7 +626,7 @@ export class APIHandler {
                 
             } catch (err) {
                 console.log(err);
-                return res.status(500).json();
+                return res.status(500).json(this.serverError);
             }
         })
 
@@ -583,7 +636,9 @@ export class APIHandler {
                 if (!body.key) return res.status(400).json();
 
                 const userID = await handler.login.getUserIDByKey(body.key);
-                if (!(isAdmin(body.key) || userID || userID == body.userID)) return res.status(401).json(this.unauthorized);
+                if (!this.isAdminOrValidUser({ adminKey: body.key, actualUserID: userID, claimedUserID: body.userID})) {
+                    return res.status(401).json(this.unauthorized);
+                }
     
                 const output = await handler.user.getSubscriptionData(body.userID);
                 return output ? 
@@ -591,7 +646,7 @@ export class APIHandler {
                     res.status(400).json({ message: errorText.cannotGetSubscription} as APIOutput<any>)
             } catch (err) {
                 console.log(err);
-                return res.status(500).json();
+                return res.status(500).json(this.serverError);
             }
         })
 
@@ -601,7 +656,9 @@ export class APIHandler {
                 if (!body.key) return res.status(400).json();
 
                 const userID = await handler.login.getUserIDByKey(body.key);
-                if (!(isAdmin(body.key) || userID || userID == body.userID)) return res.status(401).json(this.unauthorized);
+                if (!this.isAdminOrValidUser({ adminKey: body.key, actualUserID: userID, claimedUserID: body.userID})) {
+                    return res.status(401).json(this.unauthorized);
+                }
 
                 const output = await handler.user.getSettings(body.userID);
                 return output ? 
@@ -609,7 +666,7 @@ export class APIHandler {
                     res.status(400).json({ message: errorText.cannotGetSettings } as APIOutput<any>) 
             } catch (err) {
                 console.log(err);
-                return res.status(500).json();
+                return res.status(500).json(this.serverError);
             }
         })
 
@@ -619,7 +676,9 @@ export class APIHandler {
                 if (!body.key) return res.status(400).json();
 
                 const userID = await handler.login.getUserIDByKey(body.key);
-                if (!(isAdmin(body.key) || userID || userID == body.userID)) return res.status(401).json(this.unauthorized);
+                if (!this.isAdminOrValidUser({ adminKey: body.key, actualUserID: userID, claimedUserID: body.userID})) {
+                    return res.status(401).json(this.unauthorized);
+                }
     
                 const output = await handler.user.getPreferences(body.userID);
                 return output ? 
@@ -627,7 +686,7 @@ export class APIHandler {
                     res.status(400).json({ message: errorText.cannotGetPreferences } as APIOutput<any>)
             } catch (err) {
                 console.log(err);
-                return res.status(500).json();
+                return res.status(500).json(this.serverError);
             }
         })
 
@@ -641,7 +700,7 @@ export class APIHandler {
                     res.status(200).json(output as APIOutput<LoginOutput>)
             } catch (err) {
                 console.log(err);
-                return res.status(500).json();
+                return res.status(500).json(this.serverError);
             }
         })
 
@@ -655,7 +714,7 @@ export class APIHandler {
                     res.status(200).json(output as APIOutput<LoginOutput>)
             } catch (err) {
                 console.log(err);
-                return res.status(500).json();
+                return res.status(500).json(this.serverError);
             }
         })
 
@@ -665,7 +724,9 @@ export class APIHandler {
                 if (!body.key) return res.status(400).json();
 
                 const userID = await handler.login.getUserIDByKey(body.key);
-                if (!(isAdmin(body.key) || userID || userID == body.userID)) return res.status(401).json(this.unauthorized);
+                if (!this.isAdminOrValidUser({ adminKey: body.key, actualUserID: userID, claimedUserID: body.userID})) {
+                    return res.status(401).json(this.unauthorized);
+                }
     
                 const output = await handler.login.updateExpoToken(body.userID,body.expoPushToken);
                 return output ? 
@@ -673,20 +734,19 @@ export class APIHandler {
                     res.status(400).json({ message: errorText.cannotUpdatePushToken } as APIOutput<any>)
             } catch (err) {
                 console.log(err);
-                return res.status(500).json();
+                return res.status(500).json(this.serverError);
             }
         })
 
         app.post(URLs.getAttributes, async (_,res) => {
             try {
                 const output = await handler.attribute.getAttributes();
-                console.log(output);
                 return res.status(200).json(
                     { data: output } as APIOutput<any>
                 );
             } catch (err) {
                 console.log(err);
-                return res.status(500).json();
+                return res.status(500).json(this.serverError);
             }
         })
 
@@ -700,7 +760,7 @@ export class APIHandler {
                 return res.status(200).json({data: output} as APIOutput<ClientIDs>);
             } catch (err) {
                 console.log(err);
-                return res.status(500).json();
+                return res.status(500).json(this.serverError);
             }
         })
 
@@ -711,7 +771,7 @@ export class APIHandler {
                 return res.status(200).json({data: url} as APIOutput<string>)
             } catch (err) {
                 console.log(err);
-                return res.status(500).json();
+                return res.status(500).json(this.serverError);
             }
         })
 
@@ -729,7 +789,7 @@ export class APIHandler {
                     res.status(200).json(output as APIOutput<any>)
             } catch (err) {
                 console.log(err);
-                return res.status(500).json();
+                return res.status(500).json(this.serverError);
             }
         })
 
@@ -747,7 +807,7 @@ export class APIHandler {
                     res.status(200).json()
             } catch (err) {
                 console.log(err);
-                return res.status(500).json();
+                return res.status(500).json(this.serverError);
             }
         })
 
@@ -765,7 +825,7 @@ export class APIHandler {
                 return res.status(401).json(this.unauthorized);
             } catch (err) {
                 console.log(err);
-                return res.status(500).json();
+                return res.status(500).json(this.serverError);
             }
         })
 

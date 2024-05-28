@@ -677,7 +677,6 @@ export class Handler {
             type: key as AttributeType,
             value: value
         }));
-        console.log(formattedListWithObjects);
 
         await Promise.all([
             formattedListWithObjects.map( val => this.attribute.addAttribute(val))

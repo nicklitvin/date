@@ -6,6 +6,7 @@ import { attributesText } from "../text"
 import { globals } from "../globals"
 import classNames from "classnames"
 import { Attributes } from "../interfaces"
+import { Spacing } from "../components/Spacing"
 
 interface Props {
     onSubmit: (input : string[]) => any
@@ -52,9 +53,11 @@ export function AttributesPage(props : Props) {
                             className="flex w-full items-center"
                             key={`type-${entry[0]}`}
                         >
-                            <StyledText className="text-xl pb-2 w-full text-center font-bold">
+                            <Spacing size="md"/>
+                            <StyledText className="text-xl w-full text-center font-bold">
                                 {entry[0]}
                             </StyledText>
+                            <Spacing size="md"/>
                             <StyledView className="flex flex-row flex-wrap justify-center">
                                 {entry[1].map( (value) =>
                                     <StyledView 

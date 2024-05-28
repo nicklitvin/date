@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { generalText } from "../src/text";
 import { globals } from "../src/globals";
-import { ImageWithURI, UserInputWithFiles, WithKey } from "../src/interfaces";
+import { ImageWithURI, PublicProfile, UserInputWithFiles, WithKey } from "../src/interfaces";
 import { observer } from "mobx-react-lite";
 import { useStore } from "../src/store/RootStore";
 import { AccountCreationType } from "../src/types";
@@ -51,7 +51,6 @@ export function AccountCreation(props : Props) {
     );
     const [alcohol, setAlcohol] = useState<string>("");
     const [smoking, setSmoking] = useState<string>("");
-    const [firstLoad, setFirstLoad] = useState<boolean>(true);
 
     const goToNextPage = () => {
         setCurrentPage(currentPage + 1);
@@ -84,14 +83,22 @@ export function AccountCreation(props : Props) {
             }))
         };
 
-        const response = await sendRequest(URLs.createUser, userInput);
+        const response = await sendRequest<PublicProfile>(URLs.createUser, userInput);
         if (response.message) {
             Toast.show({
                 type: "error",
                 text1: response.message
             })
-        } else if (!props.noRouter) {
-            router.push("(tabs)")
+        } else if (response.data) {
+            receivedData.setProfile(response.data);
+            if (!props.noRouter) {
+                router.push("(tabs)")
+            }
+        } else {
+            return Toast.show({
+                type: "error",
+                text1: "Unknown Errpr"
+            })
         }
     }
 

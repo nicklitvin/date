@@ -3,6 +3,8 @@ import { RootStore, createStoreProvider} from '../src/store/RootStore';
 import { StyledView } from '../src/styledElements';
 import { Stack } from "expo-router";
 import * as Notifications from "expo-notifications";
+import Toast from "react-native-toast-message";
+import { toastConfig } from "../src/components/Toast";
 
 Notifications.setNotificationHandler({
     handleNotification: async () => ({
@@ -48,6 +50,7 @@ export default function App() {
                     </StoreProvider>
                 </SafeAreaView>
             </SafeAreaProvider>
+            <Toast config={toastConfig}/>
         </StyledView>
     )
 }
