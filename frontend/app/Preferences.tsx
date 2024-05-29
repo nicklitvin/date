@@ -13,7 +13,7 @@ import classNames from "classnames";
 import { sendRequest } from "../src/utils";
 import { useStore } from "../src/store/RootStore";
 import { testIDS } from "../src/testIDs";
-import Toast from "react-native-toast-message";
+import { showToast } from "../src/components/Toast";
 
 interface Props {
     noAutoLoad?: boolean
@@ -67,10 +67,7 @@ export function PreferencePage(props : Props) {
             }
             const response = await sendRequest<Preferences>(URLs.getPreferences, input);
             if (response.message) {
-                Toast.show({
-                    type: "error",
-                    props: {text: response.message}
-                })
+                showToast("Error", response.message)
             } else if (response.data) {
                 receivedData.setPreferences(response.data);
                 setGenders(response.data.genderPreference);

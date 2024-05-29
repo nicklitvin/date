@@ -20,7 +20,7 @@ import { Smoking } from "../src/simplePages/Smoking";
 import { AttributesPage } from "../src/pages/Attributes";
 import { sendRequest } from "../src/utils";
 import { router } from "expo-router";
-import Toast from "react-native-toast-message";
+import { showToast } from "../src/components/Toast";
 
 export const pageOrder : AccountCreationType[] = [
     "Create Profile","Name","Birthday", "Gender", "Alcohol", "Smoking", "Age Preference", "Gender Preference",
@@ -85,18 +85,12 @@ export function AccountCreation(props : Props) {
 
         const response = await sendRequest<PublicProfile>(URLs.createUser, userInput);
         if (response.message) {
-            Toast.show({
-                type: "error",
-                props: {text: response.message}
-            })
+            showToast("Error", response.message);
         } else if (response.data) {
             receivedData.setProfile(response.data);
             if (!props.noRouter) router.replace("(tabs)")
         } else {
-            return Toast.show({
-                type: "error",
-                props: { text: generalText.unknownError }
-            })
+            showToast("Error", generalText.unknownError);
         }
     }
 

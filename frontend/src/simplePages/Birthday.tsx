@@ -1,12 +1,12 @@
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { MySimplePage } from "../components/SimplePage"
 import { birthdayText } from "../text"
 import { differenceInCalendarYears } from "date-fns"
 import DatePicker from "react-native-date-picker"
-import { StyledText, StyledView } from "../styledElements"
-import classNames from "classnames"
 import { MyButton } from "../components/Button"
 import { getBirthdayStamp } from "../utils"
+import { globals } from "../globals"
+import { showToast } from "../components/Toast"
 
 interface Props {
     submitText: string
@@ -20,16 +20,17 @@ export function Birthday(props : Props) {
     const [birthday, setBirthday] = useState<Date>(
         props.customBirthday ?? new Date(2000,0,1)
     );
-    const [showError, setShowError] = useState<boolean>(false);
 
     const processDate = (date : Date) => {
         setOpen(false);
-        if (differenceInCalendarYears(new Date(), date) < 18) {
-            setShowError(true);
-        } else {
-            setShowError(false);
-        }
         setBirthday(date);
+    }
+
+    const submitDate = () => {
+        if (differenceInCalendarYears(new Date(), birthday) < globals.minAge) {
+            return showToast("Error", birthdayText.tooYoung);
+        }
+        if (props.onSubmit) props.onSubmit(birthday);
     }
 
     return <MySimplePage
@@ -38,7 +39,7 @@ export function Birthday(props : Props) {
         goBackFunc={props.goBack}
         beforeGapContent={
             <>
-                <DatePicker 
+                <DatePicker     
                     modal mode="date" date={birthday} open={open}
                     onConfirm={processDate} onCancel={() => setOpen(false)}
                 />
@@ -47,23 +48,13 @@ export function Birthday(props : Props) {
                     onPressFunction={() => setOpen(true)}
                     invertColor={true}
                 />
-                <StyledText className={classNames(
-                    "m-2 text-base",
-                    showError ? "opacity-100" : "opacity-0"
-                )}>
-                    {birthdayText.inputError}
-                </StyledText>
             </>
         }
         content={
             <>
                 <MyButton
                     text={props.submitText}
-                    onPressFunction={() => {
-                        if (!showError) {
-                            props.onSubmit(birthday);
-                        } 
-                    }}
+                    onPressFunction={submitDate}
                 />
             </>
         }

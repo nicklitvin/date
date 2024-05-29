@@ -13,8 +13,7 @@ import { Link } from "expo-router";
 import { useStore } from "../../src/store/RootStore";
 import { testIDS } from "../../src/testIDs";
 import Loading from "../Loading";
-import Toast from "react-native-toast-message";
-import { MyToastProps } from "../../src/components/Toast";
+import { showToast } from "../../src/components/Toast";
 
 interface Props {
     dontAutoLoad?: boolean
@@ -61,10 +60,7 @@ export function Feed(props : Props) {
             }
             const response = await sendRequest<SwipeFeed>(URLs.getFeed, input);
             if (response.message) {
-                Toast.show({
-                    type: "error",
-                    props: {text: response.message},
-                })
+                showToast("Error",response.message);
             } else if (response.data) {
                 globalState.resetSwipeStatus();
                 receivedData.setSwipeFeed(response.data);

@@ -4,6 +4,7 @@ import { genderText } from "../text";
 import { MyButton } from "../components/Button";
 import { StyledView } from "../styledElements";
 import { Spacing } from "../components/Spacing";
+import { showToast } from "../components/Toast";
 
 interface Props {
     submitText: string
@@ -15,6 +16,11 @@ interface Props {
 
 export function Gender(props : Props) {
     const [gender, setGender] = useState<string|undefined>(props.input);
+
+    const submit = () => {
+        if (gender && props.onSubmit) return props.onSubmit(gender);
+        else return showToast("Error", genderText.error);  
+    }
 
     return <MySimplePage
         title={genderText.pageTitle}
@@ -37,16 +43,10 @@ export function Gender(props : Props) {
             </>
         }
         content={
-            <>
-                <MyButton
-                    text={props.submitText}
-                    onPressFunction={() => {
-                        if (gender) {
-                            props.onSubmit(gender)
-                        }
-                    }}
-                />
-            </>
+            <MyButton
+                text={props.submitText}
+                onPressFunction={submit}
+            />
         }
     />
 }

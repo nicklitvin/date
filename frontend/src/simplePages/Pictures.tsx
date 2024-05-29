@@ -11,6 +11,7 @@ import * as ImagePicker from "expo-image-picker";
 import { Buffer } from "buffer"
 import classNames from "classnames";
 import { ImageWithURI } from "../interfaces";
+import { showToast } from "../components/Toast";
 
 interface Props {
     uploads: ImageWithURI[]
@@ -24,7 +25,6 @@ interface Props {
 export function Pictures(props : Props) {
     const [uploads, setUploads] = useState<ImageWithURI[]>(props.uploads);
     const [switchURI, setSwitchURI] = useState<string|null>(null);
-    const [showError, setShowError] = useState<boolean>(false);
 
     useEffect( () => {
         if (props.returnSwitchURI) props.returnSwitchURI(switchURI);
@@ -45,9 +45,9 @@ export function Pictures(props : Props) {
                 })
 
                 if (result.canceled) return
-                setShowError(result.assets.filter(val => val.size && val.size > globals.maxPictureSize).
-                    length > 0
-                );
+                if (result.assets.filter(val => val.size && val.size > globals.maxPictureSize).length > 0) {
+                    showToast("Error",pictureText.sizeError);
+                }
                 assets = result.assets.
                     filter(val => val.size && val.size <= globals.maxPictureSize && val.mimeType).
                     slice(0,globals.maxUploads - uploads.length).
@@ -66,14 +66,13 @@ export function Pictures(props : Props) {
 
                 const file = result.assets[0];
                 if (file.width * file.height > globals.maxPictureSize || !file.mimeType) {
-                    setShowError(true)
+                    showToast("Error", pictureText.sizeError);
                     return
                 }
-                setShowError(false);
                 assets = [{uri: file.uri, mime: file.mimeType}]
             }
         } catch (err) {
-            setShowError(true);
+            showToast("Error",pictureText.uploadError);
             console.log(err)
             return
         }
@@ -121,6 +120,14 @@ export function Pictures(props : Props) {
         }
     }
 
+    const submit = () => {
+        if (uploads.length > 0 && props.onSubmit) {
+            props.onSubmit(uploads);
+        } else {
+            showToast("Error",pictureText.noPicturesError)
+        }
+    }
+
     return <MySimplePage
         title={pictureText.pageTitle}
         subtitle={pictureText.pageSubtitle}
@@ -160,23 +167,12 @@ export function Pictures(props : Props) {
             </>
         }
         content={
-            <>
-                <StyledText className={classNames(
-                    showError ? "opacity-100" : "opacity-0",
-                    "text-base text-center"
-                )}>
-                    {pictureText.uploadError}
-                </StyledText>
-                <StyledView className="mt-3 w-full items-center">
-                    <MyButton
-                        text={props.submitText}
-                        onPressFunction={() => {
-                            if (uploads.length > 0)
-                                props.onSubmit(uploads);
-                        }}
-                    />
-                </StyledView>
-            </>
+            <StyledView className="mt-3 w-full items-center">
+                <MyButton
+                    text={props.submitText}
+                    onPressFunction={submit}
+                />
+            </StyledView>
         }
     />
 }

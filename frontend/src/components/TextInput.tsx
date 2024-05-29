@@ -3,6 +3,7 @@ import { StyledButton, StyledImage, StyledInput, StyledText, StyledView } from "
 import classNames from "classnames"
 import { Image } from "expo-image"
 import { globals } from "../globals"
+import { showToast } from "./Toast"
 
 interface Props {
     placeholder: string
@@ -17,15 +18,10 @@ interface Props {
 
 export function MyTextInput(props : Props) {
     const [message, setMessage] = useState<string>(props.initialInput ?? "");
-    const [showError, setShowError] = useState<boolean>(false);
-
-    useEffect( () => {
-        if (props.returnError) props.returnError(showError)
-    }, [showError])
 
     const processSubmit = () => {
-        if (message.length == 0) {
-            setShowError(true);
+        if (message.length == 0 && props.errorMessage) {
+            showToast("Error", props.errorMessage);
         } else {
             props.onSubmit(message);
             if (!props.dontClearAfterSubmit) setMessage("");
@@ -41,7 +37,6 @@ export function MyTextInput(props : Props) {
                     className="bg-back border border-front rounded-3xl py-2 pl-6 pr-12"
                     value={message}
                     onChangeText={(text) => {
-                        setShowError(false);
                         setMessage(text);
                     }}
                     placeholder={props.placeholder} 
@@ -60,14 +55,6 @@ export function MyTextInput(props : Props) {
                     />
                 </StyledButton>
             </StyledView>
-            {props.errorMessage ?
-                <StyledText className={classNames(
-                    `text-center text-base`,
-                    showError ? "block" : "opacity-0"
-                )}>
-                    {props.errorMessage}
-                </StyledText> : null
-            }
         </>  
     )
 }

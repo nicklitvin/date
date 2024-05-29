@@ -11,11 +11,11 @@ import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
 import classNames from "classnames";
 import { useStore } from "../src/store/RootStore";
-import { Redirect, router } from "expo-router";
+import { router } from "expo-router";
 import { URLs } from "../src/urls";
-import { createTimeoutSignal, sendRequest } from "../src/utils";
+import { sendRequest } from "../src/utils";
 import { observer } from "mobx-react-lite";
-import Toast from "react-native-toast-message";
+import { showToast } from "../src/components/Toast";
 
 
 export function EditPictures() {
@@ -101,10 +101,7 @@ export function EditPictures() {
             }
             const response = await sendRequest<ViewableImage[]>(URLs.uploadImage, input);
             if (response.message) {
-                Toast.show({
-                    type: "error",
-                    props: {text : editProfileText.cannotUploadImage}
-                })
+                showToast("Error", editProfileText.cannotUploadImage)
             } else if (response.data) {
                 setProfile({
                     ...profile!,
@@ -127,10 +124,7 @@ export function EditPictures() {
             const response = await sendRequest<ViewableImage[]>(URLs.deleteImage, input);
             if (switchURI == uri) setSwitchURI(null);
             if (response.message) {
-                Toast.show({
-                    type: "error",
-                    props: {text : editProfileText.cannotDeleteImage}
-                })
+                showToast("Error", editProfileText.cannotDeleteImage);
             } else if (response.data) {
                 setProfile({
                     ...profile!,

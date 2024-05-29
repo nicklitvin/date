@@ -12,7 +12,7 @@ import { Link, router } from "expo-router";
 import { testIDS } from "../../src/testIDs";
 import { useEffect, useState } from "react";
 import Loading from "../Loading";
-import Toast from "react-native-toast-message";
+import { showToast } from "../../src/components/Toast";
 
 interface Props {
     openLinkFunc?: (input : string) => any
@@ -90,19 +90,13 @@ export function Profile(props : Props) {
             }
             const response = await sendRequest(URLs.cancelSubscription, input);
             if (response.message) {
-                Toast.show({
-                    type: "error",
-                    props: {text: response.message},
-                })
+                showToast("Error", response.message)
             } else {
                 receivedData.setSubscription({
                     ...receivedData.subscription,
                     subscribed: false,
                 })
-                Toast.show({
-                    type: "success",
-                    props: {text: profileText.subscriptionCanceled}
-                })
+                showToast("Success", profileText.subscriptionCanceled)
             }
         } catch (err) {
             console.log(err)

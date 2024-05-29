@@ -4,9 +4,9 @@ import { MySimplePage } from "../components/SimplePage"
 import { StyledScroll, StyledText, StyledView } from "../styledElements"
 import { attributesText } from "../text"
 import { globals } from "../globals"
-import classNames from "classnames"
 import { Attributes } from "../interfaces"
 import { Spacing } from "../components/Spacing"
+import { showToast } from "../components/Toast"
 
 interface Props {
     onSubmit: (input : string[]) => any
@@ -18,7 +18,14 @@ interface Props {
 
 export function AttributesPage(props : Props) {
     const [attributes, setAttributes] = useState<string[]>(props.selectedAttributes ?? []);
-    const [showError, setShowError] = useState<boolean>(false);
+
+    const submit = () => {
+        if (attributes.length > 0 && attributes.length < globals.maxAttributes) {
+            props.onSubmit(attributes)
+        } else {
+            showToast("Error",attributesText.error)
+        }
+    }
 
     return <MySimplePage
         title={attributesText.pageTitle}
@@ -27,21 +34,9 @@ export function AttributesPage(props : Props) {
         goBackFunc={props.goBack}
         content={
             <StyledView className="w-full flex items-center mt-3">
-                <StyledText className={classNames(
-                    "p-3",
-                    showError ? "opacity-1" : "opacity-0" 
-                )}>
-                    {attributesText.error}
-                </StyledText>
                 <MyButton
                     text={props.submitText}
-                    onPressFunction={ () => {
-                        if (attributes.length > 0 && attributes.length < globals.maxAttributes) {
-                            props.onSubmit(attributes)
-                        } else {
-                            setShowError(true)
-                        }
-                    }}
+                    onPressFunction={submit}
                 />
             </StyledView>
         }
@@ -54,10 +49,6 @@ export function AttributesPage(props : Props) {
                             key={`type-${entry[0]}`}
                         >
                             <Spacing size="md"/>
-                            <StyledText className="text-xl w-full text-center font-bold">
-                                {entry[0]}
-                            </StyledText>
-                            <Spacing size="md"/>
                             <StyledView className="flex flex-row flex-wrap justify-center">
                                 {entry[1].map( (value) =>
                                     <StyledView 
@@ -68,7 +59,6 @@ export function AttributesPage(props : Props) {
                                             smallButton={true}
                                             invertColor={attributes.includes(value)}
                                             onPressFunction={ () => {
-                                                setShowError(false);
                                                 const foundIndex = attributes.findIndex( 
                                                     selected => selected == value
                                                 )

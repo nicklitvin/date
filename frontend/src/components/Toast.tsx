@@ -1,8 +1,9 @@
+import Toast from "react-native-toast-message";
 import { globals } from "../globals";
 import { StyledImage, StyledText, StyledView } from "../styledElements";
 
 type ToastType = "Success" | "Error";
-export interface MyToastProps {
+interface MyToastProps {
     text: string
 }
 
@@ -43,5 +44,12 @@ const makeToast = (props : any, toastType : ToastType) => {
 export const toastConfig = {
     success: (props : any) => makeToast(props,"Success"),
     error: (props : any) => makeToast(props,"Error"),
+}
 
+export function showToast(type : ToastType, message: string, onPress?: () => any) {
+    Toast.show({
+        type: type == "Error" ? "error" : "success",
+        props: {text : message},
+        onPress: onPress
+    })
 }

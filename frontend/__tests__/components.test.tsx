@@ -48,30 +48,6 @@ describe("components", () => {
         expect(onSubmit).toHaveBeenCalledWith(typedMessage);
     })
 
-    it("should show error when bad submit", async () => {
-        const placeholder = "placeholder";
-        const errorMessage = "error";
-        const onSubmit = jest.fn( (input : string) => input);
-        const returnError = jest.fn( (input : boolean) => input);
-
-        render(
-            <MyTextInput 
-                placeholder={placeholder}
-                errorMessage={errorMessage}
-                onSubmit={onSubmit}
-                returnError={returnError}
-            />
-        );
-        
-        expect(returnError).toHaveLastReturnedWith(false);
-
-        await act( () => {
-            fireEvent(screen.getByPlaceholderText(placeholder), "submitEditing");
-        })
-
-        expect(returnError).toHaveLastReturnedWith(true);
-    })
-
     it("should show all chatpreviewbox components", async () => {
         const otherProfile = makePublicProfile();
         const sentMessage = makeSentMessage();

@@ -1,16 +1,15 @@
 import { observer } from "mobx-react-lite";
-import { StyledButton, StyledImage, StyledScroll, StyledText, StyledView } from "../styledElements";
+import { StyledScroll, StyledText, StyledView } from "../styledElements";
 import { PageHeader } from "../components/PageHeader";
-import { profileText, profileViewText } from "../text";
+import { profileViewText } from "../text";
 import { PublicProfile, UserReportWithReportedID, SwipeInput, WithKey, Opinion } from "../interfaces";
-import axios from "axios";
 import { URLs } from "../urls";
 import { PictureSeries } from "../components/PictureSeries";
 import { Spacing } from "../components/Spacing";
 import { MyButton } from "../components/Button";
-import { createTimeoutSignal, sendRequest } from "../utils";
+import { sendRequest } from "../utils";
 import { Frequency } from "../components/Frequency";
-import Toast from "react-native-toast-message";
+import { showToast } from "../components/Toast";
 
 interface Props {
     isInSwipeFeed: boolean
@@ -37,10 +36,7 @@ export function ProfileViewEmbed(props : Props) {
             if (!props.ignoreRequest) {
                 const response = await sendRequest<{}>(URLs.makeSwipe, input);
                 if (response.message) {
-                    return Toast.show({
-                        type: "error",
-                        props: {text: response.message}
-                    })
+                    showToast("Error",response.message)
                 }
             }
 
@@ -60,10 +56,7 @@ export function ProfileViewEmbed(props : Props) {
             if (!props.ignoreRequest) {
                 const response = await sendRequest<{}>(URLs.reportUser, myReport);
                 if (response.message) {
-                    Toast.show({
-                        type: "error",
-                        props: {text: response.message}
-                    })
+                    showToast("Error", response.message)
                     return
                 } 
             }

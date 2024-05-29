@@ -1,7 +1,7 @@
 TODO
-fix toast notification to be like react hot toast
-    add toast to account creation where error
-    
+add success toast on delete accunt and unmacth/report
+disconnect user if another logins in (one at a time policy)
+add toast to account creation where error
 can only connect one socket per session
 verify if user receives socket message, if not, build up bulk send
 remove match thru websocket?

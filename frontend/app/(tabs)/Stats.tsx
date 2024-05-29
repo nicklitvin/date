@@ -13,8 +13,8 @@ import { testIDS } from "../../src/testIDs";
 import { useEffect, useState } from "react";
 import { MyDonut } from "../../src/components/Donut";
 import { Weekly } from "../../src/components/Weekly";
-import Toast from "react-native-toast-message";
 import Loading from "../Loading";
+import { showToast } from "../../src/components/Toast";
 
 interface Props {
     noAutoLoad?: boolean
@@ -61,10 +61,7 @@ export function Stats(props : Props) {
             }
             const response = await sendRequest<string>(URLs.getCheckoutPage, input);
             if (response.message) {
-                Toast.show({
-                    type: "error",
-                    props: {text: response.message},
-                })
+                showToast("Error",response.message)
             } else if (response.data) {
                 if (props.openLinkFunc) props.openLinkFunc(response.data) 
                 else await Linking.openURL(response.data);

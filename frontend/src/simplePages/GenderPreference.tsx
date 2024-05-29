@@ -4,6 +4,7 @@ import { genderPreferenceText } from "../text"
 import { StyledView } from "../styledElements"
 import classNames from "classnames"
 import { Spacing } from "../components/Spacing"
+import { showToast } from "../components/Toast"
 
 interface Props {
     genders: string[]
@@ -60,6 +61,14 @@ export function GenderPreference(props : Props) {
         </StyledView>
     )
 
+    const submit = () => {
+        if (genderPreference.length > 0 && props.onSubmit) {
+            props.onSubmit(genderPreference)
+        } else {
+            showToast("Error",genderPreferenceText.error)
+        }
+    }
+
     if (props.embed) {
         return makeContent();
     }
@@ -77,11 +86,7 @@ export function GenderPreference(props : Props) {
             <>
                 <MyButton
                     text={props.submitText ?? ""}
-                    onPressFunction={() => {
-                        if (genderPreference.length > 0 && props.onSubmit) {
-                            props.onSubmit(genderPreference)
-                        }
-                    }}
+                    onPressFunction={submit}
                 />
             </>
         }

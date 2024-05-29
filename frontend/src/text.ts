@@ -55,6 +55,7 @@ export const myNameText = {
 export const genderText = {
     pageTitle: "Gender",
     pageSubtitle: "What is your gender?",
+    error: "Please select a gender",
 }
 
 export const createProfileText = {
@@ -65,7 +66,7 @@ export const createProfileText = {
 export const birthdayText = {
     pageTitle: "Age",
     pageSubtitle: "When is your birthday?",
-    inputError: "Invalid Birthday",
+    tooYoung: "You must be 18+",
 }
 
 export const generalText = {
@@ -79,6 +80,7 @@ export const generalText = {
 export const genderPreferenceText = {
     pageTitle: "Gender Preference",
     pageSubtitle: "Who would you like to see?",
+    error: "Select at least one preference",
 }
 
 export const attributesText = {
@@ -104,7 +106,9 @@ export const pictureText = {
     pageSubtitle: "Upload pictures that show how awesome you are",
     uploadImageButton: "Add Pictures",
     uploadDocumentButton: "Add From Files",
-    uploadError: "Images must be smaller than 5MB and JPG/PNG"
+    sizeError: "Images must be smaller than 5MB and JPG/PNG",
+    noPicturesError: "Upload at least one picture",
+    uploadError: "Upload Error",
 }
 
 export const eduEmailText = {
@@ -185,16 +189,19 @@ export const settingsText = {
     deleteAccount: "Delete Account",
     modalTitle: "Are you sure you want to delete your account?",
     modalDelete: "Confirm Delete",
+    notificationsDisabledError: "Click to enable notifications in settings"
 }
 
 export const alcoholText = {
     pageTitle: "Alcohol",
-    pageSubtitle: "How often do you drink?"
+    pageSubtitle: "How often do you drink?",
+    error: "Please select frequency"
 }
 
 export const smokingText = {
     pageTitle: "Smoking",
-    pageSubtitle: "How often do you smoke?"
+    pageSubtitle: "How often do you smoke?",
+    error: "Please select frequency"
 }
 
 export const signInText = {

@@ -18,7 +18,7 @@ import * as Notifications from "expo-notifications";
 import Constants from "expo-constants";
 import { useNavigation } from "expo-router";
 import Loading from "./Loading";
-import Toast from "react-native-toast-message";
+import { showToast } from "../src/components/Toast";
 
 interface Props {
     disableToggle?: boolean
@@ -53,10 +53,7 @@ export function Settings(props : Props) {
         if (Device.isDevice) {
             const { status: existingStatus } = await Notifications.getPermissionsAsync();
             if (existingStatus !== 'granted') {
-                return Toast.show({
-                    props: {text: "Notifiactions disabled. Click me to view settings."},
-                    onPress: () => Linking.openSettings()
-                })
+                return showToast("Error", settingsText.notificationsDisabledError, Linking.openSettings)
             }
             changeToggleValue(title,true);
             const token = await Notifications.getExpoPushTokenAsync({
@@ -69,10 +66,7 @@ export function Settings(props : Props) {
             }
             const response = await sendRequest<void>(URLs.updatePushToken, input);
             if (response.message) {
-                Toast.show({
-                    props: {text: response.message},
-                    type: "error"
-                })
+                showToast("Error", response.message)
                 changeToggleValue(title,false);
             } else {
                 globalState.setExpoPushToken(token.data);
@@ -88,10 +82,7 @@ export function Settings(props : Props) {
             }
             const response = await sendRequest<SettingData[]>(URLs.getSettings, input);
             if (response.message) {
-                Toast.show({
-                    type: "error",
-                    props: {text: response.message}
-                })
+                showToast("Error", response.message)
             } else if (response.data) {
                 receivedData.setSettings(response.data);
             }
@@ -122,10 +113,7 @@ export function Settings(props : Props) {
         changeToggleValue(title, value);
         const response = await sendRequest<void>(URLs.editUser, input);
         if (response.message) {
-            Toast.show({
-                type: "error",
-                props: {text: response.message}
-            })
+            showToast("Error", response.message)
             changeToggleValue(title,!value)
         }
     }
@@ -151,10 +139,7 @@ export function Settings(props : Props) {
             }
             const response = await sendRequest(URLs.deleteAccount, input);
             if (response.message) {
-                Toast.show({
-                    type: "error",
-                    props: {text: response.message},
-                })
+                showToast("Error", response.message)
             } else {
                 signOut();
             }

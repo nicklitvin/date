@@ -100,26 +100,4 @@ describe("settings", () => {
 
         expect(store.receivedData.profile).toEqual(null);
     })
-
-    // it("should edit user", async () => {
-    //     const { store, mock } = await load();
-    //     let sentEdit = false;
-
-    //     mock.onPost(URLs.server + URLs.editUser).reply( config => {
-    //         sentEdit = true;
-    //         const payload = JSON.parse(config.data) as EditUserInput;
-    //         expect(payload.setting).toEqual(settingData[0].title);
-    //         expect(payload.value).toEqual(!settingData[0].value);
-    //         return [200]
-    //     })
-
-    //     const testID = `toggle-${settingData[0].title}`;
-    //     expect(screen.queryByTestId(testID)).not.toEqual(null);
-    //     await act( () => {
-    //         // fireEvent(screen.getByTestId(testID, "value change", true))
-    //         // fireEvent.press(screen.getByTestId(`toggle-${settingData[0].title}`));
-    //     })
-
-    //     expect(sentEdit).toEqual(true);
-    // })
 })
