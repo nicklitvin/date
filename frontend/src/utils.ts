@@ -82,12 +82,12 @@ export async function sendRequest<T>(subURL : string, data : any) : Promise<APIO
             signal: createTimeoutSignal(),
         })
         const responseData = response.data as APIOutput<T>;
+        if (!responseData) throw (Error("Not an object"));
         if (print) console.log("response from", subURL, responseData);
         return responseData
     } catch (err) {
         if (axios.isAxiosError(err)) {
             if (print) console.log("axios error", err.response?.data?.message, err.response?.status);
-            
 
             return err.response?.data.message ? 
                 {message : err.response?.data.message} :

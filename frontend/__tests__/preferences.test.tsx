@@ -84,7 +84,7 @@ describe("preferences", () => {
                 expect(payload.value[1]).toEqual(selectedGender)
             } 
             sent = true;
-            return [200]
+            return [200, {}]
         })
 
         await act( () => {
@@ -119,7 +119,7 @@ describe("preferences", () => {
         const mock = new MockAdapter(axios);
         mock.onPost(URLs.server + URLs.editUser).reply(config => {
             sent = true;
-            return [200]
+            return [200, {}]
         })
 
         await act ( () => {

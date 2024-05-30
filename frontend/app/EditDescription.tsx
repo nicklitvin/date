@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { MySimplePage } from "../src/components/SimplePage";
 import { MyTextInput } from "../src/components/TextInput";
-import { descriptionText } from "../src/text";
+import { descriptionText, editProfileText } from "../src/text";
 import { useStore } from "../src/store/RootStore";
 import { Redirect, router } from "expo-router";
 import { EditUserInput, PublicProfile, WithKey } from "../src/interfaces";
@@ -9,6 +9,7 @@ import { globals } from "../src/globals";
 import { URLs } from "../src/urls";
 import { sendRequest } from "../src/utils";
 import { useEffect, useState } from "react";
+import { showToast } from "../src/components/Toast";
 
 export function EditDescription() {
     const { receivedData } = useStore();
@@ -30,13 +31,18 @@ export function EditDescription() {
                 setting: globals.settingDescription,
                 value: description
             }
-            await sendRequest(URLs.editUser, input);
-            setProfile({
-                ...profile!,
-                description: description
-            })
-            router.back();
+            const response = await sendRequest<{}>(URLs.editUser, input);
+            if (response.message) {
+                showToast("Error", response.message);
+            } else {
+                setProfile({
+                    ...profile!,
+                    description: description
+                })
+                router.back();
+            }
         } catch (err) {
+            showToast("Error", editProfileText.cannotChangeDescription)
             console.log(err)
         }
     }

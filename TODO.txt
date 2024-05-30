@@ -10,6 +10,9 @@ see self/others/all email accounts
 request gps location
 gps preference
 links in chat
+make send icon in chat greyed out when no message to send and disabled
+editalocohol should say saved if the same option as before
+spped up profile refresh
 
 Optional TODO
 announcement/errorlog implement

@@ -17,7 +17,7 @@ import Loading from "./Loading";
 import { Announcement, APIOutput, JustUserID, LoginOutput, PublicProfile, WithKey } from "../src/interfaces";
 import { SocketManager } from "../src/components/SocketManager";
 import { Announcements } from "./Announcements";
-import { sampleChatPreviews, sampleClientIDs, sampleNewMatches, sampleProfile, sampleSavedChat, sampleSettings, sampleStats, sampleSubscribed, sampleSwipeFeed } from "../src/sample";
+import { sampleAttributes, sampleChatPreviews, sampleClientIDs, sampleNewMatches, samplePreferences, sampleProfile, sampleSavedChat, sampleSettings, sampleStats, sampleSubscribed, sampleSwipeFeed } from "../src/sample";
 
 export function Index() {
     const [loading, setLoading] = useState<boolean>(true);
@@ -37,6 +37,8 @@ export function Index() {
         // receivedData.setAnnouncements(sampleAnnouncements);
         receivedData.setSettings(sampleSettings);
         receivedData.setClientIDs(sampleClientIDs);
+        receivedData.setAttributes(sampleAttributes);
+        receivedData.setPreferences(samplePreferences);
     }
 
     const retrieveOne = async (request : Function, set : Function) => {
@@ -54,7 +56,7 @@ export function Index() {
         }
     }
 
-    const tryConnectingSocketManager = async (input : WithKey<{}>) => {
+    const tryConnectingSocketManager = async (input : WithKey<void>) => {
         try {
             const response = await sendRequest<LoginOutput>(URLs.autoLogin, input);
             if (response.data?.socketToken) {
@@ -79,9 +81,9 @@ export function Index() {
                 () => sendRequest(URLs.getAttributes, null),
                 (data: any) => receivedData.setAttributes(data)
             ),
-            key ? tryConnectingSocketManager({ key: key } as WithKey<{}>) : null,
+            key ? tryConnectingSocketManager({ key: key } as WithKey<void>) : null,
             key ? retrieveOne(
-                () => sendRequest(URLs.getMyProfile, {key: key} as WithKey<{}>),
+                () => sendRequest(URLs.getMyProfile, {key: key} as WithKey<void>),
                 (data : any) => receivedData.setProfile(data)
             ) : null,
         ]);

@@ -46,7 +46,7 @@ export function Pictures(props : Props) {
 
                 if (result.canceled) return
                 if (result.assets.filter(val => val.size && val.size > globals.maxPictureSize).length > 0) {
-                    showToast("Error",pictureText.sizeError);
+                    return showToast("Error",pictureText.sizeError);
                 }
                 assets = result.assets.
                     filter(val => val.size && val.size <= globals.maxPictureSize && val.mimeType).
@@ -66,8 +66,7 @@ export function Pictures(props : Props) {
 
                 const file = result.assets[0];
                 if (file.width * file.height > globals.maxPictureSize || !file.mimeType) {
-                    showToast("Error", pictureText.sizeError);
-                    return
+                    return showToast("Error", pictureText.sizeError);
                 }
                 assets = [{uri: file.uri, mime: file.mimeType}]
             }
@@ -91,7 +90,9 @@ export function Pictures(props : Props) {
                     uri: asset.uri
                 })
             } catch (err) {
+                showToast("Error",pictureText.uploadError);
                 console.log(err);
+                return 
             }
         }
 

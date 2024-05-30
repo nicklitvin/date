@@ -77,7 +77,7 @@ describe("settings", () => {
 
         mock.onPost(URLs.server + URLs.deleteAccount).reply(config => {
             sentDelete = true;
-            return [200]
+            return [200, {}]
         })
 
         await act( () => {

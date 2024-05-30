@@ -73,7 +73,7 @@ export class SocketManager {
     }
 
     async reconnect() {
-        const input : WithKey<{}> = {
+        const input : WithKey<void> = {
             key: this.loginKey
         }
         const response = await sendRequest<LoginOutput>(URLs.autoLogin, input);

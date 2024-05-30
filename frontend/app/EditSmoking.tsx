@@ -11,6 +11,7 @@ import { Redirect, router } from "expo-router";
 import { sendRequest } from "../src/utils";
 import { URLs } from "../src/urls";
 import { observer } from "mobx-react-lite";
+import { showToast } from "../src/components/Toast";
 
 export function EditSmoking() {   
     const { receivedData } = useStore();
@@ -34,12 +35,16 @@ export function EditSmoking() {
                 setting: globals.settingSmoking,   
                 value: frequency
             }
-            await sendRequest(URLs.editUser, input);
-            setProfile({
-                ...profile!,
-                smoking: frequency
-            });
-            router.back();
+            const response = await sendRequest<{}>(URLs.editUser, input);
+            if (response.message) {
+                showToast("Error",response.message);
+            } else {
+                setProfile({
+                    ...profile!,
+                    smoking: frequency
+                });
+                router.back();
+            }
         } catch (err) {
             console.log(err);
         }

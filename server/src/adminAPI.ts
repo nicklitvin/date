@@ -62,7 +62,7 @@ async function main() {
     
     if (argv.clear) {
         try {
-            const payload : APIRequest<{}> = {
+            const payload : APIRequest<void> = {
                 key: process.env.ADMIN_API_KEY!
             }
             const response = await axios.post(baseURL + URLs.clearInteractions, payload);
@@ -156,7 +156,7 @@ async function main() {
 
     if (argv.delete) {
         try {   
-            const payload : APIRequest<{}> = {
+            const payload : APIRequest<void> = {
                 key: process.env.ADMIN_API_KEY!
             }
             await axios.post(baseURL + URLs.deleteEverything, payload);

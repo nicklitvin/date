@@ -45,7 +45,7 @@ describe("verification", () => {
             const payload = JSON.parse(config.data) as NewVerificationInput;
             expect(payload.schoolEmail).toEqual(eduEmail);
             sent = true;
-            return [200]
+            return [200, {}]
         })
 
         const input = screen.getByPlaceholderText(eduEmailText.inputPlaceholder);
@@ -86,7 +86,7 @@ describe("verification", () => {
             expect(payload.code).toEqual(Number(code));
             expect(payload.schoolEmail).toEqual(eduEmail);
             sent = true;
-            return [200]            
+            return [200, {}]            
         })
 
         const inputCode = screen.getByPlaceholderText(verifyCodeText.inputPlaceholder);
@@ -103,7 +103,7 @@ describe("verification", () => {
     it("should resend code", async () => {
         const { mock, getSeconds} = await load(1,0,eduEmail);
 
-        mock.onPost(URLs.server + URLs.newCode).reply( config => [200] )
+        mock.onPost(URLs.server + URLs.newCode).reply( config => [200, {}] )
 
         await act( () => {
             fireEvent(screen.getByText(verifyCodeText.resendButton), "press");
@@ -118,7 +118,7 @@ describe("verification", () => {
 
         mock.onPost(URLs.server + URLs.newCode).reply( config => {
             sent = true;
-            return [200]
+            return [200, {}]
         })
 
         expect(screen.queryByText(verifyCodeText.resendButton)).toEqual(null);

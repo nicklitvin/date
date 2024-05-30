@@ -109,6 +109,7 @@ export const pictureText = {
     sizeError: "Images must be smaller than 5MB and JPG/PNG",
     noPicturesError: "Upload at least one picture",
     uploadError: "Upload Error",
+    switchError: "Error with switch"
 }
 
 export const eduEmailText = {
@@ -133,7 +134,6 @@ export const editProfileText = {
     headerDescription: "Description",
     headerAttributes: "Attributes",
     descriptionPlaceholder: "Type your description here...",
-    descriptionError: "Invalid Description",
     attributeButton: "Change Attributes",
 
     editImages: "Edit Images",
@@ -142,6 +142,8 @@ export const editProfileText = {
 
     cannotUploadImage: "Cannot upload picture",
     cannotDeleteImage: "Cannot delete picture",
+    cannotSwitchImages: "Cannot switch pictures",
+    cannotChangeDescription: "Cannot update description",
 }
 
 export const preferencesText = {

@@ -80,7 +80,7 @@ export function Verification(props : Props) {
         if (seconds > 0) return
 
         try {
-            const input : WithKey<{}> = {
+            const input : WithKey<void> = {
                 key: receivedData.loginKey,
             }
             await sendRequest(URLs.newCode, input);

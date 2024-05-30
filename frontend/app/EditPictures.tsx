@@ -1,15 +1,14 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { MySimplePage } from "../src/components/SimplePage"
 import { DeleteImageInput, EditUserInput, ImageWithURI, PublicProfile, UploadImageInput, ViewableImage, WithKey } from "../src/interfaces";
 import { editProfileText, pictureText } from "../src/text"
-import { StyledText, StyledView } from "../src/styledElements";
+import { StyledView } from "../src/styledElements";
 import { globals } from "../src/globals";
 import * as FileSystem from "expo-file-system";
 import { MyButton } from "../src/components/Button";
 import { Picture } from "../src/components/Picture";
 import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
-import classNames from "classnames";
 import { useStore } from "../src/store/RootStore";
 import { router } from "expo-router";
 import { URLs } from "../src/urls";
@@ -20,17 +19,9 @@ import { showToast } from "../src/components/Toast";
 
 export function EditPictures() {
     const { receivedData } = useStore();
-    const [profile, setProfile] = useState<PublicProfile|null>(receivedData.profile);
-    if (!profile) router.replace("Error");
-
     const [switchURI, setSwitchURI] = useState<string|null>(null);
-    const [showError, setShowError] = useState<boolean>(false);
 
-    useEffect( () => {
-        if (profile) {
-            receivedData.setProfile(profile);
-        }
-    }, [profile])
+    if (!receivedData.profile) router.replace("Error");
 
     const uploadImage = async (fromFileSys : boolean) => {
         let asset : {uri: string, mime: string};
@@ -43,9 +34,9 @@ export function EditPictures() {
                 })
 
                 if (result.canceled) return
-                setShowError(result.assets.filter(val => val.size && val.size > globals.maxPictureSize).
-                    length > 0
-                );
+                if (result.assets.filter(val => val.size && val.size > globals.maxPictureSize).length > 0) {
+                    return showToast("Error",pictureText.sizeError);
+                }
                 asset = {
                     mime: result.assets[0].mimeType!,
                     uri: result.assets[0].uri
@@ -60,15 +51,13 @@ export function EditPictures() {
 
                 const file = result.assets[0];
                 if (file.width * file.height > globals.maxPictureSize || !file.mimeType) {
-                    setShowError(true)
-                    return
+                    return showToast("Error", pictureText.sizeError);
                 }
-                setShowError(false);
                 asset = {uri: file.uri, mime: file.mimeType}
             }
         } catch (err) {
-            setShowError(true);
             console.log(err)
+            showToast("Error",pictureText.uploadError);
             return
         }
 
@@ -85,8 +74,8 @@ export function EditPictures() {
                 uri: asset.uri
             }
         } catch (err) {
-            setShowError(true);
             console.log(err)
+            showToast("Error",pictureText.uploadError);
             return
         }
 
@@ -101,14 +90,15 @@ export function EditPictures() {
             }
             const response = await sendRequest<ViewableImage[]>(URLs.uploadImage, input);
             if (response.message) {
-                showToast("Error", editProfileText.cannotUploadImage)
+                showToast("Error", response.message)
             } else if (response.data) {
-                setProfile({
-                    ...profile!,
+                receivedData.setProfile({
+                    ...receivedData.profile!,
                     images: response.data
                 });
             }
         } catch (err) {
+            showToast("Error",pictureText.uploadError);
             console.log(err);
             return
         }
@@ -122,16 +112,17 @@ export function EditPictures() {
                 imageID: uri
             };
             const response = await sendRequest<ViewableImage[]>(URLs.deleteImage, input);
-            if (switchURI == uri) setSwitchURI(null);
             if (response.message) {
-                showToast("Error", editProfileText.cannotDeleteImage);
+                showToast("Error", response.message);
             } else if (response.data) {
-                setProfile({
-                    ...profile!,
+                if (switchURI == uri) setSwitchURI(null);
+                receivedData.setProfile({
+                    ...receivedData.profile!,
                     images: response.data
                 });
             }
         } catch (err) {
+            showToast("Error", editProfileText.cannotDeleteImage)
             console.log(err);
         }
     }
@@ -140,7 +131,7 @@ export function EditPictures() {
         if (switchURI == uri) {
             setSwitchURI(null);
         } else if (switchURI) {
-            const copy = [...profile!.images];
+            const copy = [...receivedData.profile!.images];
             const index1 = copy.findIndex( val => val.id == switchURI);
             const index2 = copy.findIndex( val => val.id == uri);
             const saved = copy[index1];
@@ -153,13 +144,18 @@ export function EditPictures() {
                     setting: globals.settingImages,
                     value: copy.map(val => val.id)
                 }
-                await sendRequest(URLs.editUser, input);
-                setSwitchURI(null);
-                setProfile({
-                    ...profile!,
-                    images: copy
-                });
+                const response = await sendRequest<{}>(URLs.editUser, input);
+                if (response.message) {
+                    showToast("Error", response.message)
+                } else {
+                    setSwitchURI(null);
+                    receivedData.setProfile({
+                        ...receivedData.profile!,
+                        images: copy
+                    });
+                }
             } catch (err) {
+                showToast("Error", pictureText.switchError);
                 console.log(err);
             }
         } else {
@@ -167,7 +163,7 @@ export function EditPictures() {
         }
     }
 
-    if (!profile) return <></>
+    if (!receivedData.profile) return <></>
     return <MySimplePage
         title={pictureText.pageTitle}
         subtitle={pictureText.pageSubtitle}
@@ -176,13 +172,13 @@ export function EditPictures() {
             <>
                 <StyledView className="flex flex-row flex-wrap justify-center">
                     {Array.from({length : globals.maxUploads}).map( (_,index) => 
-                        index < profile.images.length ?
-                        <StyledView key={`picture-${profile.images[index].id}`} className="m-2">
+                        index < receivedData.profile!.images.length ?
+                        <StyledView key={`picture-${receivedData.profile!.images[index].id}`} className="m-2">
                             <Picture
-                                source={profile.images[index].url}
-                                switching={profile.images[index].id == switchURI}
-                                onPress={() => performSwitch(profile.images[index].id)}
-                                onRemove={() => removeImage(profile.images[index].id)}
+                                source={receivedData.profile!.images[index].url}
+                                switching={receivedData.profile!.images[index].id == switchURI}
+                                onPress={() => performSwitch(receivedData.profile!.images[index].id)}
+                                onRemove={() => removeImage(receivedData.profile!.images[index].id)}
                             />
                         </StyledView> :
                         <StyledView
@@ -203,16 +199,6 @@ export function EditPictures() {
                         text={pictureText.uploadDocumentButton}
                     />
                 </StyledView>
-            </>
-        }
-        content={
-            <>
-                <StyledText className={classNames(
-                    showError ? "opacity-100" : "opacity-0",
-                    "text-base text-center"
-                )}>
-                    {pictureText.uploadError}
-                </StyledText>
             </>
         }
     />

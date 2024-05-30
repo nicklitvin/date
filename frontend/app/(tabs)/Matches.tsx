@@ -40,8 +40,8 @@ export function Matches(props : Props) {
     }, [firstLoad])
 
     const load = async (refresh = false) => {
-        if (refresh || !receivedData.newMatches) await getNewMatches();
-        if (refresh || !receivedData.chatPreviews) await getChatPreviews();
+        if (refresh || !receivedData.newMatches) getNewMatches();
+        if (refresh || !receivedData.chatPreviews) getChatPreviews();
     }
 
     const getNewMatches = async (loadMoreFromTime? : Date) => {

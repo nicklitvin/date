@@ -36,7 +36,7 @@ export function ProfileViewEmbed(props : Props) {
             if (!props.ignoreRequest) {
                 const response = await sendRequest<{}>(URLs.makeSwipe, input);
                 if (response.message) {
-                    showToast("Error",response.message)
+                    return showToast("Error",response.message)
                 }
             }
 
@@ -56,8 +56,7 @@ export function ProfileViewEmbed(props : Props) {
             if (!props.ignoreRequest) {
                 const response = await sendRequest<{}>(URLs.reportUser, myReport);
                 if (response.message) {
-                    showToast("Error", response.message)
-                    return
+                    return showToast("Error", response.message)
                 } 
             }
             if (props.afterSwipe) props.afterSwipe()

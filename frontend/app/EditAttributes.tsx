@@ -11,11 +11,11 @@ import { EditUserInput, PublicProfile, WithKey } from "../src/interfaces"
 import { URLs } from "../src/urls"
 import { sendRequest } from "../src/utils"
 import { router } from "expo-router"
+import { showToast } from "../src/components/Toast"
 
 export function EditAttributes() {
     const { receivedData } = useStore();
     const [profile, setProfile] = useState<PublicProfile|null>(receivedData.profile);
-    const [showError, setShowError] = useState<boolean>(false);
     const [attributes, setAttributes] = useState<string[]>(profile?.attributes ?? []);
 
     useEffect( () => {
@@ -28,8 +28,7 @@ export function EditAttributes() {
 
     const submitChanges = async () => {
         if (attributes.length == 0 || attributes.length > globals.maxAttributes) {
-            setShowError(true)
-            return
+            return showToast("Error", attributesText.error);
         } 
 
         try {
@@ -39,12 +38,16 @@ export function EditAttributes() {
                 setting: globals.settingAttributes,
                 value: attributes
             }
-            await sendRequest(URLs.editUser, input);
-            setProfile({
-                ...receivedData.profile!,
-                attributes: attributes
-            })
-            router.back();
+            const response = await sendRequest<{}>(URLs.editUser, input);
+            if (response.message) {
+                showToast("Error", response.message);
+            } else {
+                setProfile({
+                    ...receivedData.profile!,
+                    attributes: attributes
+                })
+                router.back();
+            }
         } catch (err) { 
             console.log(err);
         }
@@ -56,12 +59,6 @@ export function EditAttributes() {
         pageType="Attributes"
         content={
             <StyledView className="w-full flex items-center mt-3">
-                <StyledText className={classNames(
-                    "p-3",
-                    showError ? "opacity-1" : "opacity-0" 
-                )}>
-                    {attributesText.error}
-                </StyledText>
                 <MyButton
                     text={generalText.saveChanges}
                     onPressFunction={submitChanges}
@@ -89,7 +86,6 @@ export function EditAttributes() {
                                             smallButton={true}
                                             invertColor={attributes.includes(value)}
                                             onPressFunction={ () => {
-                                                setShowError(false);
                                                 const foundIndex = attributes.findIndex( 
                                                     selected => selected == value
                                                 )

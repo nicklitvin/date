@@ -41,19 +41,32 @@ export function Profile(props : Props) {
                 key: receivedData.loginKey
             }
 
+            let message;
+
             if (refresh || !savedProfile) {
                 const profileResponse = await sendRequest<PublicProfile>(URLs.getMyProfile, input);
-                if (profileResponse.data) receivedData.setProfile(profileResponse.data);
+                if (profileResponse.message) {
+                    message = profileResponse.message;
+                } else if (profileResponse.data) {
+                    receivedData.setProfile(profileResponse.data);
+                }
             }
             
 
             if (refresh || !savedSubscription) {
                 const subscriptionResponse = await sendRequest<SubscriptionData>(URLs.getSubscription, input);
-                if (subscriptionResponse.data) receivedData.setSubscription({
-                    ...subscriptionResponse.data,
-                    endDate: new Date(subscriptionResponse.data.endDate!)
+                if (subscriptionResponse.message) {
+                    message = subscriptionResponse.message;
+                } else if (subscriptionResponse.data) {
+                    receivedData.setSubscription({
+                        ...subscriptionResponse.data,
+                        endDate: new Date(subscriptionResponse.data.endDate!)
+                    })
+                };
+            }
 
-                });
+            if (message) {
+                showToast("Error", message);
             }
         } catch (err) {
             console.log(err);

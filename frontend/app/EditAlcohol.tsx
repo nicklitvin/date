@@ -12,6 +12,7 @@ import { EditUserInput, PublicProfile, WithKey } from "../src/interfaces";
 import { sendRequest } from "../src/utils";
 import { URLs } from "../src/urls";
 import Loading from "./Loading";
+import { showToast } from "../src/components/Toast";
 
 export function Alcohol() {    
     const { receivedData } = useStore();
@@ -39,12 +40,16 @@ export function Alcohol() {
                 setting: globals.settingAlcohol,   
                 value: frequency
             }
-            await sendRequest(URLs.editUser, input);
-            setProfile({
-                ...profile!,
-                alcohol: frequency
-            })
-            router.back();
+            const response = await sendRequest<{}>(URLs.editUser, input);
+            if (response.message) {
+                return showToast("Error", response.message);
+            } else {
+                setProfile({
+                    ...profile!,
+                    alcohol: frequency
+                })
+                router.back();
+            }
         } catch (err) {
             console.log(err);
         }

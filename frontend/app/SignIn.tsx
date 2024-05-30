@@ -85,7 +85,7 @@ export function SignIn() {
 
             if (!loginOutput.newAccount) {
                 try {
-                    const input : WithKey<{}> = {
+                    const input : WithKey<void> = {
                         key: loginOutput.key
                     }
                     const response = await sendRequest<PublicProfile>(URLs.getMyProfile,input);

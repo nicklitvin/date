@@ -44,7 +44,7 @@ export function Stats(props : Props) {
             }
             const response = await sendRequest<UserSwipeStats>(URLs.getStats, input);
             if (response.message) {
-                // nothing
+                showToast("Error", response.message);
             } else if (response.data) {
                 receivedData.setStats(response.data);
             }

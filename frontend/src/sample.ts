@@ -1,10 +1,10 @@
 import { addHours } from "date-fns";
-import { Announcement, ChatPreview, ClientIDs, Message, NewMatchData, PublicProfile, SettingData, SubscriptionData, SwipeFeed, UserSwipeStats } from "./interfaces";
+import { Announcement, ChatPreview, ClientIDs, Message, NewMatchData, Preferences, PublicProfile, SettingData, SubscriptionData, SwipeFeed, UserSwipeStats } from "./interfaces";
 
 export const sampleProfile : PublicProfile = {
     name: "Michael",
     age: 21,
-    attributes: ["soccer", "basketball"],
+    attributes: ["Soccer", "Pop"],
     description: "this is a desceiption askdh askdjh aks dhsk ds dkas daksj daks kad jhask dajsh kasdhjasdhask das dhaskd ask dashd ",
     gender: "Male",
     id: "abc",
@@ -202,4 +202,14 @@ export const sampleClientIDs : ClientIDs = {
     android: "sample",
     expo: "sample",
     ios: "sample"
+}
+
+export const sampleAttributes : {[type : string] : string[]} = {
+    "Sports": ["Volleyball", "Soccer"],
+    "Music": ["Pop", "Country"]
+}
+
+export const samplePreferences : Preferences = {
+    agePreference: [20,28],
+    genderPreference: ["Male"]
 }

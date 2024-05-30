@@ -9,11 +9,11 @@ import { Message, Swipe } from "@prisma/client";
 import { errorText } from "./globals";
 
 export class APIHandler {
-    private unauthorized : APIOutput<{}> = {
+    private unauthorized : APIOutput<void> = {
         message: "Unauthorized"
     }
 
-    private serverError : APIOutput<{}> = {
+    private serverError : APIOutput<void> = {
         message: "Internal Server Error"
     }
 
@@ -345,7 +345,7 @@ export class APIHandler {
 
         app.post(URLs.newCode, async (req,res) => {
             try {
-                const body = req.body as APIRequest<{}>;
+                const body = req.body as APIRequest<void>;
                 if (!body.key) return res.status(400).json();
     
                 const user = await handler.login.getUserByKey(body.key);
@@ -592,7 +592,7 @@ export class APIHandler {
 
         app.post(URLs.getMyProfile, async (req,res) => {
             try {
-                const body : APIRequest<{}> = req.body;
+                const body : APIRequest<void> = req.body;
 
                 if (!body.key) return res.status(400).json();
 
@@ -706,7 +706,7 @@ export class APIHandler {
 
         app.post(URLs.autoLogin, async (req,res) => {
             try {
-                const body = req.body as APIRequest<{}>;
+                const body = req.body as APIRequest<void>;
 
                 const output = await handler.autoLogin(body.key);
                 return output.message ? 
