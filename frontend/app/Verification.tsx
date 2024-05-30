@@ -10,6 +10,8 @@ import { MyButton } from "../src/components/Button";
 import { globals } from "../src/globals";
 import { sendRequest, setCustomTimer } from "../src/utils";
 import { router } from "expo-router";
+import { showToast } from "../src/components/Toast";
+import { Spacing } from "../src/components/Spacing";
 
 interface Props {
     currentPage?: number
@@ -53,12 +55,16 @@ export function Verification(props : Props) {
                 schoolEmail: eduEmail
             }
 
-            await sendRequest(URLs.newVerification, input);
+            const response = await sendRequest<void>(URLs.newVerification, input);
 
-            setEduEmail(eduEmail);
-            goToNextPage();
+            if (response.message) {
+                showToast("Error", response.message);
+            } else {
+                setEduEmail(eduEmail);
+                goToNextPage();
+            }
         } catch (err) {
-            // console.log(err);
+            console.log(err);
         }
     }
 
@@ -69,8 +75,12 @@ export function Verification(props : Props) {
                 schoolEmail: eduEmail,
                 code: Number(code)
             }
-            await sendRequest(URLs.verifyUser, input);
-            if (!props.noRouter) router.replace("AccountCreation");
+            const response = await sendRequest<void>(URLs.verifyUser, input);
+            if (response.message) {
+                showToast("Error", response.message);
+            } else {
+                if (!props.noRouter) router.replace("AccountCreation");
+            }
         } catch (err) {
             console.log(err);
         }
@@ -80,12 +90,15 @@ export function Verification(props : Props) {
         if (seconds > 0) return
 
         try {
-            const input : WithKey<void> = {
-                key: receivedData.loginKey,
+            const input : WithKey<{}> = {
+                key: receivedData.loginKey
             }
-            await sendRequest(URLs.newCode, input);
-            setSeconds(globals.resendVerificationTimeout)
-
+            const response = await sendRequest<void>(URLs.newCode, input);
+            if (response.message) {
+                showToast("Error",response.message);
+            } else {
+                setSeconds(globals.resendVerificationTimeout)
+            }
         } catch (err) {
             console.log(err);
         }
@@ -97,11 +110,14 @@ export function Verification(props : Props) {
                 title={eduEmailText.pageTitle}
                 subtitle={eduEmailText.pageSubtitle}
                 pageType="Keyboard"
-                content={<MyTextInput
-                    placeholder={eduEmailText.inputPlaceholder}
-                    errorMessage={eduEmailText.inputError}
-                    onSubmit={sendVerification}
-                />}
+                content={
+                    <MyTextInput
+                        placeholder={eduEmailText.inputPlaceholder}
+                        errorMessage={eduEmailText.inputError}
+                        onSubmit={sendVerification}
+                        dontClearAfterSubmit={true}
+                    />
+                }
             />
         case 1:
             return <MySimplePage
@@ -115,6 +131,7 @@ export function Verification(props : Props) {
                         errorMessage={verifyCodeText.inputError}
                         onSubmit={verifyCode}
                     />
+                    <Spacing size="lg"/>
                     <MyButton
                         onPressFunction={resendCode}
                         text={seconds == 0 ? 

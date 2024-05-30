@@ -38,7 +38,7 @@ export function EditAttributes() {
                 setting: globals.settingAttributes,
                 value: attributes
             }
-            const response = await sendRequest<{}>(URLs.editUser, input);
+            const response = await sendRequest<void>(URLs.editUser, input);
             if (response.message) {
                 showToast("Error", response.message);
             } else {

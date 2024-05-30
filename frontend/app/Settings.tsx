@@ -64,7 +64,7 @@ export function Settings(props : Props) {
                 expoPushToken: token.data,
                 key: receivedData.loginKey
             }
-            const response = await sendRequest<{}>(URLs.updatePushToken, input);
+            const response = await sendRequest<void>(URLs.updatePushToken, input);
             if (response.message) {
                 showToast("Error", response.message)
                 changeToggleValue(title,false);
@@ -111,7 +111,7 @@ export function Settings(props : Props) {
             value: value
         }
         changeToggleValue(title, value);
-        const response = await sendRequest<{}>(URLs.editUser, input);
+        const response = await sendRequest<void>(URLs.editUser, input);
         if (response.message) {
             showToast("Error", response.message)
             changeToggleValue(title,!value)
@@ -139,7 +139,7 @@ export function Settings(props : Props) {
                 key: receivedData.loginKey
             }
             setShowModal(false);
-            const response = await sendRequest<{}>(URLs.deleteAccount, input);
+            const response = await sendRequest<void>(URLs.deleteAccount, input);
             if (response.message) {
                 showToast("Error", response.message)
             } else {

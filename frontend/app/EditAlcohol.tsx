@@ -40,7 +40,7 @@ export function Alcohol() {
                 setting: globals.settingAlcohol,   
                 value: frequency
             }
-            const response = await sendRequest<{}>(URLs.editUser, input);
+            const response = await sendRequest<void>(URLs.editUser, input);
             if (response.message) {
                 return showToast("Error", response.message);
             } else {

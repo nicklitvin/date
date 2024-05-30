@@ -5,6 +5,7 @@ import { Stack } from "expo-router";
 import * as Notifications from "expo-notifications";
 import Toast from "react-native-toast-message";
 import { toastConfig } from "../src/components/Toast";
+import VerificationMob from "./Verification";
 
 Notifications.setNotificationHandler({
     handleNotification: async () => ({

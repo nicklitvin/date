@@ -88,7 +88,7 @@ export function PreferencePage(props : Props) {
                 setting: globals.settingGenderPreference,
                 value: genders
             }
-            const genderResponse = await sendRequest<{}>(URLs.editUser, genderEdit);
+            const genderResponse = await sendRequest<void>(URLs.editUser, genderEdit);
             
             const ageEdit : WithKey<EditUserInput> = {
                 userID: receivedData.profile?.id!,
@@ -96,7 +96,7 @@ export function PreferencePage(props : Props) {
                 setting: globals.settingAgePreference,
                 value: agePreference
             }
-            const ageResponse = await sendRequest<{}>(URLs.editUser, ageEdit);
+            const ageResponse = await sendRequest<void>(URLs.editUser, ageEdit);
 
             const message = genderResponse.message || ageResponse.message;
             if (message) {

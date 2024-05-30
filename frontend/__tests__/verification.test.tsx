@@ -4,7 +4,7 @@ import { eduEmailText, verifyCodeText } from "../src/text";
 import MockAdapter from "axios-mock-adapter";
 import axios from "axios";
 import { URLs } from "../src/urls";
-import { ConfirmVerificationInput, NewVerificationInput } from "../src/interfaces";
+import { APIOutput, ConfirmVerificationInput, NewVerificationInput } from "../src/interfaces";
 import { RootStore, createStoreProvider } from "../src/store/RootStore";
 import { globals } from "../src/globals";
 
@@ -63,7 +63,9 @@ describe("verification", () => {
     it("should stay on page if bad email", async () => {
         const { mock, getCurrentPage } = await load();
 
-        mock.onPost(URLs.server + URLs.newVerification).reply( config => [400])
+        mock.onPost(URLs.server + URLs.newVerification).reply( config => [400, {
+            message: "cant do verification"
+        } as APIOutput<{}>])
 
         const input = screen.getByPlaceholderText(eduEmailText.inputPlaceholder);
         await act( () => {

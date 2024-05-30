@@ -144,7 +144,7 @@ export function EditPictures() {
                     setting: globals.settingImages,
                     value: copy.map(val => val.id)
                 }
-                const response = await sendRequest<{}>(URLs.editUser, input);
+                const response = await sendRequest<void>(URLs.editUser, input);
                 if (response.message) {
                     showToast("Error", response.message)
                 } else {

@@ -31,7 +31,7 @@ export function EditDescription() {
                 setting: globals.settingDescription,
                 value: description
             }
-            const response = await sendRequest<{}>(URLs.editUser, input);
+            const response = await sendRequest<void>(URLs.editUser, input);
             if (response.message) {
                 showToast("Error", response.message);
             } else {
