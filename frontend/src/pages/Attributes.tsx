@@ -49,6 +49,10 @@ export function AttributesPage(props : Props) {
                             key={`type-${entry[0]}`}
                         >
                             <Spacing size="md"/>
+                            <StyledText className="text-xl pb-2 w-full text-center font-bold">
+                                {entry[0]}
+                            </StyledText>
+                            <Spacing size="md"/>
                             <StyledView className="flex flex-row flex-wrap justify-center">
                                 {entry[1].map( (value) =>
                                     <StyledView 
