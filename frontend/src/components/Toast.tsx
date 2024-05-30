@@ -22,8 +22,16 @@ const makeToast = (props : any, toastType : ToastType) => {
     let image;
 
     switch (toastType) {
-        case "Success": image = require("../../assets/Success.png"); break;
-        case "Error": image = require("../../assets/Fail.png"); break;
+        case "Success": {
+            // console.log("success");
+            image = require("../../assets/Success.png"); 
+            break;
+        }
+        case "Error": {
+            // console.log("fail");
+            image = require("../../assets/Fail.png"); 
+            break;
+        }
     }
 
     if (!image) return
@@ -46,7 +54,7 @@ export const toastConfig = {
     error: (props : any) => makeToast(props,"Error"),
 }
 
-export function showToast(type : ToastType, message: string, onPress?: () => any) {
+export function showToast(type : ToastType, message: string, onPress = () => {}) {
     Toast.show({
         type: type == "Error" ? "error" : "success",
         props: {text : message},

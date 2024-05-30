@@ -143,6 +143,7 @@ export function Settings(props : Props) {
             if (response.message) {
                 showToast("Error", response.message)
             } else {
+                showToast("Success", settingsText.deleteSuccess);
                 signOut();
             }
         } catch (err) {}

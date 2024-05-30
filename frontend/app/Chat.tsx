@@ -111,7 +111,7 @@ export function Chat(props : Props) {
         })
     }
 
-    const deleteUser = () => {
+    const deleteUser = (isReport : boolean) => {
         receivedData.deleteSavedChat(userID);
         if (receivedData.newMatches) {
             receivedData.setNewMatches(
@@ -124,7 +124,11 @@ export function Chat(props : Props) {
             );
         }
 
-        if (!props.noRouter) router.replace("Matches");
+        showToast("Success", isReport ? chatText.reportSuccessful : chatText.unmatchSuccessful);
+
+        if (!props.noRouter) {
+            router.replace("Matches");
+        }
     }
 
     const load = async () => {
@@ -264,7 +268,7 @@ export function Chat(props : Props) {
             if (response.message) {
                 showToast("Error", response.message)
             } else {
-                deleteUser();
+                deleteUser(true);
             }
         } catch (err) {
             console.log(err);
@@ -284,7 +288,7 @@ export function Chat(props : Props) {
             if (response.message) {
                 showToast("Error", response.message);
             } else {
-                deleteUser();
+                deleteUser(false);
             }
         } catch (err) {
             console.log(err);

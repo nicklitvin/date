@@ -17,6 +17,8 @@ export const chatText = {
     modalUnlike: "Unmatch User",
     sendFirst: "Send the first message :)",
     errorCannotSend: "Cannot send message",
+    reportSuccessful: "User has been reported",
+    unmatchSuccessful: "Unmatched from user",
 }
 
 export const matchesText = {
@@ -191,7 +193,8 @@ export const settingsText = {
     deleteAccount: "Delete Account",
     modalTitle: "Are you sure you want to delete your account?",
     modalDelete: "Confirm Delete",
-    notificationsDisabledError: "Click to enable notifications in settings"
+    notificationsDisabledError: "Click to enable notifications in settings",
+    deleteSuccess: "Account deleted",
 }
 
 export const alcoholText = {

@@ -433,7 +433,7 @@ export class Handler {
         if (!user) return { message: errorText.notValidUser }
         if (!user.subscriptionID) return { message: errorText.noSubscription };
 
-        if (await this.pay.cancelSubscription(user.subscriptionID) || userID == sampleContent.userID) {
+        if (userID == sampleContent.userID || await this.pay.cancelSubscription(user.subscriptionID)) {
             await this.user.cancelSubscription(userID)
             const output = await this.user.updateElo(userID, this.user.getEloChange({
                 action: EloAction.Unsubscribe,

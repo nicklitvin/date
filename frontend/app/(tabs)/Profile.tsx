@@ -101,7 +101,7 @@ export function Profile(props : Props) {
                 userID: receivedData.profile?.id!,
                 key: receivedData.loginKey
             }
-            const response = await sendRequest(URLs.cancelSubscription, input);
+            const response = await sendRequest<{}>(URLs.cancelSubscription, input);
             if (response.message) {
                 showToast("Error", response.message)
             } else {

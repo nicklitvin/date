@@ -3,6 +3,7 @@ add success toast on delete accunt and unmacth/report
 editalocohol should say saved if the same option as before
 speed up profile refresh
 make send icon in chat greyed out when no message to send and disabled
+status bar change text to black
 
 disconnect user if another logins in (one at a time policy)
 can only connect one socket per session
