@@ -46,7 +46,7 @@ export const URLs = {
     clearInteractions: "/clearInteractions",
     purchasePremium: "/purchasePremium",
     makeAnnouncement: "/makeAnnouncement",
-    ip: "10.0.0.245",
+    ip: "192.168.181.157",
     port: 3000,
 
     // OAUTH

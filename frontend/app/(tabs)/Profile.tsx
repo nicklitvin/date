@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite";
 import { PageHeader } from "../../src/components/PageHeader";
-import { profileText } from "../../src/text";
+import { errorText, profileText } from "../../src/text";
 import { StyledButton, StyledImage, StyledScroll, StyledText, StyledView } from "../../src/styledElements";
 import { MyButton } from "../../src/components/Button";
 import { URLs } from "../../src/urls";
@@ -34,40 +34,51 @@ export function Profile(props : Props) {
         }
     }, [firstLoad])
 
-    const load = async (refresh = false) => {
+    const loadProfile = async () : Promise<string|undefined> => {
         try {
             const input : WithKey<JustUserID> = {
                 userID: receivedData.profile?.id!,
                 key: receivedData.loginKey
             }
-
-            let message;
-
-            if (refresh || !savedProfile) {
-                const profileResponse = await sendRequest<PublicProfile>(URLs.getMyProfile, input);
-                if (profileResponse.message) {
-                    message = profileResponse.message;
-                } else if (profileResponse.data) {
-                    receivedData.setProfile(profileResponse.data);
-                }
+    
+            const response = await sendRequest<PublicProfile>(URLs.getMyProfile, input);
+            if (response.message) {
+                return response.message
+            } else if (response.data) {
+                receivedData.setProfile(response.data);
             }
-            
+        } catch (err) {
+            console.log
+        }
+    }
 
-            if (refresh || !savedSubscription) {
-                const subscriptionResponse = await sendRequest<SubscriptionData>(URLs.getSubscription, input);
-                if (subscriptionResponse.message) {
-                    message = subscriptionResponse.message;
-                } else if (subscriptionResponse.data) {
-                    receivedData.setSubscription({
-                        ...subscriptionResponse.data,
-                        endDate: new Date(subscriptionResponse.data.endDate!)
-                    })
-                };
-            }
+    const loadSubscription = async () : Promise<string|undefined> => {
+        const input : WithKey<JustUserID> = {
+            userID: receivedData.profile?.id!,
+            key: receivedData.loginKey
+        }
 
-            if (message) {
-                showToast("Error", message);
-            }
+        const response = await sendRequest<SubscriptionData>(URLs.getSubscription, input);
+        if (response.message) {
+            return response.message;
+        } else if (response.data) {
+            receivedData.setSubscription({
+                ...response.data,
+                endDate: new Date(response.data.endDate!)
+            })
+        };
+    }
+
+    const load = async (refresh = false) => {
+        try {
+            const [message1, message2] = await Promise.all([
+                refresh || !savedProfile ? loadProfile() : null,
+                refresh || !savedSubscription ? loadSubscription() : null
+            ])
+
+            const message = message1 || message2;
+            if (message) showToast("Error", message);
+
         } catch (err) {
             console.log(err);
         }

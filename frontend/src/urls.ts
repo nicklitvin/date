@@ -37,5 +37,5 @@ export const URLs = {
     viewAnnouncement: "/viewAnnouncement",
     websocket: "/ws",
 
-    server: "http://10.0.0.245:3000",
+    server: "http://192.168.181.157:3000",
 }
