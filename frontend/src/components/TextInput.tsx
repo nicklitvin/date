@@ -45,8 +45,12 @@ export function MyTextInput(props : Props) {
                     multiline={props.newLine ?? false}
                 />
                 <StyledButton 
+                    disabled={message.length == 0}
                     onPress={processSubmit}
-                    className="absolute right-5 w-[20px] h-full flex justify-center"
+                    className={classNames(
+                        "absolute right-5 w-[20px] h-full flex justify-center",
+                        message.length == 0 ? "opacity-50" : "opacity-100"
+                    )}
                 >
                     <StyledImage
                         className="w-[20px] h-[20px]"
