@@ -27,6 +27,7 @@ export function Stats(props : Props) {
     const stats = receivedData.stats; 
     const [firstLoad, setFirstLoad] = useState<boolean>(true);
     const [refreshing, setRefreshing] = useState<boolean>(false);
+    const [finishedFirstLoad, setFinishedFirstLoad] = useState<boolean>(false);
 
     useEffect( () => {
         if (firstLoad) {
@@ -43,13 +44,14 @@ export function Stats(props : Props) {
                 key: receivedData.loginKey
             }
             const response = await sendRequest<UserSwipeStats>(URLs.getStats, input);
-            if (response.message) {
+            if (response.message && finishedFirstLoad) {
                 showToast("Error", response.message);
             } else if (response.data) {
                 receivedData.setStats(response.data);
             }
+            if (!finishedFirstLoad) setFinishedFirstLoad(true);
         } catch (err) {
-
+            console.log(err);
         }
     }
 
