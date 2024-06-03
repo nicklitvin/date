@@ -607,6 +607,8 @@ export class Handler {
 
         if (await this.login.getUserByEmail(email)) {
             const userLogin = await this.login.updateKey(email);
+            this.socket.disconnectUser(userLogin.userID);
+
             const verification = await this.verification.getVerificationByPersonalEmail(email);
             const reportCount = await this.report.getReportCountForEmail(verification?.schoolEmail!);
             if (input.expoPushToken) {
@@ -651,6 +653,7 @@ export class Handler {
         if (!userLogin) return { message: errorText.incorrectKey}
         if (!(userLogin.expire.getTime() > new Date().getTime())) return { message: errorText.expiredKey }
         
+        this.socket.disconnectUser(userLogin.userID);
         await this.login.updateExpiration(userLogin.email);
         return {
             data: {
@@ -771,5 +774,15 @@ export class Handler {
         }
 
         return { data: result }
+    }
+
+    public async regenerateSocketCode(userID : string) : Promise<APIOutput<LoginOutput>> {
+        this.socket.disconnectUser(userID);
+
+        return { 
+            data: { 
+                socketToken : this.socket.generateOneTimeKey(userID) 
+            }
+        }
     }
 }

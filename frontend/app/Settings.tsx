@@ -120,7 +120,10 @@ export function Settings(props : Props) {
 
     const signOut = () => {
         if (showModal) setShowModal(false);
-        globalState.setSocketManager(null);
+        if (globalState.socketManager) {
+            globalState.socketManager.close();
+            globalState.setSocketManager(null);
+        } 
         receivedData.setProfile(null);
         if (navigation) {
             navigation.reset({

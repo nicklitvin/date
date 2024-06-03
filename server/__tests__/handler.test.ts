@@ -1289,4 +1289,42 @@ describe("handler", () => {
         expect(output.data).toHaveLength(1);
         expect(output.data![0].id).toEqual(a2.id)
     })
+
+    it("should disconnect existing socket if login with token", async () => {
+        const email = "a@berkeley.edu";
+
+        const login = await handler.login.createUser({
+            email: email,
+        })
+        const userID = login.userID as any;
+        const user = await handler.user.createUser(createUserInput(email, userID));
+        
+        handler.socket.addSocket({
+            userID: user.id,
+            socket: makeMockWebSocket()
+        })
+        expect(handler.socket.isUserConnected(user.id)).toEqual(true);
+
+        await handler.loginWithToken({}, email);
+        expect(handler.socket.isUserConnected(user.id)).toEqual(false);
+    })
+
+    it("should disconnect existing socket if login with key", async () => {
+        const email = "a@berkeley.edu";
+
+        const login = await handler.login.createUser({
+            email: email,
+        })
+        const userID = login.userID as any;
+        const user = await handler.user.createUser(createUserInput(email,userID));
+
+        handler.socket.addSocket({
+            userID: user.id,
+            socket: makeMockWebSocket()
+        })
+        expect(handler.socket.isUserConnected(user.id)).toEqual(true);
+
+        await handler.autoLogin(login.key);
+        expect(handler.socket.isUserConnected(sampleContent.userID)).toEqual(false);
+    })
 })

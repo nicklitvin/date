@@ -811,6 +811,24 @@ export class APIHandler {
             }
         })
 
+        app.post(URLs.getSocketCode, async (req,res) => {
+            try {
+                const body = req.body as APIRequest<void>;
+                if (!body.key) return res.status(400).json();
+
+                const userID = await handler.login.getUserIDByKey(body.key);
+                if (!userID) return res.status(401).json(this.unauthorized);
+
+                const output = await handler.regenerateSocketCode(userID);
+                return output.message ? 
+                    res.status(400).json(output as APIOutput<any>) :
+                    res.status(200).json()
+            } catch (err) {
+                console.log(err);
+                return res.status(500).json(this.serverError);
+            }
+        })
+
         // ADMIN-ONLY
 
         app.post(URLs.deleteEverything, async (req,res) => {

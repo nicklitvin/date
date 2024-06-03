@@ -51,9 +51,9 @@ export async function validRequestUserInput() : Promise<HandlerUserInput> {
     }
 }
 
-export function createUserInput(email = "a@berkeley.edu") : UserInput {
+export function createUserInput(email = "a@berkeley.edu", id = randomUUID()) : UserInput {
     return {
-        id: randomUUID(),
+        id: id,
         email: email,
         name: "a",
         birthday: addYears(new Date(), -21),
@@ -212,6 +212,7 @@ export function makeMockWebSocket() : any {
 
     return {
         send: (payload : string) => payloads.push(payload),
+        close: () => {},
         payloads: payloads
     }
 }

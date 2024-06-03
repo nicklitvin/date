@@ -12,11 +12,13 @@ export class SocketHandler {
     private readonly socketTTLHours = 1;
     private readonly oneTimeKeyTTLMin = 1;
 
+    // userID" {socket, ttl, userID}
     private connectedSockets : Map<string, {
         socket: WebSocket,
         ttl: Date,
         userID: string,
     }>;
+    // key : {userID, ttl, key}
     private oneTimeKeys : Map<string, {
         userID: string,
         ttl: Date,
@@ -128,5 +130,16 @@ export class SocketHandler {
         this.connectedSockets.clear();
         this.oneTimeKeys.clear();
         return {keysDeleted, socketsDeleted}
+    }
+
+    public disconnectUser(userID : string) {
+        const socketData = this.connectedSockets.get(userID);
+        if (socketData) {
+            this.sendUserMessage(userID, {
+                forceLogout: true
+            })
+            socketData.socket.close(1000);
+            this.connectedSockets.delete(userID);
+        }
     }
 }

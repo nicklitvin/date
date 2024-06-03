@@ -35,6 +35,7 @@ export const URLs = {
     getPremiumPage: "/getPremiumPage",
     getAnnouncements: "/getAnnouncements",
     viewAnnouncement: "/viewAnnouncement",
+    getSocketCode: "/getSocketCode",
     websocket: "/ws",
 
     // STRIPE

@@ -1,8 +1,10 @@
 import { globals } from "../globals";
-import { APIOutput, ChatPreview, LoginOutput, Message, NewMatchData, ReadStatusInput, SocketPayloadToClient, SocketPayloadToServer, WithKey } from "../interfaces";
+import { ChatPreview, LoginOutput, Message, NewMatchData, ReadStatusInput, SocketPayloadToClient, SocketPayloadToServer, WithKey } from "../interfaces";
 import { ReceivedData } from "../store/ReceivedData";
+import { generalText } from "../text";
 import { URLs } from "../urls";
 import { sendRequest } from "../utils";
+import { showToast } from "./Toast";
 
 
 export class SocketManager {
@@ -60,6 +62,11 @@ export class SocketManager {
                         ...data.readUpdate,
                         timestamp: new Date(data.readUpdate.timestamp)
                     })
+                } else if (data.forceLogout) {
+                    this.close();
+                    delete this.ws;
+                    showToast("Error", generalText.loggedOut);
+                    this.received.setLoginKey(undefined);
                 }
             } catch (err) {
 
@@ -72,11 +79,15 @@ export class SocketManager {
         }
     }
 
+    close() {
+        if (this.ws) this.ws.close(1000);
+    }
+
     async reconnect() {
-        const input : WithKey<void> = {
+        const input : WithKey<{}> = {
             key: this.loginKey
         }
-        const response = await sendRequest<LoginOutput>(URLs.autoLogin, input);
+        const response = await sendRequest<LoginOutput>(URLs.getSocketCode, input);
         if (response.data && response.data.socketToken) {
             this.connect(this.createConnectURL(response.data.socketToken));
         }

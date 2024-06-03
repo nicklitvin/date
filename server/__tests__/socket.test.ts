@@ -108,4 +108,19 @@ describe("socket", () => {
         expect(funcs.getUserIDFromKey(key)).toEqual(userID);
         expect(funcs.getUserIDFromKey(key)).toEqual(undefined);
     })
+
+    it("should delete user socket if one", async () => {
+        const userID = "a";
+        const socket = makeMockWebSocket();
+
+        funcs.addSocket({
+            socket: socket,
+            userID: userID
+        });
+        expect(funcs.isUserConnected(userID)).toEqual(true);
+
+        funcs.disconnectUser(userID);
+        expect(funcs.isUserConnected(userID)).toEqual(false);
+
+    })
 })

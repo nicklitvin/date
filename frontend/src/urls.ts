@@ -35,6 +35,7 @@ export const URLs = {
     getPremiumPage: "/getPremiumPage",
     getAnnouncements: "/getAnnouncements",
     viewAnnouncement: "/viewAnnouncement",
+    getSocketCode: "/getSocketCode",
     websocket: "/ws",
 
     server: "http://192.168.181.157:3000",

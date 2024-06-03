@@ -82,7 +82,8 @@ export interface SocketPayloadToClient {
     message?: Message,
     match?: NewMatchData,
     readUpdate?: ReadStatusInput
-    payloadProcessedID?: string
+    payloadProcessedID?: string,
+    forceLogout?: boolean,
 }
 
 export interface SocketPayloadToServer {

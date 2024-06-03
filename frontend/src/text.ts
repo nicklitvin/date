@@ -77,6 +77,7 @@ export const generalText = {
     cancel: "Cancel",
     saved: "Saved",
     unknownError: "Unknown Error",
+    loggedOut: "Another login detected!"
 }
 
 export const genderPreferenceText = {
