@@ -19,9 +19,9 @@ export class LoginHandler {
             data: {
                 email: input.email,
                 expire: input.customDate ?? addWeeks(new Date(), miscConstants.keyExpirationWeeks),
-                key: randomUUID(),
+                key: `key-${randomUUID()}`,
                 expoPushToken: input.expoPushToken,
-                userID: input.customID ? sampleContent.userID : randomUUID()
+                userID: input.customID ? sampleContent.userID : `user-${randomUUID()}`
             }
         })
     }
@@ -57,7 +57,7 @@ export class LoginHandler {
                 email: email
             },
             data: {
-                key: randomUUID(),
+                key: `key-${randomUUID()}`,
                 expire: addWeeks(new Date(), miscConstants.keyExpirationWeeks)
             }
         })

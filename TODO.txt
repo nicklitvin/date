@@ -1,6 +1,4 @@
 TODO
-randomuuid add prefix
-
 remove match thru websocket? delete saved chat kick out from chat room?
 add loading icon in chat when getting messages
 delete user views if delete accountx

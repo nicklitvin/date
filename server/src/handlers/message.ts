@@ -16,7 +16,7 @@ export class MessageHandler {
         return await this.prisma.message.create({
             data: {
                 ...input,
-                id: randomUUID(),
+                id: `message-${randomUUID()}`,
                 readStatus: false,
                 timestamp: customTime
             }

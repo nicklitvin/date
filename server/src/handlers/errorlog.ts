@@ -15,7 +15,7 @@ export class ErrorLogHandler {
         return await this.prisma.errorLog.create({
             data: {
                 ...input,
-                id: randomUUID(),
+                id: `error-${randomUUID()}`,
                 timestamp: customTime
             }
         })

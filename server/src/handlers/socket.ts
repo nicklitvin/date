@@ -33,7 +33,7 @@ export class SocketHandler {
     public generateOneTimeKey(userID : string, 
         ttl = addMinutes(new Date(), this.oneTimeKeyTTLMin)) : string 
     {
-        const oneTimeKey = randomUUID();
+        const oneTimeKey = `key-${randomUUID()}`;
         this.oneTimeKeys.set(oneTimeKey, {
             userID: userID,
             ttl: ttl,

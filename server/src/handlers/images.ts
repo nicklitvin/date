@@ -34,7 +34,7 @@ export class S3ImageHandler implements ImageHandler {
             height: this.imageHeight
         }).toBuffer();
     
-        const imageID = randomUUID();
+        const imageID = `image-${randomUUID()}`;
     
         const command = new PutObjectCommand({
             Bucket: bucket,

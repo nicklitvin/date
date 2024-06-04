@@ -13,7 +13,7 @@ export class AttributeHandler {
         return await this.prisma.attribute.create({
             data: {
                 ...input,
-                id: randomUUID()
+                id: `attribute-${randomUUID()}`
             }
         })
     }

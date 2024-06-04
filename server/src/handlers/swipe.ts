@@ -15,7 +15,7 @@ export class SwipeHandler {
         return await this.prisma.swipe.create({
             data: {
                 ...input,
-                id: randomUUID(),
+                id: `swipe-${randomUUID()}`,
                 timestamp: customTime,
             }
         })

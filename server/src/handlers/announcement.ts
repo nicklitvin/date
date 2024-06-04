@@ -15,7 +15,7 @@ export class AnnouncementHandler {
         return await this.prisma.announcement.create({
             data: {
                 ...input,
-                id: randomUUID()
+                id: `announcement-${randomUUID()}`
             }
         })
     }
@@ -23,7 +23,7 @@ export class AnnouncementHandler {
     public async viewAnnouncement(input : ViewAnnouncementInput) {
         return await this.prisma.announcementViewed.create({
             data: {
-                id: randomUUID(),
+                id: `announcementView-${randomUUID()}`,
                 announcementID: input.announcementID,
                 userID: input.userID
             }

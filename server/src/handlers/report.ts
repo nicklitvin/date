@@ -14,7 +14,7 @@ export class ReportHandler {
         return await this.prisma.userReport.create({
             data: {
                 ...input,
-                id: randomUUID(),
+                id: `report-${randomUUID()}`,
                 timestamp: timestamp
             }
         });

@@ -27,7 +27,7 @@ export async function getImageInput(good : boolean) : Promise<ImageUploadInput> 
 export async function validRequestUserInput() : Promise<HandlerUserInput> { 
     const upload = await getImageDetails(true);
     return {
-        userID: randomUUID(),
+        userID: `user-${randomUUID()}`,
         birthday: addYears(new Date(), -userRestrictions.minAge),
         ageInterest: [18,25],
         attributes: Array.from({length: userRestrictions.maxAttributes}, (_,index) => `${index}`),
@@ -51,7 +51,7 @@ export async function validRequestUserInput() : Promise<HandlerUserInput> {
     }
 }
 
-export function createUserInput(email = "a@berkeley.edu", id = randomUUID()) : UserInput {
+export function createUserInput(email = "a@berkeley.edu", id = `user-${randomUUID()}`) : UserInput {
     return {
         id: id,
         email: email,
@@ -70,8 +70,8 @@ export function createUserInput(email = "a@berkeley.edu", id = randomUUID()) : U
 
 export function createSwipeInput(
     action : Opinion,
-    userID: string = randomUUID(), 
-    swipedUserID: string = randomUUID()
+    userID: string = `user-${randomUUID()}`, 
+    swipedUserID: string = `user-${randomUUID()}`
     ) : SwipeInput
 {
     return {
@@ -83,7 +83,7 @@ export function createSwipeInput(
 
 export function createReportInput(randomID = false) : UserReportInput {
     return {
-        userID: randomID ? randomUUID() : "userID",
+        userID: randomID ? `user-${randomUUID()}` : "userID",
         reportedEmail: "email"
     }
 }
@@ -100,8 +100,8 @@ export function makeMessageInput(userID : string, userID_2 : string) :
 
 export function makeMessageInputWithRandoms() : MessageInput {
     return {
-        userID: randomUUID(),
-        recepientID: randomUUID(),
+        userID: `user-${randomUUID()}`,
+        recepientID: `user-${randomUUID()}`,
         message: "message"
     }
 }
@@ -110,8 +110,8 @@ export function makeMessageInputWithOneRandom(userID : string, flipUsers = false
     MessageInput 
 {
     return {
-        userID: flipUsers ? randomUUID() : userID,
-        recepientID: flipUsers ? userID : randomUUID(),
+        userID: flipUsers ? `user-${randomUUID()}` : userID,
+        recepientID: flipUsers ? userID : `user-${randomUUID()}`,
         message: "message",
     }
 }
