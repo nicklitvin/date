@@ -1,10 +1,4 @@
 TODO
-disconnect user if another logins in (one at a time policy)
-    user connects
-    another user or same one attempts login
-    forcelogout user
-    terminate existing socket connection
-
 randomuuid add prefix
 
 remove match thru websocket? delete saved chat kick out from chat room?

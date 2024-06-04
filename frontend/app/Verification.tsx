@@ -20,12 +20,13 @@ interface Props {
     returnSeconds?: (input : number) => any
     customSeconds?: number
     noRouter?: boolean
+    disableToast?: boolean
 }
 
 export function Verification(props : Props) {
     const [currentPage, setCurrentPage] = useState<number>(props.currentPage ?? 0);
     const [eduEmail, setEduEmail] = useState<string>(props.eduEmail ?? "");
-    const {globalState, receivedData} = useStore();
+    const { receivedData} = useStore();
     const [seconds, setSeconds] = useState<number>(props.customSeconds ?? 0);
     const [timer, setTimer] = useState<NodeJS.Timeout|undefined>(undefined);
 
@@ -58,7 +59,7 @@ export function Verification(props : Props) {
             const response = await sendRequest<void>(URLs.newVerification, input);
 
             if (response.message) {
-                showToast("Error", response.message);
+                if (!props.disableToast) showToast("Error", response.message);
             } else {
                 setEduEmail(eduEmail);
                 goToNextPage();
@@ -77,7 +78,7 @@ export function Verification(props : Props) {
             }
             const response = await sendRequest<void>(URLs.verifyUser, input);
             if (response.message) {
-                showToast("Error", response.message);
+                if (!props.disableToast) showToast("Error", response.message);
             } else {
                 if (!props.noRouter) router.replace("AccountCreation");
             }
@@ -95,7 +96,7 @@ export function Verification(props : Props) {
             }
             const response = await sendRequest<void>(URLs.newCode, input);
             if (response.message) {
-                showToast("Error",response.message);
+                if (!props.disableToast) showToast("Error", response.message);
             } else {
                 setSeconds(globals.resendVerificationTimeout)
             }

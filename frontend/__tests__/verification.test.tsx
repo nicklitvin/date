@@ -10,7 +10,6 @@ import { globals } from "../src/globals";
 
 describe("verification", () => {
     const eduEmail = "a@berkeley.edu";
-    const personalEmail = "a@gmail.com";
 
     const load = async (currentPage? : number, customSeconds? : number, eduEmail? : string) => {
         const mock = new MockAdapter(axios);
@@ -30,6 +29,7 @@ describe("verification", () => {
                     customSeconds={customSeconds}
                     eduEmail={eduEmail}
                     noRouter={true}
+                    disableToast={true}
                 />
             </StoreProvider>
         )
@@ -37,70 +37,70 @@ describe("verification", () => {
         return { mock, store, getCurrentPage, getSeconds }
     }
 
-    // it("should send verification", async () => {
-    //     const { mock, getCurrentPage } = await load();
-    //     let sent = false;
+    it("should send verification", async () => {
+        const { mock, getCurrentPage } = await load();
+        let sent = false;
 
-    //     mock.onPost(URLs.server + URLs.newVerification).reply( config => {
-    //         const payload = JSON.parse(config.data) as NewVerificationInput;
-    //         expect(payload.schoolEmail).toEqual(eduEmail);
-    //         sent = true;
-    //         return [200, {}]
-    //     })
+        mock.onPost(URLs.server + URLs.newVerification).reply( config => {
+            const payload = JSON.parse(config.data) as NewVerificationInput;
+            expect(payload.schoolEmail).toEqual(eduEmail);
+            sent = true;
+            return [200, {}]
+        })
 
-    //     const input = screen.getByPlaceholderText(eduEmailText.inputPlaceholder);
-    //     await act( () => {
-    //         fireEvent(input, "changeText", eduEmail);
-    //     })
-    //     await act( () => {
-    //         fireEvent(input, "submitEditing");
-    //     })
+        const input = screen.getByPlaceholderText(eduEmailText.inputPlaceholder);
+        await act( () => {
+            fireEvent(input, "changeText", eduEmail);
+        })
+        await act( () => {
+            fireEvent(input, "submitEditing");
+        })
 
-    //     expect(getCurrentPage).toHaveBeenLastCalledWith(1);
-    //     expect(sent).toEqual(true);
-    // })
+        expect(getCurrentPage).toHaveBeenLastCalledWith(1);
+        expect(sent).toEqual(true);
+    })
 
-    // it("should stay on page if bad email", async () => {
-    //     const { mock, getCurrentPage } = await load();
+    it("should stay on page if bad email", async () => {
+        const { mock, getCurrentPage } = await load();
 
-    //     mock.onPost(URLs.server + URLs.newVerification).reply( config => [400, {
-    //         message: "cant do verification"
-    //     } as APIOutput<{}>])
+        mock.onPost(URLs.server + URLs.newVerification).reply( config => [400, {
+            message: "cant do verification"
+        } as APIOutput<{}>])
 
-    //     const input = screen.getByPlaceholderText(eduEmailText.inputPlaceholder);
-    //     await act( () => {
-    //         fireEvent(input, "changeText", eduEmail);
-    //     })
-    //     await act( () => {
-    //         fireEvent(input, "submitEditing");
-    //     })
+        const input = screen.getByPlaceholderText(eduEmailText.inputPlaceholder);
+        await act( () => {
+            fireEvent(input, "changeText", eduEmail);
+        })
+        await act( () => {
+            fireEvent(input, "submitEditing");
+        })
 
-    //     expect(getCurrentPage).toHaveBeenLastCalledWith(0);
-    // })
+        expect(getCurrentPage).toHaveBeenLastCalledWith(0);
+    })
 
-    // it("should verify code", async () => {
-    //     const { mock } = await load(1,0,eduEmail);
-    //     const code = "1234";
-    //     let sent = false;
+    it("should verify code", async () => {
+        const { mock } = await load(1,0,eduEmail);
+        const code = "1234";
+        let sent = false;
 
-    //     mock.onPost(URLs.server + URLs.verifyUser).reply( config => {
-    //         const payload = JSON.parse(config.data) as ConfirmVerificationInput;
-    //         expect(payload.code).toEqual(Number(code));
-    //         expect(payload.schoolEmail).toEqual(eduEmail);
-    //         sent = true;
-    //         return [200, {}]            
-    //     })
+        mock.onPost(URLs.server + URLs.verifyUser).reply( config => {
+            const payload = JSON.parse(config.data) as ConfirmVerificationInput;
+            expect(payload.code).toEqual(Number(code));
+            expect(payload.schoolEmail).toEqual(eduEmail);
+            sent = true;
+            return [200, {}]            
+        })
 
-    //     const inputCode = screen.getByPlaceholderText(verifyCodeText.inputPlaceholder);
-    //     await act( () => {
-    //         fireEvent(inputCode, "changeText", code);
-    //     })
-    //     await act( () => {
-    //         fireEvent(inputCode, "submitEditing")
-    //     })
+        const inputCode = screen.getByPlaceholderText(verifyCodeText.inputPlaceholder);
+        await act( () => {
+            fireEvent(inputCode, "changeText", code);
+        })
+        await act( () => {
+            fireEvent(inputCode, "submitEditing")
+        })
 
-    //     expect(sent).toEqual(true);
-    // })
+        expect(sent).toEqual(true);
+    })
 
     it("should resend code", async () => {
         const { mock, getSeconds} = await load(1,0,eduEmail);
