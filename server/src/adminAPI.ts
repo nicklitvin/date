@@ -16,7 +16,7 @@ const argv = yargs
         type: 'string',
     })
     .option('match', {
-        alias: 'l',
+        alias: 'x',
         describe: 'Will make match',
         type: "boolean",
     })
@@ -45,6 +45,11 @@ const argv = yargs
         describe: "deletes tables",
         type: "boolean"
     })
+    .option("logout", {
+        alias: "l",
+        describe: "force logout",
+        type: "boolean"
+    })
     .help()
     .alias('help', 'h')
     .argv as { 
@@ -54,16 +59,18 @@ const argv = yargs
         premium?: boolean, 
         announcement?: boolean, 
         attributes?: boolean,
-        delete?: boolean
+        delete?: boolean,
+        logout?: boolean
     };
 
 async function main() {
     const baseURL = `http://${URLs.ip}:${URLs.port}`;
+    const adminKEY = process.env.ADMIN_API_KEY!
     
     if (argv.clear) {
         try {
             const payload : APIRequest<{}> = {
-                key: process.env.ADMIN_API_KEY!
+                key: adminKEY
             }
             const response = await axios.post(baseURL + URLs.clearInteractions, payload);
             if (response.data?.message) console.log(response.data.message);
@@ -75,7 +82,7 @@ async function main() {
     
     if (argv.message) {
         const payload : APIRequest<MessageInput> = {
-            key: process.env.ADMIN_API_KEY!,
+            key: adminKEY,
             message: argv.message,
             userID: sampleUsers[0].id,
             recepientID: sampleContent.userID
@@ -91,13 +98,13 @@ async function main() {
     
     if (argv.match) {
         const payload1 : SwipeInput & {key : string} = {
-            key: process.env.ADMIN_API_KEY!,
+            key: adminKEY,
             userID: sampleContent.userID,
             action: "Like",
             swipedUserID: sampleUsers[0].id
         }
         const payload2 : APIRequest<SwipeInput> = {
-            key: process.env.ADMIN_API_KEY!,
+            key: adminKEY,
             userID: sampleUsers[0].id,
             action: "Like",
             swipedUserID: sampleContent.userID
@@ -116,7 +123,7 @@ async function main() {
     if (argv.premium) {
         try {
             const payload : APIRequest<JustUserID> = {
-                key: process.env.ADMIN_API_KEY!,
+                key: adminKEY,
                 userID: sampleContent.userID
             }
             const response = await axios.post(baseURL + URLs.purchasePremium, payload);
@@ -130,7 +137,7 @@ async function main() {
     if (argv.announcement) {
         try {   
             const payload : APIRequest<AnnouncementInput> = {
-                key: process.env.ADMIN_API_KEY!,
+                key: adminKEY,
                 title: "announcement title",
                 message: "announcement message",
                 startTime: new Date(),
@@ -157,10 +164,23 @@ async function main() {
     if (argv.delete) {
         try {   
             const payload : APIRequest<{}> = {
-                key: process.env.ADMIN_API_KEY!
+                key: adminKEY
             }
             await axios.post(baseURL + URLs.deleteEverything, payload);
             console.log("completed deleted")
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+    if (argv.logout) {
+        try {
+            const payload : APIRequest<JustUserID> = {
+                key: adminKEY,
+                userID: sampleContent.userID
+            }
+            await axios.post(baseURL + URLs.forceLogout, payload);
+            console.log("completed logout")
         } catch (err) {
             console.log(err);
         }

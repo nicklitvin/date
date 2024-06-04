@@ -1,4 +1,4 @@
-import { Redirect, router } from "expo-router";
+import { Redirect, router, useNavigation } from "expo-router";
 import { useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { useStore } from "../src/store/RootStore";
@@ -24,6 +24,7 @@ export function Index() {
     const { globalState, receivedData } = useStore();
     const [error, setError] = useState<boolean>(false);
     const [firstLoad, setFirstLoad] = useState<boolean>(true);
+    const navigation = useNavigation();
 
     const setSampleData = () => {
         globalState.resetSwipeStatus();
@@ -63,7 +64,8 @@ export function Index() {
                 globalState.setSocketManager(new SocketManager({
                     socketToken: response.data.socketToken, 
                     receivedData,
-                    key: response.data.key
+                    key: response.data.key,
+                    navigation: navigation
                 }))
             }
         } catch (err) {
@@ -113,7 +115,7 @@ export function Index() {
 
     const loadData = async () => {
         const key = await AsyncStorage.getItem(globals.storageloginKey);
-        receivedData.setLoginKey(key ?? "");
+        if (key) receivedData.setLoginKey(key);
 
         if (Platform.OS == "android") {
             Notifications.setNotificationChannelAsync("default", {

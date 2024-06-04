@@ -1,11 +1,10 @@
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import { RootStore, createStoreProvider} from '../src/store/RootStore';
+import { RootStore, createStoreProvider } from '../src/store/RootStore';
 import { StyledView } from '../src/styledElements';
 import { Stack } from "expo-router";
 import * as Notifications from "expo-notifications";
 import Toast from "react-native-toast-message";
 import { toastConfig } from "../src/components/Toast";
-import VerificationMob from "./Verification";
 
 Notifications.setNotificationHandler({
     handleNotification: async () => ({

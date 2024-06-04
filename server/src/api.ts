@@ -908,5 +908,22 @@ export class APIHandler {
                 return res.status(500).json(err);
             }
         })
+
+        app.post(URLs.forceLogout, async (req,res) => {
+            try {
+                const body = req.body as APIRequest<JustUserID>;
+                if (!body.key) return res.status(400).json();
+
+                if (isAdmin(body.key)) {
+                    handler.socket.disconnectUser(body.userID);
+                    return res.status(200).json();
+                }
+                return res.status(401).json(this.unauthorized);
+                
+            } catch (err) {
+                console.log(err);
+                return res.status(500).json(err);
+            }
+        })
     }
 }

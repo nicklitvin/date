@@ -9,7 +9,7 @@ import * as Apple from "expo-apple-authentication";
 import { APIOutput, LoginInput, LoginOutput, PublicProfile, WithKey } from "../src/interfaces";
 import { sendRequest } from "../src/utils";
 import { URLs } from "../src/urls";
-import { router } from "expo-router";
+import { router, useNavigation } from "expo-router";
 import { Spacing } from "../src/components/Spacing";
 import { globals } from "../src/globals";
 import { SocketManager } from "../src/components/SocketManager";
@@ -26,6 +26,7 @@ export function SignIn() {
         redirectUri: Linking.createURL("/"),
     });
     const [loginOutput, setLoginOutput] = useState<LoginOutput|undefined>();
+    const navigation = useNavigation();
 
     useEffect( () => {
         const func = async () => {
@@ -46,12 +47,15 @@ export function SignIn() {
     }
 
     const processLoginOutput = async (output : LoginOutput) => {
-        receivedData.setLoginKey(output.key);
-        globalState.setSocketManager( new SocketManager({
-            socketToken: output.socketToken,
-            receivedData
-        }))
-        setLoginOutput(output);
+        if (output.key) {
+            receivedData.setLoginKey(output.key);
+            globalState.setSocketManager( new SocketManager({
+                socketToken: output.socketToken,
+                receivedData,
+                navigation: navigation
+            }))
+            setLoginOutput(output);
+        }
     }
 
     const updateAppleAllow = async () => {
@@ -85,7 +89,7 @@ export function SignIn() {
 
             if (!loginOutput.newAccount) {
                 try {
-                    const input : WithKey<void> = {
+                    const input : WithKey<{}> = {
                         key: loginOutput.key
                     }
                     const response = await sendRequest<PublicProfile>(URLs.getMyProfile,input);

@@ -125,6 +125,7 @@ export function Settings(props : Props) {
             globalState.setSocketManager(null);
         } 
         receivedData.setProfile(null);
+        receivedData.removeLoginKey();
         if (navigation) {
             navigation.reset({
                 index: 0,

@@ -6,11 +6,11 @@ import { URLs } from "../urls";
 import { sendRequest } from "../utils";
 import { showToast } from "./Toast";
 
-
 export class SocketManager {
     private ws : WebSocket|undefined;
     private received : ReceivedData;
     private loginKey : string|undefined;
+    private navigation : any; // NavigationProp
 
     public approvedMessages : Map<string, Message>;
 
@@ -18,11 +18,13 @@ export class SocketManager {
         socketToken?: string, 
         receivedData : ReceivedData,
         testMode?: boolean,
-        key?: string
+        key?: string,
+        navigation?: any
     }) {
         this.received = input.receivedData;
         this.approvedMessages = new Map();
         this.loginKey = input.key;
+        this.navigation = input.navigation;
 
         if (!input.testMode && input.socketToken) {
             this.connect(this.createConnectURL(input.socketToken));
@@ -63,10 +65,19 @@ export class SocketManager {
                         timestamp: new Date(data.readUpdate.timestamp)
                     })
                 } else if (data.forceLogout) {
+                    console.log("LOGGOUT")
                     this.close();
                     delete this.ws;
                     showToast("Error", generalText.loggedOut);
-                    this.received.setLoginKey(undefined);
+                    this.received.removeLoginKey();
+                    if (this.navigation) {
+                        this.navigation.reset({
+                            index: 0,
+                            routes: [{
+                                name: "SignIn" as never
+                            }]
+                        })
+                    }
                 }
             } catch (err) {
 

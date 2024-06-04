@@ -77,9 +77,21 @@ export class ReceivedData {
     setClientIDs(input : ClientIDs ) { this.clientIDs = input; }
 
     @action
-    setLoginKey(input : string|undefined) { 
+    setLoginKey(input : string) { 
         this.loginKey = input; 
-        AsyncStorage.setItem(globals.storageloginKey, input ?? "");
+        if (input) {
+            try {
+                AsyncStorage.setItem(globals.storageloginKey, input);
+            } catch (err) {}
+        }
+    }
+
+    @action
+    async removeLoginKey() {
+        this.loginKey = undefined;
+        try {
+            await AsyncStorage.removeItem(globals.storageloginKey);
+        } catch (err) {}
     }
 
     @action
